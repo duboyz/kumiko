@@ -80,7 +80,26 @@ async function refreshToken(request: NextRequest): Promise<NextResponse | null> 
 }
 
 export async function middleware(request: NextRequest) {
+  const url = request.nextUrl.clone()
+  const hostname = request.headers.get('host') || ''
   const pathname = request.nextUrl.pathname
+
+  // First, handle subdomain routing for live websites
+  const subdomainMatch = hostname.match(/^([^.]+)\.(kumiko\.no|localhost)(:\d+)?$/)
+
+  if (subdomainMatch) {
+    const subdomain = subdomainMatch[1]
+
+    // Skip if it's the main domain or app subdomain
+    if (subdomain !== 'www' && subdomain !== 'app') {
+      // Rewrite to the live website page
+      const originalPath = url.pathname
+      const newPath = originalPath === '/' ? `/site/${subdomain}` : `/site/${subdomain}${originalPath}`
+
+      url.pathname = newPath
+      return NextResponse.rewrite(url)
+    }
+  }
 
   // Check if the current route is public
   const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`))

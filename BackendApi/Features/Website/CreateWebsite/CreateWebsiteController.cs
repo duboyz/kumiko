@@ -1,19 +1,20 @@
-using BackendApi.Shared;
+using BackendApi.Models;
+using BackendApi.Shared.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendApi.Features.Website.CreateWebsite;
 
-[ApiController]
-[Route("api/website")]
+[Route("api/website/create")]
+[Tags("Website")]
 [Authorize]
-public class CreateWebsiteController(IMediator mediator) : BaseController
+public class CreateWebsiteController(IMediator mediator) : BaseController(mediator)
 {
     [HttpPost]
-    public async Task<IActionResult> CreateWebsite([FromBody] CreateWebsiteCommand command)
+    public async Task<ActionResult<ApiResponse<CreateWebsiteResult>>> CreateWebsite([FromBody] CreateWebsiteCommand command)
     {
-        var result = await mediator.Send(command);
-        return CreateResponse(result);
+        var result = await Mediator.Send(command);
+        return CreateResponse(result, ApiResponseStatusCode.Success, "Website created successfully");
     }
 }

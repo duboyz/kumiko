@@ -1,10 +1,20 @@
+using System.Linq.Expressions;
 using BackendApi.Data;
 using BackendApi.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendApi.Repositories;
 
 public class WebsiteRepository(ApplicationDbContext context) : Repository<Website>(context), IWebsiteRepository
 {
+    public override async Task<IEnumerable<Website>> FindAsync(Expression<Func<Website, bool>> predicate)
+    {
+        return await _dbSet
+            .Include(w => w.Restaurant)
+            .Where(predicate)
+            .ToListAsync();
+    }
+
     public async Task<bool> SaveChangesAsync()
     {
         return await _context.SaveChangesAsync() > 0;

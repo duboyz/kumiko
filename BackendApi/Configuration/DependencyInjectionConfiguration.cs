@@ -22,6 +22,7 @@ public static class DependencyInjectionConfiguration
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();
         services.AddScoped<IUserRestaurantRepository, UserRestaurantRepository>();
+        services.AddScoped<IWebsiteRepository, WebsiteRepository>();
 
 
         // Generic Repository implementations

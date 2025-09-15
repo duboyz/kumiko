@@ -1,7 +1,6 @@
 using BackendApi.Extensions;
 using BackendApi.Repositories;
 using BackendApi.Shared.Contracts;
-using BackendApi.Shared.Results;
 
 namespace BackendApi.Features.Website.CreateWebsite;
 
@@ -10,7 +9,7 @@ public class CreateWebsiteHandler(
     IUserRestaurantRepository userRestaurantRepository,
     IHttpContextAccessor httpContextAccessor) : ICommandHandler<CreateWebsiteCommand, CreateWebsiteResult>
 {
-    public async Task<Result<CreateWebsiteResult>> Handle(CreateWebsiteCommand request, CancellationToken cancellationToken)
+    public async Task<CreateWebsiteResult> Handle(CreateWebsiteCommand request, CancellationToken cancellationToken)
     {
         var userId = httpContextAccessor.GetCurrentUserId();
 
@@ -20,14 +19,14 @@ public class CreateWebsiteHandler(
 
         if (userRestaurant?.Restaurant == null)
         {
-            return Result<CreateWebsiteResult>.Failure("User must be associated with a restaurant to create a website");
+            throw new InvalidOperationException("User must be associated with a restaurant to create a website");
         }
 
         // Check if subdomain is already taken
         var existingWebsite = await websiteRepository.FindAsync(w => w.Subdomain == request.Subdomain);
         if (existingWebsite.Any())
         {
-            return Result<CreateWebsiteResult>.Failure("Subdomain is already taken");
+            throw new InvalidOperationException("Subdomain is already taken");
         }
 
         var website = new Entities.Website
@@ -42,6 +41,6 @@ public class CreateWebsiteHandler(
         await websiteRepository.AddAsync(website);
         await websiteRepository.SaveChangesAsync();
 
-        return Result<CreateWebsiteResult>.Success(new CreateWebsiteResult(website.Id));
+        return new CreateWebsiteResult(website.Id);
     }
 }

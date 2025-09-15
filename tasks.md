@@ -69,7 +69,6 @@ first of all, lets create a component that uses SearchBusiness to get the necces
 # Appstate
 We need to have a "appstate" selected location, as of now we only support restaurants, but will be supporting more types in the future. if a user only manages (is owner, admin or editor) in one location, we set that one automatically when siging in, if not, we make them select. Figure out a smart way to handle this. also, make it possible to add more restaurants
 
-# Current task
 # Website
 
 A restaurant should be able to create a website. not drag n drop, prebuilt sections.
@@ -84,3 +83,14 @@ After creating a website, user must create pages. Here, we give the user two cho
 2. Crate a page from a template (a template), if chosing this, the user only have to set props values.
 
 A website also needs to have a subdomain, have a look at how its done in this project: /Users/vegardlokreim/SaaS/prosjektet but dont copy code from there, since this project has A LOOOT of messy code. Do ONLY have a look at how subdomain is set up.
+
+# Current task
+# Implement hospitality.
+
+A hospitality (i.e a hotel or someting similar) can have rooms.
+A website may belong to a hospitality (and not just only a restaurant).
+
+Hospitalitys dont have menus like restauraunts, they have rooms. I have set up the enitites, dont add any data, but refactor all code neccessary to make it work.
+
+Make it possible to create a Hospitality location, make it possible to create a website for the location as well. make it possible to select it as selected in appstate.
+

@@ -21,6 +21,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Allergen> Allergens { get; set; }
     public DbSet<MenuItemAllergen> MenuItemAllergens { get; set; }
 
+    // Website-related DbSets
+    public DbSet<Website> Websites { get; set; }
+    public DbSet<WebsitePage> WebsitePages { get; set; }
+    public DbSet<WebsiteSection> WebsiteSections { get; set; }
+    public DbSet<HeroSection> HeroSections { get; set; }
+    public DbSet<RestaurantMenuSection> RestaurantMenuSections { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -29,5 +36,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ConfigureUser();
         modelBuilder.ConfigureRestaurant();
         modelBuilder.ConfigureMenu();
+        modelBuilder.ConfigureWebsite();
     }
 }

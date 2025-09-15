@@ -4,6 +4,7 @@ import * as React from 'react'
 import {
   Home,
   Settings2,
+  Globe,
 } from 'lucide-react'
 
 import {
@@ -29,6 +30,11 @@ const items = [
     title: 'Dashboard',
     url: '/dashboard',
     icon: Home,
+  },
+  {
+    title: 'Websites',
+    url: '/websites',
+    icon: Globe,
   },
   {
     title: 'Settings',
