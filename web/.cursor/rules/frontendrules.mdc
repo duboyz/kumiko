@@ -1,0 +1,11 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+- Use pnpm
+- Use Shadcn
+- Make the solutions short and concise
+- Suggest making a new type or ask for file path if unsure, insted of using :any or as any
+- Never duplicate code.
