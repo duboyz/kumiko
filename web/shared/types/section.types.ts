@@ -74,3 +74,27 @@ export interface UpdateTextSectionCommand {
 export interface UpdateTextSectionResult {
   textSectionId: string;
 }
+
+// Restaurant Menu Section types
+export interface CreateRestaurantMenuSectionCommand {
+  websitePageId: string;
+  sortOrder: number;
+  restaurantMenuId: string;
+  allowOrdering: boolean;
+}
+
+export interface CreateRestaurantMenuSectionResult {
+  sectionId: string;
+  restaurantMenuSectionId: string;
+}
+
+// Update Restaurant Menu Section types
+export interface UpdateRestaurantMenuSectionCommand {
+  restaurantMenuSectionId: string;
+  restaurantMenuId: string;
+  allowOrdering: boolean;
+}
+
+export interface UpdateRestaurantMenuSectionResult {
+  restaurantMenuSectionId: string;
+}

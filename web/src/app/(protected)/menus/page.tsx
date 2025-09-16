@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Building2, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { ContentContainer } from '@/components/ContentContainer'
 
 export default function MenusPage() {
     const { selectedLocation, isLoading, hasNoLocations } = useLocationSelection()
@@ -77,14 +78,7 @@ export default function MenusPage() {
     }
 
     return (
-        <div className="container mx-auto py-6">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold">Menu Management</h1>
-                <p className="text-muted-foreground mt-2">
-                    Create and manage menus for <span className="font-medium">{selectedLocation.name}</span>.
-                    Add categories, menu items, and organize them with drag and drop.
-                </p>
-            </div>
+        <ContentContainer>
 
             <MenuList
                 menus={menusData?.menus || []}
@@ -95,6 +89,6 @@ export default function MenusPage() {
                 onDeleteMenu={deleteMenu}
                 createMenuLoading={createMenuMutation.isPending}
             />
-        </div>
+        </ContentContainer>
     )
 }

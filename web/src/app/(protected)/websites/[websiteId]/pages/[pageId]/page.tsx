@@ -4,12 +4,12 @@ import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Plus, Eye, Edit, Save } from 'lucide-react'
-import { usePages, useAddSectionWithDefaults, useUpdateHeroSection, useUpdateTextSection, HeroSectionType, TextAlignment } from '@shared'
+import { usePages, useAddSectionWithDefaults, useUpdateHeroSection, useUpdateTextSection, useUpdateRestaurantMenuSection, useRestaurantMenus, useLocationSelection, HeroSectionType, TextAlignment } from '@shared'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { ContentContainer } from '@/components/ContentContainer'
-import { WebsitePage, HeroSection, TextSection, SectionSelectionModal } from '@/components/sections'
-import type { WebsiteSectionDto, HeroSectionDto, TextSectionDto } from '@shared'
+import { WebsitePage, HeroSection, TextSection, RestaurantMenuSection, SectionSelectionModal } from '@/components/sections'
+import type { WebsiteSectionDto, HeroSectionDto, TextSectionDto, RestaurantMenuSectionDto } from '@shared'
 
 export default function PageEditorPage() {
   const params = useParams()
@@ -20,10 +20,28 @@ export default function PageEditorPage() {
   const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit')
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null)
-  const [sectionUpdates, setSectionUpdates] = useState<Record<string, Partial<HeroSectionDto> | Partial<TextSectionDto>>>({})
+  const [sectionUpdates, setSectionUpdates] = useState<Record<string, Partial<HeroSectionDto> | Partial<TextSectionDto> | Partial<RestaurantMenuSectionDto>>>({})
 
   const { data: pagesData, isLoading, error } = usePages(websiteId)
-  const { addHeroSection, addTextSection, isLoading: isAddingSection } = useAddSectionWithDefaults(websiteId, pageId)
+
+  const page = pagesData?.pages.find(p => p.id === pageId)
+
+  // Get the selected location and its menus (if it's a restaurant)
+  const { selectedLocation } = useLocationSelection()
+  const restaurantId = selectedLocation?.type === 'Restaurant' ? selectedLocation.id : null
+  const { data: menusData, isLoading: isLoadingMenus } = useRestaurantMenus(restaurantId || '')
+  const firstMenuId = menusData?.menus && menusData.menus.length > 0 ? menusData.menus[0].id : undefined
+
+  // Debug logging
+  console.log('RestaurantMenuSection Debug:', {
+    selectedLocation,
+    restaurantId,
+    menusData,
+    firstMenuId,
+    isLoadingMenus
+  })
+
+  const { addHeroSection, addTextSection, addRestaurantMenuSection, isLoading: isAddingSection } = useAddSectionWithDefaults(websiteId, pageId, firstMenuId)
 
   const updateHeroSection = useUpdateHeroSection(websiteId, () => {
     // Clear editing state after successful save
@@ -47,7 +65,16 @@ export default function PageEditorPage() {
     }
   })
 
-  const page = pagesData?.pages.find(p => p.id === pageId)
+  const updateRestaurantMenuSection = useUpdateRestaurantMenuSection(websiteId, () => {
+    // Clear editing state after successful save
+    if (editingSectionId) {
+      setEditingSectionId(null)
+      setSectionUpdates(prev => {
+        const { [editingSectionId]: _, ...rest } = prev
+        return rest
+      })
+    }
+  })
 
   const handleAddSection = (sectionType: string) => {
     if (page) {
@@ -56,6 +83,12 @@ export default function PageEditorPage() {
         addHeroSection(nextSortOrder)
       } else if (sectionType === 'text') {
         addTextSection(nextSortOrder)
+      } else if (sectionType === 'restaurant-menu') {
+        if (!firstMenuId) {
+          alert('No menus available. Please create a menu first before adding a menu section.')
+          return
+        }
+        addRestaurantMenuSection(nextSortOrder, firstMenuId)
       }
     }
   }
@@ -65,7 +98,7 @@ export default function PageEditorPage() {
     setViewMode('edit')
   }
 
-  const handleSectionUpdate = (sectionId: string, field: string, value: string) => {
+  const handleSectionUpdate = (sectionId: string, field: string, value: string | boolean) => {
     setSectionUpdates(prev => ({
       ...prev,
       [sectionId]: {
@@ -130,6 +163,20 @@ export default function PageEditorPage() {
 
       updateTextSection.mutate({
         textSectionId: section.textSection.id,
+        updates: updateCommand
+      })
+    }
+    // Handle Restaurant Menu Section
+    else if (section.restaurantMenuSection) {
+      const menuUpdates = updates as Partial<RestaurantMenuSectionDto>
+      const updateCommand = {
+        restaurantMenuSectionId: section.restaurantMenuSection.id,
+        restaurantMenuId: menuUpdates.restaurantMenuId ?? section.restaurantMenuSection.restaurantMenuId,
+        allowOrdering: menuUpdates.allowOrdering ?? section.restaurantMenuSection.allowOrdering,
+      }
+
+      updateRestaurantMenuSection.mutate({
+        restaurantMenuSectionId: section.restaurantMenuSection.id,
         updates: updateCommand
       })
     }
@@ -276,6 +323,33 @@ export default function PageEditorPage() {
                         onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
                       />
                     )}
+
+                    {section.restaurantMenuSection && (() => {
+                      const menuSection = section.restaurantMenuSection;
+                      const menu = menusData?.menus?.find(m => m.id === menuSection.restaurantMenuId);
+
+                      if (!menu) {
+                        return (
+                          <div className="py-12 px-4 text-center text-gray-500">
+                            <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
+                            <p>The selected menu (ID: {menuSection.restaurantMenuId}) could not be loaded.</p>
+                            {editingSectionId === section.id && (
+                              <p className="mt-2 text-sm">Please select a different menu in the section settings.</p>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <RestaurantMenuSection
+                          restaurantMenu={menu}
+                          allowOrdering={menuSection.allowOrdering}
+                          isEditing={editingSectionId === section.id}
+                          availableMenus={menusData?.menus || []}
+                          onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
+                        />
+                      );
+                    })()}
                   </div>
                 ))
             )}
@@ -288,6 +362,8 @@ export default function PageEditorPage() {
         open={isAddSectionModalOpen}
         onOpenChange={setIsAddSectionModalOpen}
         onSelectSection={handleAddSection}
+        hasMenusAvailable={!!firstMenuId}
+        isLoadingMenus={isLoadingMenus}
       />
     </ContentContainer>
   )

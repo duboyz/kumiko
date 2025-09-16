@@ -7,6 +7,10 @@ import type {
   CreateTextSectionResult,
   UpdateTextSectionCommand,
   UpdateTextSectionResult,
+  CreateRestaurantMenuSectionCommand,
+  CreateRestaurantMenuSectionResult,
+  UpdateRestaurantMenuSectionCommand,
+  UpdateRestaurantMenuSectionResult,
   ApiResponse,
   ResponseData
 } from '../types'
@@ -34,6 +38,18 @@ export const sectionApi = {
   updateTextSection: async (textSectionId: string, command: UpdateTextSectionCommand): Promise<ResponseData<UpdateTextSectionResult>> => {
     const { data } = await apiClient.put<ApiResponse<UpdateTextSectionResult>>(`/api/section/text/${textSectionId}`, command)
     if (!data.success) throw new Error(data.message || 'Failed to update text section')
+    return data.data
+  },
+
+  createRestaurantMenuSection: async (command: CreateRestaurantMenuSectionCommand): Promise<ResponseData<CreateRestaurantMenuSectionResult>> => {
+    const { data } = await apiClient.post<ApiResponse<CreateRestaurantMenuSectionResult>>('/api/section/restaurant-menu', command)
+    if (!data.success) throw new Error(data.message || 'Failed to create restaurant menu section')
+    return data.data
+  },
+
+  updateRestaurantMenuSection: async (restaurantMenuSectionId: string, command: UpdateRestaurantMenuSectionCommand): Promise<ResponseData<UpdateRestaurantMenuSectionResult>> => {
+    const { data } = await apiClient.put<ApiResponse<UpdateRestaurantMenuSectionResult>>(`/api/section/restaurant-menu/${restaurantMenuSectionId}`, command)
+    if (!data.success) throw new Error(data.message || 'Failed to update restaurant menu section')
     return data.data
   }
 }
