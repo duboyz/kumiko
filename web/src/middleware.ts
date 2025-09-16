@@ -94,7 +94,15 @@ export async function middleware(request: NextRequest) {
     if (subdomain !== 'www' && subdomain !== 'app') {
       // Rewrite to the live website page (public route, no auth needed)
       const originalPath = url.pathname
-      const newPath = originalPath === '/' ? `/site/${subdomain}` : `/site/${subdomain}${originalPath}`
+      let newPath: string
+
+      if (originalPath === '/') {
+        // Homepage: subdomain.localhost -> /site/subdomain
+        newPath = `/site/${subdomain}`
+      } else {
+        // Page with slug: subdomain.localhost/about -> /site/subdomain/about
+        newPath = `/site/${subdomain}${originalPath}`
+      }
 
       url.pathname = newPath
       // Return the rewrite without running auth checks

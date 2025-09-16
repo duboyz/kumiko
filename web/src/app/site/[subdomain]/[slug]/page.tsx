@@ -7,14 +7,14 @@ import { ErrorMessage } from '@/components/ErrorMessage'
 import { WebsitePage } from '@/components/sections'
 import { PublicWebsiteHeader } from '@/components/PublicWebsiteHeader'
 
-export default function PublicWebsitePage() {
+export default function PublicWebsitePageWithSlug() {
   const params = useParams()
   const subdomain = params.subdomain as string
+  const slug = params.slug as string
 
   const { data: websiteData, isLoading, error } = useWebsiteBySubdomain(subdomain)
 
   // Get menus for restaurant menu sections (if any)
-  // For now, we'll use a simple approach - in the future this might need to be more sophisticated
   const { data: menusData } = useRestaurantMenus(websiteData?.type === 'Restaurant' ? 'get-all' : '')
 
   if (isLoading) return <LoadingSpinner />
@@ -33,34 +33,41 @@ export default function PublicWebsitePage() {
     )
   }
 
-  // Find the home page (first page or page with slug 'home')
-  const homePage = websiteData.pages.find(p => p.slug === 'home') || websiteData.pages[0]
+  // Find the requested page by slug
+  const requestedPage = websiteData.pages.find(p => p.slug === slug)
 
-  if (!homePage) {
+  if (!requestedPage) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-gray-900">No Content Available</h1>
-          <p className="text-gray-600">This website doesn't have any pages yet.</p>
+      <>
+        <PublicWebsiteHeader
+          websiteName={websiteData.name}
+          pages={websiteData.pages.map(p => ({ id: p.id, title: p.title, slug: p.slug }))}
+          currentPageSlug={slug}
+        />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center space-y-4">
+            <h1 className="text-2xl font-bold text-gray-900">Page Not Found</h1>
+            <p className="text-gray-600">The page "{slug}" could not be found.</p>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
   // Convert the public DTO structure to the format expected by WebsitePage component
   const adaptedPage = {
-    id: homePage.id,
-    title: homePage.title,
-    slug: homePage.slug,
-    seoTitle: homePage.title,
+    id: requestedPage.id,
+    title: requestedPage.title,
+    slug: requestedPage.slug,
+    seoTitle: requestedPage.title,
     seoDescription: websiteData.description,
     seoKeywords: '',
     subdomain: websiteData.subdomain,
     websiteId: websiteData.id,
-    sections: homePage.sections.map(section => ({
+    sections: requestedPage.sections.map(section => ({
       id: section.id,
       sortOrder: section.sortOrder,
-      websitePageId: homePage.id,
+      websitePageId: requestedPage.id,
       heroSection: section.heroSection ? {
         id: section.heroSection.id,
         title: section.heroSection.title,
@@ -75,13 +82,13 @@ export default function PublicWebsitePage() {
         buttonUrl: section.heroSection.buttonUrl,
         buttonTextColor: section.heroSection.buttonTextColor,
         buttonBackgroundColor: section.heroSection.buttonBackgroundColor,
-        type: section.heroSection.type as any, // Will be properly typed
+        type: section.heroSection.type as any,
       } : undefined,
       textSection: section.textSection ? {
         id: section.textSection.id,
         title: section.textSection.title,
         text: section.textSection.text,
-        alignText: section.textSection.alignText as any, // Will be properly typed
+        alignText: section.textSection.alignText as any,
         textColor: section.textSection.textColor,
       } : undefined,
       restaurantMenuSection: section.restaurantMenuSection ? {
@@ -97,7 +104,7 @@ export default function PublicWebsitePage() {
       <PublicWebsiteHeader
         websiteName={websiteData.name}
         pages={websiteData.pages.map(p => ({ id: p.id, title: p.title, slug: p.slug }))}
-        currentPageSlug="home"
+        currentPageSlug={slug}
       />
       <WebsitePage
         page={adaptedPage}
