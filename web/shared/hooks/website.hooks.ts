@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { websiteApi } from '../api'
-import type { CreateWebsiteCommand } from '../types'
+import type { CreateWebsiteCommand, UpdateWebsiteCommand } from '../types'
 
 export const useRestaurantWebsites = (entityId?: string, entityType?: string) => {
   return useQuery({
@@ -17,6 +17,28 @@ export const useCreateWebsite = () => {
     mutationFn: (command: CreateWebsiteCommand) => websiteApi.createWebsite(command),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurant-websites'] })
+    },
+  })
+}
+
+export const useWebsiteBySubdomain = (subdomain: string) => {
+  return useQuery({
+    queryKey: ['website-by-subdomain', subdomain],
+    queryFn: () => websiteApi.getWebsiteBySubdomain(subdomain),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!subdomain,
+  })
+}
+
+export const useUpdateWebsite = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ websiteId, updates }: { websiteId: string, updates: UpdateWebsiteCommand }) =>
+      websiteApi.updateWebsite(websiteId, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['restaurant-websites'] })
+      queryClient.invalidateQueries({ queryKey: ['website-by-subdomain'] })
     },
   })
 }

@@ -2,6 +2,9 @@ import type {
   CreateWebsiteCommand,
   CreateWebsiteResult,
   GetRestaurantWebsitesResult,
+  GetWebsiteBySubdomainResult,
+  UpdateWebsiteCommand,
+  UpdateWebsiteResult,
   ApiResponse,
   ResponseData
 } from '@shared';
@@ -24,6 +27,18 @@ export const websiteApi = {
 
     const { data } = await apiClient.get<ApiResponse<GetRestaurantWebsitesResult>>(url);
     if (!data.success) throw new Error(data.message || 'Failed to get restaurant websites');
+    return data.data;
+  },
+
+  getWebsiteBySubdomain: async (subdomain: string): Promise<ResponseData<GetWebsiteBySubdomainResult>> => {
+    const { data } = await apiClient.get<ApiResponse<GetWebsiteBySubdomainResult>>(`/api/website/by-subdomain/${subdomain}`);
+    if (!data.success) throw new Error(data.message || 'Failed to get website by subdomain');
+    return data.data;
+  },
+
+  updateWebsite: async (websiteId: string, command: UpdateWebsiteCommand): Promise<ResponseData<UpdateWebsiteResult>> => {
+    const { data } = await apiClient.put<ApiResponse<UpdateWebsiteResult>>(`/api/website/${websiteId}`, command);
+    if (!data.success) throw new Error(data.message || 'Failed to update website');
     return data.data;
   },
 };

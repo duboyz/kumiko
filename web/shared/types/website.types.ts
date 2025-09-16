@@ -86,3 +86,76 @@ export interface RestaurantMenuSectionDto {
   restaurantMenuId: string;
   allowOrdering: boolean;
 }
+
+// Public website types
+export interface GetWebsiteBySubdomainQuery {
+  subdomain: string;
+}
+
+export interface GetWebsiteBySubdomainResult {
+  id: string;
+  name: string;
+  subdomain: string;
+  description?: string;
+  isPublished: boolean;
+  type: string;
+  pages: PublicWebsitePageDto[];
+}
+
+export interface PublicWebsitePageDto {
+  id: string;
+  title: string;
+  slug: string;
+  sections: PublicWebsiteSectionDto[];
+}
+
+export interface PublicWebsiteSectionDto {
+  id: string;
+  sortOrder: number;
+  heroSection?: PublicHeroSectionDto;
+  textSection?: PublicTextSectionDto;
+  restaurantMenuSection?: PublicRestaurantMenuSectionDto;
+}
+
+export interface PublicHeroSectionDto {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+  imageAlt?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  backgroundOverlayColor?: string;
+  backgroundImageUrl?: string;
+  buttonText?: string;
+  buttonUrl?: string;
+  buttonTextColor?: string;
+  buttonBackgroundColor?: string;
+  type: string;
+}
+
+export interface PublicTextSectionDto {
+  id: string;
+  title?: string;
+  text?: string;
+  alignText: string;
+  textColor?: string;
+}
+
+export interface PublicRestaurantMenuSectionDto {
+  id: string;
+  restaurantMenuId: string;
+  allowOrdering: boolean;
+}
+
+// Update website types
+export interface UpdateWebsiteCommand {
+  name?: string;
+  description?: string;
+  isPublished?: boolean;
+}
+
+export interface UpdateWebsiteResult {
+  websiteId: string;
+  isPublished: boolean;
+}

@@ -7,11 +7,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Globe, Settings, Eye } from 'lucide-react'
-import { useRestaurantWebsites, useCreateWebsite, useLocationSelection } from '@shared'
+import { Plus, Globe, Settings, Eye, Power, PowerOff } from 'lucide-react'
+import { useRestaurantWebsites, useCreateWebsite, useUpdateWebsite, useLocationSelection } from '@shared'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { ContentContainer } from '@/components/ContentContainer'
+import { openSubdomainUrl } from '@/lib/subdomain'
 
 export default function WebsitesPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
@@ -27,6 +28,7 @@ export default function WebsitesPage() {
     selectedLocation?.type || 'Restaurant'
   )
   const createWebsite = useCreateWebsite()
+  const updateWebsite = useUpdateWebsite()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,6 +46,17 @@ export default function WebsitesPage() {
       setFormData({ name: '', subdomain: '', description: '' })
     } catch (error) {
       console.error('Failed to create website:', error)
+    }
+  }
+
+  const handleTogglePublish = async (websiteId: string, isCurrentlyPublished: boolean) => {
+    try {
+      await updateWebsite.mutateAsync({
+        websiteId,
+        updates: { isPublished: !isCurrentlyPublished }
+      })
+    } catch (error) {
+      console.error('Failed to toggle website publish status:', error)
     }
   }
 
@@ -168,11 +181,10 @@ export default function WebsitesPage() {
 
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>{website.restaurantName}</span>
-                  <span className={`px-2 py-1 rounded-full ${
-                    website.isPublished
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-full ${website.isPublished
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                    }`}>
                     {website.isPublished ? 'Published' : 'Draft'}
                   </span>
                 </div>
@@ -182,7 +194,7 @@ export default function WebsitesPage() {
                     size="sm"
                     variant="outline"
                     className="flex-1"
-                    onClick={() => window.open(`http://${website.subdomain}.localhost:3000`, '_blank')}
+                    onClick={() => openSubdomainUrl(website.subdomain)}
                   >
                     <Eye className="h-4 w-4 mr-1" />
                     Preview
@@ -197,6 +209,26 @@ export default function WebsitesPage() {
                     Manage
                   </Button>
                 </div>
+
+                <Button
+                  size="sm"
+                  variant={website.isPublished ? "destructive" : "default"}
+                  className="w-full mt-2"
+                  onClick={() => handleTogglePublish(website.id, website.isPublished)}
+                  disabled={updateWebsite.isPending}
+                >
+                  {website.isPublished ? (
+                    <>
+                      <PowerOff className="h-4 w-4 mr-1" />
+                      Unpublish
+                    </>
+                  ) : (
+                    <>
+                      <Power className="h-4 w-4 mr-1" />
+                      Publish
+                    </>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>

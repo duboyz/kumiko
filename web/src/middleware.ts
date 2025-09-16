@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 
 // Define public routes that don't require authentication
-const publicRoutes = ['/login', '/register', '/forgot-password', '/', '/about', '/contact']
+const publicRoutes = ['/login', '/register', '/forgot-password', '/', '/about', '/contact', '/site']
 
 // Define the JWT secret (should match backend)
 const JWT_SECRET = new TextEncoder().encode(
@@ -92,11 +92,12 @@ export async function middleware(request: NextRequest) {
 
     // Skip if it's the main domain or app subdomain
     if (subdomain !== 'www' && subdomain !== 'app') {
-      // Rewrite to the live website page
+      // Rewrite to the live website page (public route, no auth needed)
       const originalPath = url.pathname
       const newPath = originalPath === '/' ? `/site/${subdomain}` : `/site/${subdomain}${originalPath}`
 
       url.pathname = newPath
+      // Return the rewrite without running auth checks
       return NextResponse.rewrite(url)
     }
   }
