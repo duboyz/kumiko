@@ -309,6 +309,9 @@ namespace BackendApi.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("RestaurantMenuId")
                         .HasColumnType("uuid");
 
@@ -320,6 +323,43 @@ namespace BackendApi.Migrations
                     b.HasIndex("RestaurantMenuId");
 
                     b.ToTable("MenuCategories");
+                });
+
+            modelBuilder.Entity("BackendApi.Entities.MenuCategoryItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("MenuCategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("MenuItemId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuItemId");
+
+                    b.HasIndex("MenuCategoryId", "MenuItemId")
+                        .IsUnique();
+
+                    b.ToTable("MenuCategoryItems");
                 });
 
             modelBuilder.Entity("BackendApi.Entities.MenuItem", b =>
@@ -345,9 +385,6 @@ namespace BackendApi.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("MenuCategoryId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -357,12 +394,15 @@ namespace BackendApi.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
 
+                    b.Property<Guid>("RestaurantMenuId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MenuCategoryId");
+                    b.HasIndex("RestaurantMenuId");
 
                     b.ToTable("MenuItems");
                 });
@@ -968,15 +1008,34 @@ namespace BackendApi.Migrations
                     b.Navigation("RestaurantMenu");
                 });
 
-            modelBuilder.Entity("BackendApi.Entities.MenuItem", b =>
+            modelBuilder.Entity("BackendApi.Entities.MenuCategoryItem", b =>
                 {
                     b.HasOne("BackendApi.Entities.MenuCategory", "MenuCategory")
-                        .WithMany("MenuItems")
+                        .WithMany("MenuCategoryItems")
                         .HasForeignKey("MenuCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BackendApi.Entities.MenuItem", "MenuItem")
+                        .WithMany("MenuCategoryItems")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("MenuCategory");
+
+                    b.Navigation("MenuItem");
+                });
+
+            modelBuilder.Entity("BackendApi.Entities.MenuItem", b =>
+                {
+                    b.HasOne("BackendApi.Entities.RestaurantMenu", "RestaurantMenu")
+                        .WithMany()
+                        .HasForeignKey("RestaurantMenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RestaurantMenu");
                 });
 
             modelBuilder.Entity("BackendApi.Entities.MenuItemAllergen", b =>
@@ -1134,12 +1193,14 @@ namespace BackendApi.Migrations
 
             modelBuilder.Entity("BackendApi.Entities.MenuCategory", b =>
                 {
-                    b.Navigation("MenuItems");
+                    b.Navigation("MenuCategoryItems");
                 });
 
             modelBuilder.Entity("BackendApi.Entities.MenuItem", b =>
                 {
                     b.Navigation("Allergens");
+
+                    b.Navigation("MenuCategoryItems");
 
                     b.Navigation("Options");
                 });

@@ -41,9 +41,27 @@ public static class MenuConfiguration
             entity.Property(e => e.Description).HasMaxLength(1000);
             entity.Property(e => e.Price).HasPrecision(10, 2);
 
+            entity.HasOne(e => e.RestaurantMenu)
+                .WithMany()
+                .HasForeignKey(e => e.RestaurantMenuId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // MenuCategoryItem (junction table) configuration
+        modelBuilder.Entity<MenuCategoryItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.OrderIndex).IsRequired();
+            entity.HasIndex(e => new { e.MenuCategoryId, e.MenuItemId }).IsUnique();
+
             entity.HasOne(e => e.MenuCategory)
-                .WithMany(c => c.MenuItems)
+                .WithMany(c => c.MenuCategoryItems)
                 .HasForeignKey(e => e.MenuCategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.MenuItem)
+                .WithMany(i => i.MenuCategoryItems)
+                .HasForeignKey(e => e.MenuItemId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 

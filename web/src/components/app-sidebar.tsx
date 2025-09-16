@@ -5,6 +5,7 @@ import {
   Home,
   Settings2,
   Globe,
+  ChefHat,
 } from 'lucide-react'
 
 import {
@@ -23,6 +24,7 @@ import {
 import { SidebarRestaurantSelector } from '@/components/SidebarRestaurantSelector'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useLocationSelection } from '@shared'
 
 // Menu items.
 const items = [
@@ -30,6 +32,12 @@ const items = [
     title: 'Dashboard',
     url: '/dashboard',
     icon: Home,
+  },
+  {
+    title: 'Menus',
+    url: '/menus',
+    icon: ChefHat,
+    restaurantOnly: true,
   },
   {
     title: 'Websites',
@@ -45,6 +53,15 @@ const items = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
+  const { selectedLocation } = useLocationSelection()
+
+  // Filter items based on location type
+  const visibleItems = items.filter(item => {
+    if (item.restaurantOnly) {
+      return selectedLocation?.type === 'Restaurant'
+    }
+    return true
+  })
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -60,7 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {visibleItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={pathname === item.url}>
                     <Link href={item.url}>

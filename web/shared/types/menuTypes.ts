@@ -104,3 +104,4 @@ export interface UpdateMenuCategoryItemCommand {
   id: string;
   orderIndex: number;
 }
+
