@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useWebsiteBySubdomain, useRestaurantMenus } from '@shared'
+import { useWebsiteBySubdomain } from '@shared'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { WebsitePage } from '@/components/sections'
@@ -12,10 +12,6 @@ export default function PublicWebsitePage() {
   const subdomain = params.subdomain as string
 
   const { data: websiteData, isLoading, error } = useWebsiteBySubdomain(subdomain)
-
-  // Get menus for restaurant menu sections (if any)
-  // For now, we'll use a simple approach - in the future this might need to be more sophisticated
-  const { data: menusData } = useRestaurantMenus(websiteData?.type === 'Restaurant' ? 'get-all' : '')
 
   if (isLoading) return <LoadingSpinner />
   if (error) return <ErrorMessage message={error instanceof Error ? error.message : 'Website not found'} />
@@ -101,7 +97,7 @@ export default function PublicWebsitePage() {
       />
       <WebsitePage
         page={adaptedPage}
-        availableMenus={menusData?.menus || []}
+        availableMenus={[]}
       />
     </div>
   )

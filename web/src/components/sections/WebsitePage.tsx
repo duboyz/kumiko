@@ -3,6 +3,7 @@
 import { HeroSection } from './HeroSection'
 import { TextSection } from './TextSection'
 import { RestaurantMenuSection } from './RestaurantMenuSection'
+import { PublicRestaurantMenuSection } from './PublicRestaurantMenuSection'
 import type { WebsitePageDto, RestaurantMenuDto } from '@shared'
 
 interface WebsitePageProps {
@@ -54,6 +55,19 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
 
         // Render Restaurant Menu Sections
         if (section.restaurantMenuSection) {
+          // If no availableMenus provided (public site), use the public component that fetches by ID
+          if (availableMenus.length === 0) {
+            return (
+              <PublicRestaurantMenuSection
+                key={section.id}
+                restaurantMenuSectionId={section.restaurantMenuSection.id}
+                restaurantMenuId={section.restaurantMenuSection.restaurantMenuId}
+                allowOrdering={section.restaurantMenuSection.allowOrdering}
+              />
+            )
+          }
+
+          // For admin/editing mode with availableMenus, use the original component
           const menu = availableMenus.find(m => m.id === section.restaurantMenuSection!.restaurantMenuId);
 
           if (!menu) {

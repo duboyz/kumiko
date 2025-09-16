@@ -105,3 +105,33 @@ export interface UpdateMenuCategoryItemCommand {
   orderIndex: number;
 }
 
+// Public menu types
+export interface GetMenuByIdResult {
+  id: string
+  name: string
+  description?: string
+  categories: PublicMenuCategoryDto[]
+}
+
+export interface PublicMenuCategoryDto {
+  id: string
+  name: string
+  description?: string
+  orderIndex: number
+  menuCategoryItems: PublicMenuCategoryItemDto[]
+}
+
+export interface PublicMenuCategoryItemDto {
+  id: string
+  orderIndex: number
+  menuItem?: PublicMenuItemDto
+}
+
+export interface PublicMenuItemDto {
+  id: string
+  name: string
+  description?: string
+  price: number
+  isAvailable: boolean
+}
+

@@ -108,7 +108,7 @@ export default function PublicWebsitePageWithSlug() {
       />
       <WebsitePage
         page={adaptedPage}
-        availableMenus={menusData?.menus || []}
+        availableMenus={[]}
       />
     </div>
   )

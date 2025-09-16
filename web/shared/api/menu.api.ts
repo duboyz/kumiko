@@ -1,15 +1,16 @@
 import client from './client'
-import { 
-  RestaurantMenuDto, 
-  MenuCategoryDto, 
-  MenuItemDto, 
+import {
+  RestaurantMenuDto,
+  MenuCategoryDto,
+  MenuItemDto,
   MenuCategoryItemDto,
   CreateMenuCategoryCommand,
   CreateMenuItemCommand,
   AddMenuItemToCategoryCommand,
   UpdateMenuCategoryCommand,
   UpdateMenuItemCommand,
-  UpdateMenuCategoryItemCommand
+  UpdateMenuCategoryItemCommand,
+  GetMenuByIdResult
 } from '../types/menu.types'
 import { ApiResponse, ResponseData } from '../types/apiResponse.types'
 
@@ -160,5 +161,12 @@ export const menuApi = {
   reorderMenuItems: async (categoryId: string, categoryItemIds: string[]): Promise<void> => {
     const { data } = await client.post<ApiResponse<null>>(`/api/menu-categories/${categoryId}/reorder-items`, { categoryItemIds })
     if (!data.success) throw new Error(data.message || 'Failed to reorder menu items')
+  },
+
+  // Get menu by ID (public endpoint)
+  getMenuById: async (menuId: string): Promise<ResponseData<GetMenuByIdResult>> => {
+    const { data } = await client.get<ApiResponse<GetMenuByIdResult>>(`/api/menu/${menuId}`)
+    if (!data.success) throw new Error(data.message || 'Failed to get menu')
+    return data.data
   }
 }

@@ -165,12 +165,22 @@ export const useReorderCategories = () => {
 // Reorder menu items
 export const useReorderMenuItems = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
-    mutationFn: ({ categoryId, categoryItemIds }: { categoryId: string; categoryItemIds: string[] }) => 
+    mutationFn: ({ categoryId, categoryItemIds }: { categoryId: string; categoryItemIds: string[] }) =>
       menuApi.reorderMenuItems(categoryId, categoryItemIds),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurant-menus'] })
     }
+  })
+}
+
+// Get menu by ID (public hook)
+export const useMenuById = (menuId: string) => {
+  return useQuery({
+    queryKey: ['menu-by-id', menuId],
+    queryFn: () => menuApi.getMenuById(menuId),
+    enabled: !!menuId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
