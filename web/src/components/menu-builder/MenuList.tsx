@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ChefHat, Plus, Edit2, Trash2, Calendar } from 'lucide-react'
-import { MenuCategoryDto, MenuItemDto, RestaurantMenuDto } from '../../../shared/types/menuTypes'
+import { MenuCategoryDto, MenuItemDto, RestaurantMenuDto } from "../../../shared/types/menu.types"
 import { CreateMenuForm } from './CreateMenuForm'
 
 interface MenuListProps {

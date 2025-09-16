@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { MenuCategoryDto, MenuItemDto, MenuCategoryItemDto, CreateMenuCategoryCommand, CreateMenuItemCommand } from '../../../shared/types/menuTypes'
+import { MenuCategoryDto, MenuItemDto, MenuCategoryItemDto, CreateMenuCategoryCommand, CreateMenuItemCommand } from "../../../shared/types/menu.types"
 import { MenuHeader } from './MenuHeader'
 import { AddCategoryForm } from './AddCategoryForm'
 import { SortableCategory } from './SortableCategory'

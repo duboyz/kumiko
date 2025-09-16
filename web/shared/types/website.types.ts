@@ -1,5 +1,5 @@
 // Website types
-import { TextAlignment } from './sectionTypes';
+import { TextAlignment } from './section.types';
 export interface WebsiteDto {
   id: string;
   name: string;

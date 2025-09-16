@@ -5,7 +5,7 @@ import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Save, X } from 'lucide-react'
-import { CreateMenuCategoryCommand } from '../../../shared/types/menuTypes'
+import { CreateMenuCategoryCommand } from "../../../shared/types/menu.types"
 
 interface AddCategoryFormProps {
     onAddCategory: (category: CreateMenuCategoryCommand) => void

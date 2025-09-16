@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { GripVertical, Edit2, Check, Trash2 } from 'lucide-react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { MenuCategoryDto, MenuItemDto, MenuCategoryItemDto, CreateMenuItemCommand } from '../../../shared/types/menuTypes'
+import { MenuCategoryDto, MenuItemDto, MenuCategoryItemDto, CreateMenuItemCommand } from "../../../shared/types/menu.types"
 import { SortableMenuItem } from './SortableMenuItem'
 import { AddItemPopover } from './AddItemPopover'
 import { AddExistingItemForm } from './AddExistingItemForm'

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Save, X } from 'lucide-react'
-import { MenuItemDto } from '../../../shared/types/menuTypes'
+import { MenuItemDto } from "../../../shared/types/menu.types"
 
 interface AddExistingItemFormProps {
     selectedItemId: string

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { Plus, Search } from 'lucide-react'
-import { MenuItemDto } from '../../../shared/types/menuTypes'
+import { MenuItemDto } from "../../../shared/types/menu.types"
 
 interface AddItemPopoverProps {
     categoryId: string

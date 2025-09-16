@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { GripVertical, Edit2, Check, Trash2 } from 'lucide-react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { MenuItemDto, MenuCategoryItemDto, MenuCategoryDto } from '../../../shared/types/menuTypes'
+import { MenuItemDto, MenuCategoryItemDto, MenuCategoryDto } from "../../../shared/types/menu.types"
 
 interface SortableMenuItemProps {
     categoryItem: MenuCategoryItemDto

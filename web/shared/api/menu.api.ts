@@ -10,8 +10,8 @@ import {
   UpdateMenuCategoryCommand,
   UpdateMenuItemCommand,
   UpdateMenuCategoryItemCommand
-} from '../types/menuTypes'
-import { ApiResponse, ResponseData } from '../types/api-response'
+} from '../types/menu.types'
+import { ApiResponse, ResponseData } from '../types/apiResponse.types'
 
 // Response data types (what's inside the ApiResponse.data)
 interface GetRestaurantMenusData {

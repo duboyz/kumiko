@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { menuApi } from '../api/menuApi'
+import { menuApi } from '../api/menu.api'
 // Get restaurant menus
 export const useRestaurantMenus = (restaurantId: string) => {
   return useQuery({

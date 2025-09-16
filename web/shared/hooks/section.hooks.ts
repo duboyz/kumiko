@@ -1,22 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { sectionApi } from '../api'
 import type { CreateHeroSectionCommand, UpdateHeroSectionCommand, CreateTextSectionCommand, UpdateTextSectionCommand } from '../types'
-import { HeroSectionType } from '../types/websiteTypes'
+import { HeroSectionType } from '../types/website.types'
 import { TextAlignment } from '../types'
 
 export const useCreateHeroSection = (websiteId: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (command: CreateHeroSectionCommand) => {
-      const response = await sectionApi.createHeroSection(command)
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to create hero section')
-      }
-      return response.data
-    },
+    mutationFn: (command: CreateHeroSectionCommand) => sectionApi.createHeroSection(command),
     onSuccess: () => {
-      // Invalidate the pages query to refresh sections
       queryClient.invalidateQueries({
         queryKey: ['pages', websiteId]
       })
@@ -28,19 +21,12 @@ export const useUpdateHeroSection = (websiteId: string, onSuccess?: () => void) 
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ heroSectionId, updates }: { heroSectionId: string, updates: UpdateHeroSectionCommand }) => {
-      const response = await sectionApi.updateHeroSection(heroSectionId, updates)
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to update hero section')
-      }
-      return response.data
-    },
+    mutationFn: ({ heroSectionId, updates }: { heroSectionId: string, updates: UpdateHeroSectionCommand }) => 
+      sectionApi.updateHeroSection(heroSectionId, updates),
     onSuccess: () => {
-      // Invalidate the pages query to refresh sections
       queryClient.invalidateQueries({
         queryKey: ['pages', websiteId]
       })
-      // Call the optional success callback
       onSuccess?.()
     },
     onError: (error) => {
@@ -54,15 +40,8 @@ export const useCreateTextSection = (websiteId: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (command: CreateTextSectionCommand) => {
-      const response = await sectionApi.createTextSection(command)
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to create text section')
-      }
-      return response.data
-    },
+    mutationFn: (command: CreateTextSectionCommand) => sectionApi.createTextSection(command),
     onSuccess: () => {
-      // Invalidate the pages query to refresh sections
       queryClient.invalidateQueries({
         queryKey: ['pages', websiteId]
       })
@@ -74,19 +53,12 @@ export const useUpdateTextSection = (websiteId: string, onSuccess?: () => void) 
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ textSectionId, updates }: { textSectionId: string, updates: UpdateTextSectionCommand }) => {
-      const response = await sectionApi.updateTextSection(textSectionId, updates)
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to update text section')
-      }
-      return response.data
-    },
+    mutationFn: ({ textSectionId, updates }: { textSectionId: string, updates: UpdateTextSectionCommand }) =>
+      sectionApi.updateTextSection(textSectionId, updates),
     onSuccess: () => {
-      // Invalidate the pages query to refresh sections
       queryClient.invalidateQueries({
         queryKey: ['pages', websiteId]
       })
-      // Call the optional success callback
       onSuccess?.()
     },
     onError: (error) => {

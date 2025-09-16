@@ -1,4 +1,4 @@
-import { WebsitePageDto } from "./websiteTypes";
+import { WebsitePageDto } from "./website.types";
 
 // Website Page operation types
 export interface CreateWebsitePageCommand {

@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useUserRestaurants } from './useRestaurant'
+import { useUserRestaurants } from './restaurant.hooks'
 import { useRestaurantStore } from '../stores/restaurant-store'
 
 export const useRestaurantSelection = () => {

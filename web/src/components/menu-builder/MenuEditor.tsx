@@ -13,7 +13,7 @@ import {
   RestaurantMenuDto,
   CreateMenuCategoryCommand,
   CreateMenuItemCommand
-} from '../../../shared/types/menuTypes'
+} from "../../../shared/types/menu.types"
 import {
   useCreateMenuCategory,
   useUpdateMenuCategory,

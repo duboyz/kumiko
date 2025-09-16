@@ -5,10 +5,9 @@ import { CreateRestaurantCommand, CreateRestaurantResult, GetUserRestaurantsResu
 export const useCreateRestaurant = () => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateRestaurantResult, Error, CreateRestaurantCommand>({
-    mutationFn: restaurantApi.createRestaurant,
+  return useMutation({
+    mutationFn: (data: CreateRestaurantCommand) => restaurantApi.createRestaurant(data),
     onSuccess: () => {
-      // Invalidate any restaurant-related queries when a new restaurant is created
       queryClient.invalidateQueries({ queryKey: ['restaurants'] })
       queryClient.invalidateQueries({ queryKey: ['user-restaurants'] })
     }
@@ -16,8 +15,9 @@ export const useCreateRestaurant = () => {
 }
 
 export const useUserRestaurants = (params?: GetUserRestaurantsParams) => {
-  return useQuery<GetUserRestaurantsResult, Error>({
+  return useQuery({
     queryKey: ['user-restaurants', params],
-    queryFn: () => restaurantApi.getUserRestaurants(params)
+    queryFn: () => restaurantApi.getUserRestaurants(params),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }

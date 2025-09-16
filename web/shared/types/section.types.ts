@@ -19,7 +19,7 @@ export interface CreateHeroSectionCommand {
   buttonUrl?: string;
   buttonTextColor?: string;
   buttonBackgroundColor?: string;
-  type: import('./websiteTypes').HeroSectionType;
+  type: import('./website.types').HeroSectionType;
 }
 
 export interface CreateHeroSectionResult {
