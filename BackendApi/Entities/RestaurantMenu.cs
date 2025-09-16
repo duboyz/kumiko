@@ -20,7 +20,7 @@ public class MenuCategory : BaseEntity
     public Guid RestaurantMenuId { get; set; }
     public RestaurantMenu RestaurantMenu { get; set; } = null!;
 
-    public ICollection<MenuItem> MenuItems { get; set; } = [];
+    public ICollection<MenuCategoryItem> MenuCategoryItems { get; set; } = [];
 }
 
 public class MenuItem : BaseEntity
@@ -30,11 +30,24 @@ public class MenuItem : BaseEntity
     public decimal Price { get; set; }
     public bool IsAvailable { get; set; } = true;
 
+    public Guid RestaurantMenuId { get; set; }
+    public RestaurantMenu RestaurantMenu { get; set; } = null!;
+
+    public ICollection<MenuCategoryItem> MenuCategoryItems { get; set; } = [];
+    public ICollection<MenuItemOption> Options { get; set; } = [];
+    public ICollection<MenuItemAllergen> Allergens { get; set; } = [];
+}
+
+// Join table for many-to-many relationship between MenuCategory and MenuItem with ordering
+public class MenuCategoryItem : BaseEntity
+{
     public Guid MenuCategoryId { get; set; }
     public MenuCategory MenuCategory { get; set; } = null!;
 
-    public ICollection<MenuItemOption> Options { get; set; } = [];
-    public ICollection<MenuItemAllergen> Allergens { get; set; } = [];
+    public Guid MenuItemId { get; set; }
+    public MenuItem MenuItem { get; set; } = null!;
+
+    public int OrderIndex { get; set; } = 0;
 }
 
 public class MenuItemOption : BaseEntity

@@ -15,7 +15,7 @@ export interface MenuCategoryDto {
   description: string;
   orderIndex: number;
   restaurantMenuId: string;
-  menuItems: MenuItemDto[];
+  menuCategoryItems: MenuCategoryItemDto[];
   createdAt: string;
   updatedAt: string;
 }
@@ -26,9 +26,21 @@ export interface MenuItemDto {
   description: string;
   price: number;
   isAvailable: boolean;
-  menuCategoryId: string;
+  restaurantMenuId: string;
+  menuCategoryItems: MenuCategoryItemDto[];
   options: MenuItemOptionDto[];
   allergens: AllergenDto[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MenuCategoryItemDto {
+  id: string;
+  menuCategoryId: string;
+  menuItemId: string;
+  orderIndex: number;
+  menuCategory?: MenuCategoryDto;
+  menuItem?: MenuItemDto;
   createdAt: string;
   updatedAt: string;
 }
@@ -64,7 +76,13 @@ export interface CreateMenuItemCommand {
   description: string;
   price: number;
   isAvailable: boolean;
+  restaurantMenuId: string;
+}
+
+export interface AddMenuItemToCategoryCommand {
+  menuItemId: string;
   menuCategoryId: string;
+  orderIndex: number;
 }
 
 export interface UpdateMenuCategoryCommand {
@@ -80,4 +98,9 @@ export interface UpdateMenuItemCommand {
   description: string;
   price: number;
   isAvailable: boolean;
+}
+
+export interface UpdateMenuCategoryItemCommand {
+  id: string;
+  orderIndex: number;
 }

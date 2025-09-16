@@ -18,7 +18,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { MenuCategoryDto, MenuItemDto, CreateMenuCategoryCommand, CreateMenuItemCommand } from '../../../../shared/types/menuTypes'
+import { MenuCategoryDto, MenuItemDto, MenuCategoryItemDto, CreateMenuCategoryCommand, CreateMenuItemCommand } from '../../../../shared/types/menuTypes'
 
 // Mock existing menu items (global database of all menu items)
 const mockExistingMenuItems: MenuItemDto[] = [
@@ -28,7 +28,8 @@ const mockExistingMenuItems: MenuItemDto[] = [
     description: 'Fresh romaine lettuce with caesar dressing and parmesan cheese',
     price: 14.00,
     isAvailable: true,
-    menuCategoryId: '', // Will be set when added to category
+    restaurantMenuId: 'menu-1',
+    menuCategoryItems: [],
     options: [],
     allergens: [],
     createdAt: '2024-01-01',
@@ -40,7 +41,8 @@ const mockExistingMenuItems: MenuItemDto[] = [
     description: 'Buffalo wings served with blue cheese dressing',
     price: 16.50,
     isAvailable: true,
-    menuCategoryId: '',
+    restaurantMenuId: 'menu-1',
+    menuCategoryItems: [],
     options: [],
     allergens: [],
     createdAt: '2024-01-01',
@@ -52,7 +54,8 @@ const mockExistingMenuItems: MenuItemDto[] = [
     description: 'Classic pizza with tomato sauce, mozzarella, and fresh basil',
     price: 22.00,
     isAvailable: true,
-    menuCategoryId: '',
+    restaurantMenuId: 'menu-1',
+    menuCategoryItems: [],
     options: [],
     allergens: [],
     createdAt: '2024-01-01',
@@ -64,7 +67,8 @@ const mockExistingMenuItems: MenuItemDto[] = [
     description: 'Rich chocolate cake with chocolate frosting',
     price: 8.50,
     isAvailable: true,
-    menuCategoryId: '',
+    restaurantMenuId: 'menu-1',
+    menuCategoryItems: [],
     options: [],
     allergens: [],
     createdAt: '2024-01-01',
@@ -76,7 +80,64 @@ const mockExistingMenuItems: MenuItemDto[] = [
     description: 'Beer-battered cod with crispy fries and tartar sauce',
     price: 24.00,
     isAvailable: true,
-    menuCategoryId: '',
+    restaurantMenuId: 'menu-1',
+    menuCategoryItems: [],
+    options: [],
+    allergens: [],
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
+  }
+]
+
+// Mock menu items that are already assigned to categories
+const mockMenuItems: MenuItemDto[] = [
+  {
+    id: 'item-1',
+    name: 'Bruschetta',
+    description: 'Toasted bread with fresh tomatoes, garlic, and basil',
+    price: 12.50,
+    isAvailable: true,
+    restaurantMenuId: 'menu-1',
+    menuCategoryItems: [],
+    options: [],
+    allergens: [],
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
+  },
+  {
+    id: 'item-2',
+    name: 'Calamari Rings',
+    description: 'Crispy fried squid rings with marinara sauce',
+    price: 15.00,
+    isAvailable: true,
+    restaurantMenuId: 'menu-1',
+    menuCategoryItems: [],
+    options: [],
+    allergens: [],
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
+  },
+  {
+    id: 'item-3',
+    name: 'Grilled Salmon',
+    description: 'Fresh Atlantic salmon with lemon butter sauce',
+    price: 28.00,
+    isAvailable: true,
+    restaurantMenuId: 'menu-1',
+    menuCategoryItems: [],
+    options: [],
+    allergens: [],
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
+  },
+  {
+    id: 'item-4',
+    name: 'Ribeye Steak',
+    description: '12oz ribeye steak cooked to perfection',
+    price: 35.00,
+    isAvailable: false,
+    restaurantMenuId: 'menu-1',
+    menuCategoryItems: [],
     options: [],
     allergens: [],
     createdAt: '2024-01-01',
@@ -92,28 +153,22 @@ const mockCategories: MenuCategoryDto[] = [
     description: 'Start your meal with our delicious appetizers',
     orderIndex: 0,
     restaurantMenuId: 'menu-1',
-    menuItems: [
+    menuCategoryItems: [
       {
-        id: 'item-1',
-        name: 'Bruschetta',
-        description: 'Toasted bread with fresh tomatoes, garlic, and basil',
-        price: 12.50,
-        isAvailable: true,
+        id: 'cat-item-1',
         menuCategoryId: '1',
-        options: [],
-        allergens: [],
+        menuItemId: 'item-1',
+        orderIndex: 0,
+        menuItem: mockMenuItems[0],
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01'
       },
       {
-        id: 'item-2',
-        name: 'Calamari Rings',
-        description: 'Crispy fried squid rings with marinara sauce',
-        price: 15.00,
-        isAvailable: true,
+        id: 'cat-item-2',
         menuCategoryId: '1',
-        options: [],
-        allergens: [],
+        menuItemId: 'item-2',
+        orderIndex: 1,
+        menuItem: mockMenuItems[1],
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01'
       }
@@ -127,28 +182,22 @@ const mockCategories: MenuCategoryDto[] = [
     description: 'Our signature main dishes',
     orderIndex: 1,
     restaurantMenuId: 'menu-1',
-    menuItems: [
+    menuCategoryItems: [
       {
-        id: 'item-3',
-        name: 'Grilled Salmon',
-        description: 'Fresh Atlantic salmon with lemon butter sauce',
-        price: 28.00,
-        isAvailable: true,
+        id: 'cat-item-3',
         menuCategoryId: '2',
-        options: [],
-        allergens: [],
+        menuItemId: 'item-3',
+        orderIndex: 0,
+        menuItem: mockMenuItems[2],
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01'
       },
       {
-        id: 'item-4',
-        name: 'Ribeye Steak',
-        description: '12oz ribeye steak cooked to perfection',
-        price: 35.00,
-        isAvailable: false,
+        id: 'cat-item-4',
         menuCategoryId: '2',
-        options: [],
-        allergens: [],
+        menuItemId: 'item-4',
+        orderIndex: 1,
+        menuItem: mockMenuItems[3],
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01'
       }
@@ -157,6 +206,14 @@ const mockCategories: MenuCategoryDto[] = [
     updatedAt: '2024-01-01'
   }
 ]
+
+// Helper function to get menu items for a category
+const getMenuItemsForCategory = (category: MenuCategoryDto): MenuItemDto[] => {
+  return category.menuCategoryItems
+    .sort((a, b) => a.orderIndex - b.orderIndex)
+    .map(categoryItem => categoryItem.menuItem!)
+    .filter(item => item !== undefined)
+}
 
 export default function AboutPage() {
   return (
@@ -187,7 +244,7 @@ function MenuBuilder() {
     description: '',
     price: 0,
     isAvailable: true,
-    menuCategoryId: '',
+    restaurantMenuId: 'menu-1',
     categoryId: ''
   })
   const [showNewCategoryForm, setShowNewCategoryForm] = useState(false)
@@ -217,7 +274,7 @@ function MenuBuilder() {
       description: newCategory.description,
       orderIndex: categories.length, // Add at the end
       restaurantMenuId: newCategory.restaurantMenuId,
-      menuItems: [],
+      menuCategoryItems: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
@@ -247,25 +304,40 @@ function MenuBuilder() {
   const addMenuItem = (categoryId: string) => {
     if (!newItem.name.trim()) return
 
+    const category = categories.find(cat => cat.id === categoryId)
+    const orderIndex = category ? category.menuCategoryItems.length : 0
+
+    const newItemId = `item-${Date.now()}`
     const item: MenuItemDto = {
-      id: `item-${Date.now()}`,
+      id: newItemId,
       name: newItem.name,
       description: newItem.description,
       price: newItem.price,
       isAvailable: newItem.isAvailable,
-      menuCategoryId: categoryId,
+      restaurantMenuId: 'menu-1',
+      menuCategoryItems: [],
       options: [],
       allergens: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
 
+    const categoryItem = {
+      id: `cat-item-${Date.now()}`,
+      menuCategoryId: categoryId,
+      menuItemId: newItemId,
+      orderIndex: orderIndex,
+      menuItem: item,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+
     setCategories(categories.map(cat =>
       cat.id === categoryId
-        ? { ...cat, menuItems: [...cat.menuItems, item] }
+        ? { ...cat, menuCategoryItems: [...cat.menuCategoryItems, categoryItem] }
         : cat
     ))
-    setNewItem({ name: '', description: '', price: 0, isAvailable: true, menuCategoryId: '', categoryId: '' })
+    setNewItem({ name: '', description: '', price: 0, isAvailable: true, restaurantMenuId: 'menu-1', categoryId: '' })
     closeAddItemForm()
   }
 
@@ -275,17 +347,23 @@ function MenuBuilder() {
     const existingItem = mockExistingMenuItems.find(item => item.id === selectedExistingItem)
     if (!existingItem) return
 
-    // Create a new instance with a new ID but same data
-    const item: MenuItemDto = {
-      ...existingItem,
-      id: `item-${Date.now()}`,
+    const category = categories.find(cat => cat.id === categoryId)
+    const orderIndex = category ? category.menuCategoryItems.length : 0
+
+    // Create a new MenuCategoryItem linking the existing item to this category
+    const categoryItem = {
+      id: `cat-item-${Date.now()}`,
       menuCategoryId: categoryId,
+      menuItemId: existingItem.id,
+      orderIndex: orderIndex,
+      menuItem: existingItem,
+      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
 
     setCategories(categories.map(cat =>
       cat.id === categoryId
-        ? { ...cat, menuItems: [...cat.menuItems, item] }
+        ? { ...cat, menuCategoryItems: [...cat.menuCategoryItems, categoryItem] }
         : cat
     ))
     setSelectedExistingItem('')
@@ -296,7 +374,7 @@ function MenuBuilder() {
     setPopoverOpen(categoryId)
     setAddItemMode(null)
     setSelectedExistingItem('')
-    setNewItem({ name: '', description: '', price: 0, isAvailable: true, menuCategoryId: '', categoryId: '' })
+    setNewItem({ name: '', description: '', price: 0, isAvailable: true, restaurantMenuId: 'menu-1', categoryId: '' })
   }
 
   const handleModeSelect = (mode: 'existing' | 'new', categoryId: string) => {
@@ -309,24 +387,24 @@ function MenuBuilder() {
     setShowNewItemForm(null)
     setAddItemMode(null)
     setSelectedExistingItem('')
-    setNewItem({ name: '', description: '', price: 0, isAvailable: true, menuCategoryId: '', categoryId: '' })
+    setNewItem({ name: '', description: '', price: 0, isAvailable: true, restaurantMenuId: 'menu-1', categoryId: '' })
   }
 
   const getAvailableExistingItems = () => {
     // Filter out items that are already in the current category
     const currentCategoryId = showNewItemForm
     const currentCategory = categories.find(cat => cat.id === currentCategoryId)
-    const usedItemNames = currentCategory?.menuItems.map(item => item.name.toLowerCase()) || []
+    const usedItemIds = currentCategory?.menuCategoryItems.map(categoryItem => categoryItem.menuItemId) || []
 
     return mockExistingMenuItems.filter(item =>
-      !usedItemNames.includes(item.name.toLowerCase())
+      !usedItemIds.includes(item.id)
     )
   }
 
-  const confirmDeleteMenuItem = (categoryId: string, itemId: string) => {
+  const confirmDeleteMenuItem = (categoryId: string, categoryItemId: string) => {
     setCategories(categories.map(cat =>
       cat.id === categoryId
-        ? { ...cat, menuItems: cat.menuItems.filter(item => item.id !== itemId) }
+        ? { ...cat, menuCategoryItems: cat.menuCategoryItems.filter(categoryItem => categoryItem.id !== categoryItemId) }
         : cat
     ))
     setDeleteDialogOpen(null)
@@ -342,8 +420,14 @@ function MenuBuilder() {
       cat.id === categoryId
         ? {
           ...cat,
-          menuItems: cat.menuItems.map(item =>
-            item.id === itemId ? { ...item, ...updates, updatedAt: new Date().toISOString() } : item
+          menuCategoryItems: cat.menuCategoryItems.map(categoryItem =>
+            categoryItem.menuItemId === itemId && categoryItem.menuItem
+              ? {
+                ...categoryItem,
+                menuItem: { ...categoryItem.menuItem, ...updates, updatedAt: new Date().toISOString() },
+                updatedAt: new Date().toISOString()
+              }
+              : categoryItem
           )
         }
         : cat
@@ -355,19 +439,56 @@ function MenuBuilder() {
     const { active, over } = event
 
     if (active.id !== over?.id) {
-      setCategories((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over?.id)
+      const activeId = String(active.id)
+      const overId = String(over?.id)
 
-        const reorderedCategories = arrayMove(items, oldIndex, newIndex)
+      // Check if we're dragging categories
+      const isDraggingCategory = categories.some(cat => cat.id === activeId)
 
-        // Update orderIndex for all categories
-        return reorderedCategories.map((category, index) => ({
-          ...category,
-          orderIndex: index,
-          updatedAt: new Date().toISOString()
-        }))
-      })
+      if (isDraggingCategory) {
+        // Handle category reordering
+        setCategories((items) => {
+          const oldIndex = items.findIndex((item) => item.id === activeId)
+          const newIndex = items.findIndex((item) => item.id === overId)
+
+          const reorderedCategories = arrayMove(items, oldIndex, newIndex)
+
+          // Update orderIndex for all categories
+          return reorderedCategories.map((category, index) => ({
+            ...category,
+            orderIndex: index,
+            updatedAt: new Date().toISOString()
+          }))
+        })
+      } else {
+        // Handle menu item reordering within a category
+        setCategories((categories) => {
+          return categories.map((category) => {
+            const activeCategoryItemIndex = category.menuCategoryItems.findIndex(categoryItem => categoryItem.id === activeId)
+            const overCategoryItemIndex = category.menuCategoryItems.findIndex(categoryItem => categoryItem.id === overId)
+
+            // If both items are in this category, reorder them
+            if (activeCategoryItemIndex !== -1 && overCategoryItemIndex !== -1) {
+              const reorderedCategoryItems = arrayMove(category.menuCategoryItems, activeCategoryItemIndex, overCategoryItemIndex)
+
+              // Update orderIndex for all category items
+              const updatedCategoryItems = reorderedCategoryItems.map((categoryItem, index) => ({
+                ...categoryItem,
+                orderIndex: index,
+                updatedAt: new Date().toISOString()
+              }))
+
+              return {
+                ...category,
+                menuCategoryItems: updatedCategoryItems,
+                updatedAt: new Date().toISOString()
+              }
+            }
+
+            return category
+          })
+        })
+      }
     }
   }
 
@@ -459,7 +580,13 @@ function MenuBuilder() {
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={sortedCategories.map(cat => cat.id)} strategy={verticalListSortingStrategy}>
+        <SortableContext
+          items={[
+            ...sortedCategories.map(cat => cat.id),
+            ...sortedCategories.flatMap(cat => cat.menuCategoryItems.map(categoryItem => categoryItem.id))
+          ]}
+          strategy={verticalListSortingStrategy}
+        >
           <div className="space-y-6">
             {sortedCategories.map((category) => (
               <SortableCategory
@@ -477,7 +604,7 @@ function MenuBuilder() {
                 onAddItemClick={handleAddItemClick}
                 onModeSelect={handleModeSelect}
                 onEditItem={(itemId: string) => setEditDialogOpen({ type: 'item', id: itemId, categoryId: category.id })}
-                onDeleteItem={(itemId: string) => setDeleteDialogOpen({ type: 'item', id: itemId, categoryId: category.id })}
+                onDeleteItem={(categoryItemId: string) => setDeleteDialogOpen({ type: 'item', id: categoryItemId, categoryId: category.id })}
                 onUpdateCategory={updateCategory}
                 onUpdateMenuItem={updateMenuItem}
                 onAddExistingMenuItem={addExistingMenuItem}
@@ -513,7 +640,7 @@ function MenuBuilder() {
               {deleteDialogOpen?.type === 'category' ? (
                 <>
                   Are you sure you want to delete this category? This will permanently remove the category and all {
-                    categories.find(cat => cat.id === deleteDialogOpen.id)?.menuItems.length || 0
+                    categories.find(cat => cat.id === deleteDialogOpen.id)?.menuCategoryItems.length || 0
                   } menu items within it. This action cannot be undone.
                 </>
               ) : (
@@ -681,7 +808,7 @@ function SortableCategory({
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     {category.name}
-                    <Badge variant="secondary">{category.menuItems.length} items</Badge>
+                    <Badge variant="secondary">{category.menuCategoryItems.length} items</Badge>
                   </CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">{category.description}</p>
                 </div>
@@ -892,81 +1019,27 @@ function SortableCategory({
             )}
 
             {/* Menu Items Rows */}
-            {category.menuItems.map((item) => (
-              <TableRow key={item.id} className="hover:bg-muted/30">
-                <TableCell>
-                  {editingItem === item.id ? (
-                    <Input
-                      defaultValue={item.name}
-                      onBlur={(e) => onUpdateMenuItem(category.id, item.id, { name: e.target.value })}
-                      className="h-8"
-                    />
-                  ) : (
-                    <span className="font-medium">{item.name}</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingItem === item.id ? (
-                    <Input
-                      defaultValue={item.description}
-                      onBlur={(e) => onUpdateMenuItem(category.id, item.id, { description: e.target.value })}
-                      className="h-8"
-                    />
-                  ) : (
-                    <span className="text-sm">{item.description}</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingItem === item.id ? (
-                    <Input
-                      type="number"
-                      defaultValue={item.price}
-                      onBlur={(e) => onUpdateMenuItem(category.id, item.id, { price: parseFloat(e.target.value) || 0 })}
-                      className="h-8"
-                    />
-                  ) : (
-                    <span className="font-semibold text-green-600">${item.price.toFixed(2)}</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Checkbox
-                    checked={item.isAvailable}
-                    onCheckedChange={(checked) => onUpdateMenuItem(category.id, item.id, { isAvailable: !!checked })}
-                  />
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    {editingItem === item.id ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onUpdateMenuItem(category.id, item.id, {})}
-                      >
-                        <Check className="w-4 h-4" />
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEditItem(item.id)}
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onDeleteItem(item.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            {getMenuItemsForCategory(category).map((item, index) => {
+              const categoryItem = category.menuCategoryItems.find(ci => ci.menuItemId === item.id)
+              if (!categoryItem) return null
+
+              return (
+                <SortableMenuItem
+                  key={categoryItem.id}
+                  categoryItem={categoryItem}
+                  item={item}
+                  category={category}
+                  editingItem={editingItem}
+                  onUpdateMenuItem={onUpdateMenuItem}
+                  onEditItem={onEditItem}
+                  onDeleteItem={onDeleteItem}
+                />
+              )
+            })}
+
 
             {/* Empty state for category with no items */}
-            {category.menuItems.length === 0 && showNewItemForm !== category.id && (
+            {category.menuCategoryItems.length === 0 && showNewItemForm !== category.id && (
               <TableRow>
                 <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                   No menu items yet. Click the + button above to add your first item.
@@ -977,5 +1050,127 @@ function SortableCategory({
         </Table>
       </CardContent>
     </Card>
+  )
+}
+
+// Sortable Menu Item Component
+interface SortableMenuItemProps {
+  categoryItem: MenuCategoryItemDto;
+  item: MenuItemDto;
+  category: MenuCategoryDto;
+  editingItem: string | null;
+  onUpdateMenuItem: (categoryId: string, itemId: string, updates: Partial<MenuItemDto>) => void;
+  onEditItem: (itemId: string) => void;
+  onDeleteItem: (categoryItemId: string) => void;
+}
+
+function SortableMenuItem({
+  categoryItem,
+  item,
+  category,
+  editingItem,
+  onUpdateMenuItem,
+  onEditItem,
+  onDeleteItem,
+}: SortableMenuItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: categoryItem.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <TableRow
+      ref={setNodeRef}
+      style={style}
+      className={`hover:bg-muted/30 ${isDragging ? 'shadow-lg z-50' : ''}`}
+    >
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded flex-shrink-0"
+          >
+            <GripVertical className="w-3 h-3 text-gray-400" />
+          </div>
+          {editingItem === item.id ? (
+            <Input
+              defaultValue={item.name}
+              onBlur={(e) => onUpdateMenuItem(category.id, item.id, { name: e.target.value })}
+              className="h-8 flex-1"
+            />
+          ) : (
+            <span className="font-medium">{item.name}</span>
+          )}
+        </div>
+      </TableCell>
+      <TableCell>
+        {editingItem === item.id ? (
+          <Input
+            defaultValue={item.description}
+            onBlur={(e) => onUpdateMenuItem(category.id, item.id, { description: e.target.value })}
+            className="h-8"
+          />
+        ) : (
+          <span className="text-sm">{item.description}</span>
+        )}
+      </TableCell>
+      <TableCell>
+        {editingItem === item.id ? (
+          <Input
+            type="number"
+            defaultValue={item.price}
+            onBlur={(e) => onUpdateMenuItem(category.id, item.id, { price: parseFloat(e.target.value) || 0 })}
+            className="h-8"
+          />
+        ) : (
+          <span className="font-semibold text-green-600">${item.price.toFixed(2)}</span>
+        )}
+      </TableCell>
+      <TableCell>
+        <Checkbox
+          checked={item.isAvailable}
+          onCheckedChange={(checked) => onUpdateMenuItem(category.id, item.id, { isAvailable: !!checked })}
+        />
+      </TableCell>
+      <TableCell>
+        <div className="flex gap-1">
+          {editingItem === item.id ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onUpdateMenuItem(category.id, item.id, {})}
+            >
+              <Check className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEditItem(item.id)}
+            >
+              <Edit2 className="w-4 h-4" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onDeleteItem(categoryItem.id)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
   )
 }
