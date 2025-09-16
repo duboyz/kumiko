@@ -32,14 +32,6 @@ export default function PageEditorPage() {
   const { data: menusData, isLoading: isLoadingMenus } = useRestaurantMenus(restaurantId || '')
   const firstMenuId = menusData?.menus && menusData.menus.length > 0 ? menusData.menus[0].id : undefined
 
-  // Debug logging
-  console.log('RestaurantMenuSection Debug:', {
-    selectedLocation,
-    restaurantId,
-    menusData,
-    firstMenuId,
-    isLoadingMenus
-  })
 
   const { addHeroSection, addTextSection, addRestaurantMenuSection, isLoading: isAddingSection } = useAddSectionWithDefaults(websiteId, pageId, firstMenuId)
 
@@ -99,13 +91,18 @@ export default function PageEditorPage() {
   }
 
   const handleSectionUpdate = (sectionId: string, field: string, value: string | boolean) => {
-    setSectionUpdates(prev => ({
-      ...prev,
-      [sectionId]: {
-        ...prev[sectionId],
-        [field]: value
-      }
-    }))
+    console.log('Section Update:', { sectionId, field, value });
+    setSectionUpdates(prev => {
+      const newUpdates = {
+        ...prev,
+        [sectionId]: {
+          ...prev[sectionId],
+          [field]: value
+        }
+      };
+      console.log('Updated section data:', newUpdates);
+      return newUpdates;
+    });
   }
 
   const handleTypeChange = (sectionId: string, newType: HeroSectionType) => {
@@ -168,6 +165,7 @@ export default function PageEditorPage() {
     }
     // Handle Restaurant Menu Section
     else if (section.restaurantMenuSection) {
+      console.log('Saving restaurant menu section:', { section, updates });
       const menuUpdates = updates as Partial<RestaurantMenuSectionDto>
       const updateCommand = {
         restaurantMenuSectionId: section.restaurantMenuSection.id,
@@ -175,6 +173,7 @@ export default function PageEditorPage() {
         allowOrdering: menuUpdates.allowOrdering ?? section.restaurantMenuSection.allowOrdering,
       }
 
+      console.log('Update command:', updateCommand);
       updateRestaurantMenuSection.mutate({
         restaurantMenuSectionId: section.restaurantMenuSection.id,
         updates: updateCommand
@@ -209,11 +208,11 @@ export default function PageEditorPage() {
           {editingSectionId && (
             <Button
               onClick={() => handleSaveSection(editingSectionId)}
-              disabled={updateHeroSection.isPending}
+              disabled={updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending}
               className="bg-green-600 hover:bg-green-700"
             >
               <Save className="w-4 h-4 mr-2" />
-              {updateHeroSection.isPending ? 'Saving...' : 'Save Changes'}
+              {(updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending) ? 'Saving...' : 'Save Changes'}
             </Button>
           )}
 
@@ -326,13 +325,19 @@ export default function PageEditorPage() {
 
                     {section.restaurantMenuSection && (() => {
                       const menuSection = section.restaurantMenuSection;
-                      const menu = menusData?.menus?.find(m => m.id === menuSection.restaurantMenuId);
+                      const menuUpdates = sectionUpdates[section.id] as Partial<RestaurantMenuSectionDto>;
+
+                      // Use updated values if they exist, otherwise use original values
+                      const currentMenuId = menuUpdates?.restaurantMenuId ?? menuSection.restaurantMenuId;
+                      const currentAllowOrdering = menuUpdates?.allowOrdering ?? menuSection.allowOrdering;
+
+                      const menu = menusData?.menus?.find(m => m.id === currentMenuId);
 
                       if (!menu) {
                         return (
                           <div className="py-12 px-4 text-center text-gray-500">
                             <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
-                            <p>The selected menu (ID: {menuSection.restaurantMenuId}) could not be loaded.</p>
+                            <p>The selected menu (ID: {currentMenuId}) could not be loaded.</p>
                             {editingSectionId === section.id && (
                               <p className="mt-2 text-sm">Please select a different menu in the section settings.</p>
                             )}
@@ -343,7 +348,8 @@ export default function PageEditorPage() {
                       return (
                         <RestaurantMenuSection
                           restaurantMenu={menu}
-                          allowOrdering={menuSection.allowOrdering}
+                          allowOrdering={currentAllowOrdering}
+                          currentMenuId={currentMenuId}
                           isEditing={editingSectionId === section.id}
                           availableMenus={menusData?.menus || []}
                           onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}

@@ -15,6 +15,7 @@ interface RestaurantMenuSectionProps {
   className?: string
   isEditing?: boolean
   availableMenus?: RestaurantMenuDto[]
+  currentMenuId?: string
   onUpdate?: (field: string, value: string | boolean) => void
 }
 
@@ -24,6 +25,7 @@ export function RestaurantMenuSection({
   className = '',
   isEditing = false,
   availableMenus = [],
+  currentMenuId,
   onUpdate
 }: RestaurantMenuSectionProps) {
   const handleAddToCart = (itemId: string, itemName: string) => {
@@ -49,7 +51,7 @@ export function RestaurantMenuSection({
                 <div>
                   <label className="text-sm font-medium text-gray-700 mb-1 block">Select Menu</label>
                   <Select
-                    value={restaurantMenu.id}
+                    value={currentMenuId || restaurantMenu.id}
                     onValueChange={(value) => onUpdate?.('restaurantMenuId', value)}
                   >
                     <SelectTrigger>
