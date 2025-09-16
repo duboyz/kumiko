@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Plus, Eye, Edit, Save } from 'lucide-react'
-import { usePages, useAddSectionWithDefaults, useUpdateHeroSection, useUpdateTextSection, useUpdateRestaurantMenuSection, useRestaurantMenus, useLocationSelection, HeroSectionType, TextAlignment } from '@shared'
+import { ArrowLeft, Plus, Eye, Edit, Save, Trash2 } from 'lucide-react'
+import { usePages, useAddSectionWithDefaults, useUpdateHeroSection, useUpdateTextSection, useUpdateRestaurantMenuSection, useDeleteSection, useRestaurantMenus, useLocationSelection, HeroSectionType, TextAlignment } from '@shared'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { ContentContainer } from '@/components/ContentContainer'
@@ -67,6 +67,8 @@ export default function PageEditorPage() {
       })
     }
   })
+
+  const deleteSection = useDeleteSection(websiteId)
 
   const handleAddSection = (sectionType: string) => {
     if (page) {
@@ -174,6 +176,12 @@ export default function PageEditorPage() {
     }
   }
 
+  const handleDeleteSection = (sectionId: string) => {
+    if (confirm('Are you sure you want to delete this section? This action cannot be undone.')) {
+      deleteSection.mutate(sectionId)
+    }
+  }
+
   if (isLoading) return <LoadingSpinner />
   if (error) return <ErrorMessage message={error instanceof Error ? error.message : 'An error occurred'} />
   if (!page) return <ErrorMessage message="Page not found" />
@@ -199,14 +207,25 @@ export default function PageEditorPage() {
 
         <div className="flex items-center space-x-2">
           {editingSectionId && (
-            <Button
-              onClick={() => handleSaveSection(editingSectionId)}
-              disabled={updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {(updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending) ? 'Saving...' : 'Save Changes'}
-            </Button>
+            <>
+              <Button
+                onClick={() => handleDeleteSection(editingSectionId)}
+                disabled={deleteSection.isPending}
+                variant="destructive"
+                size="sm"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                {deleteSection.isPending ? 'Deleting...' : 'Delete'}
+              </Button>
+              <Button
+                onClick={() => handleSaveSection(editingSectionId)}
+                disabled={updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {(updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending) ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </>
           )}
 
           <div className="flex items-center border rounded-lg p-1">

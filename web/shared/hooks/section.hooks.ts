@@ -118,6 +118,8 @@ export const useAddSectionWithDefaults = (websiteId: string, pageId: string, def
       title: 'Your Awesome Title',
       description: 'Add a compelling description that captures your audience\'s attention and clearly explains what you offer.',
       imageUrl: 'https://images.pexels.com/photos/2014773/pexels-photo-2014773.jpeg',
+      backgroundImageUrl: 'https://images.pexels.com/photos/2014773/pexels-photo-2014773.jpeg',
+      backgroundOverlayColor: 'rgba(0, 0, 0, 0.5)',
       imageAlt: 'Your Awesome Image',
       type: HeroSectionType.ImageRight,
       backgroundColor: '#ffffff',
@@ -165,4 +167,22 @@ export const useAddSectionWithDefaults = (websiteId: string, pageId: string, def
     addRestaurantMenuSection,
     isLoading: createHeroSection.isPending || createTextSection.isPending || createRestaurantMenuSection.isPending
   }
+}
+
+// Delete Section hook
+export const useDeleteSection = (websiteId: string, onSuccess?: () => void) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (sectionId: string) => sectionApi.deleteSection(sectionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['pages', websiteId]
+      })
+      onSuccess?.()
+    },
+    onError: (error) => {
+      console.error('Failed to delete section:', error)
+    }
+  })
 }

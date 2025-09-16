@@ -98,3 +98,12 @@ export interface UpdateRestaurantMenuSectionCommand {
 export interface UpdateRestaurantMenuSectionResult {
   restaurantMenuSectionId: string;
 }
+
+// Delete Section types
+export interface DeleteSectionCommand {
+  sectionId: string;
+}
+
+export interface DeleteSectionResult {
+  success: boolean;
+}

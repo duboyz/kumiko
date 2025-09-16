@@ -11,6 +11,8 @@ import type {
   CreateRestaurantMenuSectionResult,
   UpdateRestaurantMenuSectionCommand,
   UpdateRestaurantMenuSectionResult,
+  DeleteSectionCommand,
+  DeleteSectionResult,
   ApiResponse,
   ResponseData
 } from '../types'
@@ -50,6 +52,12 @@ export const sectionApi = {
   updateRestaurantMenuSection: async (restaurantMenuSectionId: string, command: UpdateRestaurantMenuSectionCommand): Promise<ResponseData<UpdateRestaurantMenuSectionResult>> => {
     const { data } = await apiClient.put<ApiResponse<UpdateRestaurantMenuSectionResult>>(`/api/section/restaurant-menu/${restaurantMenuSectionId}`, command)
     if (!data.success) throw new Error(data.message || 'Failed to update restaurant menu section')
+    return data.data
+  },
+
+  deleteSection: async (sectionId: string): Promise<ResponseData<DeleteSectionResult>> => {
+    const { data } = await apiClient.delete<ApiResponse<DeleteSectionResult>>(`/api/website-sections/${sectionId}`)
+    if (!data.success) throw new Error(data.message || 'Failed to delete section')
     return data.data
   }
 }
