@@ -18,6 +18,8 @@ nunit-*.xml
 *.ncrunchsolution
 *.DotSettings.user
 
+docs/
+
 # .NET Core
 project.lock.json
 project.fragment.lock.json
@@ -238,5 +240,3 @@ bld/
 [Ll]ogs/
 
 
-
-tasks.md
