@@ -11,7 +11,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
-import { Trash2, Edit2, Plus, Save, X, Check, Search } from 'lucide-react'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { Trash2, Edit2, Plus, Save, X, Check, Search, AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import { MenuCategoryDto, MenuItemDto, CreateMenuCategoryCommand, CreateMenuItemCommand } from '../../../../shared/types/menuTypes'
 
@@ -187,6 +188,11 @@ function MenuBuilder() {
   const [addItemMode, setAddItemMode] = useState<'existing' | 'new' | null>(null)
   const [selectedExistingItem, setSelectedExistingItem] = useState<string>('')
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<{ type: 'category' | 'item', id: string, categoryId?: string } | null>(null)
+  const [editDialogOpen, setEditDialogOpen] = useState<{ type: 'category' | 'item', id: string, categoryId?: string } | null>(null)
+  const [menuTitle, setMenuTitle] = useState('Main Menu')
+  const [menuDescription, setMenuDescription] = useState('Our carefully crafted selection of dishes')
+  const [editingMenu, setEditingMenu] = useState(false)
 
   const addCategory = () => {
     if (!newCategory.name.trim()) return
@@ -206,8 +212,14 @@ function MenuBuilder() {
     setShowNewCategoryForm(false)
   }
 
-  const deleteCategory = (categoryId: string) => {
+  const confirmDeleteCategory = (categoryId: string) => {
     setCategories(categories.filter(cat => cat.id !== categoryId))
+    setDeleteDialogOpen(null)
+  }
+
+  const confirmEditCategory = (categoryId: string) => {
+    setEditingCategory(categoryId)
+    setEditDialogOpen(null)
   }
 
   const updateCategory = (categoryId: string, updates: Partial<MenuCategoryDto>) => {
@@ -296,12 +308,18 @@ function MenuBuilder() {
     )
   }
 
-  const deleteMenuItem = (categoryId: string, itemId: string) => {
+  const confirmDeleteMenuItem = (categoryId: string, itemId: string) => {
     setCategories(categories.map(cat =>
       cat.id === categoryId
         ? { ...cat, menuItems: cat.menuItems.filter(item => item.id !== itemId) }
         : cat
     ))
+    setDeleteDialogOpen(null)
+  }
+
+  const confirmEditMenuItem = (categoryId: string, itemId: string) => {
+    setEditingItem(itemId)
+    setEditDialogOpen(null)
   }
 
   const updateMenuItem = (categoryId: string, itemId: string, updates: Partial<MenuItemDto>) => {
@@ -320,6 +338,47 @@ function MenuBuilder() {
 
   return (
     <div className="space-y-6">
+      {/* Menu Title and Description Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              {editingMenu ? (
+                <div className="space-y-3">
+                  <Input
+                    value={menuTitle}
+                    onChange={(e) => setMenuTitle(e.target.value)}
+                    className="text-2xl font-bold h-12"
+                    placeholder="Menu title..."
+                  />
+                  <Textarea
+                    value={menuDescription}
+                    onChange={(e) => setMenuDescription(e.target.value)}
+                    className="text-base"
+                    placeholder="Menu description..."
+                    rows={2}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">{menuTitle}</h1>
+                  <p className="text-lg text-muted-foreground mt-2">{menuDescription}</p>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 ml-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditingMenu(!editingMenu)}
+              >
+                {editingMenu ? <Check className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
       {/* Add New Category Section */}
       <Card>
         <CardHeader>
@@ -389,13 +448,23 @@ function MenuBuilder() {
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setEditingCategory(editingCategory === category.id ? null : category.id)}
-                  >
-                    {editingCategory === category.id ? <Check className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
-                  </Button>
+                  {editingCategory === category.id ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditingCategory(null)}
+                    >
+                      <Check className="w-4 h-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditDialogOpen({ type: 'category', id: category.id })}
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                  )}
                   <Popover open={popoverOpen === category.id} onOpenChange={(open) => setPopoverOpen(open ? category.id : null)}>
                     <PopoverTrigger asChild>
                       <Button
@@ -442,7 +511,7 @@ function MenuBuilder() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => deleteCategory(category.id)}
+                    onClick={() => setDeleteDialogOpen({ type: 'category', id: category.id })}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -626,17 +695,27 @@ function MenuBuilder() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
+                          {editingItem === item.id ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingItem(null)}
+                            >
+                              <Check className="w-4 h-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditDialogOpen({ type: 'item', id: item.id, categoryId: category.id })}
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setEditingItem(editingItem === item.id ? null : item.id)}
-                          >
-                            {editingItem === item.id ? <Check className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteMenuItem(category.id, item.id)}
+                            onClick={() => setDeleteDialogOpen({ type: 'item', id: item.id, categoryId: category.id })}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -668,6 +747,84 @@ function MenuBuilder() {
           </Card>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteDialogOpen} onOpenChange={(open: boolean) => !open && setDeleteDialogOpen(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              Confirm Deletion
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteDialogOpen?.type === 'category' ? (
+                <>
+                  Are you sure you want to delete this category? This will permanently remove the category and all {
+                    categories.find(cat => cat.id === deleteDialogOpen.id)?.menuItems.length || 0
+                  } menu items within it. This action cannot be undone.
+                </>
+              ) : (
+                <>
+                  Are you sure you want to delete this menu item? This action cannot be undone.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteDialogOpen?.type === 'category') {
+                  confirmDeleteCategory(deleteDialogOpen.id)
+                } else if (deleteDialogOpen?.type === 'item' && deleteDialogOpen.categoryId) {
+                  confirmDeleteMenuItem(deleteDialogOpen.categoryId, deleteDialogOpen.id)
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Warning Dialog */}
+      <AlertDialog open={!!editDialogOpen} onOpenChange={(open: boolean) => !open && setEditDialogOpen(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
+              Edit Warning
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {editDialogOpen?.type === 'category' ? (
+                <>
+                  You are about to edit this category. Changes to the category name and description will be visible wherever this category is used across your restaurant menus.
+                </>
+              ) : (
+                <>
+                  You are about to edit this menu item. This action will affect everywhere this item is used across your restaurant menus. Changes to name, description, and price will be reflected in all locations.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (editDialogOpen?.type === 'category') {
+                  confirmEditCategory(editDialogOpen.id)
+                } else if (editDialogOpen?.type === 'item' && editDialogOpen.categoryId) {
+                  confirmEditMenuItem(editDialogOpen.categoryId, editDialogOpen.id)
+                }
+              }}
+              className="bg-amber-500 text-white hover:bg-amber-600"
+            >
+              Continue Editing
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
