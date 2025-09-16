@@ -13,6 +13,7 @@ export interface MenuCategoryDto {
   id: string;
   name: string;
   description: string;
+  orderIndex: number;
   restaurantMenuId: string;
   menuItems: MenuItemDto[];
   createdAt: string;
@@ -54,6 +55,7 @@ export interface AllergenDto {
 export interface CreateMenuCategoryCommand {
   name: string;
   description: string;
+  orderIndex: number;
   restaurantMenuId: string;
 }
 
@@ -69,6 +71,7 @@ export interface UpdateMenuCategoryCommand {
   id: string;
   name: string;
   description: string;
+  orderIndex: number;
 }
 
 export interface UpdateMenuItemCommand {
