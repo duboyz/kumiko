@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5157/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5158'
 
 if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_API_URL) {
   console.error('NEXT_PUBLIC_API_URL environment variable is required in production')
@@ -47,7 +47,7 @@ apiClient.interceptors.response.use(
     if (!originalRequest) return Promise.reject(error)
 
     // Don't try to refresh for auth endpoints
-    const isAuthEndpoint = originalRequest.url?.includes('/auth/')
+    const isAuthEndpoint = originalRequest.url?.includes('/api/auth/')
 
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
@@ -60,7 +60,7 @@ apiClient.interceptors.response.use(
       isRefreshing = true
 
       try {
-        await apiClient.post('/auth/refresh')
+        await apiClient.post('/api/auth/refresh')
         processQueue(null)
         return apiClient(originalRequest)
       } catch (refreshError) {

@@ -8,6 +8,7 @@ public class WebsiteSection : BaseEntity
     public int SortOrder { get; set; }
 
     public HeroSection? HeroSection { get; set; }
+    public TextSection? TextSection { get; set; }
     public RestaurantMenuSection? RestaurantMenuSection { get; set; }
 }
 
@@ -15,6 +16,13 @@ public enum HeroSectionType
 {
     ImageRight,
     BackgroundImage,
+}
+
+public enum TextAlignment
+{
+    Left,
+    Center,
+    Right,
 }
 
 public class HeroSection : BaseEntity
@@ -39,6 +47,17 @@ public class HeroSection : BaseEntity
     public Guid WebsiteSectionId { get; set; }
     public WebsiteSection WebsiteSection { get; set; } = null!;
 
+}
+
+public class TextSection : BaseEntity
+{
+    public string? Title { get; set; }
+    public string? Text { get; set; }
+    public TextAlignment AlignText { get; set; } = TextAlignment.Left;
+    public string? TextColor { get; set; }
+
+    public Guid WebsiteSectionId { get; set; }
+    public WebsiteSection WebsiteSection { get; set; } = null!;
 }
 
 public class RestaurantMenuSection : BaseEntity

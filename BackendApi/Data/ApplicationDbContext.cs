@@ -13,6 +13,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Restaurant> Restaurants { get; set; }
     public DbSet<UserRestaurant> UserRestaurants { get; set; }
 
+    // Hospitality-related DbSets
+    public DbSet<Hospitality> Hospitalities { get; set; }
+    public DbSet<UserHospitality> UserHospitalities { get; set; }
+    public DbSet<HospitalityRoom> HospitalityRooms { get; set; }
+
     // Menu-related DbSets
     public DbSet<RestaurantMenu> RestaurantMenus { get; set; }
     public DbSet<MenuCategory> MenuCategories { get; set; }
@@ -26,6 +31,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<WebsitePage> WebsitePages { get; set; }
     public DbSet<WebsiteSection> WebsiteSections { get; set; }
     public DbSet<HeroSection> HeroSections { get; set; }
+    public DbSet<TextSection> TextSections { get; set; }
     public DbSet<RestaurantMenuSection> RestaurantMenuSections { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,5 +43,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ConfigureRestaurant();
         modelBuilder.ConfigureMenu();
         modelBuilder.ConfigureWebsite();
+        modelBuilder.ConfigureHospitality();
     }
 }

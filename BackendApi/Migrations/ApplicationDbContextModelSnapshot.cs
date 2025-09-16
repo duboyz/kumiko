@@ -171,6 +171,119 @@ namespace BackendApi.Migrations
                     b.ToTable("HeroSections");
                 });
 
+            modelBuilder.Entity("BackendApi.Entities.Hospitality", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("GooglePlaceId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Latitude")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Longitude")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Zip")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Hospitalities");
+                });
+
+            modelBuilder.Entity("BackendApi.Entities.HospitalityRoom", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("HospitalityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HospitalityId");
+
+                    b.ToTable("HospitalityRooms");
+                });
+
             modelBuilder.Entity("BackendApi.Entities.MenuCategory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -479,6 +592,47 @@ namespace BackendApi.Migrations
                     b.ToTable("RestaurantMenuSections");
                 });
 
+            modelBuilder.Entity("BackendApi.Entities.TextSection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AlignText")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TextColor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("WebsiteSectionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WebsiteSectionId")
+                        .IsUnique();
+
+                    b.ToTable("TextSections");
+                });
+
             modelBuilder.Entity("BackendApi.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -530,6 +684,44 @@ namespace BackendApi.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("BackendApi.Entities.UserHospitality", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("HospitalityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HospitalityId");
+
+                    b.HasIndex("UserId", "HospitalityId")
+                        .IsUnique();
+
+                    b.ToTable("UserHospitalities");
                 });
 
             modelBuilder.Entity("BackendApi.Entities.UserRestaurant", b =>
@@ -585,6 +777,9 @@ namespace BackendApi.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<Guid?>("HospitalityId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -598,7 +793,7 @@ namespace BackendApi.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<Guid>("RestaurantId")
+                    b.Property<Guid?>("RestaurantId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Subdomain")
@@ -606,10 +801,15 @@ namespace BackendApi.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("HospitalityId");
 
                     b.HasIndex("RestaurantId");
 
@@ -746,6 +946,17 @@ namespace BackendApi.Migrations
                     b.Navigation("WebsiteSection");
                 });
 
+            modelBuilder.Entity("BackendApi.Entities.HospitalityRoom", b =>
+                {
+                    b.HasOne("BackendApi.Entities.Hospitality", "Hospitality")
+                        .WithMany("Rooms")
+                        .HasForeignKey("HospitalityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hospitality");
+                });
+
             modelBuilder.Entity("BackendApi.Entities.MenuCategory", b =>
                 {
                     b.HasOne("BackendApi.Entities.RestaurantMenu", "RestaurantMenu")
@@ -828,6 +1039,36 @@ namespace BackendApi.Migrations
                     b.Navigation("WebsiteSection");
                 });
 
+            modelBuilder.Entity("BackendApi.Entities.TextSection", b =>
+                {
+                    b.HasOne("BackendApi.Entities.WebsiteSection", "WebsiteSection")
+                        .WithOne("TextSection")
+                        .HasForeignKey("BackendApi.Entities.TextSection", "WebsiteSectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WebsiteSection");
+                });
+
+            modelBuilder.Entity("BackendApi.Entities.UserHospitality", b =>
+                {
+                    b.HasOne("BackendApi.Entities.Hospitality", "Hospitality")
+                        .WithMany()
+                        .HasForeignKey("HospitalityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackendApi.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hospitality");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BackendApi.Entities.UserRestaurant", b =>
                 {
                     b.HasOne("BackendApi.Entities.Restaurant", "Restaurant")
@@ -849,11 +1090,17 @@ namespace BackendApi.Migrations
 
             modelBuilder.Entity("BackendApi.Entities.Website", b =>
                 {
+                    b.HasOne("BackendApi.Entities.Hospitality", "Hospitality")
+                        .WithMany()
+                        .HasForeignKey("HospitalityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("BackendApi.Entities.Restaurant", "Restaurant")
                         .WithMany()
                         .HasForeignKey("RestaurantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Hospitality");
 
                     b.Navigation("Restaurant");
                 });
@@ -878,6 +1125,11 @@ namespace BackendApi.Migrations
                         .IsRequired();
 
                     b.Navigation("WebsitePage");
+                });
+
+            modelBuilder.Entity("BackendApi.Entities.Hospitality", b =>
+                {
+                    b.Navigation("Rooms");
                 });
 
             modelBuilder.Entity("BackendApi.Entities.MenuCategory", b =>
@@ -924,6 +1176,8 @@ namespace BackendApi.Migrations
                     b.Navigation("HeroSection");
 
                     b.Navigation("RestaurantMenuSection");
+
+                    b.Navigation("TextSection");
                 });
 #pragma warning restore 612, 618
         }

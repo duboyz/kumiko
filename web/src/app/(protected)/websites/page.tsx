@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Plus, Globe, Settings, Eye } from 'lucide-react'
-import { useRestaurantWebsites, useCreateWebsite, useRestaurantSelection } from '@shared'
+import { useRestaurantWebsites, useCreateWebsite, useLocationSelection } from '@shared'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { ContentContainer } from '@/components/ContentContainer'
@@ -21,10 +21,10 @@ export default function WebsitesPage() {
     description: ''
   })
 
-  const { selectedRestaurant } = useRestaurantSelection()
+  const { selectedLocation } = useLocationSelection()
   const { data: websites, isLoading, error } = useRestaurantWebsites(
-    selectedRestaurant?.restaurant.id,
-    'Restaurant'
+    selectedLocation?.id,
+    selectedLocation?.type || 'Restaurant'
   )
   const createWebsite = useCreateWebsite()
 
@@ -35,7 +35,9 @@ export default function WebsitesPage() {
       await createWebsite.mutateAsync({
         name: formData.name,
         subdomain: formData.subdomain,
-        description: formData.description || undefined
+        description: formData.description || undefined,
+        entityId: selectedLocation?.id,
+        entityType: selectedLocation?.type || 'Restaurant'
       })
 
       setIsCreateOpen(false)
@@ -189,10 +191,10 @@ export default function WebsitesPage() {
                     size="sm"
                     variant="outline"
                     className="flex-1"
-                    onClick={() => alert('Website builder coming soon!')}
+                    onClick={() => window.location.href = `/websites/${website.id}/pages`}
                   >
                     <Settings className="h-4 w-4 mr-1" />
-                    Edit
+                    Manage
                   </Button>
                 </div>
               </div>

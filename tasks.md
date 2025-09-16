@@ -84,7 +84,6 @@ After creating a website, user must create pages. Here, we give the user two cho
 
 A website also needs to have a subdomain, have a look at how its done in this project: /Users/vegardlokreim/SaaS/prosjektet but dont copy code from there, since this project has A LOOOT of messy code. Do ONLY have a look at how subdomain is set up.
 
-# Current task
 # Implement hospitality.
 
 A hospitality (i.e a hotel or someting similar) can have rooms.
@@ -94,3 +93,20 @@ Hospitalitys dont have menus like restauraunts, they have rooms. I have set up t
 
 Make it possible to create a Hospitality location, make it possible to create a website for the location as well. make it possible to select it as selected in appstate.
 
+
+# create pages
+Lets make it possible to create pages.
+we should be able to:
+1. Compose a website on their own using prebuilt sections.
+2. Crate a page from a template (a template), if chosing this, the user only have to set props values.
+
+
+# Text section
+Lets implmenet a Text Section. A Text Section can have title and text. Both are nullable, if title is not defined, we dont display it, if text is not defined we dont disolay it. it can have AlignText : "Right", "Left" "Center" and it can have text color.
+
+Implement neccessary endopoints, apiCalls, types and hooks and then create a section in frotnend with editable inputs when editing.
+
+
+
+# Current task
+lets implement 

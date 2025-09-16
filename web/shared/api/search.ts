@@ -3,7 +3,7 @@ import { RequestSearchAddress, SearchBusinessResult, ApiResponse } from '../type
 
 export const searchApi = {
   searchBusiness: async (data: RequestSearchAddress): Promise<SearchBusinessResult> => {
-    const response = await apiClient.post<ApiResponse<SearchBusinessResult>>('/search/businesses', data)
+    const response = await apiClient.post<ApiResponse<SearchBusinessResult>>('/api/search/businesses', data)
     if (!response.data.data) {
       throw new Error('No data returned from server')
     }

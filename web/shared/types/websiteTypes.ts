@@ -1,4 +1,5 @@
 // Website types
+import { TextAlignment } from './sectionTypes';
 export interface WebsiteDto {
   id: string;
   name: string;
@@ -13,6 +14,8 @@ export interface CreateWebsiteCommand {
   name: string;
   subdomain: string;
   description?: string;
+  entityId?: string;
+  entityType?: string;
 }
 
 export interface CreateWebsiteResult {
@@ -46,6 +49,15 @@ export interface HeroSectionDto {
   type: HeroSectionType;
 }
 
+// Text Section types
+export interface TextSectionDto {
+  id: string;
+  title?: string;
+  text?: string;
+  alignText: TextAlignment;
+  textColor?: string;
+}
+
 // Website Page types
 export interface WebsitePageDto {
   id: string;
@@ -65,6 +77,7 @@ export interface WebsiteSectionDto {
   sortOrder: number;
   websitePageId: string;
   heroSection?: HeroSectionDto;
+  textSection?: TextSectionDto;
   restaurantMenuSection?: RestaurantMenuSectionDto;
 }
 

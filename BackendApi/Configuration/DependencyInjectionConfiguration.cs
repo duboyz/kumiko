@@ -23,6 +23,12 @@ public static class DependencyInjectionConfiguration
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();
         services.AddScoped<IUserRestaurantRepository, UserRestaurantRepository>();
         services.AddScoped<IWebsiteRepository, WebsiteRepository>();
+        services.AddScoped<IWebsitePageRepository, WebsitePageRepository>();
+        services.AddScoped<IWebsiteSectionRepository, WebsiteSectionRepository>();
+        services.AddScoped<IHeroSectionRepository, HeroSectionRepository>();
+        services.AddScoped<ITextSectionRepository, TextSectionRepository>();
+        services.AddScoped<IHospitalityRepository, HospitalityRepository>();
+        services.AddScoped<IUserHospitalityRepository, UserHospitalityRepository>();
 
 
         // Generic Repository implementations

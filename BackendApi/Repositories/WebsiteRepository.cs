@@ -11,6 +11,7 @@ public class WebsiteRepository(ApplicationDbContext context) : Repository<Websit
     {
         return await _dbSet
             .Include(w => w.Restaurant)
+            .Include(w => w.Hospitality)
             .Where(predicate)
             .ToListAsync();
     }

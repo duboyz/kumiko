@@ -24,6 +24,12 @@ public static class WebsiteConfiguration
                   .WithMany()
                   .HasForeignKey(w => w.RestaurantId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            // Relationship to Hospitality
+            entity.HasOne(w => w.Hospitality)
+                  .WithMany()
+                  .HasForeignKey(w => w.HospitalityId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // WebsitePage entity

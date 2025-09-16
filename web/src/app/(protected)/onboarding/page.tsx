@@ -36,7 +36,7 @@ const locationTypes: LocationTypeOption[] = [
     title: 'Hotel',
     description: 'Manage bookings, rooms, and hospitality services',
     icon: Hotel,
-    available: false
+    available: true
   }
 ]
 
@@ -47,6 +47,9 @@ export default function OnboardingPage() {
     if (selectedType === 'restaurant') {
       // Navigate to restaurant setup step
       window.location.href = '/onboarding/restaurant'
+    } else if (selectedType === 'hotel') {
+      // Navigate to hotel setup step
+      window.location.href = '/onboarding/hospitality'
     }
   }
 
