@@ -91,18 +91,13 @@ export default function PageEditorPage() {
   }
 
   const handleSectionUpdate = (sectionId: string, field: string, value: string | boolean) => {
-    console.log('Section Update:', { sectionId, field, value });
-    setSectionUpdates(prev => {
-      const newUpdates = {
-        ...prev,
-        [sectionId]: {
-          ...prev[sectionId],
-          [field]: value
-        }
-      };
-      console.log('Updated section data:', newUpdates);
-      return newUpdates;
-    });
+    setSectionUpdates(prev => ({
+      ...prev,
+      [sectionId]: {
+        ...prev[sectionId],
+        [field]: value
+      }
+    }));
   }
 
   const handleTypeChange = (sectionId: string, newType: HeroSectionType) => {
@@ -165,7 +160,6 @@ export default function PageEditorPage() {
     }
     // Handle Restaurant Menu Section
     else if (section.restaurantMenuSection) {
-      console.log('Saving restaurant menu section:', { section, updates });
       const menuUpdates = updates as Partial<RestaurantMenuSectionDto>
       const updateCommand = {
         restaurantMenuSectionId: section.restaurantMenuSection.id,
@@ -173,7 +167,6 @@ export default function PageEditorPage() {
         allowOrdering: menuUpdates.allowOrdering ?? section.restaurantMenuSection.allowOrdering,
       }
 
-      console.log('Update command:', updateCommand);
       updateRestaurantMenuSection.mutate({
         restaurantMenuSectionId: section.restaurantMenuSection.id,
         updates: updateCommand
@@ -249,7 +242,7 @@ export default function PageEditorPage() {
       <div className="space-y-6">
         {viewMode === 'preview' ? (
           <div className="border rounded-lg overflow-hidden bg-white">
-            <WebsitePage page={page} />
+            <WebsitePage page={page} availableMenus={menusData?.menus || []} />
           </div>
         ) : (
           <div className="space-y-4">

@@ -2,14 +2,16 @@
 
 import { HeroSection } from './HeroSection'
 import { TextSection } from './TextSection'
-import type { WebsitePageDto } from '@shared'
+import { RestaurantMenuSection } from './RestaurantMenuSection'
+import type { WebsitePageDto, RestaurantMenuDto } from '@shared'
 
 interface WebsitePageProps {
   page: WebsitePageDto
   className?: string
+  availableMenus?: RestaurantMenuDto[]
 }
 
-export function WebsitePage({ page, className = '' }: WebsitePageProps) {
+export function WebsitePage({ page, className = '', availableMenus = [] }: WebsitePageProps) {
   const sortedSections = page.sections.sort((a, b) => a.sortOrder - b.sortOrder)
 
   return (
@@ -52,21 +54,24 @@ export function WebsitePage({ page, className = '' }: WebsitePageProps) {
 
         // Render Restaurant Menu Sections
         if (section.restaurantMenuSection) {
-          return (
-            <div key={section.id} className="py-12 px-4 md:py-20 md:px-6 lg:px-8">
-              <div className="max-w-4xl mx-auto text-center">
-                <h2 className="text-2xl md:text-3xl font-bold mb-4">Our Menu</h2>
-                <p className="text-gray-600 mb-8">Menu section coming soon...</p>
-                <div className="bg-gray-100 rounded-lg p-8">
-                  <p className="text-sm text-gray-500">
-                    Restaurant Menu Section (ID: {section.restaurantMenuSection.restaurantMenuId})
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Ordering: {section.restaurantMenuSection.allowOrdering ? 'Enabled' : 'Disabled'}
-                  </p>
-                </div>
+          const menu = availableMenus.find(m => m.id === section.restaurantMenuSection!.restaurantMenuId);
+
+          if (!menu) {
+            return (
+              <div key={section.id} className="py-12 px-4 text-center text-gray-500">
+                <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
+                <p>The selected menu could not be loaded.</p>
               </div>
-            </div>
+            );
+          }
+
+          return (
+            <RestaurantMenuSection
+              key={section.id}
+              restaurantMenu={menu}
+              allowOrdering={section.restaurantMenuSection.allowOrdering}
+              isEditing={false}
+            />
           )
         }
 
