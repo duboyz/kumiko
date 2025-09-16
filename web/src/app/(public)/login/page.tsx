@@ -59,7 +59,7 @@ export default function LoginPage() {
   }
 
   return (
-    <ContentContainer className="max-w-md mx-auto mt-8">
+    <ContentContainer>
       <Card>
         <CardHeader>
           <CardTitle>Welcome back</CardTitle>

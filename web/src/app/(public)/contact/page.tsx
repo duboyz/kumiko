@@ -2,7 +2,7 @@ import { ContentContainer } from '@/components/ContentContainer'
 
 export default function ContactPage() {
   return (
-    <ContentContainer className="max-w-4xl mx-auto">
+    <ContentContainer>
       <h1 className="text-4xl font-bold mb-6">Contact Us</h1>
       <p className="text-lg text-muted-foreground mb-8">
         Get in touch with our team for support or inquiries.

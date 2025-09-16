@@ -73,7 +73,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <ContentContainer className="max-w-md mx-auto mt-8">
+    <ContentContainer>
       <Card>
         <CardHeader>
           <CardTitle>Create an account</CardTitle>
