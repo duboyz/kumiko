@@ -40,6 +40,12 @@ const items = [
     restaurantOnly: true,
   },
   {
+    title: 'Menu items',
+    url: '/menu-items',
+    icon: ChefHat,
+    restaurantOnly: true,
+  },
+  {
     title: 'Websites',
     url: '/websites',
     icon: Globe,

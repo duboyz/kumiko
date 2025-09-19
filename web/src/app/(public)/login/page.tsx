@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import { useLogin } from '@shared/hooks'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { useLogin } from "@shared/hooks";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,7 +15,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -23,40 +23,47 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { ContentContainer } from '@/components/ContentContainer'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { ContentContainer } from "@/components/ContentContainer";
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-})
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
-type LoginFormValues = z.infer<typeof loginSchema>
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const router = useRouter()
-  const loginMutation = useLogin()
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const loginMutation = useLogin();
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
-  })
+  });
+
+  const fillTestData = () => {
+    form.setValue("email", "test@example.com");
+    form.setValue("password", "password123");
+  };
 
   const onSubmit = async (data: LoginFormValues) => {
-    setError(null)
+    setError(null);
 
     try {
-      await loginMutation.mutateAsync(data)
+      await loginMutation.mutateAsync(data);
       // The useLogin hook handles navigation to dashboard
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.')
+      setError(
+        err instanceof Error ? err.message : "Login failed. Please try again.",
+      );
     }
-  }
+  };
 
   return (
     <ContentContainer>
@@ -116,20 +123,31 @@ export default function LoginPage() {
                 className="w-full"
                 disabled={loginMutation.isPending}
               >
-                {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
+                {loginMutation.isPending ? "Signing in..." : "Sign in"}
               </Button>
             </form>
           </Form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link href="/register" className="text-primary hover:underline">
               Sign up
             </Link>
           </p>
         </CardFooter>
+        {process.env.NODE_ENV === "development" && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={fillTestData}
+            className="w-full"
+          >
+            Fill Test Data
+          </Button>
+        )}
       </Card>
     </ContentContainer>
-  )
+  );
 }
