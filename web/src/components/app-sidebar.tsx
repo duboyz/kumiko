@@ -1,12 +1,7 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import {
-  Home,
-  Settings2,
-  Globe,
-  ChefHat,
-} from 'lucide-react'
+import * as React from "react";
+import { Home, Settings2, Globe, ChefHat, LogOut } from "lucide-react";
 
 import {
   Sidebar,
@@ -20,54 +15,55 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from '@/components/ui/sidebar'
-import { SidebarRestaurantSelector } from '@/components/SidebarRestaurantSelector'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useLocationSelection } from '@shared'
+} from "@/components/ui/sidebar";
+import { SidebarRestaurantSelector } from "@/components/SidebarRestaurantSelector";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useLocationSelection, useLogout } from "@shared";
 
 // Menu items.
 const items = [
   {
-    title: 'Dashboard',
-    url: '/dashboard',
+    title: "Dashboard",
+    url: "/dashboard",
     icon: Home,
   },
   {
-    title: 'Menus',
-    url: '/menus',
+    title: "Menus",
+    url: "/menus",
     icon: ChefHat,
     restaurantOnly: true,
   },
   {
-    title: 'Menu items',
-    url: '/menu-items',
+    title: "Menu items",
+    url: "/menu-items",
     icon: ChefHat,
     restaurantOnly: true,
   },
   {
-    title: 'Websites',
-    url: '/websites',
+    title: "Websites",
+    url: "/websites",
     icon: Globe,
   },
   {
-    title: 'Settings',
-    url: '/settings',
+    title: "Settings",
+    url: "/settings",
     icon: Settings2,
   },
-]
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname()
-  const { selectedLocation } = useLocationSelection()
+  const pathname = usePathname();
+  const { selectedLocation } = useLocationSelection();
+  const logoutMutation = useLogout();
 
   // Filter items based on location type
-  const visibleItems = items.filter(item => {
+  const visibleItems = items.filter((item) => {
     if (item.restaurantOnly) {
-      return selectedLocation?.type === 'Restaurant'
+      return selectedLocation?.type === "Restaurant";
     }
-    return true
-  })
+    return true;
+  });
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -100,14 +96,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="sm">
-              <Settings2 />
-              <span>Settings</span>
+            <SidebarMenuButton
+              size="sm"
+              onClick={() => logoutMutation.mutate()}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              disabled={logoutMutation.isPending}
+            >
+              <LogOut />
+              <span>Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
