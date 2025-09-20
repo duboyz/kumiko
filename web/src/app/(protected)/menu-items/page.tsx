@@ -4,7 +4,6 @@ import { ContentContainer } from "@/components/ContentContainer";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { DeleteConfirmDialog } from "@/components/menu-builder/DeleteConfirmDialog";
 import { MenuItemForm } from "@/components/menu-builder/MenuItemForm";
-import { MenuItemReview } from "@/components/menu-builder/MenuItemReview";
 import MenuItemTableView from "@/components/menu-builder/MenuItemTableView";
 import {
   useAllRestaurantMenuItems,
@@ -18,6 +17,7 @@ import { useLocationSelection } from "@shared";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+import Link from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -25,13 +25,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Building2,
@@ -39,23 +32,15 @@ import {
   Plus,
   Edit,
   Trash2,
-  DollarSign,
   Package,
   Grid3X3,
   Table,
   Upload,
-  Camera,
-  FileText,
-  X,
   CheckCircle,
-  AlertTriangle,
-  Lightbulb,
 } from "lucide-react";
 import { useState, useEffect, Suspense } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
-import QRCode from "qrcode";
-import { isMobileDevice } from "@/lib/device-detection";
 import {
   MenuItemDto,
   CreateMenuItemCommand,
@@ -90,210 +75,18 @@ function MenuItemsPageContent() {
   } | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [activeView, setActiveView] = useState<"cards" | "table">("cards");
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-  const [importMode, setImportMode] = useState<"select" | "preview" | "review">(
-    "select",
-  );
-  const [parsedItems, setParsedItems] = useState<any[]>([]);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
-  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [abortController, setAbortController] =
-    useState<AbortController | null>(null);
-  const [processingStep, setProcessingStep] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
-  // Handle import success from mobile upload
+  // Handle import success from new import flow
   useEffect(() => {
     if (searchParams.get("import") === "success") {
-      const storedItems = sessionStorage.getItem("parsedMenuItems");
-      if (storedItems) {
-        const items = JSON.parse(storedItems);
-        setParsedItems(items);
-        setImportMode("review");
-        setIsImportDialogOpen(true);
-        sessionStorage.removeItem("parsedMenuItems");
-        // Clean up URL
-        window.history.replaceState({}, "", window.location.pathname);
-      }
-    }
-  }, [searchParams]);
-
-  const generateQRCode = async () => {
-    setIsGeneratingQR(true);
-    try {
-      const uploadUrl = `${window.location.origin}/menu-upload`;
-      const qrCodeDataURL = await QRCode.toDataURL(uploadUrl, {
-        width: 256,
-        margin: 2,
-      });
-      setQrCodeUrl(qrCodeDataURL);
-    } catch (error) {
-      console.error("Failed to generate QR code:", error);
-    } finally {
-      setIsGeneratingQR(false);
-    }
-  };
-
-  const handleFileSelect = (file: File) => {
-    setSelectedImage(file);
-    const url = URL.createObjectURL(file);
-    setImagePreview(url);
-    setImportMode("preview");
-  };
-
-  const handleFileUpload = async () => {
-    if (!selectedImage) return;
-
-    const controller = new AbortController();
-    setAbortController(controller);
-    setIsProcessing(true);
-    setErrorMessage(null);
-
-    try {
-      setProcessingStep("Preparing image...");
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Small delay for UX
-
-      setProcessingStep("Sending to AI...");
-      const formData = new FormData();
-      formData.append("image", selectedImage);
-
-      setProcessingStep("AI is analyzing your menu...");
-      const response = await fetch("/api/menu/parse", {
-        method: "POST",
-        body: formData,
-        signal: controller.signal,
-      });
-
-      if (response.ok) {
-        setProcessingStep("Processing results...");
-        const result = await response.json();
-
-        // Add confidence scores to items
-        const itemsWithConfidence = result.menuItems.map((item: any) => ({
-          ...item,
-          confidence: Math.random() * 0.4 + 0.6, // Mock confidence score 60-100%
-        }));
-
-        setParsedItems(itemsWithConfidence);
-        setImportMode("review");
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
-      } else {
-        const errorData = await response.json();
-        console.error("API Error:", errorData);
-
-        // Better error messages
-        let errorMsg = "Failed to parse menu";
-        if (errorData.error?.includes("No text detected")) {
-          errorMsg = "No text detected in image. Please try a clearer photo.";
-        } else if (errorData.error?.includes("Image too blurry")) {
-          errorMsg = "Image is too blurry. Please take a clearer photo.";
-        } else if (errorData.error?.includes("No menu items found")) {
-          errorMsg =
-            "No menu items found. Please ensure the image contains a menu.";
-        } else {
-          errorMsg = errorData.error || "Unknown error occurred";
-        }
-
-        setErrorMessage(errorMsg);
-        throw new Error(errorMsg);
-      }
-    } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") {
-        console.log("Processing cancelled by user");
-        return;
-      }
-      console.error("Upload error:", error);
-      if (!errorMessage) {
-        setErrorMessage(
-          `Failed to upload and parse menu: ${error instanceof Error ? error.message : "Unknown error"}`,
-        );
-      }
-    } finally {
-      setIsProcessing(false);
-      setAbortController(null);
-      setProcessingStep("");
-    }
-  };
-
-  const handleCancelProcessing = () => {
-    if (abortController) {
-      abortController.abort();
-    }
-    setIsProcessing(false);
-    setAbortController(null);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-
-    const files = e.dataTransfer.files;
-    if (files && files[0] && files[0].type.startsWith("image/")) {
-      handleFileSelect(files[0]);
-    }
-  };
-
-  const handleReviewConfirm = async (items: any[]) => {
-    try {
-      if (!selectedCategoryId) {
-        alert("Please select a category for the menu items.");
-        return;
-      }
-
-      // Create menu items first
-      const createdMenuItems = [];
-      for (const item of items) {
-        const result = await createMenuItemMutation.mutateAsync({
-          name: item.name,
-          description: item.description,
-          price: item.price,
-          restaurantMenuId: menusData?.menus?.[0]?.id || "", // Use first menu or handle this better
-          isAvailable: true,
-        });
-        createdMenuItems.push(result);
-      }
-
-      // Then bulk add them to the selected category
-      if (createdMenuItems.length > 0) {
-        await bulkAddMenuItemsToCategoryMutation.mutateAsync({
-          menuItemIds: createdMenuItems
-            .filter((item) => item)
-            .map((item) => item!.id),
-          menuCategoryId: selectedCategoryId,
-          startOrderIndex: 0,
-        });
-      }
-
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
-
-      setImportMode("select");
-      setParsedItems([]);
-      setSelectedCategoryId("");
-      setIsImportDialogOpen(false);
-    } catch (error) {
-      console.error("Failed to create menu items:", error);
-      alert("Failed to create some menu items. Please try again.");
+      // Clean up URL
+      window.history.replaceState({}, "", window.location.pathname);
     }
-  };
+  }, [searchParams]);
 
   if (isLoading) {
     return (
@@ -455,327 +248,12 @@ function MenuItemsPageContent() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Dialog
-            open={isImportDialogOpen}
-            onOpenChange={(open) => {
-              setIsImportDialogOpen(open);
-              if (!open) {
-                // Cancel any ongoing processing
-                if (abortController) {
-                  abortController.abort();
-                }
-                setImportMode("select");
-                setParsedItems([]);
-                setQrCodeUrl("");
-                setSelectedImage(null);
-                setImagePreview(null);
-                setIsProcessing(false);
-                setIsDragOver(false);
-                setAbortController(null);
-                setProcessingStep("");
-                setErrorMessage(null);
-                if (imagePreview) {
-                  URL.revokeObjectURL(imagePreview);
-                }
-              }
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Upload className="w-4 h-4 mr-2" />
-                Import
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>
-                  {importMode === "select"
-                    ? "Import Menu Items"
-                    : importMode === "preview"
-                      ? "Preview Image"
-                      : "Review Parsed Items"}
-                </DialogTitle>
-
-                {/* Progress Bar */}
-                <div className="w-full">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                    <span>Step 1: Upload</span>
-                    <span>Step 2: Preview</span>
-                    <span>Step 3: Process</span>
-                    <span>Step 4: Review</span>
-                    <span>Step 5: Complete</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full transition-all duration-500"
-                      style={{
-                        width:
-                          importMode === "select"
-                            ? "20%"
-                            : importMode === "preview"
-                              ? "40%"
-                              : importMode === "review"
-                                ? "80%"
-                                : "100%",
-                      }}
-                    />
-                  </div>
-                </div>
-              </DialogHeader>
-
-              {importMode === "select" ? (
-                <div className="space-y-4">
-                  {/* Image Quality Tips */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <Lightbulb className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <h4 className="font-medium text-blue-900 mb-2">
-                          Tips for best results:
-                        </h4>
-                        <ul className="text-sm text-blue-800 space-y-1">
-                          <li>• Ensure good lighting and clear text</li>
-                          <li>• Take photo straight-on, not at an angle</li>
-                          <li>• Include the entire menu in the frame</li>
-                          <li>• Avoid shadows and reflections</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Drag and Drop Area */}
-                  <div
-                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                      isDragOver
-                        ? "border-primary bg-primary/5"
-                        : "border-muted-foreground/25"
-                    }`}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                  >
-                    <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-lg font-medium mb-2">
-                      Upload Menu Image
-                    </p>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Drag and drop an image here, or click to select
-                    </p>
-                    <Button
-                      onClick={() => {
-                        const input = document.createElement("input");
-                        input.type = "file";
-                        input.accept = "image/*";
-                        input.onchange = (e) => {
-                          const file = (e.target as HTMLInputElement)
-                            .files?.[0];
-                          if (file) handleFileSelect(file);
-                        };
-                        input.click();
-                      }}
-                    >
-                      Choose File
-                    </Button>
-                  </div>
-
-                  {/* Mobile Camera Option */}
-                  {isMobileDevice() ? (
-                    <Button
-                      variant="outline"
-                      className="w-full h-12 flex items-center justify-center gap-2"
-                      onClick={() => {
-                        const input = document.createElement("input");
-                        input.type = "file";
-                        input.accept = "image/*";
-                        input.capture = "environment";
-                        input.onchange = (e) => {
-                          const file = (e.target as HTMLInputElement)
-                            .files?.[0];
-                          if (file) handleFileSelect(file);
-                        };
-                        input.click();
-                      }}
-                    >
-                      <Camera className="w-4 h-4" />
-                      Take Picture
-                    </Button>
-                  ) : (
-                    <div className="text-center">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          if (!qrCodeUrl) {
-                            generateQRCode();
-                          }
-                        }}
-                        disabled={isGeneratingQR}
-                        className="w-full h-12 flex items-center justify-center gap-2"
-                      >
-                        <Camera className="w-4 h-4" />
-                        {isGeneratingQR
-                          ? "Generating..."
-                          : "Take Picture with Phone"}
-                      </Button>
-                      {qrCodeUrl && (
-                        <div className="mt-4 space-y-2">
-                          <p className="text-sm text-muted-foreground">
-                            Scan this QR code with your phone
-                          </p>
-                          <div className="flex justify-center">
-                            <img
-                              src={qrCodeUrl}
-                              alt="QR Code"
-                              className="w-32 h-32"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ) : importMode === "preview" ? (
-                <div className="space-y-4">
-                  <div className="relative">
-                    <img
-                      src={imagePreview!}
-                      alt="Menu preview"
-                      className="w-full h-64 object-cover rounded-lg"
-                    />
-                    <Button
-                      onClick={() => {
-                        if (isProcessing) {
-                          handleCancelProcessing();
-                        } else {
-                          setSelectedImage(null);
-                          setImagePreview(null);
-                          setImportMode("select");
-                          if (imagePreview) {
-                            URL.revokeObjectURL(imagePreview);
-                          }
-                        }
-                      }}
-                      size="sm"
-                      variant={isProcessing ? "secondary" : "destructive"}
-                      className="absolute top-2 right-2"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-
-                  {isProcessing ? (
-                    <div className="text-center space-y-4 py-8">
-                      <div className="relative">
-                        <div className="w-16 h-16 mx-auto mb-4 relative">
-                          <div className="absolute inset-0 rounded-full border-4 border-primary/20"></div>
-                          <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
-                          <div
-                            className="absolute inset-2 rounded-full border-2 border-primary/40 border-b-transparent animate-spin"
-                            style={{
-                              animationDirection: "reverse",
-                              animationDuration: "0.8s",
-                            }}
-                          ></div>
-                        </div>
-                        <h3 className="text-lg font-semibold mb-2">
-                          {processingStep || "AI is analyzing your menu..."}
-                        </h3>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          This may take a few moments
-                        </p>
-                        <Button
-                          onClick={handleCancelProcessing}
-                          variant="outline"
-                          size="sm"
-                        >
-                          Cancel Processing
-                        </Button>
-                      </div>
-                    </div>
-                  ) : errorMessage ? (
-                    <div className="text-center space-y-4 py-8">
-                      <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-                        <AlertTriangle className="w-8 h-8 text-red-600" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-red-900 mb-2">
-                        Processing Failed
-                      </h3>
-                      <p className="text-sm text-red-700 mb-4">
-                        {errorMessage}
-                      </p>
-                      <div className="flex gap-2 justify-center">
-                        <Button
-                          onClick={() => {
-                            setErrorMessage(null);
-                            setSelectedImage(null);
-                            setImagePreview(null);
-                            setImportMode("select");
-                            if (imagePreview) {
-                              URL.revokeObjectURL(imagePreview);
-                            }
-                          }}
-                          variant="outline"
-                          size="sm"
-                        >
-                          Try Again
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setErrorMessage(null);
-                            setImportMode("select");
-                          }}
-                          size="sm"
-                        >
-                          Choose Different Image
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => {
-                          setSelectedImage(null);
-                          setImagePreview(null);
-                          setImportMode("select");
-                          if (imagePreview) {
-                            URL.revokeObjectURL(imagePreview);
-                          }
-                        }}
-                        variant="outline"
-                        className="flex-1"
-                      >
-                        Choose Different Image
-                      </Button>
-                      <Button onClick={handleFileUpload} className="flex-1">
-                        Process with AI
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <MenuItemReview
-                  initialItems={parsedItems}
-                  categories={menusData?.menus?.[0]?.categories || []}
-                  selectedCategoryId={selectedCategoryId}
-                  onCategoryChange={setSelectedCategoryId}
-                  onConfirm={handleReviewConfirm}
-                  onCancel={() => {
-                    setImportMode("select");
-                    setParsedItems([]);
-                    setSelectedCategoryId("");
-                    setSelectedImage(null);
-                    setImagePreview(null);
-                    if (imagePreview) {
-                      URL.revokeObjectURL(imagePreview);
-                    }
-                  }}
-                  isLoading={
-                    createMenuItemMutation.isPending ||
-                    bulkAddMenuItemsToCategoryMutation.isPending
-                  }
-                />
-              )}
-            </DialogContent>
-          </Dialog>
+          <Button variant="outline" asChild>
+            <Link href="/menu-items/import">
+              <Upload className="w-4 h-4 mr-2" />
+              Import from Photo
+            </Link>
+          </Button>
           <Dialog
             open={isCreateDialogOpen}
             onOpenChange={setIsCreateDialogOpen}
@@ -838,28 +316,70 @@ function MenuItemsPageContent() {
                 <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h2 className="text-xl font-semibold mb-2">No Menu Items</h2>
                 <p className="text-muted-foreground mb-6">
-                  Get started by creating your first menu item.
+                  Get started by creating your first menu item or importing from
+                  a photo.
                 </p>
-                <Button onClick={() => setIsCreateDialogOpen(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Menu Item
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button asChild size="lg">
+                    <Link href="/menu-items/import">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Import from Photo
+                    </Link>
+                  </Button>
+                  <Button
+                    onClick={() => setIsCreateDialogOpen(true)}
+                    variant="outline"
+                    size="lg"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Manually
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {menuItems.map((item) => (
-                <MenuItemCard
-                  key={item.id}
-                  item={item}
-                  onEdit={(item) => {
-                    setEditingItem(item);
-                    setIsEditDialogOpen(true);
-                  }}
-                  onDelete={handleDeleteMenuItem}
-                />
-              ))}
-            </div>
+            <>
+              {/* Quick Import Card - Show when user has items but might want to import more */}
+              {menuItems.length > 0 && menuItems.length < 10 && (
+                <Card className="mb-6 border-dashed border-2 border-primary/20 bg-primary/5">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                          <Upload className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-sm">
+                            Import More Items
+                          </h3>
+                          <p className="text-xs text-muted-foreground">
+                            Have a menu photo? Import multiple items at once
+                            with AI.
+                          </p>
+                        </div>
+                      </div>
+                      <Button asChild size="sm">
+                        <Link href="/menu-items/import">Import</Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {menuItems.map((item) => (
+                  <MenuItemCard
+                    key={item.id}
+                    item={item}
+                    onEdit={(item) => {
+                      setEditingItem(item);
+                      setIsEditDialogOpen(true);
+                    }}
+                    onDelete={handleDeleteMenuItem}
+                  />
+                ))}
+              </div>
+            </>
           )}
         </TabsContent>
 

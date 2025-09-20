@@ -33,6 +33,7 @@ import {
   CheckSquare,
   Square,
   Users,
+  Upload,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -605,6 +606,14 @@ export default function MenuItemTableView({
                 <option value={25}>25 per page</option>
                 <option value={50}>50 per page</option>
               </select>
+
+              {/* Import Button */}
+              <Button variant="outline" size="sm" asChild>
+                <a href="/menu-items/import">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import
+                </a>
+              </Button>
 
               {/* Global Edit Mode Toggle */}
               <div className="flex items-center gap-3">

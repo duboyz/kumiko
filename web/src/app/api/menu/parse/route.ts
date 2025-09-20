@@ -20,10 +20,22 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const imageFile = formData.get("image") as File;
+    const annotationsData = formData.get("annotations") as string;
 
     if (!imageFile) {
       console.error("No image file provided");
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
+    }
+
+    // Parse annotations if provided
+    let annotations = [];
+    if (annotationsData) {
+      try {
+        annotations = JSON.parse(annotationsData);
+        console.log("Annotations received:", annotations.length);
+      } catch (error) {
+        console.error("Failed to parse annotations:", error);
+      }
     }
 
     console.log("Image file received:", {
@@ -39,22 +51,49 @@ export async function POST(request: NextRequest) {
 
     console.log("Image converted to base64, length:", base64.length);
 
-    // Create OpenAI vision prompt
-    const prompt = `Analyze this menu image and extract all menu items. For each item, provide:
+    // Create OpenAI vision prompt with annotation context
+    let prompt = `Analyze this menu image and extract all menu items. For each item, provide:
       1. Name (required)
       2. Description (if available, otherwise use a brief description)
       3. Price (extract the price as a number, if no price found use 0)
+      4. Category (if you can identify which section/category this item belongs to)
 
       Return the data as a JSON array of objects with this exact structure:
       [
         {
           "name": "Item Name",
           "description": "Item description or brief summary",
-          "price": 12.99
+          "price": 12.99,
+          "category": "Category Name"
         }
       ]
 
       Only extract actual menu items (food/drinks), not headers, sections, or other text. Be accurate with prices and names.`;
+
+    // Add annotation context if available
+    if (annotations.length > 0) {
+      const categoryAnnotations = annotations.filter(
+        (a) => a.type === "category",
+      );
+      const itemAnnotations = annotations.filter((a) => a.type === "item");
+      const priceAnnotations = annotations.filter((a) => a.type === "price");
+
+      prompt += `\n\nIMPORTANT: This image has been annotated to help you understand the structure:
+      
+      - BLUE annotations mark CATEGORIES/SECTIONS (like "Appetizers", "Main Courses", "Desserts")
+      - GREEN annotations mark INDIVIDUAL MENU ITEMS (specific dishes)
+      - YELLOW annotations mark PRICES (price text and numbers)
+      - RED annotations mark SPECIAL NOTES (like "Spicy", "Vegetarian")
+      - PURPLE annotations mark DESCRIPTIONS (item descriptions)
+      
+      The annotations are positioned at specific coordinates on the image. Use these visual markers to:
+      1. Identify which text belongs to which category
+      2. Group menu items by their sections
+      3. Extract prices more accurately
+      4. Understand the menu layout and structure
+      
+      Pay special attention to the BLUE category markers - these will help you group items correctly.`;
+    }
 
     console.log("Calling OpenAI API...");
     const response = await openai.chat.completions.create({
