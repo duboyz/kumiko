@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Trash2,
   Edit,
@@ -29,6 +30,9 @@ import {
   Check,
   RotateCcw,
   Info,
+  CheckSquare,
+  Square,
+  Users,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -47,7 +51,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { MenuItemDto, RestaurantMenuDto } from "@shared";
+import {
+  MenuItemDto,
+  RestaurantMenuDto,
+  useBulkDeleteMenuItems,
+} from "@shared";
 
 interface MenuItemTableViewProps {
   menuItems: MenuItemDto[];
@@ -57,6 +65,11 @@ interface MenuItemTableViewProps {
   onDeleteItem?: (itemId: string) => void;
   onUpdateItem?: (item: MenuItemDto) => void;
   onCreateItem?: (item: Partial<MenuItemDto>) => void;
+  onBulkDelete?: (itemIds: string[]) => void;
+  onBulkUpdate?: (updates: {
+    itemIds: string[];
+    updates: Partial<MenuItemDto>;
+  }) => void;
 }
 
 interface EditableMenuItem extends MenuItemDto {
@@ -72,7 +85,10 @@ export default function MenuItemTableView({
   onDeleteItem,
   onUpdateItem,
   onCreateItem,
+  onBulkDelete,
+  onBulkUpdate,
 }: MenuItemTableViewProps) {
+  const bulkDeleteMenuItemsMutation = useBulkDeleteMenuItems();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMenu, setSelectedMenu] = useState<string>("");
   const [deleteConfirmItem, setDeleteConfirmItem] =
@@ -86,6 +102,11 @@ export default function MenuItemTableView({
   const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [isMac, setIsMac] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
+  const [bulkMenuAssign, setBulkMenuAssign] = useState(false);
+  const [bulkMenuId, setBulkMenuId] = useState<string>("");
+  const [isBulkOperationLoading, setIsBulkOperationLoading] = useState(false);
 
   // Detect operating system
   useEffect(() => {
@@ -95,7 +116,13 @@ export default function MenuItemTableView({
   }, []);
 
   // Filter and paginate menu items
-  const { filteredItems, paginatedItems, totalPages } = useMemo(() => {
+  const {
+    filteredItems,
+    paginatedItems,
+    totalPages,
+    isAllSelected,
+    isIndeterminate,
+  } = useMemo(() => {
     // Filter items based on search and menu
     const filtered = menuItems.filter((item) => {
       const matchesSearch =
@@ -112,12 +139,30 @@ export default function MenuItemTableView({
     const paginated = filtered.slice(startIndex, endIndex);
     const totalPagesCalc = Math.ceil(filtered.length / itemsPerPage);
 
+    // Calculate selection state
+    const selectedCount = paginated.filter((item) =>
+      selectedItems.has(item.id),
+    ).length;
+    const isAllSelected =
+      paginated.length > 0 && selectedCount === paginated.length;
+    const isIndeterminate =
+      selectedCount > 0 && selectedCount < paginated.length;
+
     return {
       filteredItems: filtered,
       paginatedItems: paginated,
       totalPages: totalPagesCalc,
+      isAllSelected,
+      isIndeterminate,
     };
-  }, [menuItems, searchTerm, selectedMenu, currentPage, itemsPerPage]);
+  }, [
+    menuItems,
+    searchTerm,
+    selectedMenu,
+    currentPage,
+    itemsPerPage,
+    selectedItems,
+  ]);
 
   const handleDelete = (item: MenuItemDto) => {
     setDeleteConfirmItem(item);
@@ -127,6 +172,111 @@ export default function MenuItemTableView({
     if (deleteConfirmItem && onDeleteItem) {
       onDeleteItem(deleteConfirmItem.id);
       setDeleteConfirmItem(null);
+    }
+  };
+
+  // Bulk selection handlers
+  const handleSelectItem = (itemId: string, checked: boolean) => {
+    setSelectedItems((prev) => {
+      const newSet = new Set(prev);
+      if (checked) {
+        newSet.add(itemId);
+      } else {
+        newSet.delete(itemId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(paginatedItems.map((item) => item.id));
+      setSelectedItems(allIds);
+    } else {
+      setSelectedItems(new Set());
+    }
+  };
+
+  const handleBulkDelete = () => {
+    setBulkDeleteConfirm(true);
+  };
+
+  const confirmBulkDelete = async () => {
+    if (selectedItems.size > 0) {
+      setIsBulkOperationLoading(true);
+      try {
+        const result = await bulkDeleteMenuItemsMutation.mutateAsync({
+          menuItemIds: Array.from(selectedItems),
+        });
+
+        setSelectedItems(new Set());
+        setBulkDeleteConfirm(false);
+
+        if (result && result.itemsNotFound > 0) {
+          toast.warning(
+            `Deleted ${result.itemsDeleted} menu items. ${result.itemsNotFound} items were not found.`,
+          );
+        } else if (result) {
+          toast.success(`Deleted ${result.itemsDeleted} menu items`);
+        }
+      } catch (error) {
+        toast.error("Failed to delete menu items");
+        console.error("Bulk delete error:", error);
+      } finally {
+        setIsBulkOperationLoading(false);
+      }
+    }
+  };
+
+  const handleBulkMenuAssign = () => {
+    setBulkMenuAssign(true);
+  };
+
+  const confirmBulkMenuAssign = async () => {
+    if (onBulkUpdate && selectedItems.size > 0 && bulkMenuId) {
+      setIsBulkOperationLoading(true);
+      try {
+        await onBulkUpdate({
+          itemIds: Array.from(selectedItems),
+          updates: { restaurantMenuId: bulkMenuId },
+        });
+        setSelectedItems(new Set());
+        setBulkMenuAssign(false);
+        setBulkMenuId("");
+        toast.success(`Updated ${selectedItems.size} menu items`);
+      } catch (error) {
+        toast.error("Failed to update menu items");
+        console.error("Bulk update error:", error);
+      } finally {
+        setIsBulkOperationLoading(false);
+      }
+    }
+  };
+
+  const handleBulkToggleAvailability = async () => {
+    if (onBulkUpdate && selectedItems.size > 0) {
+      setIsBulkOperationLoading(true);
+      try {
+        // Get the first selected item to determine current availability state
+        const firstSelected = paginatedItems.find((item) =>
+          selectedItems.has(item.id),
+        );
+        const newAvailability = !firstSelected?.isAvailable;
+
+        await onBulkUpdate({
+          itemIds: Array.from(selectedItems),
+          updates: { isAvailable: newAvailability },
+        });
+        setSelectedItems(new Set());
+        toast.success(
+          `Updated availability for ${selectedItems.size} menu items`,
+        );
+      } catch (error) {
+        toast.error("Failed to update menu items");
+        console.error("Bulk update error:", error);
+      } finally {
+        setIsBulkOperationLoading(false);
+      }
     }
   };
 
@@ -286,6 +436,10 @@ export default function MenuItemTableView({
             if (!isGlobalEditMode) {
               handleToggleGlobalEditMode();
             }
+            break;
+          case "a":
+            event.preventDefault();
+            handleSelectAll(!isAllSelected);
             break;
         }
       }
@@ -470,7 +624,7 @@ export default function MenuItemTableView({
         </CardHeader>
 
         <CardContent>
-          {/* Add Row Button */}
+          {/* Add Row Button and Bulk Actions */}
           <div className="mb-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <Button
@@ -480,8 +634,48 @@ export default function MenuItemTableView({
                 variant="outline"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Add Menu Item (Shift + Enter)
+                Add (Shift + Enter)
               </Button>
+
+              {/* Bulk Actions */}
+              {selectedItems.size > 0 && (
+                <div className="flex items-center gap-2 pl-4 border-l border-gray-200">
+                  <span className="text-sm text-gray-600">
+                    {selectedItems.size} selected
+                  </span>
+                  <Button
+                    onClick={handleBulkDelete}
+                    size="sm"
+                    variant="outline"
+                    className="text-red-600 hover:text-red-700"
+                    disabled={
+                      isBulkOperationLoading ||
+                      bulkDeleteMenuItemsMutation.isPending
+                    }
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </Button>
+                  <Button
+                    onClick={handleBulkMenuAssign}
+                    size="sm"
+                    variant="outline"
+                    disabled={isBulkOperationLoading}
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Assign to Menu
+                  </Button>
+                  <Button
+                    onClick={handleBulkToggleAvailability}
+                    size="sm"
+                    variant="outline"
+                    disabled={isBulkOperationLoading}
+                  >
+                    <Check className="mr-2 h-4 w-4" />
+                    Toggle Availability
+                  </Button>
+                </div>
+              )}
 
               {/* Keyboard shortcuts info tooltip */}
               <div className="relative group">
@@ -515,6 +709,9 @@ export default function MenuItemTableView({
                       </span>{" "}
                       Toggle edit mode
                     </div>
+                    <div>
+                      <span className="font-semibold">Ctrl+A:</span> Select all
+                    </div>
                   </div>
                   {/* Arrow pointing down */}
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
@@ -531,6 +728,17 @@ export default function MenuItemTableView({
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={isAllSelected}
+                    onCheckedChange={handleSelectAll}
+                    ref={(el) => {
+                      if (el) {
+                        (el as any).indeterminate = isIndeterminate;
+                      }
+                    }}
+                  />
+                </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Menu</TableHead>
@@ -551,8 +759,16 @@ export default function MenuItemTableView({
                 return (
                   <TableRow
                     key={item.id}
-                    className={`hover:bg-gray-50 ${isGlobalEditMode ? "bg-blue-50/30" : ""}`}
+                    className={`hover:bg-gray-50 ${isGlobalEditMode ? "bg-blue-50/30" : ""} ${selectedItems.has(item.id) ? "bg-blue-50" : ""}`}
                   >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedItems.has(item.id)}
+                        onCheckedChange={(checked) =>
+                          handleSelectItem(item.id, checked as boolean)
+                        }
+                      />
+                    </TableCell>
                     <TableCell>
                       {isCurrentlyEditing && editingItem ? (
                         <Input
@@ -794,6 +1010,14 @@ export default function MenuItemTableView({
                       className="bg-green-50/30 border-l-4 border-l-green-400"
                     >
                       <TableCell>
+                        <Checkbox
+                          checked={selectedItems.has(item.id)}
+                          onCheckedChange={(checked) =>
+                            handleSelectItem(item.id, checked as boolean)
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
                         <Input
                           value={item.name}
                           onChange={(e) =>
@@ -1028,6 +1252,75 @@ export default function MenuItemTableView({
               className="bg-red-600 hover:bg-red-700"
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog
+        open={bulkDeleteConfirm}
+        onOpenChange={() => setBulkDeleteConfirm(false)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Selected Menu Items</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedItems.size} selected menu
+              items? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmBulkDelete}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={
+                isBulkOperationLoading || bulkDeleteMenuItemsMutation.isPending
+              }
+            >
+              {isBulkOperationLoading || bulkDeleteMenuItemsMutation.isPending
+                ? "Deleting..."
+                : `Delete ${selectedItems.size} Items`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Menu Assign Dialog */}
+      <AlertDialog
+        open={bulkMenuAssign}
+        onOpenChange={() => setBulkMenuAssign(false)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Assign to Menu</AlertDialogTitle>
+            <AlertDialogDescription>
+              Select a menu to assign {selectedItems.size} selected menu items
+              to:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <select
+              value={bulkMenuId}
+              onChange={(e) => setBulkMenuId(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Menu</option>
+              {menus.map((menu) => (
+                <option key={menu.id} value={menu.id}>
+                  {menu.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmBulkMenuAssign}
+              disabled={!bulkMenuId || isBulkOperationLoading}
+            >
+              {isBulkOperationLoading ? "Assigning..." : "Assign to Menu"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

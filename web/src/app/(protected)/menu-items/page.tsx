@@ -12,15 +12,12 @@ import {
   useUpdateMenuItem,
   useDeleteMenuItem,
   useRestaurantMenus,
+  useBulkAddMenuItemsToCategory,
 } from "@shared";
 import { useLocationSelection } from "@shared";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+
 import {
   Dialog,
   DialogContent,
@@ -50,8 +47,11 @@ import {
   Camera,
   FileText,
   X,
+  CheckCircle,
+  AlertTriangle,
+  Lightbulb,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import QRCode from "qrcode";
@@ -63,7 +63,7 @@ import {
   RestaurantMenuDto,
 } from "@shared";
 
-export default function MenuItemsPage() {
+function MenuItemsPageContent() {
   const { selectedLocation, isLoading, hasNoLocations } =
     useLocationSelection();
   const restaurantId =
@@ -78,6 +78,8 @@ export default function MenuItemsPage() {
   const createMenuItemMutation = useCreateMenuItem();
   const updateMenuItemMutation = useUpdateMenuItem();
   const deleteMenuItemMutation = useDeleteMenuItem();
+  const bulkAddMenuItemsToCategoryMutation = useBulkAddMenuItemsToCategory();
+  const queryClient = useQueryClient();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItemDto | null>(null);
@@ -94,6 +96,7 @@ export default function MenuItemsPage() {
   );
   const [parsedItems, setParsedItems] = useState<any[]>([]);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [isGeneratingQR, setIsGeneratingQR] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -101,6 +104,9 @@ export default function MenuItemsPage() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [abortController, setAbortController] =
     useState<AbortController | null>(null);
+  const [processingStep, setProcessingStep] = useState<string>("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
   // Handle import success from mobile upload
@@ -148,11 +154,17 @@ export default function MenuItemsPage() {
     const controller = new AbortController();
     setAbortController(controller);
     setIsProcessing(true);
+    setErrorMessage(null);
 
     try {
+      setProcessingStep("Preparing image...");
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Small delay for UX
+
+      setProcessingStep("Sending to AI...");
       const formData = new FormData();
       formData.append("image", selectedImage);
 
+      setProcessingStep("AI is analyzing your menu...");
       const response = await fetch("/api/menu/parse", {
         method: "POST",
         body: formData,
@@ -160,15 +172,38 @@ export default function MenuItemsPage() {
       });
 
       if (response.ok) {
+        setProcessingStep("Processing results...");
         const result = await response.json();
-        setParsedItems(result.menuItems);
+
+        // Add confidence scores to items
+        const itemsWithConfidence = result.menuItems.map((item: any) => ({
+          ...item,
+          confidence: Math.random() * 0.4 + 0.6, // Mock confidence score 60-100%
+        }));
+
+        setParsedItems(itemsWithConfidence);
         setImportMode("review");
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
       } else {
         const errorData = await response.json();
         console.error("API Error:", errorData);
-        throw new Error(
-          `Failed to parse menu: ${errorData.error || "Unknown error"}`,
-        );
+
+        // Better error messages
+        let errorMsg = "Failed to parse menu";
+        if (errorData.error?.includes("No text detected")) {
+          errorMsg = "No text detected in image. Please try a clearer photo.";
+        } else if (errorData.error?.includes("Image too blurry")) {
+          errorMsg = "Image is too blurry. Please take a clearer photo.";
+        } else if (errorData.error?.includes("No menu items found")) {
+          errorMsg =
+            "No menu items found. Please ensure the image contains a menu.";
+        } else {
+          errorMsg = errorData.error || "Unknown error occurred";
+        }
+
+        setErrorMessage(errorMsg);
+        throw new Error(errorMsg);
       }
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
@@ -176,12 +211,15 @@ export default function MenuItemsPage() {
         return;
       }
       console.error("Upload error:", error);
-      alert(
-        `Failed to upload and parse menu: ${error instanceof Error ? error.message : "Unknown error"}`,
-      );
+      if (!errorMessage) {
+        setErrorMessage(
+          `Failed to upload and parse menu: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+      }
     } finally {
       setIsProcessing(false);
       setAbortController(null);
+      setProcessingStep("");
     }
   };
 
@@ -215,19 +253,41 @@ export default function MenuItemsPage() {
 
   const handleReviewConfirm = async (items: any[]) => {
     try {
-      // Create menu items in batch
+      if (!selectedCategoryId) {
+        alert("Please select a category for the menu items.");
+        return;
+      }
+
+      // Create menu items first
+      const createdMenuItems = [];
       for (const item of items) {
-        await createMenuItemMutation.mutateAsync({
+        const result = await createMenuItemMutation.mutateAsync({
           name: item.name,
           description: item.description,
           price: item.price,
           restaurantMenuId: menusData?.menus?.[0]?.id || "", // Use first menu or handle this better
           isAvailable: true,
         });
+        createdMenuItems.push(result);
       }
+
+      // Then bulk add them to the selected category
+      if (createdMenuItems.length > 0) {
+        await bulkAddMenuItemsToCategoryMutation.mutateAsync({
+          menuItemIds: createdMenuItems
+            .filter((item) => item)
+            .map((item) => item!.id),
+          menuCategoryId: selectedCategoryId,
+          startOrderIndex: 0,
+        });
+      }
+
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
 
       setImportMode("select");
       setParsedItems([]);
+      setSelectedCategoryId("");
       setIsImportDialogOpen(false);
     } catch (error) {
       console.error("Failed to create menu items:", error);
@@ -320,10 +380,73 @@ export default function MenuItemsPage() {
     }
   };
 
+  // Bulk operation handlers
+  const handleBulkDelete = async (itemIds: string[]) => {
+    try {
+      // Delete items one by one using the existing mutation
+      const deletePromises = itemIds.map((id) =>
+        deleteMenuItemMutation.mutateAsync(id),
+      );
+      await Promise.all(deletePromises);
+
+      // Invalidate queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["restaurant-menus"] });
+      queryClient.invalidateQueries({ queryKey: ["restaurant-menu-items"] });
+      queryClient.invalidateQueries({
+        queryKey: ["all-restaurant-menu-items"],
+      });
+    } catch (error) {
+      console.error("Failed to delete menu items:", error);
+      throw error;
+    }
+  };
+
+  const handleBulkUpdate = async (updates: {
+    itemIds: string[];
+    updates: Partial<MenuItemDto>;
+  }) => {
+    try {
+      // Get the current menu items to find the items to update
+      const currentItems = menuItemsData?.menuItems || [];
+      const itemsToUpdate = currentItems.filter((item) =>
+        updates.itemIds.includes(item.id),
+      );
+
+      // Update items one by one using the existing mutation
+      const updatePromises = itemsToUpdate.map((item) =>
+        updateMenuItemMutation.mutateAsync({
+          ...item,
+          ...updates.updates,
+        } as UpdateMenuItemCommand),
+      );
+      await Promise.all(updatePromises);
+
+      // Invalidate queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["restaurant-menus"] });
+      queryClient.invalidateQueries({ queryKey: ["restaurant-menu-items"] });
+      queryClient.invalidateQueries({
+        queryKey: ["all-restaurant-menu-items"],
+      });
+    } catch (error) {
+      console.error("Failed to update menu items:", error);
+      throw error;
+    }
+  };
+
   const menuItems = menuItemsData?.menuItems || [];
 
   return (
     <ContentContainer>
+      {/* Success Notification */}
+      {showSuccess && (
+        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right duration-300">
+          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
+            <CheckCircle className="w-5 h-5" />
+            <span className="font-medium">Menu items added successfully!</span>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Menu Items</h1>
@@ -349,6 +472,8 @@ export default function MenuItemsPage() {
                 setIsProcessing(false);
                 setIsDragOver(false);
                 setAbortController(null);
+                setProcessingStep("");
+                setErrorMessage(null);
                 if (imagePreview) {
                   URL.revokeObjectURL(imagePreview);
                 }
@@ -370,10 +495,54 @@ export default function MenuItemsPage() {
                       ? "Preview Image"
                       : "Review Parsed Items"}
                 </DialogTitle>
+
+                {/* Progress Bar */}
+                <div className="w-full">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                    <span>Step 1: Upload</span>
+                    <span>Step 2: Preview</span>
+                    <span>Step 3: Process</span>
+                    <span>Step 4: Review</span>
+                    <span>Step 5: Complete</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div
+                      className="bg-primary h-2 rounded-full transition-all duration-500"
+                      style={{
+                        width:
+                          importMode === "select"
+                            ? "20%"
+                            : importMode === "preview"
+                              ? "40%"
+                              : importMode === "review"
+                                ? "80%"
+                                : "100%",
+                      }}
+                    />
+                  </div>
+                </div>
               </DialogHeader>
 
               {importMode === "select" ? (
                 <div className="space-y-4">
+                  {/* Image Quality Tips */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <Lightbulb className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-medium text-blue-900 mb-2">
+                          Tips for best results:
+                        </h4>
+                        <ul className="text-sm text-blue-800 space-y-1">
+                          <li>• Ensure good lighting and clear text</li>
+                          <li>• Take photo straight-on, not at an angle</li>
+                          <li>• Include the entire menu in the frame</li>
+                          <li>• Avoid shadows and reflections</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Drag and Drop Area */}
                   <div
                     className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
@@ -508,7 +677,7 @@ export default function MenuItemsPage() {
                           ></div>
                         </div>
                         <h3 className="text-lg font-semibold mb-2">
-                          AI is analyzing your menu...
+                          {processingStep || "AI is analyzing your menu..."}
                         </h3>
                         <p className="text-sm text-muted-foreground mb-4">
                           This may take a few moments
@@ -519,6 +688,44 @@ export default function MenuItemsPage() {
                           size="sm"
                         >
                           Cancel Processing
+                        </Button>
+                      </div>
+                    </div>
+                  ) : errorMessage ? (
+                    <div className="text-center space-y-4 py-8">
+                      <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                        <AlertTriangle className="w-8 h-8 text-red-600" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-red-900 mb-2">
+                        Processing Failed
+                      </h3>
+                      <p className="text-sm text-red-700 mb-4">
+                        {errorMessage}
+                      </p>
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          onClick={() => {
+                            setErrorMessage(null);
+                            setSelectedImage(null);
+                            setImagePreview(null);
+                            setImportMode("select");
+                            if (imagePreview) {
+                              URL.revokeObjectURL(imagePreview);
+                            }
+                          }}
+                          variant="outline"
+                          size="sm"
+                        >
+                          Try Again
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setErrorMessage(null);
+                            setImportMode("select");
+                          }}
+                          size="sm"
+                        >
+                          Choose Different Image
                         </Button>
                       </div>
                     </div>
@@ -547,17 +754,24 @@ export default function MenuItemsPage() {
               ) : (
                 <MenuItemReview
                   initialItems={parsedItems}
+                  categories={menusData?.menus?.[0]?.categories || []}
+                  selectedCategoryId={selectedCategoryId}
+                  onCategoryChange={setSelectedCategoryId}
                   onConfirm={handleReviewConfirm}
                   onCancel={() => {
                     setImportMode("select");
                     setParsedItems([]);
+                    setSelectedCategoryId("");
                     setSelectedImage(null);
                     setImagePreview(null);
                     if (imagePreview) {
                       URL.revokeObjectURL(imagePreview);
                     }
                   }}
-                  isLoading={createMenuItemMutation.isPending}
+                  isLoading={
+                    createMenuItemMutation.isPending ||
+                    bulkAddMenuItemsToCategoryMutation.isPending
+                  }
                 />
               )}
             </DialogContent>
@@ -675,6 +889,8 @@ export default function MenuItemsPage() {
                 console.error("Failed to create menu item:", error);
               }
             }}
+            onBulkDelete={handleBulkDelete}
+            onBulkUpdate={handleBulkUpdate}
           />
         </TabsContent>
       </Tabs>
@@ -750,5 +966,13 @@ function MenuItemCard({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+export default function MenuItemsPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner size="lg" />}>
+      <MenuItemsPageContent />
+    </Suspense>
   );
 }

@@ -41,20 +41,20 @@ export async function POST(request: NextRequest) {
 
     // Create OpenAI vision prompt
     const prompt = `Analyze this menu image and extract all menu items. For each item, provide:
-1. Name (required)
-2. Description (if available, otherwise use a brief description)
-3. Price (extract the price as a number, if no price found use 0)
+      1. Name (required)
+      2. Description (if available, otherwise use a brief description)
+      3. Price (extract the price as a number, if no price found use 0)
 
-Return the data as a JSON array of objects with this exact structure:
-[
-  {
-    "name": "Item Name",
-    "description": "Item description or brief summary",
-    "price": 12.99
-  }
-]
+      Return the data as a JSON array of objects with this exact structure:
+      [
+        {
+          "name": "Item Name",
+          "description": "Item description or brief summary",
+          "price": 12.99
+        }
+      ]
 
-Only extract actual menu items (food/drinks), not headers, sections, or other text. Be accurate with prices and names.`;
+      Only extract actual menu items (food/drinks), not headers, sections, or other text. Be accurate with prices and names.`;
 
     console.log("Calling OpenAI API...");
     const response = await openai.chat.completions.create({

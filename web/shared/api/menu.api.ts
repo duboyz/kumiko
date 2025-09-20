@@ -7,6 +7,10 @@ import {
   CreateMenuCategoryCommand,
   CreateMenuItemCommand,
   AddMenuItemToCategoryCommand,
+  BulkAddMenuItemsToCategoryCommand,
+  BulkAddMenuItemsToCategoryResult,
+  BulkDeleteMenuItemsCommand,
+  BulkDeleteMenuItemsResult,
   UpdateMenuCategoryCommand,
   UpdateMenuItemCommand,
   UpdateMenuCategoryItemCommand,
@@ -189,6 +193,18 @@ export const menuApi = {
       throw new Error(data.message || "Failed to delete menu item");
   },
 
+  // Bulk delete menu items
+  bulkDeleteMenuItems: async (
+    command: BulkDeleteMenuItemsCommand,
+  ): Promise<ResponseData<BulkDeleteMenuItemsResult>> => {
+    const { data } = await client.delete<
+      ApiResponse<BulkDeleteMenuItemsResult>
+    >("/api/menu-items/bulk", { data: command });
+    if (!data.success)
+      throw new Error(data.message || "Failed to bulk delete menu items");
+    return data.data;
+  },
+
   // Add existing menu item to category
   addMenuItemToCategory: async (
     command: AddMenuItemToCategoryCommand,
@@ -199,6 +215,20 @@ export const menuApi = {
     );
     if (!data.success)
       throw new Error(data.message || "Failed to add menu item to category");
+    return data.data;
+  },
+
+  // Bulk add menu items to category
+  bulkAddMenuItemsToCategory: async (
+    command: BulkAddMenuItemsToCategoryCommand,
+  ): Promise<ResponseData<BulkAddMenuItemsToCategoryResult>> => {
+    const { data } = await client.post<
+      ApiResponse<BulkAddMenuItemsToCategoryResult>
+    >("/api/menu-category-items/bulk", command);
+    if (!data.success)
+      throw new Error(
+        data.message || "Failed to bulk add menu items to category",
+      );
     return data.data;
   },
 

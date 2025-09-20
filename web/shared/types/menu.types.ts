@@ -85,6 +85,29 @@ export interface AddMenuItemToCategoryCommand {
   orderIndex: number;
 }
 
+export interface BulkAddMenuItemsToCategoryCommand {
+  menuItemIds: string[];
+  menuCategoryId: string;
+  startOrderIndex?: number;
+}
+
+export interface BulkAddMenuItemsToCategoryResult {
+  createdCategoryItemIds: string[];
+  itemsAdded: number;
+  itemsSkipped: number;
+  skippedReasons: string[];
+}
+
+export interface BulkDeleteMenuItemsCommand {
+  menuItemIds: string[];
+}
+
+export interface BulkDeleteMenuItemsResult {
+  itemsDeleted: number;
+  itemsNotFound: number;
+  notFoundReasons: string[];
+}
+
 export interface UpdateMenuCategoryCommand {
   id: string;
   name: string;
@@ -107,31 +130,30 @@ export interface UpdateMenuCategoryItemCommand {
 
 // Public menu types
 export interface GetMenuByIdResult {
-  id: string
-  name: string
-  description?: string
-  categories: PublicMenuCategoryDto[]
+  id: string;
+  name: string;
+  description?: string;
+  categories: PublicMenuCategoryDto[];
 }
 
 export interface PublicMenuCategoryDto {
-  id: string
-  name: string
-  description?: string
-  orderIndex: number
-  menuCategoryItems: PublicMenuCategoryItemDto[]
+  id: string;
+  name: string;
+  description?: string;
+  orderIndex: number;
+  menuCategoryItems: PublicMenuCategoryItemDto[];
 }
 
 export interface PublicMenuCategoryItemDto {
-  id: string
-  orderIndex: number
-  menuItem?: PublicMenuItemDto
+  id: string;
+  orderIndex: number;
+  menuItem?: PublicMenuItemDto;
 }
 
 export interface PublicMenuItemDto {
-  id: string
-  name: string
-  description?: string
-  price: number
-  isAvailable: boolean
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  isAvailable: boolean;
 }
-
