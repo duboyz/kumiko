@@ -13,5 +13,8 @@ public class Hospitality : BaseEntity
     public string Longitude { get; set; } = string.Empty;
     public string? Description { get; set; }
 
+    // Localization settings
+    public Currency Currency { get; set; } = Currency.USD;
+
     public ICollection<HospitalityRoom> Rooms { get; set; } = [];
 }

@@ -12,5 +12,6 @@ public record GetCurrentUserResult(
     string Email,
     string FirstName,
     string LastName,
-    bool IsDeleted
+    bool IsDeleted,
+    Language PreferredLanguage
 );

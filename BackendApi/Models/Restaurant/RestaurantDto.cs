@@ -1,3 +1,5 @@
+using BackendApi.Entities;
+
 namespace BackendApi.Models.Restaurant;
 
 public record RestaurantBaseDto(
@@ -10,5 +12,6 @@ public record RestaurantBaseDto(
     string Zip,
     string Country,
     string Latitude,
-    string Longitude
+    string Longitude,
+    Currency Currency
 );

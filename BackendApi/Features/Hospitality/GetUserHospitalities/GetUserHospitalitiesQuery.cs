@@ -1,3 +1,4 @@
+using BackendApi.Entities;
 using BackendApi.Shared.Contracts;
 
 namespace BackendApi.Features.Hospitality.GetUserHospitalities;
@@ -19,5 +20,6 @@ public record HospitalityBaseDto(
     string State,
     string Zip,
     string Country,
-    string? Description
+    string? Description,
+    Currency Currency
 );

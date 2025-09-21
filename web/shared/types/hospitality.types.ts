@@ -1,3 +1,5 @@
+import { Currency } from './localization.types'
+
 // Hospitality types
 export interface HospitalityBaseDto {
   id: string;
@@ -8,6 +10,7 @@ export interface HospitalityBaseDto {
   zip: string;
   country: string;
   description?: string;
+  currency: Currency;
 }
 
 export interface UserHospitalityDto {
@@ -51,4 +54,5 @@ export interface LocationOption {
   address: string;
   city: string;
   role: string;
+  currency: Currency;
 }

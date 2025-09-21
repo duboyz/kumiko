@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useLocationStore } from '../stores/location-store'
 import { useUserRestaurants, useUserHospitalities } from '@shared'
 import type { LocationOption } from '@shared'
+import { Currency } from '../types/localization.types'
 
 export const useLocationSelection = () => {
   const {
@@ -15,7 +16,25 @@ export const useLocationSelection = () => {
   const { data: restaurants, isLoading: restaurantsLoading } = useUserRestaurants()
   const { data: hospitalities, isLoading: hospitalitiesLoading } = useUserHospitalities()
 
+
   const isLoading = restaurantsLoading || hospitalitiesLoading
+
+  // Convert string currency from API to numeric enum
+  const convertCurrencyFromApi = (apiCurrency: any): Currency => {
+    if (typeof apiCurrency === 'string') {
+      switch (apiCurrency) {
+        case 'EUR': return Currency.EUR
+        case 'USD': return Currency.USD
+        case 'GBP': return Currency.GBP
+        case 'NOK': return Currency.NOK
+        case 'SEK': return Currency.SEK
+        case 'ISK': return Currency.ISK
+        case 'DKK': return Currency.DKK
+        default: return Currency.USD
+      }
+    }
+    return apiCurrency ?? Currency.USD
+  }
 
   const userLocations = useMemo(() => {
     const locations: LocationOption[] = []
@@ -29,7 +48,8 @@ export const useLocationSelection = () => {
           type: 'Restaurant',
           address: restaurant.restaurant.address,
           city: restaurant.restaurant.city,
-          role: restaurant.role
+          role: restaurant.role,
+          currency: convertCurrencyFromApi(restaurant.restaurant.currency)
         })
       })
     }
@@ -43,7 +63,8 @@ export const useLocationSelection = () => {
           type: 'Hospitality',
           address: hospitality.hospitality.address,
           city: hospitality.hospitality.city,
-          role: hospitality.role
+          role: hospitality.role,
+          currency: convertCurrencyFromApi(hospitality.hospitality.currency)
         })
       })
     }

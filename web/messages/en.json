@@ -1,0 +1,106 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "restaurants": "Restaurants",
+    "hospitality": "Hospitality",
+    "websites": "Websites",
+    "menu": "Menu",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "loginButton": "Sign In",
+    "registerButton": "Sign Up",
+    "forgotPassword": "Forgot Password?",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logged out successfully",
+    "registerSuccess": "Registration successful"
+  },
+  "settings": {
+    "title": "Settings",
+    "userSettings": "User Settings",
+    "locationSettings": "Location Settings",
+    "language": "Language",
+    "currency": "Currency",
+    "preferredLanguage": "Preferred Language",
+    "selectLanguage": "Select Language",
+    "selectCurrency": "Select Currency",
+    "settingsUpdated": "Settings updated successfully"
+  },
+  "restaurant": {
+    "title": "Restaurant",
+    "restaurants": "Restaurants",
+    "createRestaurant": "Create Restaurant",
+    "editRestaurant": "Edit Restaurant",
+    "restaurantName": "Restaurant Name",
+    "address": "Address",
+    "city": "City",
+    "state": "State",
+    "country": "Country",
+    "description": "Description"
+  },
+  "hospitality": {
+    "title": "Hospitality",
+    "hospitalities": "Hospitalities",
+    "createHospitality": "Create Hospitality",
+    "editHospitality": "Edit Hospitality",
+    "hospitalityName": "Hospitality Name",
+    "rooms": "Rooms"
+  },
+  "website": {
+    "title": "Website",
+    "websites": "Websites",
+    "createWebsite": "Create Website",
+    "editWebsite": "Edit Website",
+    "websiteName": "Website Name",
+    "pages": "Pages",
+    "sections": "Sections"
+  },
+  "languages": {
+    "en": "English",
+    "no": "Norwegian",
+    "sv": "Swedish",
+    "da": "Danish",
+    "th": "Thai"
+  },
+  "currencies": {
+    "USD": "US Dollar",
+    "EUR": "Euro",
+    "GBP": "British Pound",
+    "NOK": "Norwegian Krone",
+    "SEK": "Swedish Krona",
+    "DKK": "Danish Krone",
+    "ISK": "Icelandic Krona"
+  }
+}

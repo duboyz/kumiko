@@ -10,6 +10,8 @@ export interface CreateRestaurantCommand {
   googlePlaceId: string;
 }
 
+import { Currency } from './localization.types'
+
 export interface RestaurantBaseDto {
   id: string;
   name: string;
@@ -21,6 +23,7 @@ export interface RestaurantBaseDto {
   country: string;
   latitude: string;
   longitude: string;
+  currency: Currency;
 }
 
 export interface CreateRestaurantResult extends RestaurantBaseDto {}

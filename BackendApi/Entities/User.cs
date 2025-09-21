@@ -10,6 +10,9 @@ public class User : BaseEntity
     // Phone number for bookings/orders
     public string? PhoneNumber { get; set; }
 
+    // Localization settings
+    public Language PreferredLanguage { get; set; } = Language.English;
+
     // Refresh token for authentication
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiresAt { get; set; }

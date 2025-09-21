@@ -1,0 +1,106 @@
+{
+  "common": {
+    "loading": "Laster...",
+    "save": "Lagre",
+    "cancel": "Avbryt",
+    "delete": "Slett",
+    "edit": "Rediger",
+    "back": "Tilbake",
+    "next": "Neste",
+    "previous": "Forrige",
+    "submit": "Send inn",
+    "close": "Lukk",
+    "search": "Søk",
+    "filter": "Filter",
+    "clear": "Tøm",
+    "confirm": "Bekreft",
+    "yes": "Ja",
+    "no": "Nei",
+    "success": "Suksess",
+    "error": "Feil",
+    "warning": "Advarsel",
+    "info": "Informasjon"
+  },
+  "navigation": {
+    "dashboard": "Dashbord",
+    "restaurants": "Restauranter",
+    "hospitality": "Gjestfrihet",
+    "websites": "Nettsider",
+    "menu": "Meny",
+    "settings": "Innstillinger",
+    "profile": "Profil",
+    "logout": "Logg ut"
+  },
+  "auth": {
+    "login": "Logg inn",
+    "register": "Registrer",
+    "email": "E-post",
+    "password": "Passord",
+    "firstName": "Fornavn",
+    "lastName": "Etternavn",
+    "loginButton": "Logg inn",
+    "registerButton": "Registrer",
+    "forgotPassword": "Glemt passord?",
+    "alreadyHaveAccount": "Har du allerede en konto?",
+    "dontHaveAccount": "Har du ikke en konto?",
+    "loginSuccess": "Innlogging vellykket",
+    "logoutSuccess": "Logget ut",
+    "registerSuccess": "Registrering vellykket"
+  },
+  "settings": {
+    "title": "Innstillinger",
+    "userSettings": "Brukerinnstillinger",
+    "locationSettings": "Lokasjonsinnstillinger",
+    "language": "Språk",
+    "currency": "Valuta",
+    "preferredLanguage": "Foretrukket språk",
+    "selectLanguage": "Velg språk",
+    "selectCurrency": "Velg valuta",
+    "settingsUpdated": "Innstillinger oppdatert"
+  },
+  "restaurant": {
+    "title": "Restaurant",
+    "restaurants": "Restauranter",
+    "createRestaurant": "Opprett restaurant",
+    "editRestaurant": "Rediger restaurant",
+    "restaurantName": "Restaurantnavn",
+    "address": "Adresse",
+    "city": "By",
+    "state": "Fylke",
+    "country": "Land",
+    "description": "Beskrivelse"
+  },
+  "hospitality": {
+    "title": "Gjestfrihet",
+    "hospitalities": "Gjestfrihet",
+    "createHospitality": "Opprett gjestfrihet",
+    "editHospitality": "Rediger gjestfrihet",
+    "hospitalityName": "Gjestfrihetsnavn",
+    "rooms": "Rom"
+  },
+  "website": {
+    "title": "Nettside",
+    "websites": "Nettsider",
+    "createWebsite": "Opprett nettside",
+    "editWebsite": "Rediger nettside",
+    "websiteName": "Nettsidenavn",
+    "pages": "Sider",
+    "sections": "Seksjoner"
+  },
+  "languages": {
+    "en": "Engelsk",
+    "no": "Norsk",
+    "sv": "Svensk",
+    "da": "Dansk",
+    "th": "Thai"
+  },
+  "currencies": {
+    "USD": "Amerikanske dollar",
+    "EUR": "Euro",
+    "GBP": "Britiske pund",
+    "NOK": "Norske kroner",
+    "SEK": "Svenske kroner",
+    "DKK": "Danske kroner",
+    "ISK": "Islandske kroner"
+  }
+}

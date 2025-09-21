@@ -1,3 +1,5 @@
+import { Language } from './localization.types'
+
 export interface UserSdto {
   id: string
   email: string
@@ -5,6 +7,7 @@ export interface UserSdto {
   lastName: string
   isActive: boolean
   userType: UserType
+  preferredLanguage: Language
 }
 
 export enum UserType {

@@ -25,7 +25,8 @@ public class GetUserHospitalitiesHandler(
                     uh.Hospitality.State,
                     uh.Hospitality.Zip,
                     uh.Hospitality.Country,
-                    uh.Hospitality.Description
+                    uh.Hospitality.Description,
+                    uh.Hospitality.Currency
                 ),
                 uh.Role.ToString()
             )).ToList();

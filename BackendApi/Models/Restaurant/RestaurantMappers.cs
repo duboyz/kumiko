@@ -19,7 +19,8 @@ public static class RestaurantMappers
             restaurant.Zip ?? string.Empty,
             restaurant.Country ?? string.Empty,
             restaurant.Latitude ?? string.Empty,
-            restaurant.Longitude ?? string.Empty
+            restaurant.Longitude ?? string.Empty,
+            restaurant.Currency
         );
     }
 }

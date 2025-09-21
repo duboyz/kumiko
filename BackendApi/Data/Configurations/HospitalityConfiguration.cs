@@ -21,6 +21,10 @@ public static class HospitalityConfiguration
             entity.Property(h => h.Latitude).HasMaxLength(50);
             entity.Property(h => h.Longitude).HasMaxLength(50);
             entity.Property(h => h.Description).HasMaxLength(1000);
+            entity.Property(h => h.Currency)
+                .HasConversion<string>()
+                .HasDefaultValue(Currency.USD)
+                .HasSentinel(Currency.Unspecified);
         });
 
         // UserHospitality entity

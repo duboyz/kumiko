@@ -1,6 +1,35 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
+import { locales } from './i18n'
+
+// Function to detect locale from request headers and user preferences
+function detectLocale(request: NextRequest): string {
+  // Check if there's a cookie for user's preferred locale
+  const localeCookie = request.cookies.get('locale')?.value
+  if (localeCookie && locales.includes(localeCookie as any)) {
+    return localeCookie
+  }
+
+  // Fall back to Accept-Language header
+  const acceptLanguage = request.headers.get('Accept-Language')
+  if (acceptLanguage) {
+    // Simple language detection from Accept-Language header
+    const languages = acceptLanguage
+      .split(',')
+      .map(lang => lang.split(';')[0].trim().toLowerCase())
+
+    for (const lang of languages) {
+      if (lang === 'nb' || lang === 'no') return 'no' // Norwegian
+      if (lang === 'sv') return 'sv' // Swedish
+      if (lang === 'da') return 'da' // Danish
+      if (lang === 'th') return 'th' // Thai
+      if (lang === 'en') return 'en' // English
+    }
+  }
+
+  return 'en' // Default to English
+}
 
 // Define public routes that don't require authentication
 const publicRoutes = ['/login', '/register', '/forgot-password', '/', '/about', '/contact', '/site']
@@ -110,11 +139,20 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Detect and set locale for non-subdomain routes
+  const locale = detectLocale(request)
+
+  // Create response that will continue through the middleware
+  const response = NextResponse.next()
+
+  // Set the detected locale in a custom header for the app to use
+  response.headers.set('x-locale', locale)
+
   // Check if the current route is public
   const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`))
 
   if (isPublicRoute) {
-    return NextResponse.next()
+    return response
   }
 
   // Get the access token from cookies
@@ -149,8 +187,8 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    // Token is valid, continue
-    return NextResponse.next()
+    // Token is valid, continue with locale header
+    return response
   } catch (error) {
     // Token is invalid, try to refresh
     const refreshResponse = await refreshToken(request)

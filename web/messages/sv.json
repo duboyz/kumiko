@@ -1,0 +1,106 @@
+{
+  "common": {
+    "loading": "Laddar...",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "delete": "Radera",
+    "edit": "Redigera",
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "previous": "Föregående",
+    "submit": "Skicka",
+    "close": "Stäng",
+    "search": "Sök",
+    "filter": "Filter",
+    "clear": "Rensa",
+    "confirm": "Bekräfta",
+    "yes": "Ja",
+    "no": "Nej",
+    "success": "Framgång",
+    "error": "Fel",
+    "warning": "Varning",
+    "info": "Information"
+  },
+  "navigation": {
+    "dashboard": "Instrumentpanel",
+    "restaurants": "Restauranger",
+    "hospitality": "Gästfrihet",
+    "websites": "Webbplatser",
+    "menu": "Meny",
+    "settings": "Inställningar",
+    "profile": "Profil",
+    "logout": "Logga ut"
+  },
+  "auth": {
+    "login": "Logga in",
+    "register": "Registrera",
+    "email": "E-post",
+    "password": "Lösenord",
+    "firstName": "Förnamn",
+    "lastName": "Efternamn",
+    "loginButton": "Logga in",
+    "registerButton": "Registrera",
+    "forgotPassword": "Glömt lösenord?",
+    "alreadyHaveAccount": "Har du redan ett konto?",
+    "dontHaveAccount": "Har du inget konto?",
+    "loginSuccess": "Inloggning lyckades",
+    "logoutSuccess": "Utloggad",
+    "registerSuccess": "Registrering lyckades"
+  },
+  "settings": {
+    "title": "Inställningar",
+    "userSettings": "Användarinställningar",
+    "locationSettings": "Platsinställningar",
+    "language": "Språk",
+    "currency": "Valuta",
+    "preferredLanguage": "Föredraget språk",
+    "selectLanguage": "Välj språk",
+    "selectCurrency": "Välj valuta",
+    "settingsUpdated": "Inställningar uppdaterade"
+  },
+  "restaurant": {
+    "title": "Restaurang",
+    "restaurants": "Restauranger",
+    "createRestaurant": "Skapa restaurang",
+    "editRestaurant": "Redigera restaurang",
+    "restaurantName": "Restaurangnamn",
+    "address": "Adress",
+    "city": "Stad",
+    "state": "Delstat",
+    "country": "Land",
+    "description": "Beskrivning"
+  },
+  "hospitality": {
+    "title": "Gästfrihet",
+    "hospitalities": "Gästfrihet",
+    "createHospitality": "Skapa gästfrihet",
+    "editHospitality": "Redigera gästfrihet",
+    "hospitalityName": "Gästfrihetsnamn",
+    "rooms": "Rum"
+  },
+  "website": {
+    "title": "Webbplats",
+    "websites": "Webbplatser",
+    "createWebsite": "Skapa webbplats",
+    "editWebsite": "Redigera webbplats",
+    "websiteName": "Webbplatsnamn",
+    "pages": "Sidor",
+    "sections": "Sektioner"
+  },
+  "languages": {
+    "en": "Engelska",
+    "no": "Norska",
+    "sv": "Svenska",
+    "da": "Danska",
+    "th": "Thailändska"
+  },
+  "currencies": {
+    "USD": "Amerikanska dollar",
+    "EUR": "Euro",
+    "GBP": "Brittiska pund",
+    "NOK": "Norska kronor",
+    "SEK": "Svenska kronor",
+    "DKK": "Danska kronor",
+    "ISK": "Isländska kronor"
+  }
+}

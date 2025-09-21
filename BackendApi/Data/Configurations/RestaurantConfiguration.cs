@@ -21,6 +21,10 @@ public static class RestaurantConfiguration
             entity.Property(e => e.Country).HasMaxLength(100);
             entity.Property(e => e.Latitude).HasMaxLength(50);
             entity.Property(e => e.Longitude).HasMaxLength(50);
+            entity.Property(e => e.Currency)
+                .HasConversion<string>()
+                .HasDefaultValue(Currency.USD)
+                .HasSentinel(Currency.Unspecified);
         });
 
         // UserRestaurant (junction table) configuration

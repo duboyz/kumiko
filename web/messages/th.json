@@ -1,0 +1,106 @@
+{
+  "common": {
+    "loading": "กำลังโหลด...",
+    "save": "บันทึก",
+    "cancel": "ยกเลิก",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "back": "กลับ",
+    "next": "ถัดไป",
+    "previous": "ก่อนหน้า",
+    "submit": "ส่ง",
+    "close": "ปิด",
+    "search": "ค้นหา",
+    "filter": "กรอง",
+    "clear": "ล้าง",
+    "confirm": "ยืนยัน",
+    "yes": "ใช่",
+    "no": "ไม่",
+    "success": "สำเร็จ",
+    "error": "ข้อผิดพลาด",
+    "warning": "คำเตือน",
+    "info": "ข้อมูล"
+  },
+  "navigation": {
+    "dashboard": "แดชบอร์ด",
+    "restaurants": "ร้านอาหาร",
+    "hospitality": "การบริการ",
+    "websites": "เว็บไซต์",
+    "menu": "เมนู",
+    "settings": "การตั้งค่า",
+    "profile": "โปรไฟล์",
+    "logout": "ออกจากระบบ"
+  },
+  "auth": {
+    "login": "เข้าสู่ระบบ",
+    "register": "สมัครสมาชิก",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน",
+    "firstName": "ชื่อ",
+    "lastName": "นามสกุล",
+    "loginButton": "เข้าสู่ระบบ",
+    "registerButton": "สมัครสมาชิก",
+    "forgotPassword": "ลืมรหัสผ่าน?",
+    "alreadyHaveAccount": "มีบัญชีแล้ว?",
+    "dontHaveAccount": "ยังไม่มีบัญชี?",
+    "loginSuccess": "เข้าสู่ระบบสำเร็จ",
+    "logoutSuccess": "ออกจากระบบแล้ว",
+    "registerSuccess": "สมัครสมาชิกสำเร็จ"
+  },
+  "settings": {
+    "title": "การตั้งค่า",
+    "userSettings": "การตั้งค่าผู้ใช้",
+    "locationSettings": "การตั้งค่าสถานที่",
+    "language": "ภาษา",
+    "currency": "สกุลเงิน",
+    "preferredLanguage": "ภาษาที่ต้องการ",
+    "selectLanguage": "เลือกภาษา",
+    "selectCurrency": "เลือกสกุลเงิน",
+    "settingsUpdated": "อัปเดตการตั้งค่าแล้ว"
+  },
+  "restaurant": {
+    "title": "ร้านอาหาร",
+    "restaurants": "ร้านอาหาร",
+    "createRestaurant": "สร้างร้านอาหาร",
+    "editRestaurant": "แก้ไขร้านอาหาร",
+    "restaurantName": "ชื่อร้านอาหาร",
+    "address": "ที่อยู่",
+    "city": "เมือง",
+    "state": "รัฐ",
+    "country": "ประเทศ",
+    "description": "คำอธิบาย"
+  },
+  "hospitality": {
+    "title": "การบริการ",
+    "hospitalities": "การบริการ",
+    "createHospitality": "สร้างการบริการ",
+    "editHospitality": "แก้ไขการบริการ",
+    "hospitalityName": "ชื่อการบริการ",
+    "rooms": "ห้อง"
+  },
+  "website": {
+    "title": "เว็บไซต์",
+    "websites": "เว็บไซต์",
+    "createWebsite": "สร้างเว็บไซต์",
+    "editWebsite": "แก้ไขเว็บไซต์",
+    "websiteName": "ชื่อเว็บไซต์",
+    "pages": "หน้า",
+    "sections": "ส่วน"
+  },
+  "languages": {
+    "en": "อังกฤษ",
+    "no": "นอร์เวย์",
+    "sv": "สวีเดน",
+    "da": "เดนมาร์ก",
+    "th": "ไทย"
+  },
+  "currencies": {
+    "USD": "ดอลลาร์สหรัฐ",
+    "EUR": "ยูโร",
+    "GBP": "ปอนด์อังกฤษ",
+    "NOK": "โครนนอร์เวย์",
+    "SEK": "โครนสวีเดน",
+    "DKK": "โครนเดนมาร์ก",
+    "ISK": "โครนไอซ์แลนด์"
+  }
+}

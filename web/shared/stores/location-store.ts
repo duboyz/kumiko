@@ -27,7 +27,8 @@ export const useLocationStore = create<LocationStore>()(
             type: 'Restaurant',
             address: restaurant.restaurant.address,
             city: restaurant.restaurant.city,
-            role: restaurant.role
+            role: restaurant.role,
+            currency: restaurant.restaurant.currency
           }
           set({ selectedLocation: location })
         } else {
@@ -43,7 +44,8 @@ export const useLocationStore = create<LocationStore>()(
             type: 'Hospitality',
             address: hospitality.hospitality.address,
             city: hospitality.hospitality.city,
-            role: hospitality.role
+            role: hospitality.role,
+            currency: hospitality.hospitality.currency
           }
           set({ selectedLocation: location })
         } else {

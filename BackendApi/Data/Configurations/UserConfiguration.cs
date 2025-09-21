@@ -17,6 +17,10 @@ public static class UserConfiguration
             entity.Property(e => e.FirstName).HasMaxLength(100);
             entity.Property(e => e.LastName).HasMaxLength(100);
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+            entity.Property(e => e.PreferredLanguage)
+                .HasConversion<string>()
+                .HasDefaultValue(Language.English)
+                .HasSentinel(Language.Unspecified);
             entity.Property(e => e.CreatedAt).IsRequired();
         });
     }

@@ -1,0 +1,106 @@
+{
+  "common": {
+    "loading": "Indlæser...",
+    "save": "Gem",
+    "cancel": "Annuller",
+    "delete": "Slet",
+    "edit": "Rediger",
+    "back": "Tilbage",
+    "next": "Næste",
+    "previous": "Forrige",
+    "submit": "Indsend",
+    "close": "Luk",
+    "search": "Søg",
+    "filter": "Filter",
+    "clear": "Ryd",
+    "confirm": "Bekræft",
+    "yes": "Ja",
+    "no": "Nej",
+    "success": "Succes",
+    "error": "Fejl",
+    "warning": "Advarsel",
+    "info": "Information"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "restaurants": "Restauranter",
+    "hospitality": "Gæstfrihed",
+    "websites": "Hjemmesider",
+    "menu": "Menu",
+    "settings": "Indstillinger",
+    "profile": "Profil",
+    "logout": "Log ud"
+  },
+  "auth": {
+    "login": "Log ind",
+    "register": "Registrer",
+    "email": "E-mail",
+    "password": "Adgangskode",
+    "firstName": "Fornavn",
+    "lastName": "Efternavn",
+    "loginButton": "Log ind",
+    "registerButton": "Registrer",
+    "forgotPassword": "Glemt adgangskode?",
+    "alreadyHaveAccount": "Har du allerede en konto?",
+    "dontHaveAccount": "Har du ikke en konto?",
+    "loginSuccess": "Login lykkedes",
+    "logoutSuccess": "Logget ud",
+    "registerSuccess": "Registrering lykkedes"
+  },
+  "settings": {
+    "title": "Indstillinger",
+    "userSettings": "Brugerindstillinger",
+    "locationSettings": "Lokationsindstillinger",
+    "language": "Sprog",
+    "currency": "Valuta",
+    "preferredLanguage": "Foretrukket sprog",
+    "selectLanguage": "Vælg sprog",
+    "selectCurrency": "Vælg valuta",
+    "settingsUpdated": "Indstillinger opdateret"
+  },
+  "restaurant": {
+    "title": "Restaurant",
+    "restaurants": "Restauranter",
+    "createRestaurant": "Opret restaurant",
+    "editRestaurant": "Rediger restaurant",
+    "restaurantName": "Restaurantnavn",
+    "address": "Adresse",
+    "city": "By",
+    "state": "Stat",
+    "country": "Land",
+    "description": "Beskrivelse"
+  },
+  "hospitality": {
+    "title": "Gæstfrihed",
+    "hospitalities": "Gæstfrihed",
+    "createHospitality": "Opret gæstfrihed",
+    "editHospitality": "Rediger gæstfrihed",
+    "hospitalityName": "Gæstfrihedsnavn",
+    "rooms": "Værelser"
+  },
+  "website": {
+    "title": "Hjemmeside",
+    "websites": "Hjemmesider",
+    "createWebsite": "Opret hjemmeside",
+    "editWebsite": "Rediger hjemmeside",
+    "websiteName": "Hjemmesidenavn",
+    "pages": "Sider",
+    "sections": "Sektioner"
+  },
+  "languages": {
+    "en": "Engelsk",
+    "no": "Norsk",
+    "sv": "Svensk",
+    "da": "Dansk",
+    "th": "Thai"
+  },
+  "currencies": {
+    "USD": "Amerikanske dollar",
+    "EUR": "Euro",
+    "GBP": "Britiske pund",
+    "NOK": "Norske kroner",
+    "SEK": "Svenske kroner",
+    "DKK": "Danske kroner",
+    "ISK": "Islandske kroner"
+  }
+}

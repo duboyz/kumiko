@@ -20,7 +20,8 @@ public class GetCurrentUserHandler(
             user.Email,
             user.FirstName ?? string.Empty,
             user.LastName ?? string.Empty,
-            user.IsDeleted
+            user.IsDeleted,
+            user.PreferredLanguage
         );
     }
 }
