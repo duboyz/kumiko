@@ -7,20 +7,20 @@ const kumikoHeadingVariants = cva(
   {
     variants: {
       level: {
-        h1: "text-6xl font-ultra-light tracking-ultra mb-5 lg:text-6xl",
-        h2: "text-xl font-light tracking-tight mb-12 lg:text-xl",
-        h3: "text-lg font-light tracking-wide mb-10 lg:text-lg",
-        h4: "text-2xl font-light tracking-normal mb-10 lg:text-2xl",
-        h5: "text-base font-normal tracking-tight mb-6 lg:text-md",
-        h6: "text-sm font-normal tracking-tight mb-4 lg:text-base",
+        h1: "text-6xl font-ultra-light tracking-tight mb-5 lg:text-6xl",
+        h2: "text-xl font-light tracking-tight mb-6 lg:text-xl",
+        h3: "text-lg font-light tracking-normal mb-5 lg:text-lg",
+        h4: "text-2xl font-light tracking-normal mb-5 lg:text-2xl",
+        h5: "text-base font-normal tracking-normal mb-4 lg:text-md",
+        h6: "text-sm font-normal tracking-normal mb-3 lg:text-base",
       },
       size: {
-        logo: "text-4xl font-ultra-light tracking-wider mb-5 lg:text-5xl lg:tracking-widest",
-        "logo-large": "text-5xl font-ultra-light tracking-widest mb-5 lg:text-6xl lg:tracking-ultra",
-        subtitle: "text-xs font-normal tracking-wide uppercase mb-20 lg:text-xs",
-        section: "text-lg font-light tracking-tight mb-12 lg:text-xl",
-        step: "text-xl font-light tracking-tight mb-12 lg:text-xl",
-        category: "text-2xl font-light tracking-normal mb-5 lg:text-2xl",
+        logo: "text-4xl font-ultra-light tracking-normal mb-5 lg:text-5xl lg:tracking-wide",
+        "logo-large": "text-5xl font-ultra-light tracking-normal mb-5 lg:text-6xl lg:tracking-wide",
+        subtitle: "text-xs font-normal tracking-wide uppercase mb-8 lg:text-xs",
+        section: "text-lg font-light tracking-tight mb-2 lg:text-xl",
+        step: "text-xl font-light tracking-tight mb-6 lg:text-xl",
+        category: "text-2xl font-light tracking-normal mb-4 lg:text-2xl",
       },
       color: {
         primary: "text-kumiko-black",
@@ -53,7 +53,7 @@ const kumikoHeadingVariants = cva(
 
 export interface KumikoHeadingProps
   extends Omit<React.HTMLAttributes<HTMLHeadingElement>, 'color'>,
-    VariantProps<typeof kumikoHeadingVariants> {
+  VariantProps<typeof kumikoHeadingVariants> {
   level?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
 }

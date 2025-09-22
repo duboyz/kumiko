@@ -1,0 +1,1 @@
+export { TextSection, textSectionVariants, type TextSectionProps } from './TextSection';

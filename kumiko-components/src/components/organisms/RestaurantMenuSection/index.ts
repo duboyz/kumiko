@@ -1,5 +1,3 @@
-export { HeroSection, heroSectionVariants, type HeroSectionProps } from './HeroSection';
-export { TextSection, textSectionVariants, type TextSectionProps } from './TextSection';
 export {
   RestaurantMenuSection,
   restaurantMenuSectionVariants,

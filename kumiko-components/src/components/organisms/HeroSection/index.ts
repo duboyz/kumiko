@@ -1,0 +1,1 @@
+export { HeroSection, heroSectionVariants, type HeroSectionProps } from './HeroSection';

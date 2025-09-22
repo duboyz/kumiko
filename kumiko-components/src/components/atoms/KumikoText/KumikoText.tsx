@@ -54,7 +54,7 @@ const kumikoTextVariants = cva(
 
 export interface KumikoTextProps
   extends Omit<React.HTMLAttributes<HTMLElement>, 'color'>,
-    VariantProps<typeof kumikoTextVariants> {
+  VariantProps<typeof kumikoTextVariants> {
   as?: "p" | "span" | "div" | "label" | "small" | "strong" | "em"
 }
 
