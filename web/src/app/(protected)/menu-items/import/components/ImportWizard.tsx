@@ -311,6 +311,7 @@ export function ImportWizard() {
                 {currentStep === "preview-structure" && editableStructure && (
                   <StructurePreviewStep
                     editableStructure={editableStructure}
+                    restaurantId={selectedLocation.id}
                     onConfirm={() => {
                       setShowSuccess(true);
                       handleStepChange("complete");

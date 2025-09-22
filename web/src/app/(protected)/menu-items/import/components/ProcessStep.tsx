@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -88,12 +88,7 @@ export function ProcessStep({
     setAbortController(null);
   };
 
-  // Auto-start processing when component mounts
-  useEffect(() => {
-    if (imageFile && !isProcessing && !errorMessage) {
-      handleProcess();
-    }
-  }, [imageFile]);
+  // No auto-start - user must click "Start Processing"
 
   const totalItems = annotations.filter((a) => a.type === "item").length;
   const totalCategories = annotations.filter(
@@ -103,10 +98,13 @@ export function ProcessStep({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Processing Your Menu</h2>
+        <h2 className="text-2xl font-bold mb-2">
+          {isProcessing ? "Processing Your Menu" : "Ready to Process"}
+        </h2>
         <p className="text-muted-foreground">
-          AI is analyzing your menu structure and extracting categories and
-          items
+          {isProcessing
+            ? "AI is analyzing your menu structure and extracting categories and items"
+            : "Click 'Start Processing' to analyze your menu with AI"}
         </p>
         {annotations.length > 0 && (
           <p className="text-sm text-muted-foreground mt-2">
@@ -116,8 +114,8 @@ export function ProcessStep({
         )}
       </div>
 
-      {/* Image Preview */}
-      {imagePreview && (
+      {/* Image Preview - Only show when not processing */}
+      {imagePreview && !isProcessing && (
         <Card>
           <CardContent className="p-4">
             <div className="relative">
@@ -126,13 +124,6 @@ export function ProcessStep({
                 alt="Menu being processed"
                 className="w-full max-w-md mx-auto rounded-lg shadow-sm"
               />
-              {isProcessing && (
-                <div className="absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center">
-                  <div className="bg-white rounded-full p-3 shadow-lg">
-                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                  </div>
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>
@@ -284,7 +275,7 @@ export function ProcessStep({
         {!isProcessing && !errorMessage && (
           <Button onClick={handleProcess} size="lg">
             <ArrowRight className="w-4 h-4 mr-2" />
-            Continue
+            Start Processing
           </Button>
         )}
       </div>

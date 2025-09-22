@@ -12,12 +12,17 @@ import {
   Clock,
   Users,
   Menu as MenuIcon,
+  AlertCircle,
 } from "lucide-react";
-import { EditableMenuStructure } from "@shared/types/menu-structure.types";
-import { cn } from "@/lib/utils";
+import {
+  EditableMenuStructure,
+  CreateMenuStructureRequest,
+} from "@shared/types/menu-structure.types";
+import { createMenuStructure } from "@shared/api/menu-structure.api";
 
 interface StructurePreviewStepProps {
   editableStructure: EditableMenuStructure;
+  restaurantId: string;
   onConfirm: () => void;
   onBack: () => void;
   isCreating?: boolean;
@@ -25,11 +30,14 @@ interface StructurePreviewStepProps {
 
 export function StructurePreviewStep({
   editableStructure,
+  restaurantId,
   onConfirm,
   onBack,
   isCreating = false,
 }: StructurePreviewStepProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [isCreatingMenu, setIsCreatingMenu] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const totalItems = editableStructure.categories.reduce(
     (sum, cat) => sum + cat.items.length,
@@ -43,6 +51,44 @@ export function StructurePreviewStep({
   );
 
   const averagePrice = totalItems > 0 ? totalValue / totalItems : 0;
+
+  const convertToApiRequest = (): CreateMenuStructureRequest => {
+    return {
+      restaurantId: restaurantId,
+      menuName: editableStructure.menuName,
+      menuDescription: editableStructure.menuDescription,
+      categories: editableStructure.categories.map((category) => ({
+        name: category.name,
+        description: category.description,
+        orderIndex: category.orderIndex,
+        items: category.items.map((item) => ({
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          orderIndex: item.orderIndex,
+          isAvailable: item.isAvailable,
+        })),
+      })),
+    };
+  };
+
+  const handleCreateMenu = async () => {
+    try {
+      setIsCreatingMenu(true);
+      setError(null);
+
+      const request = convertToApiRequest();
+      const result = await createMenuStructure(request);
+
+      console.log("Menu created successfully:", result);
+      onConfirm();
+    } catch (err) {
+      console.error("Failed to create menu:", err);
+      setError(err instanceof Error ? err.message : "Failed to create menu");
+    } finally {
+      setIsCreatingMenu(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -213,6 +259,21 @@ export function StructurePreviewStep({
         </CardContent>
       </Card>
 
+      {/* Error Display */}
+      {error && (
+        <Card className="bg-red-50 border-red-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-red-800">
+              <AlertCircle className="w-5 h-5" />
+              <div>
+                <h3 className="font-semibold">Failed to create menu</h3>
+                <p className="text-sm">{error}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* What happens next */}
       <Card className="bg-blue-50 border-blue-200">
         <CardContent className="p-4">
@@ -232,16 +293,16 @@ export function StructurePreviewStep({
 
       {/* Actions */}
       <div className="flex items-center justify-between pt-6">
-        <Button variant="outline" onClick={onBack} disabled={isCreating}>
+        <Button variant="outline" onClick={onBack} disabled={isCreatingMenu}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Items
         </Button>
         <Button
-          onClick={onConfirm}
-          disabled={isCreating}
+          onClick={handleCreateMenu}
+          disabled={isCreatingMenu}
           className="min-w-[120px]"
         >
-          {isCreating ? (
+          {isCreatingMenu ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
               Creating...

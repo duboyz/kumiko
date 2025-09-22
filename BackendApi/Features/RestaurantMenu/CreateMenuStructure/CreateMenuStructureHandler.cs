@@ -13,24 +13,28 @@ public class CreateMenuStructureHandler(ApplicationDbContext context) : ICommand
 
         try
         {
-            // Verify restaurant menu exists
-            var restaurantMenu = await context.RestaurantMenus
-                .FirstOrDefaultAsync(m => m.Id == request.RestaurantMenuId, cancellationToken);
+            // Verify restaurant exists
+            var restaurant = await context.Restaurants
+                .FirstOrDefaultAsync(r => r.Id == request.RestaurantId, cancellationToken);
 
-            if (restaurantMenu == null)
+            if (restaurant == null)
             {
-                throw new ArgumentException("Restaurant menu not found");
+                throw new ArgumentException("Restaurant not found");
             }
 
-            // Update menu name and description if provided
-            if (!string.IsNullOrEmpty(request.MenuName))
+            // Create new restaurant menu
+            var restaurantMenu = new Entities.RestaurantMenu
             {
-                restaurantMenu.Name = request.MenuName;
-            }
-            if (!string.IsNullOrEmpty(request.MenuDescription))
-            {
-                restaurantMenu.Description = request.MenuDescription;
-            }
+                Id = Guid.NewGuid(),
+                Name = request.MenuName,
+                Description = request.MenuDescription,
+                RestaurantId = request.RestaurantId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            context.RestaurantMenus.Add(restaurantMenu);
+            await context.SaveChangesAsync(cancellationToken);
 
             var createdCategories = new List<CreatedCategoryResult>();
             var totalItemsCreated = 0;
@@ -45,7 +49,7 @@ public class CreateMenuStructureHandler(ApplicationDbContext context) : ICommand
                     Name = categoryCommand.Name,
                     Description = categoryCommand.Description,
                     OrderIndex = categoryCommand.OrderIndex,
-                    RestaurantMenuId = request.RestaurantMenuId,
+                    RestaurantMenuId = restaurantMenu.Id,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
@@ -65,7 +69,7 @@ public class CreateMenuStructureHandler(ApplicationDbContext context) : ICommand
                         Description = itemCommand.Description,
                         Price = itemCommand.Price,
                         IsAvailable = itemCommand.IsAvailable,
-                        RestaurantMenuId = request.RestaurantMenuId,
+                        RestaurantMenuId = restaurantMenu.Id,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     };

@@ -22,7 +22,7 @@ export interface ParsedMenuItem {
 
 // API request/response types
 export interface CreateMenuStructureRequest {
-  restaurantMenuId: string;
+  restaurantId: string;
   menuName: string;
   menuDescription: string;
   categories: CreateCategoryRequest[];

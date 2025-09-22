@@ -97,10 +97,10 @@ export function UploadStep({ onImageSelect, onBack }: UploadStepProps) {
 
       {!selectedFile ? (
         <div className="space-y-6">
-          {/* Drag and Drop Area */}
+          {/* Single Upload Area */}
           <div
             className={`
-              border-2 border-dashed rounded-xl p-12 text-center transition-colors
+              border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer
               ${
                 isDragOver
                   ? "border-primary bg-primary/5"
@@ -110,6 +110,7 @@ export function UploadStep({ onImageSelect, onBack }: UploadStepProps) {
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            onClick={handleFileUpload}
           >
             <div className="space-y-4">
               <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
@@ -117,56 +118,31 @@ export function UploadStep({ onImageSelect, onBack }: UploadStepProps) {
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2">
-                  Drop your menu image here
+                  Upload Menu Image
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Or click to browse files
+                  Drag and drop your menu image here, or click to browse
                 </p>
-                <Button onClick={handleFileUpload} size="lg">
-                  <FileImage className="w-4 h-4 mr-2" />
-                  Choose File
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button
+                    onClick={handleFileUpload}
+                    size="lg"
+                    variant="outline"
+                  >
+                    <FileImage className="w-4 h-4 mr-2" />
+                    Choose File
+                  </Button>
+                  <Button
+                    onClick={handleCameraCapture}
+                    size="lg"
+                    variant="outline"
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Take Photo
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Camera Options */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6 text-center">
-                <Camera className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
-                <h3 className="font-semibold mb-2">Take Photo</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Use your device camera
-                </p>
-                <Button
-                  onClick={handleCameraCapture}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <Camera className="w-4 h-4 mr-2" />
-                  Open Camera
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6 text-center">
-                <FileImage className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
-                <h3 className="font-semibold mb-2">Upload File</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Select from device
-                </p>
-                <Button
-                  onClick={handleFileUpload}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <FileImage className="w-4 h-4 mr-2" />
-                  Browse Files
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         </div>
       ) : (

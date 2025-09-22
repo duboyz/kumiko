@@ -114,18 +114,35 @@ export function AnnotationStep({
   const [selectedAnnotationId, setSelectedAnnotationId] = useState<
     string | null
   >(null);
+  const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
   const stageRef = useRef<Konva.Stage>(null);
 
   const selectedAnnotationType = ANNOTATION_TYPES.find(
     (t) => t.type === selectedType,
   );
 
-  // Load image
+  // Load image and calculate proper dimensions
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
       setImage(img);
+
+      // Calculate stage dimensions that maintain aspect ratio
+      const maxWidth = 800;
+      const maxHeight = 600;
+      const aspectRatio = img.width / img.height;
+
+      let stageWidth = maxWidth;
+      let stageHeight = maxWidth / aspectRatio;
+
+      // If height exceeds max, scale down by height instead
+      if (stageHeight > maxHeight) {
+        stageHeight = maxHeight;
+        stageWidth = maxHeight * aspectRatio;
+      }
+
+      setStageSize({ width: stageWidth, height: stageHeight });
     };
     img.src = imagePreview;
   }, [imagePreview]);
@@ -457,8 +474,8 @@ export function AnnotationStep({
               <div className="relative border rounded-lg overflow-hidden bg-gray-50">
                 <Stage
                   ref={stageRef}
-                  width={800}
-                  height={600}
+                  width={stageSize.width}
+                  height={stageSize.height}
                   onMouseDown={handleMouseDown}
                   onMousemove={handleMouseMove}
                   onMouseup={handleMouseUp}
@@ -478,10 +495,8 @@ export function AnnotationStep({
                     {/* Background Image */}
                     <KonvaImage
                       image={image}
-                      width={800}
-                      height={600}
-                      scaleX={800 / image.width}
-                      scaleY={600 / image.height}
+                      width={stageSize.width}
+                      height={stageSize.height}
                     />
 
                     {/* Existing Annotations */}

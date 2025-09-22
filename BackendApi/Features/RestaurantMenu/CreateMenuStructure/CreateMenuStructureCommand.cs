@@ -4,7 +4,7 @@ namespace BackendApi.Features.RestaurantMenu.CreateMenuStructure;
 
 public class CreateMenuStructureCommand : ICommand<CreateMenuStructureResult>
 {
-    public Guid RestaurantMenuId { get; set; }
+    public Guid RestaurantId { get; set; }
     public string MenuName { get; set; } = string.Empty;
     public string MenuDescription { get; set; } = string.Empty;
     public List<CreateCategoryCommand> Categories { get; set; } = [];
