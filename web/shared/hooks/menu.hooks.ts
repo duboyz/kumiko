@@ -127,6 +127,22 @@ export const useDeleteMenuItem = () => {
   });
 };
 
+// Bulk delete menu items
+export const useBulkDeleteMenuItems = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: menuApi.bulkDeleteMenuItems,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["restaurant-menus"] });
+      queryClient.invalidateQueries({ queryKey: ["restaurant-menu-items"] });
+      queryClient.invalidateQueries({
+        queryKey: ["all-restaurant-menu-items"],
+      });
+    },
+  });
+};
+
 // Add menu item to category
 export const useAddMenuItemToCategory = () => {
   const queryClient = useQueryClient();
@@ -136,6 +152,22 @@ export const useAddMenuItemToCategory = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["restaurant-menus"] });
       queryClient.invalidateQueries({ queryKey: ["restaurant-menu-items"] });
+    },
+  });
+};
+
+// Bulk add menu items to category
+export const useBulkAddMenuItemsToCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: menuApi.bulkAddMenuItemsToCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["restaurant-menus"] });
+      queryClient.invalidateQueries({ queryKey: ["restaurant-menu-items"] });
+      queryClient.invalidateQueries({
+        queryKey: ["all-restaurant-menu-items"],
+      });
     },
   });
 };
