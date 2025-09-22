@@ -1,0 +1,1 @@
+export { KumikoText, type KumikoTextProps } from './KumikoText';

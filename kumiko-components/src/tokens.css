@@ -1,0 +1,117 @@
+/* Kumiko Design Tokens - Japanese-Inspired Design System */
+:root {
+  /* Typography */
+  --font-family-kumiko: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-weight-ultra-light: 100;
+  --font-weight-light: 200;
+  --font-weight-normal: 300;
+  --font-weight-medium: 400;
+
+  /* Font Sizes */
+  --text-xs: 11px;      /* Subtitles, meta text */
+  --text-sm: 12px;      /* Labels, hints */
+  --text-base: 14px;    /* Body text */
+  --text-md: 16px;      /* Form inputs */
+  --text-lg: 18px;      /* Section titles */
+  --text-xl: 20px;      /* Step titles */
+  --text-2xl: 24px;     /* Category titles */
+  --text-3xl: 32px;     /* Large headers */
+  --text-4xl: 48px;     /* Mobile logo */
+  --text-5xl: 56px;     /* Desktop logo */
+  --text-6xl: 64px;     /* Large logo */
+
+  /* Letter Spacing */
+  --tracking-tighter: 0.5px;    /* Body text */
+  --tracking-tight: 1px;        /* Labels */
+  --tracking-normal: 2px;       /* Category titles */
+  --tracking-wide: 3px;         /* Subtitles */
+  --tracking-wider: 8px;        /* Mobile logo */
+  --tracking-widest: 14px;      /* Desktop logo */
+  --tracking-ultra: 16px;       /* Large logo */
+
+  /* Colors - Monochromatic Scale */
+  --color-black: #000000;        /* Primary text, logo */
+  --color-gray-900: #333333;     /* Hover states */
+  --color-gray-800: #444444;     /* Secondary emphasis */
+  --color-gray-700: #666666;     /* Secondary text */
+  --color-gray-600: #777777;     /* Tertiary text */
+  --color-gray-500: #888888;     /* Descriptions */
+  --color-gray-400: #999999;     /* Meta text */
+  --color-gray-300: #cccccc;     /* Placeholders */
+  --color-gray-200: #d0d0d0;     /* Disabled text */
+  --color-gray-100: #e0e0e0;     /* Borders */
+  --color-gray-50: #f0f0f0;      /* Light borders */
+  --color-gray-25: #f8f8f8;      /* Background accents */
+  --color-white: #ffffff;        /* Background */
+
+  /* Semantic Colors */
+  --color-primary: var(--color-black);
+  --color-secondary: var(--color-gray-700);
+  --color-muted: var(--color-gray-500);
+  --color-subtle: var(--color-gray-400);
+  --color-border: var(--color-gray-100);
+  --color-border-light: var(--color-gray-50);
+  --color-background: var(--color-white);
+  --color-foreground: var(--color-black);
+
+  /* Spacing Scale (Base unit: 4px) */
+  --space-0: 0px;
+  --space-1: 4px;       /* 0.25rem */
+  --space-2: 8px;       /* 0.5rem */
+  --space-3: 12px;      /* 0.75rem */
+  --space-4: 16px;      /* 1rem */
+  --space-5: 20px;      /* 1.25rem */
+  --space-6: 24px;      /* 1.5rem */
+  --space-8: 32px;      /* 2rem */
+  --space-10: 40px;     /* 2.5rem */
+  --space-12: 48px;     /* 3rem */
+  --space-15: 60px;     /* 3.75rem */
+  --space-16: 64px;     /* 4rem */
+  --space-20: 80px;     /* 5rem */
+  --space-24: 96px;     /* 6rem */
+  --space-32: 128px;    /* 8rem */
+
+  /* Border Radius */
+  --radius-none: 0px;
+  --radius-sm: 2px;      /* Subtle rounding */
+  --radius-base: 4px;    /* Standard rounding */
+  --radius-md: 6px;      /* Medium rounding */
+  --radius-lg: 8px;      /* Large rounding */
+  --radius-xl: 12px;     /* Extra large rounding */
+  --radius-2xl: 16px;    /* 2x large rounding */
+  --radius-full: 9999px; /* Full rounding */
+
+  /* Shadows */
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01);
+  --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.02);
+  --shadow-medium: 0 10px 15px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.03);
+  --shadow-large: 0 20px 25px rgba(0, 0, 0, 0.08), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-strong: 0 25px 50px rgba(0, 0, 0, 0.1), 0 12px 20px rgba(0, 0, 0, 0.06);
+
+  /* Animation */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-medium: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 800ms;
+
+  /* Easing */
+  --easing-linear: linear;
+  --easing-ease: ease;
+  --easing-ease-in: ease-in;
+  --easing-ease-out: ease-out;
+  --easing-ease-in-out: ease-in-out;
+  --easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Z-Index Scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+}
