@@ -1,8 +1,18 @@
 import type { Preview } from '@storybook/nextjs-vite'
+import React from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '../src/app/globals.css'
 
-// Import Noto Sans JP font for Storybook
 import '@fontsource/noto-sans-jp/latin.css'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+      retry: false,
+    },
+  },
+})
 
 const preview: Preview = {
   parameters: {
@@ -51,7 +61,11 @@ const preview: Preview = {
         document.documentElement.style.setProperty('--font-noto-sans-jp', 'Noto Sans JP')
       }
 
-      return Story()
+      return (
+        <QueryClientProvider client={queryClient}>
+          <Story />
+        </QueryClientProvider>
+      )
     },
   ],
 }

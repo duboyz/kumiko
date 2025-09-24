@@ -8,7 +8,8 @@ import { usePages, useAddSectionWithDefaults, useUpdateHeroSection, useUpdateTex
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { ContentContainer } from '@/components/ContentContainer'
-import { WebsitePage, HeroSection, TextSection, RestaurantMenuSection, SectionSelectionModal } from '@/components/sections'
+import { WebsitePage, HeroSection, TextSection, SectionSelectionModal } from '@/components/sections'
+import { RestaurantMenuSection } from '@/stories/WebsiteSections/RestaurantMenuSection/RestaurantMenuSection'
 import type { WebsiteSectionDto, HeroSectionDto, TextSectionDto, RestaurantMenuSectionDto } from '@shared'
 
 export default function PageEditorPage() {

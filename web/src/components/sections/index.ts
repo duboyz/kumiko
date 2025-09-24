@@ -1,5 +1,4 @@
-export { HeroSection } from './HeroSection'
+export { HeroSection } from '../../stories/WebsiteSections/HeroSection'
 export { TextSection } from './TextSection'
-export { RestaurantMenuSection } from './RestaurantMenuSection'
 export { WebsitePage } from './WebsitePage'
 export { SectionSelectionModal } from './SectionSelectionModal'

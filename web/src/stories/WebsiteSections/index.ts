@@ -8,4 +8,3 @@ export { TextSection } from './TextSection/TextSection'
 
 // Menu Sections
 export { RestaurantMenuSection } from './RestaurantMenuSection/RestaurantMenuSection'
-export { PublicRestaurantMenuSection } from './PublicRestaurantMenuSection/PublicRestaurantMenuSection'

@@ -1,10 +1,11 @@
 'use client'
 
-import { HeroSection } from './HeroSection'
+import { HeroSection } from '../../stories/WebsiteSections/HeroSection'
 import { TextSection } from './TextSection'
-import { RestaurantMenuSection } from './RestaurantMenuSection'
-import { PublicRestaurantMenuSection } from './PublicRestaurantMenuSection'
+import { RestaurantMenuSection } from '../../stories/WebsiteSections/RestaurantMenuSection/RestaurantMenuSection'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
 import type { WebsitePageDto, RestaurantMenuDto } from '@shared'
+import { useMenuById } from '@shared'
 
 interface WebsitePageProps {
   page: WebsitePageDto
@@ -12,12 +13,46 @@ interface WebsitePageProps {
   availableMenus?: RestaurantMenuDto[]
 }
 
+// Component to handle menu fetching when not in editing mode
+function MenuSectionWithFetch({
+  restaurantMenuId,
+  allowOrdering,
+}: {
+  restaurantMenuId: string
+  allowOrdering: boolean
+}) {
+  const { data: menuData, isLoading, error } = useMenuById(restaurantMenuId)
+
+  if (isLoading) {
+    return (
+      <section className="relative py-12 px-4 md:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto flex justify-center">
+          <LoadingSpinner />
+        </div>
+      </section>
+    )
+  }
+
+  if (error || !menuData) {
+    return (
+      <section className="relative py-12 px-4 md:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center text-gray-500">
+          <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
+          <p>The selected menu could not be loaded.</p>
+        </div>
+      </section>
+    )
+  }
+
+  return <RestaurantMenuSection restaurantMenu={menuData} allowOrdering={allowOrdering} isEditing={false} />
+}
+
 export function WebsitePage({ page, className = '', availableMenus = [] }: WebsitePageProps) {
   const sortedSections = page.sections.sort((a, b) => a.sortOrder - b.sortOrder)
 
   return (
     <div className={`min-h-screen ${className}`}>
-      {sortedSections.map((section) => {
+      {sortedSections.map(section => {
         // Render Hero Sections
         if (section.heroSection) {
           return (
@@ -55,20 +90,19 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
 
         // Render Restaurant Menu Sections
         if (section.restaurantMenuSection) {
-          // If no availableMenus provided (public site), use the public component that fetches by ID
+          // If no availableMenus provided (public site), fetch the menu data
           if (availableMenus.length === 0) {
             return (
-              <PublicRestaurantMenuSection
+              <MenuSectionWithFetch
                 key={section.id}
-                restaurantMenuSectionId={section.restaurantMenuSection.id}
                 restaurantMenuId={section.restaurantMenuSection.restaurantMenuId}
                 allowOrdering={section.restaurantMenuSection.allowOrdering}
               />
             )
           }
 
-          // For admin/editing mode with availableMenus, use the original component
-          const menu = availableMenus.find(m => m.id === section.restaurantMenuSection!.restaurantMenuId);
+          // For admin/editing mode with availableMenus, use the menu from props
+          const menu = availableMenus.find(m => m.id === section.restaurantMenuSection!.restaurantMenuId)
 
           if (!menu) {
             return (
@@ -76,7 +110,7 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
                 <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
                 <p>The selected menu could not be loaded.</p>
               </div>
-            );
+            )
           }
 
           return (

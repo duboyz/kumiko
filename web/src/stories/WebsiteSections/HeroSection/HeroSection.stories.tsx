@@ -1,5 +1,5 @@
 import { HeroSectionType } from '@shared'
-import { HeroSection } from './HeroSection'
+import { HeroSection } from './index'
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { useState } from 'react'
 
@@ -29,14 +29,7 @@ const EditableHeroWrapper = (args: any) => {
     console.log('Type changed to:', type)
   }
 
-  return (
-    <HeroSection
-      {...args}
-      {...state}
-      onUpdate={handleUpdate}
-      onTypeChange={handleTypeChange}
-    />
-  )
+  return <HeroSection {...args} {...state} onUpdate={handleUpdate} onTypeChange={handleTypeChange} />
 }
 
 const meta = {
@@ -126,7 +119,7 @@ export const LightOverlay: StoryObj<typeof meta> = {
 }
 
 export const EditableMode: StoryObj<typeof meta> = {
-  render: (args) => <EditableHeroWrapper {...args} />,
+  render: args => <EditableHeroWrapper {...args} />,
   args: {
     title: 'Editable Hero Section',
     description: 'This is an example of the hero section in editing mode. Click on the text fields to edit them.',
@@ -147,7 +140,8 @@ export const EditableMode: StoryObj<typeof meta> = {
 export const ImageRight: StoryObj<typeof meta> = {
   args: {
     title: 'Welcome to Our Restaurant',
-    description: 'Experience exceptional dining with our carefully crafted menu and warm atmosphere. Join us for an unforgettable culinary journey.',
+    description:
+      'Experience exceptional dining with our carefully crafted menu and warm atmosphere. Join us for an unforgettable culinary journey.',
     buttonText: 'Make Reservation',
     buttonUrl: '#reservation',
     buttonTextColor: '#ffffff',
@@ -196,10 +190,11 @@ export const ImageRightColored: StoryObj<typeof meta> = {
 }
 
 export const ImageRightEditable: StoryObj<typeof meta> = {
-  render: (args) => <EditableHeroWrapper {...args} />,
+  render: args => <EditableHeroWrapper {...args} />,
   args: {
     title: 'Editable Image Right Hero',
-    description: 'This is an editable image right hero section. You can edit all the text fields and see the changes in real-time.',
+    description:
+      'This is an editable image right hero section. You can edit all the text fields and see the changes in real-time.',
     buttonText: 'Try Editing',
     buttonUrl: '#edit',
     buttonTextColor: '#ffffff',
