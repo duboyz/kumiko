@@ -16,7 +16,7 @@
                  (VV)
 ```
 
-# 🔥 Project Phoenix  
+# 🔥 Project Kumiko  
 
 Like a phoenix rising from the ashes of spaghetti, this repo is our redemption arc.  
 
