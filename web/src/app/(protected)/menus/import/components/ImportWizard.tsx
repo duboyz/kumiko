@@ -1,37 +1,30 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useLocationSelection } from "@shared";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { ArrowLeft, AlertCircle } from "lucide-react";
-import { ProgressSidebar } from "./ProgressSidebar";
-import { UploadStep } from "./UploadStep";
-import { AnnotationStep } from "./AnnotationStep";
-import { ProcessStep } from "./ProcessStep";
-import { ReviewStep } from "./ReviewStep";
-import { CompleteStep } from "./CompleteStep";
-import { CategoryReviewStep } from "./CategoryReviewStep";
-import { ItemReviewStep } from "./ItemReviewStep";
-import { StructurePreviewStep } from "./StructurePreviewStep";
-import { useImportFlow } from "../hooks/useImportFlow";
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useLocationSelection } from '@shared'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { ArrowLeft, AlertCircle } from 'lucide-react'
+import { ProgressSidebar } from './ProgressSidebar'
+import { UploadStep } from './UploadStep'
+import { AnnotationStep } from './AnnotationStep'
+import { ProcessStep } from './ProcessStep'
+import { ReviewStep } from './ReviewStep'
+import { CompleteStep } from './CompleteStep'
+import { CategoryReviewStep } from './CategoryReviewStep'
+import { ItemReviewStep } from './ItemReviewStep'
+import { StructurePreviewStep } from './StructurePreviewStep'
+import { StructureReviewStep } from './StructureReviewStep'
+import { useImportFlow } from '../hooks/useImportFlow'
 
-export type ImportStep =
-  | "upload"
-  | "preview"
-  | "process"
-  | "review-categories" // New: Review detected categories
-  | "review-items" // New: Review items within categories
-  | "preview-structure" // New: Preview final menu structure
-  | "complete";
+export type ImportStep = 'upload' | 'preview' | 'process' | 'review'
 
 export function ImportWizard() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { selectedLocation, isLoading, hasNoLocations } =
-    useLocationSelection();
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { selectedLocation, isLoading, hasNoLocations } = useLocationSelection()
 
   const {
     currentStep,
@@ -59,55 +52,46 @@ export function ImportWizard() {
     editableStructure,
     setEditableStructure,
     resetImportFlow,
-  } = useImportFlow();
+  } = useImportFlow()
 
   // Handle URL state
   useEffect(() => {
-    const step = searchParams.get("step") as ImportStep;
-    if (
-      step &&
-      ["upload", "preview", "process", "review", "complete"].includes(step)
-    ) {
-      setCurrentStep(step);
+    const step = searchParams.get('step') as ImportStep
+    if (step && ['upload', 'preview', 'process', 'review'].includes(step)) {
+      setCurrentStep(step)
     }
-  }, [searchParams, setCurrentStep]);
+  }, [searchParams, setCurrentStep])
 
   // Update URL when step changes
   const handleStepChange = (step: ImportStep) => {
-    setCurrentStep(step);
-    const url = new URL(window.location.href);
-    url.searchParams.set("step", step);
-    window.history.pushState({}, "", url.toString());
-  };
+    setCurrentStep(step)
+    const url = new URL(window.location.href)
+    url.searchParams.set('step', step)
+    window.history.pushState({}, '', url.toString())
+  }
 
   const handleBack = () => {
-    if (currentStep === "upload") {
-      router.push("/menu-items");
-    } else if (currentStep === "preview") {
-      handleStepChange("upload");
-    } else if (currentStep === "process") {
-      handleStepChange("preview");
-    } else if (currentStep === "review-categories") {
-      handleStepChange("process");
-    } else if (currentStep === "review-items") {
-      handleStepChange("review-categories");
-    } else if (currentStep === "preview-structure") {
-      handleStepChange("review-items");
-    } else if (currentStep === "complete") {
-      handleStepChange("preview-structure");
+    if (currentStep === 'upload') {
+      router.push('/menu-items')
+    } else if (currentStep === 'preview') {
+      handleStepChange('upload')
+    } else if (currentStep === 'process') {
+      handleStepChange('preview')
+    } else if (currentStep === 'review') {
+      handleStepChange('process')
     }
-  };
+  }
 
   const handleComplete = () => {
-    router.push("/menu-items");
-  };
+    router.push('/menu-items')
+  }
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
-    );
+    )
   }
 
   if (hasNoLocations) {
@@ -117,19 +101,17 @@ export function ImportWizard() {
           <CardContent className="text-center py-12">
             <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">No Restaurants Found</h2>
-            <p className="text-muted-foreground mb-6">
-              You need to add a restaurant before you can import menu items.
-            </p>
+            <p className="text-muted-foreground mb-6">You need to add a restaurant before you can import menu items.</p>
             <Button asChild>
               <a href="/onboarding/restaurant">Add Restaurant</a>
             </Button>
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
-  if (!selectedLocation || selectedLocation.type !== "Restaurant") {
+  if (!selectedLocation || selectedLocation.type !== 'Restaurant') {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -137,17 +119,16 @@ export function ImportWizard() {
             <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Restaurant Required</h2>
             <p className="text-muted-foreground mb-6">
-              Menu item import is only available for restaurant locations.
-              Please select a restaurant from the sidebar.
+              Menu item import is only available for restaurant locations. Please select a restaurant from the sidebar.
             </p>
-            <Button onClick={() => router.push("/menu-items")}>
+            <Button onClick={() => router.push('/menu-items')}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Menu Items
             </Button>
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
   return (
@@ -160,7 +141,7 @@ export function ImportWizard() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => router.push("/menu-items")}
+                onClick={() => router.push('/menu-items')}
                 className="text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -169,16 +150,10 @@ export function ImportWizard() {
               <div className="h-6 w-px bg-border" />
               <div>
                 <h1 className="text-lg font-semibold">Import Menu Items</h1>
-                <p className="text-sm text-muted-foreground">
-                  {selectedLocation.name}
-                </p>
+                <p className="text-sm text-muted-foreground">{selectedLocation.name}</p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={resetImportFlow}
-              className="text-muted-foreground"
-            >
+            <Button variant="outline" onClick={resetImportFlow} className="text-muted-foreground">
               Start Over
             </Button>
           </div>
@@ -191,31 +166,21 @@ export function ImportWizard() {
           <div className="bg-white rounded-lg border p-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
               <span>
-                Step{" "}
-                {currentStep === "upload"
-                  ? "1"
-                  : currentStep === "preview"
-                    ? "2"
-                    : currentStep === "process"
-                      ? "3"
-                      : currentStep === "review"
-                        ? "4"
-                        : "5"}{" "}
-                of 5
+                Step{' '}
+                {currentStep === 'upload'
+                  ? '1'
+                  : currentStep === 'preview'
+                    ? '2'
+                    : currentStep === 'process'
+                      ? '3'
+                      : '4'}{' '}
+                of 4
               </span>
               <span>
                 {Math.round(
-                  ((currentStep === "upload"
-                    ? 1
-                    : currentStep === "preview"
-                      ? 2
-                      : currentStep === "process"
-                        ? 3
-                        : currentStep === "review"
-                          ? 4
-                          : 5) /
-                    5) *
-                    100,
+                  ((currentStep === 'upload' ? 1 : currentStep === 'preview' ? 2 : currentStep === 'process' ? 3 : 4) /
+                    4) *
+                    100
                 )}
                 %
               </span>
@@ -224,7 +189,7 @@ export function ImportWizard() {
               <div
                 className="bg-primary h-2 rounded-full transition-all duration-500"
                 style={{
-                  width: `${((currentStep === "upload" ? 1 : currentStep === "preview" ? 2 : currentStep === "process" ? 3 : currentStep === "review" ? 4 : 5) / 5) * 100}%`,
+                  width: `${((currentStep === 'upload' ? 1 : currentStep === 'preview' ? 2 : currentStep === 'process' ? 3 : 4) / 4) * 100}%`,
                 }}
               />
             </div>
@@ -234,47 +199,44 @@ export function ImportWizard() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-8">
           {/* Sidebar - Hidden on mobile, shown on desktop */}
           <div className="hidden lg:block lg:col-span-1">
-            <ProgressSidebar
-              currentStep={currentStep}
-              onStepClick={handleStepChange}
-            />
+            <ProgressSidebar currentStep={currentStep} onStepClick={handleStepChange} />
           </div>
 
           {/* Main Content */}
           <div className="lg:col-span-3">
             <Card>
               <CardContent className="p-4 sm:p-6">
-                {currentStep === "upload" && (
+                {currentStep === 'upload' && (
                   <UploadStep
                     onImageSelect={(file, preview) => {
-                      setImageFile(file);
-                      setImagePreview(preview);
-                      handleStepChange("preview");
+                      setImageFile(file)
+                      setImagePreview(preview)
+                      handleStepChange('preview')
                     }}
                     onBack={handleBack}
                   />
                 )}
 
-                {currentStep === "preview" && (
+                {currentStep === 'preview' && (
                   <AnnotationStep
                     imagePreview={imagePreview!}
-                    onAnnotate={(newAnnotations) => {
-                      setAnnotations(newAnnotations);
-                      handleStepChange("process");
+                    onAnnotate={newAnnotations => {
+                      setAnnotations(newAnnotations)
+                      handleStepChange('process')
                     }}
                     onBack={handleBack}
-                    onSkip={() => handleStepChange("process")}
+                    onSkip={() => handleStepChange('process')}
                   />
                 )}
 
-                {currentStep === "process" && (
+                {currentStep === 'process' && (
                   <ProcessStep
                     imageFile={imageFile}
                     imagePreview={imagePreview}
                     annotations={annotations}
-                    onProcess={(structure) => {
-                      setParsedStructure(structure);
-                      handleStepChange("review-categories");
+                    onProcess={structure => {
+                      setParsedStructure(structure)
+                      handleStepChange('review')
                     }}
                     onBack={handleBack}
                     onError={setErrorMessage}
@@ -286,60 +248,15 @@ export function ImportWizard() {
                   />
                 )}
 
-                {currentStep === "review-categories" && parsedStructure && (
-                  <CategoryReviewStep
+                {currentStep === 'review' && parsedStructure && (
+                  <StructureReviewStep
                     parsedStructure={parsedStructure}
-                    onConfirm={(editableStructure) => {
-                      setEditableStructure(editableStructure);
-                      handleStepChange("review-items");
-                    }}
-                    onBack={handleBack}
-                  />
-                )}
-
-                {currentStep === "review-items" && editableStructure && (
-                  <ItemReviewStep
-                    editableStructure={editableStructure}
-                    onConfirm={(updatedStructure) => {
-                      setEditableStructure(updatedStructure);
-                      handleStepChange("preview-structure");
-                    }}
-                    onBack={handleBack}
-                  />
-                )}
-
-                {currentStep === "preview-structure" && editableStructure && (
-                  <StructurePreviewStep
-                    editableStructure={editableStructure}
-                    restaurantId={selectedLocation.id}
                     onConfirm={() => {
-                      setShowSuccess(true);
-                      handleStepChange("complete");
+                      setShowSuccess(true)
+                      handleComplete()
                     }}
                     onBack={handleBack}
-                    isCreating={false}
-                  />
-                )}
-
-                {currentStep === "review" && (
-                  <ReviewStep
-                    parsedItems={parsedItems}
-                    onConfirm={() => {
-                      setShowSuccess(true);
-                      handleStepChange("complete");
-                    }}
-                    onBack={handleBack}
-                    selectedCategoryId={selectedCategoryId}
-                    onCategoryChange={setSelectedCategoryId}
                     restaurantId={selectedLocation.id}
-                  />
-                )}
-
-                {currentStep === "complete" && (
-                  <CompleteStep
-                    onComplete={handleComplete}
-                    onBack={handleBack}
-                    showSuccess={showSuccess}
                   />
                 )}
               </CardContent>
@@ -348,5 +265,5 @@ export function ImportWizard() {
         </div>
       </div>
     </div>
-  );
+  )
 }

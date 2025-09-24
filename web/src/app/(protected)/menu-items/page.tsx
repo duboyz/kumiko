@@ -46,7 +46,7 @@ function MenuItemsPageContent() {
     id: string
   } | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [activeView, setActiveView] = useState<'cards' | 'table'>('cards')
+  const [activeView, setActiveView] = useState<'cards' | 'table'>('table')
   const [showSuccess, setShowSuccess] = useState(false)
   const searchParams = useSearchParams()
 
@@ -244,7 +244,7 @@ function MenuItemsPageContent() {
       </div>
 
       <Tabs value={activeView} onValueChange={value => setActiveView(value as 'cards' | 'table')} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        {/* <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="cards" className="flex items-center gap-2">
             <Grid3X3 className="w-4 h-4" />
             Cards
@@ -253,7 +253,7 @@ function MenuItemsPageContent() {
             <Table className="w-4 h-4" />
             Table
           </TabsTrigger>
-        </TabsList>
+        </TabsList> */}
 
         <TabsContent value="cards" className="mt-6">
           {menuItemsLoading ? (

@@ -112,14 +112,38 @@ export function ProcessStep({
     onError('')
 
     try {
-      setProcessingStep('Preparing image...')
+      // Step 1: Image preparation
+      setProcessingStep('Preparing image for analysis...')
+      await new Promise(resolve => setTimeout(resolve, 800))
+
+      setProcessingStep('Optimizing image quality...')
+      await new Promise(resolve => setTimeout(resolve, 600))
+
+      setProcessingStep('Extracting text regions...')
+      await new Promise(resolve => setTimeout(resolve, 700))
+
+      // Step 2: AI Analysis
+      setProcessingStep('Sending to AI vision model...')
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      setProcessingStep('Sending to AI for structure analysis...')
+      setProcessingStep('Analyzing menu layout...')
+      await new Promise(resolve => setTimeout(resolve, 400))
+
+      setProcessingStep('Detecting categories and items...')
       const structure = await parseMenuStructure(imageFile, annotations)
 
-      setProcessingStep('Processing menu structure...')
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Step 3: Processing results
+      setProcessingStep('Validating detected structure...')
+      await new Promise(resolve => setTimeout(resolve, 600))
+
+      setProcessingStep('Extracting pricing information...')
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      setProcessingStep('Organizing menu hierarchy...')
+      await new Promise(resolve => setTimeout(resolve, 400))
+
+      setProcessingStep('Finalizing menu structure...')
+      await new Promise(resolve => setTimeout(resolve, 300))
 
       setProcessingStep('Complete!')
       onProcess(structure)
@@ -154,6 +178,29 @@ export function ProcessStep({
 
   const totalItems = annotations.filter(a => a.type === 'item').length
   const totalCategories = annotations.filter(a => a.type === 'category').length
+
+  // Calculate progress percentage based on current step
+  const getProgressPercentage = () => {
+    const steps = [
+      'Preparing image for analysis...',
+      'Optimizing image quality...',
+      'Extracting text regions...',
+      'Sending to AI vision model...',
+      'Analyzing menu layout...',
+      'Detecting categories and items...',
+      'Validating detected structure...',
+      'Extracting pricing information...',
+      'Organizing menu hierarchy...',
+      'Finalizing menu structure...',
+      'Complete!',
+    ]
+
+    const currentIndex = steps.findIndex(step => processingStep === step)
+    if (currentIndex === -1) return 0
+    return Math.round(((currentIndex + 1) / steps.length) * 100)
+  }
+
+  const progressPercentage = getProgressPercentage()
 
   return (
     <div className="space-y-6">
@@ -239,22 +286,48 @@ export function ProcessStep({
       {/* Processing Status */}
       <Card>
         <CardContent className="p-6">
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-6">
             {isProcessing ? (
               <>
                 <div className="flex justify-center">
                   <div className="relative">
-                    <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
-                    <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-20 h-20 border-4 border-gray-200 rounded-full"></div>
+                    <div className="absolute top-0 left-0 w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-primary">{progressPercentage}%</span>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Processing...</h3>
-                  <p className="text-muted-foreground">{processingStep}</p>
+
+                <div className="space-y-3">
+                  <h3 className="text-xl font-semibold">AI is analyzing your menu...</h3>
+                  <p className="text-muted-foreground text-lg">{processingStep}</p>
+
+                  {/* Progress Bar */}
+                  <div className="w-full max-w-md mx-auto">
+                    <div className="flex justify-between text-sm text-muted-foreground mb-2">
+                      <span>Progress</span>
+                      <span>{progressPercentage}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div
+                        className="bg-gradient-to-r from-primary to-primary/80 h-3 rounded-full transition-all duration-500 ease-out"
+                        style={{ width: `${progressPercentage}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+                  <div className="flex items-center gap-2 text-blue-800">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                    <span className="text-sm font-medium">This usually takes 30-60 seconds</span>
+                  </div>
+                </div>
+
                 <Button variant="outline" onClick={handleCancel} className="mt-4">
                   <X className="w-4 h-4 mr-2" />
-                  Cancel
+                  Cancel Processing
                 </Button>
               </>
             ) : errorMessage ? (
@@ -293,61 +366,116 @@ export function ProcessStep({
       {/* Processing Steps */}
       <Card>
         <CardContent className="p-4">
-          <h3 className="font-semibold mb-3">Processing Steps</h3>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  processingStep === 'Preparing image...' || isProcessing
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
-              >
-                1
+          <h3 className="font-semibold mb-4">Processing Pipeline</h3>
+          <div className="space-y-3">
+            {/* Phase 1: Image Preparation */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-sm font-medium text-blue-700">Image Preparation</span>
               </div>
-              <span className={processingStep === 'Preparing image...' ? 'text-primary font-medium' : ''}>
-                Preparing image
-              </span>
+              <div className="ml-4 space-y-1">
+                <div
+                  className={`flex items-center gap-2 text-sm ${processingStep === 'Preparing image for analysis...' ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${processingStep === 'Preparing image for analysis...' ? 'bg-primary' : 'bg-gray-300'}`}
+                  ></div>
+                  Preparing image for analysis
+                </div>
+                <div
+                  className={`flex items-center gap-2 text-sm ${processingStep === 'Optimizing image quality...' ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${processingStep === 'Optimizing image quality...' ? 'bg-primary' : 'bg-gray-300'}`}
+                  ></div>
+                  Optimizing image quality
+                </div>
+                <div
+                  className={`flex items-center gap-2 text-sm ${processingStep === 'Extracting text regions...' ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${processingStep === 'Extracting text regions...' ? 'bg-primary' : 'bg-gray-300'}`}
+                  ></div>
+                  Extracting text regions
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  processingStep.includes('Sending to AI') || processingStep.includes('AI is analyzing')
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
-              >
-                2
+
+            {/* Phase 2: AI Analysis */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm font-medium text-green-700">AI Analysis</span>
               </div>
-              <span
-                className={
-                  processingStep.includes('Sending to AI') || processingStep.includes('AI is analyzing')
-                    ? 'text-primary font-medium'
-                    : ''
-                }
-              >
-                AI structure analysis
-              </span>
+              <div className="ml-4 space-y-1">
+                <div
+                  className={`flex items-center gap-2 text-sm ${processingStep === 'Sending to AI vision model...' ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${processingStep === 'Sending to AI vision model...' ? 'bg-primary' : 'bg-gray-300'}`}
+                  ></div>
+                  Sending to AI vision model
+                </div>
+                <div
+                  className={`flex items-center gap-2 text-sm ${processingStep === 'Analyzing menu layout...' ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${processingStep === 'Analyzing menu layout...' ? 'bg-primary' : 'bg-gray-300'}`}
+                  ></div>
+                  Analyzing menu layout
+                </div>
+                <div
+                  className={`flex items-center gap-2 text-sm ${processingStep === 'Detecting categories and items...' ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${processingStep === 'Detecting categories and items...' ? 'bg-primary' : 'bg-gray-300'}`}
+                  ></div>
+                  Detecting categories and items
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  processingStep === 'Processing menu structure...' || processingStep === 'Complete!'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
-              >
-                3
+
+            {/* Phase 3: Processing Results */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                <span className="text-sm font-medium text-purple-700">Processing Results</span>
               </div>
-              <span
-                className={
-                  processingStep === 'Processing menu structure...' || processingStep === 'Complete!'
-                    ? 'text-primary font-medium'
-                    : ''
-                }
-              >
-                Processing results
-              </span>
+              <div className="ml-4 space-y-1">
+                <div
+                  className={`flex items-center gap-2 text-sm ${processingStep === 'Validating detected structure...' ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${processingStep === 'Validating detected structure...' ? 'bg-primary' : 'bg-gray-300'}`}
+                  ></div>
+                  Validating detected structure
+                </div>
+                <div
+                  className={`flex items-center gap-2 text-sm ${processingStep === 'Extracting pricing information...' ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${processingStep === 'Extracting pricing information...' ? 'bg-primary' : 'bg-gray-300'}`}
+                  ></div>
+                  Extracting pricing information
+                </div>
+                <div
+                  className={`flex items-center gap-2 text-sm ${processingStep === 'Organizing menu hierarchy...' ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${processingStep === 'Organizing menu hierarchy...' ? 'bg-primary' : 'bg-gray-300'}`}
+                  ></div>
+                  Organizing menu hierarchy
+                </div>
+                <div
+                  className={`flex items-center gap-2 text-sm ${processingStep === 'Finalizing menu structure...' ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${processingStep === 'Finalizing menu structure...' ? 'bg-primary' : 'bg-gray-300'}`}
+                  ></div>
+                  Finalizing menu structure
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
