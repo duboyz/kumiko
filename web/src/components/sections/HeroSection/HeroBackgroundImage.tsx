@@ -39,7 +39,7 @@ export function HeroBackgroundImage({
   isEditing,
   onUpdate,
   onTypeChange,
-  type
+  type,
 }: HeroBackgroundImageProps) {
   const sectionStyle = {
     backgroundColor: backgroundColor || '#1f2937',
@@ -60,10 +60,7 @@ export function HeroBackgroundImage({
   }
 
   return (
-    <section
-      className={`relative py-20 md:py-32 px-4 md:px-6 lg:px-8 ${className}`}
-      style={sectionStyle}
-    >
+    <section className={`relative py-20 md:py-32 px-4 md:px-6 lg:px-8 ${className}`} style={sectionStyle}>
       {/* Floating Edit Button */}
       {isEditing && onUpdate && (
         <HeroSettingsPopover
@@ -82,10 +79,7 @@ export function HeroBackgroundImage({
       )}
 
       {/* Overlay */}
-      <div
-        className="absolute inset-0"
-        style={overlayStyle}
-      />
+      <div className="absolute inset-0" style={overlayStyle} />
 
       {/* Content */}
       <div className="relative max-w-4xl mx-auto text-center space-y-8">
@@ -94,13 +88,13 @@ export function HeroBackgroundImage({
             {/* Content Editing */}
             <Input
               value={title}
-              onChange={(e) => onUpdate('title', e.target.value)}
+              onChange={e => onUpdate('title', e.target.value)}
               placeholder="Enter title..."
               className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight min-h-[4rem] resize-none border-2 border-dashed border-white/50 bg-white/10 placeholder:text-white/70 text-center"
             />
             <Textarea
               value={description}
-              onChange={(e) => onUpdate('description', e.target.value)}
+              onChange={e => onUpdate('description', e.target.value)}
               placeholder="Enter description..."
               className="text-xl md:text-2xl opacity-90 leading-relaxed max-w-3xl mx-auto min-h-[6rem] resize-none border-2 border-dashed border-white/50 bg-white/10 placeholder:text-white/70 text-center"
             />
@@ -121,12 +115,8 @@ export function HeroBackgroundImage({
           </>
         ) : (
           <>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-              {title}
-            </h1>
-            <p className="text-xl md:text-2xl opacity-90 leading-relaxed max-w-3xl mx-auto">
-              {description}
-            </p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">{title}</h1>
+            <p className="text-xl md:text-2xl opacity-90 leading-relaxed max-w-3xl mx-auto">{description}</p>
             {buttonText && (
               <div className="pt-6">
                 <Button
@@ -135,11 +125,7 @@ export function HeroBackgroundImage({
                   style={buttonStyle}
                   asChild={!!buttonUrl}
                 >
-                  {buttonUrl ? (
-                    <a href={buttonUrl}>{buttonText}</a>
-                  ) : (
-                    <span>{buttonText}</span>
-                  )}
+                  {buttonUrl ? <a href={buttonUrl}>{buttonText}</a> : <span>{buttonText}</span>}
                 </Button>
               </div>
             )}
