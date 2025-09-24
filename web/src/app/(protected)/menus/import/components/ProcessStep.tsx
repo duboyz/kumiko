@@ -37,6 +37,7 @@ interface ProcessStepProps {
   imageFile: File | null
   imagePreview: string | null
   annotations: any[]
+  restaurantId: string
   onProcess: (structure: ParsedMenuStructure) => void
   onBack: () => void
   onError: (error: string) => void
@@ -51,6 +52,7 @@ export function ProcessStep({
   imageFile,
   imagePreview,
   annotations,
+  restaurantId,
   onProcess,
   onBack,
   onError,
@@ -130,7 +132,7 @@ export function ProcessStep({
       await new Promise(resolve => setTimeout(resolve, 400))
 
       setProcessingStep('Detecting categories and items...')
-      const structure = await parseMenuStructure(imageFile, annotations)
+      const structure = await parseMenuStructure(imageFile, annotations, restaurantId)
 
       // Step 3: Processing results
       setProcessingStep('Validating detected structure...')

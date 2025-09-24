@@ -1,4 +1,5 @@
 using BackendApi.Services.Jwt;
+using BackendApi.Services;
 using BackendApi.Repositories.UserRepository;
 using BackendApi.Repositories;
 
@@ -16,6 +17,7 @@ public static class DependencyInjectionConfiguration
 
         // Services
         services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IOpenAiService, OpenAiService>();
 
 
         // Repositories

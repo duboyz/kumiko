@@ -11,13 +11,8 @@ import { ProgressSidebar } from './ProgressSidebar'
 import { UploadStep } from './UploadStep'
 import { AnnotationStep } from './AnnotationStep'
 import { ProcessStep } from './ProcessStep'
-import { ReviewStep } from './ReviewStep'
-import { CompleteStep } from './CompleteStep'
-import { CategoryReviewStep } from './CategoryReviewStep'
-import { ItemReviewStep } from './ItemReviewStep'
-import { StructurePreviewStep } from './StructurePreviewStep'
-import { StructureReviewStep } from './StructureReviewStep'
 import { useImportFlow } from '../hooks/useImportFlow'
+import { StructureReviewStep } from './StructureReviewStep'
 
 export type ImportStep = 'upload' | 'preview' | 'process' | 'review'
 
@@ -234,6 +229,7 @@ export function ImportWizard() {
                     imageFile={imageFile}
                     imagePreview={imagePreview}
                     annotations={annotations}
+                    restaurantId={selectedLocation.id}
                     onProcess={structure => {
                       setParsedStructure(structure)
                       handleStepChange('review')
