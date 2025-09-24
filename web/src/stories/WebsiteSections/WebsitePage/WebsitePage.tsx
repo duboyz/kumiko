@@ -1,9 +1,9 @@
 'use client'
 
-import { HeroSection } from '../../stories/WebsiteSections/HeroSection'
-import { TextSection } from './TextSection'
-import { RestaurantMenuSection } from '../../stories/WebsiteSections/RestaurantMenuSection/RestaurantMenuSection'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { HeroSection } from '../HeroSection'
+import { TextSection } from '../TextSection/TextSection'
+import { RestaurantMenuSection } from '../RestaurantMenuSection/RestaurantMenuSection'
+import { LoadingSpinner } from '@/components'
 import type { WebsitePageDto, RestaurantMenuDto } from '@shared'
 import { useMenuById } from '@shared'
 

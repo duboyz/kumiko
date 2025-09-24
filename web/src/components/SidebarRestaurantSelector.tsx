@@ -6,11 +6,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenuButton } from '@/components/ui/sidebar'
 import { Building2, ChevronDown, Plus } from 'lucide-react'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { LoadingSpinner } from '@/components'
 import { useLocationSelection } from '@shared'
 
 export function SidebarRestaurantSelector() {
@@ -43,11 +43,7 @@ export function SidebarRestaurantSelector() {
   const displayLocation = selectedLocation || (userLocations.length > 0 ? userLocations[0] : null)
 
   if (!displayLocation) {
-    return (
-      <div className="text-xs text-muted-foreground p-2">
-        No location data
-      </div>
-    )
+    return <div className="text-xs text-muted-foreground p-2">No location data</div>
   }
 
   return (
@@ -59,7 +55,9 @@ export function SidebarRestaurantSelector() {
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">{displayLocation.name}</span>
-            <span className="truncate text-xs">{displayLocation.role} • {displayLocation.city}</span>
+            <span className="truncate text-xs">
+              {displayLocation.role} • {displayLocation.city}
+            </span>
           </div>
           <ChevronDown className="ml-auto" />
         </SidebarMenuButton>
@@ -68,17 +66,17 @@ export function SidebarRestaurantSelector() {
       <DropdownMenuContent align="start" className="w-64">
         {userLocations.length > 1 && (
           <>
-            {userLocations.map((location) => (
+            {userLocations.map(location => (
               <DropdownMenuItem
                 key={`${location.type}-${location.id}`}
                 onClick={() => setSelectedLocation(location)}
-                className={selectedLocation?.id === location.id && selectedLocation?.type === location.type ? 'bg-accent' : ''}
+                className={
+                  selectedLocation?.id === location.id && selectedLocation?.type === location.type ? 'bg-accent' : ''
+                }
               >
                 <Building2 className="h-4 w-4 mr-2" />
                 <div className="flex-1 min-w-0">
-                  <div className="truncate font-medium">
-                    {location.name}
-                  </div>
+                  <div className="truncate font-medium">{location.name}</div>
                   <div className="truncate text-xs text-muted-foreground">
                     {location.role} • {location.city} • {location.type}
                   </div>

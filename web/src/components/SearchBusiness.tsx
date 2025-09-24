@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { MapPin, Star, Phone, Globe } from 'lucide-react'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { LoadingSpinner } from '@/components'
 import { useSearchBusiness, ResponseBusinessDetails } from '@shared'
 
 interface SearchBusinessProps {

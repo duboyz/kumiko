@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { ImportWizard } from "./components/ImportWizard";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { LoadingSpinner } from "@/components";
 
 export default function ImportMenuItemsPage() {
   return (

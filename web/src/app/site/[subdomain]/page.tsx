@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { useWebsiteBySubdomain } from '@shared'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { WebsitePage } from '@/components/sections'
 import { PublicWebsiteHeader } from '@/components/PublicWebsiteHeader'

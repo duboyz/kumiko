@@ -1,7 +1,7 @@
 'use client'
 
 import { ContentContainer } from '@/components/ContentContainer'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { LoadingSpinner } from '@/components'
 import { DeleteConfirmDialog } from '@/components/menu-builder/DeleteConfirmDialog'
 import { MenuItemForm } from '@/components/menu-builder/MenuItemForm'
 import MenuItemTableView from '@/components/menu-builder/MenuItemTableView'

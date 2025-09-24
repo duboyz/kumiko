@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Plus, FileText, ArrowLeft, Edit } from 'lucide-react'
 import { usePages, useCreatePage } from '@shared'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { ContentContainer } from '@/components/ContentContainer'
 

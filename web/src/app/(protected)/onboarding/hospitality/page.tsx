@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import SearchBusiness from '@/components/SearchBusiness'
 import { useCreateHospitality } from '@shared'
 import type { ResponseBusinessDetails } from '@shared'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components/ErrorMessage'
 import { ContentContainer } from '@/components/ContentContainer'
 
