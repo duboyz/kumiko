@@ -1,1 +1,0 @@
-export { MenuItemOption, type MenuItemOptionProps, type MenuItemOptionData } from './MenuItemOption';

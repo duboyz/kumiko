@@ -1,1 +1,0 @@
-export { KumikoLabel, type KumikoLabelProps } from './KumikoLabel';

@@ -15,10 +15,10 @@ public class CreateCategoryCommand
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public int OrderIndex { get; set; }
-    public List<CreateMenuItemCommand> Items { get; set; } = [];
+    public List<CreateStructureMenuItemCommand> Items { get; set; } = [];
 }
 
-public class CreateMenuItemCommand
+public class CreateStructureMenuItemCommand
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;

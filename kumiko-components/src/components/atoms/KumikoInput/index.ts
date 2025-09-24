@@ -1,1 +1,0 @@
-export { KumikoInput, KumikoTextarea, type KumikoInputProps, type KumikoTextareaProps } from './KumikoInput';

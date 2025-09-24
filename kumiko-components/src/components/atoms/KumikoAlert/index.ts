@@ -1,1 +1,0 @@
-export { KumikoAlert, kumikoAlertVariants, type KumikoAlertProps } from './KumikoAlert';

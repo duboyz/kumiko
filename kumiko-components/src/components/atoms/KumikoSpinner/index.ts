@@ -1,1 +1,0 @@
-export { KumikoSpinner, kumikoSpinnerVariants, type KumikoSpinnerProps } from './KumikoSpinner';

@@ -44,7 +44,7 @@ public class GetWebsitePagesHandler(
 
         var pages = await websitePageRepository.FindWithSectionsAsync(p => p.WebsiteId == request.WebsiteId);
 
-        var pageDtos = pages.Select(p => new WebsitePageDto(
+        var pageDtos = pages.Select(p => new WebsitePageDetailsDto(
             p.Id,
             p.Slug,
             p.Title,
@@ -53,11 +53,11 @@ public class GetWebsitePagesHandler(
             p.SeoKeywords,
             p.Subdomain,
             p.WebsiteId,
-            p.Sections.OrderBy(s => s.SortOrder).Select(s => new WebsiteSectionDto(
+            p.Sections.OrderBy(s => s.SortOrder).Select(s => new WebsitePageSectionDto(
                 s.Id,
                 s.SortOrder,
                 s.WebsitePageId,
-                s.HeroSection != null ? new HeroSectionDto(
+                s.HeroSection != null ? new WebsitePageHeroSectionDto(
                     s.HeroSection.Id,
                     s.HeroSection.Title,
                     s.HeroSection.Description,
@@ -73,14 +73,14 @@ public class GetWebsitePagesHandler(
                     s.HeroSection.ButtonBackgroundColor,
                     s.HeroSection.Type
                 ) : null,
-                s.TextSection != null ? new TextSectionDto(
+                s.TextSection != null ? new WebsitePageTextSectionDto(
                     s.TextSection.Id,
                     s.TextSection.Title,
                     s.TextSection.Text,
                     s.TextSection.AlignText,
                     s.TextSection.TextColor
                 ) : null,
-                s.RestaurantMenuSection != null ? new RestaurantMenuSectionDto(
+                s.RestaurantMenuSection != null ? new WebsitePageRestaurantMenuSectionDto(
                     s.RestaurantMenuSection.Id,
                     s.RestaurantMenuSection.RestaurantMenuId,
                     s.RestaurantMenuSection.AllowOrdering

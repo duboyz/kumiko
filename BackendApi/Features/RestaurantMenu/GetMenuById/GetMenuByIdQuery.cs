@@ -10,24 +10,24 @@ public record GetMenuByIdResult(
     Guid Id,
     string Name,
     string? Description,
-    IEnumerable<MenuCategoryDto> Categories
+    IEnumerable<MenuByIdCategoryDto> Categories
 );
 
-public record MenuCategoryDto(
+public record MenuByIdCategoryDto(
     Guid Id,
     string Name,
     string? Description,
     int OrderIndex,
-    IEnumerable<MenuCategoryItemDto> MenuCategoryItems
+    IEnumerable<MenuByIdCategoryItemDto> MenuCategoryItems
 );
 
-public record MenuCategoryItemDto(
+public record MenuByIdCategoryItemDto(
     Guid Id,
     int OrderIndex,
-    MenuItemDto? MenuItem
+    MenuByIdItemDto? MenuItem
 );
 
-public record MenuItemDto(
+public record MenuByIdItemDto(
     Guid Id,
     string Name,
     string? Description,

@@ -21,17 +21,17 @@ public class GetMenuByIdHandler(ApplicationDbContext context) : IQueryHandler<Ge
 
         var categories = menu.Categories
             .OrderBy(c => c.OrderIndex)
-            .Select(category => new MenuCategoryDto(
+            .Select(category => new MenuByIdCategoryDto(
                 category.Id,
                 category.Name,
                 category.Description,
                 category.OrderIndex,
                 category.MenuCategoryItems
                     .OrderBy(mci => mci.OrderIndex)
-                    .Select(categoryItem => new MenuCategoryItemDto(
+                    .Select(categoryItem => new MenuByIdCategoryItemDto(
                         categoryItem.Id,
                         categoryItem.OrderIndex,
-                        categoryItem.MenuItem != null ? new MenuItemDto(
+                        categoryItem.MenuItem != null ? new MenuByIdItemDto(
                             categoryItem.MenuItem.Id,
                             categoryItem.MenuItem.Name,
                             categoryItem.MenuItem.Description,

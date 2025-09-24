@@ -6,7 +6,7 @@ public record GetWebsitePagesQuery(
     Guid WebsiteId
 ) : IQuery<GetWebsitePagesResult>;
 
-public record WebsitePageDto(
+public record WebsitePageDetailsDto(
     Guid Id,
     string Slug,
     string Title,
@@ -15,19 +15,19 @@ public record WebsitePageDto(
     string? SeoKeywords,
     string Subdomain,
     Guid WebsiteId,
-    List<WebsiteSectionDto> Sections
+    List<WebsitePageSectionDto> Sections
 );
 
-public record WebsiteSectionDto(
+public record WebsitePageSectionDto(
     Guid Id,
     int SortOrder,
     Guid WebsitePageId,
-    HeroSectionDto? HeroSection,
-    TextSectionDto? TextSection,
-    RestaurantMenuSectionDto? RestaurantMenuSection
+    WebsitePageHeroSectionDto? HeroSection,
+    WebsitePageTextSectionDto? TextSection,
+    WebsitePageRestaurantMenuSectionDto? RestaurantMenuSection
 );
 
-public record HeroSectionDto(
+public record WebsitePageHeroSectionDto(
     Guid Id,
     string Title,
     string Description,
@@ -44,7 +44,7 @@ public record HeroSectionDto(
     BackendApi.Entities.HeroSectionType Type
 );
 
-public record TextSectionDto(
+public record WebsitePageTextSectionDto(
     Guid Id,
     string? Title,
     string? Text,
@@ -52,12 +52,12 @@ public record TextSectionDto(
     string? TextColor
 );
 
-public record RestaurantMenuSectionDto(
+public record WebsitePageRestaurantMenuSectionDto(
     Guid Id,
     Guid RestaurantMenuId,
     bool AllowOrdering
 );
 
 public record GetWebsitePagesResult(
-    List<WebsitePageDto> Pages
+    List<WebsitePageDetailsDto> Pages
 );

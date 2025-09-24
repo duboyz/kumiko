@@ -1,1 +1,0 @@
-export { KumikoHeading, type KumikoHeadingProps } from './KumikoHeading';

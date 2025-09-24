@@ -1,5 +1,6 @@
 using BackendApi.Data;
 using BackendApi.Shared.Contracts;
+using BackendApi.Features.RestaurantMenu.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendApi.Features.RestaurantMenu.GetRestaurantMenus;
