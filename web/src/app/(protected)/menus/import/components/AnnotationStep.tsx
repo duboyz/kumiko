@@ -18,6 +18,7 @@ import {
   Type,
   Eraser,
   Circle,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -528,10 +529,10 @@ export function AnnotationStep({
                               const newAnnotations = annotations.map((a) =>
                                 a.id === annotation.id
                                   ? {
-                                      ...a,
-                                      x: e.target.x() - a.width / 2,
-                                      y: e.target.y() - a.height / 2,
-                                    }
+                                    ...a,
+                                    x: e.target.x() - a.width / 2,
+                                    y: e.target.y() - a.height / 2,
+                                  }
                                   : a,
                               );
                               setAnnotations(newAnnotations);
@@ -557,10 +558,10 @@ export function AnnotationStep({
                               const newAnnotations = annotations.map((a) =>
                                 a.id === annotation.id
                                   ? {
-                                      ...a,
-                                      x: e.target.x(),
-                                      y: e.target.y(),
-                                    }
+                                    ...a,
+                                    x: e.target.x(),
+                                    y: e.target.y(),
+                                  }
                                   : a,
                               );
                               setAnnotations(newAnnotations);
@@ -669,12 +670,12 @@ export function AnnotationStep({
                                   const newWidth = Math.max(
                                     20,
                                     selectedAnnotation.width +
-                                      (e.target.x() - handle.x),
+                                    (e.target.x() - handle.x),
                                   );
                                   const newHeight = Math.max(
                                     20,
                                     selectedAnnotation.height +
-                                      (e.target.y() - handle.y),
+                                    (e.target.y() - handle.y),
                                   );
                                   return {
                                     ...a,
