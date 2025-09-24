@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from './providers'
-import { Nunito } from 'next/font/google'
+import { Noto_Sans_JP } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 
-const nunito = Nunito({
+const notoSansJP = Noto_Sans_JP({
   subsets: ['latin'],
-  variable: '--font-nunito',
+  variable: '--font-noto-sans-jp',
   display: 'swap',
 })
 
@@ -27,7 +27,7 @@ export default async function RootLayout({
 
   return (
     <html suppressHydrationWarning>
-      <body className={nunito.variable}>
+      <body className={notoSansJP.variable}>
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>
