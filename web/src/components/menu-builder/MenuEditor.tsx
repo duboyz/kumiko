@@ -35,11 +35,9 @@ import {
   useAllRestaurantMenuItems,
   useLocationSelection,
 } from '@shared'
-import { MenuHeader } from './MenuHeader'
+import { MenuHeader, DeleteConfirmDialog, EditWarningDialog } from '@/components'
 import { AddCategoryForm } from './AddCategoryForm'
 import { SortableCategory } from './SortableCategory'
-import { DeleteConfirmDialog } from './DeleteConfirmDialog'
-import { EditWarningDialog } from './EditWarningDialog'
 import { ClientOnlyWrapper } from './ClientOnlyWrapper'
 
 // Helper function to get menu items for a category

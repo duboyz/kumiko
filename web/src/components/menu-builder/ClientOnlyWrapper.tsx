@@ -14,9 +14,6 @@ export function ClientOnlyWrapper({ children, fallback = null }: ClientOnlyWrapp
     setIsMounted(true)
   }, [])
 
-  if (!isMounted) {
-    return <>{fallback}</>
-  }
-
+  if (!isMounted) return <>{fallback}</>
   return <>{children}</>
 }
