@@ -1,13 +1,14 @@
 import { LabeledInput } from '@/stories/LabeledInput/LabeledInput'
-import { MenuItemRow } from './MenuItemRow'
-import { Save } from 'lucide-react'
+import { MenuItem } from './MenuItemRow'
+import { Save, Trash } from 'lucide-react'
 
 interface EditableProps {
-  menuItem: MenuItemRow
-  handleChange: (property: keyof MenuItemRow, value: MenuItemRow[keyof MenuItemRow]) => void
+  menuItem: MenuItem
+  handleChange: (property: keyof MenuItem, value: MenuItem[keyof MenuItem]) => void
   onSave: () => void
+  onDelete: () => void
 }
-export const Editable = ({ menuItem, handleChange, onSave }: EditableProps) => {
+export const Editable = ({ menuItem, handleChange, onSave, onDelete }: EditableProps) => {
   return (
     <div className="grid grid-cols-12 gap-4 w-full">
       <div className="col-span-3">
@@ -43,8 +44,9 @@ export const Editable = ({ menuItem, handleChange, onSave }: EditableProps) => {
         />
       </div>
 
-      <div className="col-span-2 flex items-center justify-end">
-        <Save className="w-4 h-4" onClick={onSave} />
+      <div className="col-span-2 flex items-center gap-4 justify-end">
+        <Save className="w-4 h-4 cursor-pointer hover:text-green-600" onClick={onSave} />
+        <Trash className="w-4 h-4 cursor-pointer hover:text-red-600" onClick={onDelete} />
       </div>
     </div>
   )

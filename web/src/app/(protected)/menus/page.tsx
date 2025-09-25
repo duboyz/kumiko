@@ -77,6 +77,7 @@ export default function MenusPage() {
 
   return (
     <ContentContainer>
+      <Link href="/menus/create-menu">Create Menu</Link>
       <MenuList
         menus={menusData?.menus || []}
         restaurantId={restaurantId || ''}

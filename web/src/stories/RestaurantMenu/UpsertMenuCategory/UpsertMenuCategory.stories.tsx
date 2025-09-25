@@ -1,6 +1,7 @@
 import { StoryObj } from '@storybook/nextjs-vite'
 import { useState } from 'react'
 import { UpsertMenuCategory } from './UpsertMenuCategory'
+import { MenuItem } from '../MenuItemRow/MenuItemRow'
 
 const meta = {
   component: UpsertMenuCategory,
@@ -32,15 +33,15 @@ export const Default: Story = {
     const [categoryName, setCategoryName] = useState(args.categoryName)
     const [items, setItems] = useState(args.items)
 
-    const handleRowSave = (item: (typeof items)[0]) => {
+    const handleRowSave = (item: MenuItem) => {
       setItems(prev => prev.map(i => (i.id === item.id ? item : i)))
     }
 
-    const handleRowDelete = (item: (typeof items)[0]) => {
+    const handleRowDelete = (item: MenuItem) => {
       setItems(prev => prev.filter(i => i.id !== item.id))
     }
 
-    const handleRowEdit = (item: (typeof items)[0]) => {
+    const handleRowEdit = (item: MenuItem) => {
       console.log('Editing item:', item)
     }
 

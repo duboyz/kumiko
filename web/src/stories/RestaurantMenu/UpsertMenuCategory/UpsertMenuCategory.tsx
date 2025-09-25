@@ -2,15 +2,15 @@ import { LabeledInput } from '@/stories/LabeledInput/LabeledInput'
 import { IconButton } from '@/stories/IconButton'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import { MenuItemRow } from '../MenuItemRow/MenuItemRow'
+import { MenuItemRow, MenuItem } from '../MenuItemRow/MenuItemRow'
 
 interface UpsertMenuCategoryProps {
   categoryName: string
   setCategoryName: (name: string) => void
-  items: MenuItemRow[]
-  onRowSave: (item: MenuItemRow) => void
-  onRowDelete: (item: MenuItemRow) => void
-  onRowEdit: (item: MenuItemRow) => void
+  items: MenuItem[]
+  onRowSave: (item: MenuItem) => void
+  onRowDelete: (item: MenuItem) => void
+  onRowEdit: (item: MenuItem) => void
   onAddItem: () => void
 }
 
@@ -24,27 +24,27 @@ export const UpsertMenuCategory = ({
   onAddItem,
 }: UpsertMenuCategoryProps) => {
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
-  const [editingItem, setEditingItem] = useState<MenuItemRow | null>(null)
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
 
-  const handleRowEdit = (item: MenuItemRow) => {
+  const handleRowEdit = (item: MenuItem) => {
     setEditingItemId(item.id)
     setEditingItem({ ...item })
     onRowEdit(item)
   }
 
-  const handleRowSave = (item: MenuItemRow) => {
+  const handleRowSave = (item: MenuItem) => {
     setEditingItemId(null)
     setEditingItem(null)
     onRowSave(item)
   }
 
-  const handleRowDelete = (item: MenuItemRow) => {
+  const handleRowDelete = (item: MenuItem) => {
     setEditingItemId(null)
     setEditingItem(null)
     onRowDelete(item)
   }
 
-  const handleItemChange = (property: keyof MenuItemRow, value: MenuItemRow[keyof MenuItemRow]) => {
+  const handleItemChange = (property: keyof MenuItem, value: MenuItem[keyof MenuItem]) => {
     if (editingItem) {
       setEditingItem(prev => (prev ? { ...prev, [property]: value } : null))
     }
