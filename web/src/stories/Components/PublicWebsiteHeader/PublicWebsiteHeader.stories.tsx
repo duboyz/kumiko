@@ -100,7 +100,7 @@ export const LongWebsiteName: Story = {
 
 export const ShortWebsiteName: Story = {
   args: {
-    websiteName: 'Joe\'s',
+    websiteName: "Joe's",
     pages: mockPages,
     currentPageSlug: 'home',
   },
@@ -128,9 +128,7 @@ export const FewPages: Story = {
 export const SinglePage: Story = {
   args: {
     websiteName: 'Simple Bistro',
-    pages: [
-      { id: '1', title: 'Home', slug: 'home' },
-    ],
+    pages: [{ id: '1', title: 'Home', slug: 'home' }],
     currentPageSlug: 'home',
   },
 }
@@ -217,7 +215,7 @@ export const StickyHeader: Story = {
     pages: mockPages,
     currentPageSlug: 'menu',
   },
-  render: (args) => (
+  render: args => (
     <div>
       <PublicWebsiteHeader {...args} />
       <div className="h-screen bg-gradient-to-b from-blue-50 to-blue-100 p-8">
@@ -225,11 +223,15 @@ export const StickyHeader: Story = {
           <h1 className="text-4xl font-bold text-gray-900 mb-8">Page Content</h1>
           <div className="space-y-4 text-gray-700">
             <p>This demonstrates the sticky header behavior. Scroll down to see the header stick to the top.</p>
-            <p>The header has a white background with a subtle border and maintains its position at the top of the viewport.</p>
+            <p>
+              The header has a white background with a subtle border and maintains its position at the top of the
+              viewport.
+            </p>
             {Array.from({ length: 20 }, (_, i) => (
               <p key={i}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+                ex ea commodo consequat.
               </p>
             ))}
           </div>

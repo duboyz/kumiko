@@ -1,9 +1,9 @@
-import { ContentContainer } from "@/components/ContentContainer";
-import { useTranslations } from 'next-intl';
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { ContentContainer } from '@/components/ContentContainer'
+import { useTranslations } from 'next-intl'
+import { LanguageSelector } from '@/components/LanguageSelector'
 
 export default function DashboardPage() {
-  const t = useTranslations('navigation');
+  const t = useTranslations('navigation')
 
   return (
     <ContentContainer>

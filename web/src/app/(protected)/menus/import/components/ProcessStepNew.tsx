@@ -1,31 +1,24 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  ArrowLeft,
-  ArrowRight,
-  X,
-  AlertTriangle,
-  CheckCircle,
-  Loader2,
-} from "lucide-react";
-import { parseMenuStructure } from "@/shared/api/menu-structure.api";
-import { ParsedMenuStructure } from "@/shared/types/menu-structure.types";
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { ArrowLeft, ArrowRight, X, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react'
+import { parseMenuStructure } from '@/shared/api/menu-structure.api'
+import { ParsedMenuStructure } from '@/shared/types/menu-structure.types'
 
 interface ProcessStepProps {
-  imageFile: File | null;
-  imagePreview: string | null;
-  annotations: any[];
-  onProcess: (structure: ParsedMenuStructure) => void;
-  onBack: () => void;
-  onError: (error: string) => void;
-  isProcessing: boolean;
-  setIsProcessing: (processing: boolean) => void;
-  processingStep: string;
-  setProcessingStep: (step: string) => void;
-  errorMessage: string | null;
+  imageFile: File | null
+  imagePreview: string | null
+  annotations: any[]
+  onProcess: (structure: ParsedMenuStructure) => void
+  onBack: () => void
+  onError: (error: string) => void
+  isProcessing: boolean
+  setIsProcessing: (processing: boolean) => void
+  processingStep: string
+  setProcessingStep: (step: string) => void
+  errorMessage: string | null
 }
 
 export function ProcessStep({
@@ -41,77 +34,66 @@ export function ProcessStep({
   setProcessingStep,
   errorMessage,
 }: ProcessStepProps) {
-  const [abortController, setAbortController] =
-    useState<AbortController | null>(null);
+  const [abortController, setAbortController] = useState<AbortController | null>(null)
 
   const handleProcess = async () => {
-    if (!imageFile) return;
+    if (!imageFile) return
 
-    const controller = new AbortController();
-    setAbortController(controller);
-    setIsProcessing(true);
-    onError("");
+    const controller = new AbortController()
+    setAbortController(controller)
+    setIsProcessing(true)
+    onError('')
 
     try {
-      setProcessingStep("Preparing image...");
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      setProcessingStep('Preparing image...')
+      await new Promise(resolve => setTimeout(resolve, 500))
 
-      setProcessingStep("Sending to AI for structure analysis...");
-      const structure = await parseMenuStructure(imageFile, annotations);
+      setProcessingStep('Sending to AI for structure analysis...')
+      const structure = await parseMenuStructure(imageFile, annotations)
 
-      setProcessingStep("Processing menu structure...");
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setProcessingStep('Processing menu structure...')
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
-      setProcessingStep("Complete!");
-      onProcess(structure);
+      setProcessingStep('Complete!')
+      onProcess(structure)
     } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") {
-        return; // User cancelled
+      if (error instanceof Error && error.name === 'AbortError') {
+        return // User cancelled
       }
-      console.error("Error processing image:", error);
-      onError(
-        error instanceof Error
-          ? error.message
-          : "Failed to process image. Please try again.",
-      );
+      console.error('Error processing image:', error)
+      onError(error instanceof Error ? error.message : 'Failed to process image. Please try again.')
     } finally {
-      setIsProcessing(false);
-      setAbortController(null);
+      setIsProcessing(false)
+      setAbortController(null)
     }
-  };
+  }
 
   const handleCancel = () => {
     if (abortController) {
-      abortController.abort();
+      abortController.abort()
     }
-    setIsProcessing(false);
-    setAbortController(null);
-  };
+    setIsProcessing(false)
+    setAbortController(null)
+  }
 
   // Auto-start processing when component mounts
   useEffect(() => {
     if (imageFile && !isProcessing && !errorMessage) {
-      handleProcess();
+      handleProcess()
     }
-  }, [imageFile]);
+  }, [imageFile])
 
-  const totalItems = annotations.filter((a) => a.type === "item").length;
-  const totalCategories = annotations.filter(
-    (a) => a.type === "category",
-  ).length;
+  const totalItems = annotations.filter(a => a.type === 'item').length
+  const totalCategories = annotations.filter(a => a.type === 'category').length
 
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Processing Your Menu</h2>
-        <p className="text-muted-foreground">
-          AI is analyzing your menu structure and extracting categories and
-          items
-        </p>
+        <p className="text-muted-foreground">AI is analyzing your menu structure and extracting categories and items</p>
         {annotations.length > 0 && (
           <p className="text-sm text-muted-foreground mt-2">
-            Using {totalCategories} category annotations and {totalItems} item
-            annotations
+            Using {totalCategories} category annotations and {totalItems} item annotations
           </p>
         )}
       </div>
@@ -154,11 +136,7 @@ export function ProcessStep({
                   <h3 className="text-lg font-semibold mb-2">Processing...</h3>
                   <p className="text-muted-foreground">{processingStep}</p>
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="mt-4"
-                >
+                <Button variant="outline" onClick={handleCancel} className="mt-4">
                   <X className="w-4 h-4 mr-2" />
                   Cancel
                 </Button>
@@ -171,9 +149,7 @@ export function ProcessStep({
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2 text-red-600">
-                    Processing Failed
-                  </h3>
+                  <h3 className="text-lg font-semibold mb-2 text-red-600">Processing Failed</h3>
                   <p className="text-muted-foreground mb-4">{errorMessage}</p>
                   <Button onClick={handleProcess} size="lg">
                     <ArrowRight className="w-4 h-4 mr-2" />
@@ -189,12 +165,8 @@ export function ProcessStep({
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2 text-green-600">
-                    Processing Complete!
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Your menu structure has been analyzed successfully
-                  </p>
+                  <h3 className="text-lg font-semibold mb-2 text-green-600">Processing Complete!</h3>
+                  <p className="text-muted-foreground">Your menu structure has been analyzed successfully</p>
                 </div>
               </>
             )}
@@ -210,40 +182,32 @@ export function ProcessStep({
             <div className="flex items-center gap-3">
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  processingStep === "Preparing image..." || isProcessing
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-gray-200 text-gray-600"
+                  processingStep === 'Preparing image...' || isProcessing
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-gray-200 text-gray-600'
                 }`}
               >
                 1
               </div>
-              <span
-                className={
-                  processingStep === "Preparing image..."
-                    ? "text-primary font-medium"
-                    : ""
-                }
-              >
+              <span className={processingStep === 'Preparing image...' ? 'text-primary font-medium' : ''}>
                 Preparing image
               </span>
             </div>
             <div className="flex items-center gap-3">
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  processingStep.includes("Sending to AI") ||
-                  processingStep.includes("AI is analyzing")
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-gray-200 text-gray-600"
+                  processingStep.includes('Sending to AI') || processingStep.includes('AI is analyzing')
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-gray-200 text-gray-600'
                 }`}
               >
                 2
               </div>
               <span
                 className={
-                  processingStep.includes("Sending to AI") ||
-                  processingStep.includes("AI is analyzing")
-                    ? "text-primary font-medium"
-                    : ""
+                  processingStep.includes('Sending to AI') || processingStep.includes('AI is analyzing')
+                    ? 'text-primary font-medium'
+                    : ''
                 }
               >
                 AI structure analysis
@@ -252,20 +216,18 @@ export function ProcessStep({
             <div className="flex items-center gap-3">
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  processingStep === "Processing menu structure..." ||
-                  processingStep === "Complete!"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-gray-200 text-gray-600"
+                  processingStep === 'Processing menu structure...' || processingStep === 'Complete!'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-gray-200 text-gray-600'
                 }`}
               >
                 3
               </div>
               <span
                 className={
-                  processingStep === "Processing menu structure..." ||
-                  processingStep === "Complete!"
-                    ? "text-primary font-medium"
-                    : ""
+                  processingStep === 'Processing menu structure...' || processingStep === 'Complete!'
+                    ? 'text-primary font-medium'
+                    : ''
                 }
               >
                 Processing results
@@ -289,5 +251,5 @@ export function ProcessStep({
         )}
       </div>
     </div>
-  );
+  )
 }

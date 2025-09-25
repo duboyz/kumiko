@@ -34,7 +34,7 @@ export function HeroSettingsPopover({
   buttonTextColor,
   buttonBackgroundColor,
   onUpdate,
-  onTypeChange
+  onTypeChange,
 }: HeroSettingsPopoverProps) {
   return (
     <div className="absolute top-0 right-0 z-10">
@@ -51,7 +51,7 @@ export function HeroSettingsPopover({
             {/* Type Selector */}
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">Layout Type</label>
-              <Select value={type} onValueChange={(value) => onTypeChange?.(value as HeroSectionType)}>
+              <Select value={type} onValueChange={value => onTypeChange?.(value as HeroSectionType)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -69,8 +69,10 @@ export function HeroSettingsPopover({
               </label>
               <div className="flex gap-2">
                 <Input
-                  value={type === HeroSectionType.ImageRight ? (imageUrl || '') : (backgroundImageUrl || '')}
-                  onChange={(e) => onUpdate(type === HeroSectionType.ImageRight ? 'imageUrl' : 'backgroundImageUrl', e.target.value)}
+                  value={type === HeroSectionType.ImageRight ? imageUrl || '' : backgroundImageUrl || ''}
+                  onChange={e =>
+                    onUpdate(type === HeroSectionType.ImageRight ? 'imageUrl' : 'backgroundImageUrl', e.target.value)
+                  }
                   placeholder={type === HeroSectionType.ImageRight ? 'Image URL...' : 'Background image URL...'}
                   className="text-sm"
                 />
@@ -89,7 +91,7 @@ export function HeroSettingsPopover({
                     <Input
                       type="color"
                       value={backgroundColor || '#ffffff'}
-                      onChange={(e) => onUpdate('backgroundColor', e.target.value)}
+                      onChange={e => onUpdate('backgroundColor', e.target.value)}
                       className="w-full h-8 p-1 rounded border"
                       title="Background"
                     />
@@ -99,7 +101,7 @@ export function HeroSettingsPopover({
                     <Input
                       type="color"
                       value={textColor || '#1f2937'}
-                      onChange={(e) => onUpdate('textColor', e.target.value)}
+                      onChange={e => onUpdate('textColor', e.target.value)}
                       className="w-full h-8 p-1 rounded border"
                       title="Text"
                     />
@@ -109,7 +111,7 @@ export function HeroSettingsPopover({
                     <Input
                       type="color"
                       value={buttonBackgroundColor || '#3b82f6'}
-                      onChange={(e) => onUpdate('buttonBackgroundColor', e.target.value)}
+                      onChange={e => onUpdate('buttonBackgroundColor', e.target.value)}
                       className="w-full h-8 p-1 rounded border"
                       title="Button"
                     />
@@ -122,7 +124,7 @@ export function HeroSettingsPopover({
                     <Input
                       type="color"
                       value={backgroundColor || '#1f2937'}
-                      onChange={(e) => onUpdate('backgroundColor', e.target.value)}
+                      onChange={e => onUpdate('backgroundColor', e.target.value)}
                       className="w-full h-8 p-1 rounded border"
                       title="Background"
                     />
@@ -132,7 +134,7 @@ export function HeroSettingsPopover({
                     <Input
                       type="color"
                       value={textColor || '#ffffff'}
-                      onChange={(e) => onUpdate('textColor', e.target.value)}
+                      onChange={e => onUpdate('textColor', e.target.value)}
                       className="w-full h-8 p-1 rounded border"
                       title="Text"
                     />
@@ -142,7 +144,7 @@ export function HeroSettingsPopover({
                     <Input
                       type="color"
                       value={backgroundOverlayColor || 'rgba(0, 0, 0, 0.5)'}
-                      onChange={(e) => onUpdate('backgroundOverlayColor', e.target.value)}
+                      onChange={e => onUpdate('backgroundOverlayColor', e.target.value)}
                       className="w-full h-8 p-1 rounded border"
                       title="Overlay"
                     />
@@ -158,13 +160,13 @@ export function HeroSettingsPopover({
               <div className="space-y-2">
                 <Input
                   value={buttonText || ''}
-                  onChange={(e) => onUpdate('buttonText', e.target.value)}
+                  onChange={e => onUpdate('buttonText', e.target.value)}
                   placeholder="Button text..."
                   className="text-sm"
                 />
                 <Input
                   value={buttonUrl || ''}
-                  onChange={(e) => onUpdate('buttonUrl', e.target.value)}
+                  onChange={e => onUpdate('buttonUrl', e.target.value)}
                   placeholder="Button URL..."
                   className="text-sm"
                 />
@@ -174,7 +176,7 @@ export function HeroSettingsPopover({
                       <Input
                         type="color"
                         value={buttonBackgroundColor || '#3b82f6'}
-                        onChange={(e) => onUpdate('buttonBackgroundColor', e.target.value)}
+                        onChange={e => onUpdate('buttonBackgroundColor', e.target.value)}
                         className="w-full h-8 p-1 rounded border"
                         title="Button Background"
                       />
@@ -184,7 +186,7 @@ export function HeroSettingsPopover({
                       <Input
                         type="color"
                         value={buttonTextColor || '#ffffff'}
-                        onChange={(e) => onUpdate('buttonTextColor', e.target.value)}
+                        onChange={e => onUpdate('buttonTextColor', e.target.value)}
                         className="w-full h-8 p-1 rounded border"
                         title="Button Text"
                       />

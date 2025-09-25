@@ -30,19 +30,18 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
 
           {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
-            {pages.map((page) => {
-              const isActive = currentPageSlug === page.slug ||
-                               (page.slug === 'home' && !currentPageSlug) ||
-                               (page.slug === 'home' && currentPageSlug === '')
+            {pages.map(page => {
+              const isActive =
+                currentPageSlug === page.slug ||
+                (page.slug === 'home' && !currentPageSlug) ||
+                (page.slug === 'home' && currentPageSlug === '')
 
               return (
                 <Link
                   key={page.id}
                   href={page.slug === 'home' ? '/' : `/${page.slug}`}
                   className={`text-sm font-medium transition-colors duration-200 ${
-                    isActive
-                      ? 'text-blue-600 border-b-2 border-blue-600 pb-1'
-                      : 'text-gray-700 hover:text-blue-600'
+                    isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'
                   }`}
                 >
                   {page.title}
@@ -68,19 +67,18 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
         {/* Mobile Navigation */}
         <div className="md:hidden border-t border-gray-200">
           <div className="py-2 space-y-1">
-            {pages.map((page) => {
-              const isActive = currentPageSlug === page.slug ||
-                               (page.slug === 'home' && !currentPageSlug) ||
-                               (page.slug === 'home' && currentPageSlug === '')
+            {pages.map(page => {
+              const isActive =
+                currentPageSlug === page.slug ||
+                (page.slug === 'home' && !currentPageSlug) ||
+                (page.slug === 'home' && currentPageSlug === '')
 
               return (
                 <Link
                   key={page.id}
                   href={page.slug === 'home' ? '/' : `/${page.slug}`}
                   className={`block px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-                    isActive
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                    isActive ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                   }`}
                 >
                   {page.title}

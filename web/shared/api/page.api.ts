@@ -3,7 +3,7 @@ import type {
   CreateWebsitePageResult,
   GetWebsitePagesResult,
   ApiResponse,
-  ResponseData
+  ResponseData,
 } from '../types'
 import apiClient from './client'
 
@@ -18,5 +18,5 @@ export const pageApi = {
     const { data } = await apiClient.get<ApiResponse<GetWebsitePagesResult>>(`/api/page/list?websiteId=${websiteId}`)
     if (!data.success) throw new Error(data.message || 'Failed to get pages')
     return data.data
-  }
+  },
 }

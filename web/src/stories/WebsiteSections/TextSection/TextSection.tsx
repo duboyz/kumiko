@@ -26,7 +26,7 @@ export function TextSection({
   textColor,
   className = '',
   isEditing,
-  onUpdate
+  onUpdate,
 }: TextSectionProps) {
   const sectionStyle = {
     color: textColor || '#1f2937',
@@ -50,10 +50,7 @@ export function TextSection({
   }
 
   return (
-    <section
-      className={`relative py-12 px-4 md:px-6 lg:px-8 ${className}`}
-      style={sectionStyle}
-    >
+    <section className={`relative py-12 px-4 md:px-6 lg:px-8 ${className}`} style={sectionStyle}>
       {/* Floating Edit Button */}
       {isEditing && onUpdate && (
         <div className="absolute top-0 right-0 z-10">
@@ -72,7 +69,7 @@ export function TextSection({
                   <label className="text-sm font-medium text-gray-700 mb-1 block">Text Alignment</label>
                   <Select
                     value={alignText}
-                    onValueChange={(value) => {
+                    onValueChange={value => {
                       onUpdate?.('alignText', value)
                     }}
                   >
@@ -94,13 +91,13 @@ export function TextSection({
                     <Input
                       type="color"
                       value={textColor || '#1f2937'}
-                      onChange={(e) => onUpdate('textColor', e.target.value)}
-                      className={cn("w-16 h-8 p-1 rounded border",)}
+                      onChange={e => onUpdate('textColor', e.target.value)}
+                      className={cn('w-16 h-8 p-1 rounded border')}
                       title="Text Color"
                     />
                     <Input
                       value={textColor || '#1f2937'}
-                      onChange={(e) => onUpdate('textColor', e.target.value)}
+                      onChange={e => onUpdate('textColor', e.target.value)}
                       placeholder="Text color..."
                       className="flex-1 text-sm"
                     />
@@ -120,28 +117,24 @@ export function TextSection({
         {isEditing && onUpdate ? (
           <Input
             value={title || ''}
-            onChange={(e) => onUpdate('title', e.target.value)}
+            onChange={e => onUpdate('title', e.target.value)}
             placeholder="Enter section title (optional)..."
             className={`text-2xl md:text-3xl lg:text-4xl font-bold leading-tight min-h-[3rem] resize-none border-2 border-dashed border-blue-300 bg-blue-50/50 ${getAlignmentClass()}`}
           />
         ) : title ? (
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
-            {title}
-          </h2>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">{title}</h2>
         ) : null}
 
         {/* Text */}
         {isEditing && onUpdate ? (
           <Textarea
             value={text || ''}
-            onChange={(e) => onUpdate('text', e.target.value)}
+            onChange={e => onUpdate('text', e.target.value)}
             placeholder="Enter your text content (optional)..."
             className={`text-base md:text-lg leading-relaxed min-h-[8rem] resize-none border-2 border-dashed border-blue-300 bg-blue-50/50 ${getAlignmentClass()}`}
           />
         ) : text ? (
-          <div className="text-base md:text-lg leading-relaxed whitespace-pre-wrap">
-            {text}
-          </div>
+          <div className="text-base md:text-lg leading-relaxed whitespace-pre-wrap">{text}</div>
         ) : null}
 
         {/* Show placeholder when both title and text are empty and not editing */}

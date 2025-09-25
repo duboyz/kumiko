@@ -1,43 +1,24 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Trash2,
-  Plus,
-  Check,
-  AlertTriangle,
-  TrendingUp,
-  Loader2,
-} from "lucide-react";
-import { ParsedMenuItem } from "../hooks/useImportFlow";
-import {
-  useRestaurantMenus,
-  useCreateMenuItem,
-  useBulkAddMenuItemsToCategory,
-} from "@shared";
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ArrowLeft, ArrowRight, Trash2, Plus, Check, AlertTriangle, TrendingUp, Loader2 } from 'lucide-react'
+import { ParsedMenuItem } from '../hooks/useImportFlow'
+import { useRestaurantMenus, useCreateMenuItem, useBulkAddMenuItemsToCategory } from '@shared'
 
 interface ReviewStepProps {
-  parsedItems: ParsedMenuItem[];
-  onConfirm: () => void;
-  onBack: () => void;
-  selectedCategoryId: string;
-  onCategoryChange: (categoryId: string) => void;
-  restaurantId: string;
+  parsedItems: ParsedMenuItem[]
+  onConfirm: () => void
+  onBack: () => void
+  selectedCategoryId: string
+  onCategoryChange: (categoryId: string) => void
+  restaurantId: string
 }
 
 export function ReviewStep({
@@ -48,100 +29,90 @@ export function ReviewStep({
   onCategoryChange,
   restaurantId,
 }: ReviewStepProps) {
-  const [items, setItems] = useState<ParsedMenuItem[]>(parsedItems);
-  const [isCreating, setIsCreating] = useState(false);
+  const [items, setItems] = useState<ParsedMenuItem[]>(parsedItems)
+  const [isCreating, setIsCreating] = useState(false)
 
-  const { data: menusData } = useRestaurantMenus(restaurantId);
-  const createMenuItemMutation = useCreateMenuItem();
-  const bulkAddMenuItemsToCategoryMutation = useBulkAddMenuItemsToCategory();
+  const { data: menusData } = useRestaurantMenus(restaurantId)
+  const createMenuItemMutation = useCreateMenuItem()
+  const bulkAddMenuItemsToCategoryMutation = useBulkAddMenuItemsToCategory()
 
-  const categories = menusData?.menus?.[0]?.categories || [];
+  const categories = menusData?.menus?.[0]?.categories || []
 
   useEffect(() => {
-    setItems(parsedItems);
-  }, [parsedItems]);
+    setItems(parsedItems)
+  }, [parsedItems])
 
-  const updateItem = (
-    id: string,
-    field: keyof ParsedMenuItem,
-    value: string | number,
-  ) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-    );
-  };
+  const updateItem = (id: string, field: keyof ParsedMenuItem, value: string | number) => {
+    setItems(prev => prev.map(item => (item.id === id ? { ...item, [field]: value } : item)))
+  }
 
   const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
+    setItems(prev => prev.filter(item => item.id !== id))
+  }
 
   const addNewItem = () => {
     const newItem: ParsedMenuItem = {
       id: `new-${Date.now()}`,
-      name: "",
-      description: "",
+      name: '',
+      description: '',
       price: 0,
-    };
-    setItems((prev) => [...prev, newItem]);
-  };
+    }
+    setItems(prev => [...prev, newItem])
+  }
 
   const handleConfirm = async () => {
     if (!selectedCategoryId) {
-      alert("Please select a category for the menu items.");
-      return;
+      alert('Please select a category for the menu items.')
+      return
     }
 
-    const validItems = items.filter((item) => item.name.trim() !== "");
+    const validItems = items.filter(item => item.name.trim() !== '')
     if (validItems.length === 0) {
-      alert("Please add at least one valid menu item.");
-      return;
+      alert('Please add at least one valid menu item.')
+      return
     }
 
-    setIsCreating(true);
+    setIsCreating(true)
 
     try {
       // Create menu items first
-      const createdMenuItems = [];
+      const createdMenuItems = []
       for (const item of validItems) {
         const result = await createMenuItemMutation.mutateAsync({
           name: item.name,
           description: item.description,
           price: item.price,
-          restaurantMenuId: menusData?.menus?.[0]?.id || "",
+          restaurantMenuId: menusData?.menus?.[0]?.id || '',
           isAvailable: true,
-        });
-        createdMenuItems.push(result);
+        })
+        createdMenuItems.push(result)
       }
 
       // Then bulk add them to the selected category
       if (createdMenuItems.length > 0) {
         await bulkAddMenuItemsToCategoryMutation.mutateAsync({
-          menuItemIds: createdMenuItems
-            .filter((item) => item)
-            .map((item) => item!.id),
+          menuItemIds: createdMenuItems.filter(item => item).map(item => item!.id),
           menuCategoryId: selectedCategoryId,
           startOrderIndex: 0,
-        });
+        })
       }
 
-      onConfirm();
+      onConfirm()
     } catch (error) {
-      console.error("Failed to create menu items:", error);
-      alert("Failed to create some menu items. Please try again.");
+      console.error('Failed to create menu items:', error)
+      alert('Failed to create some menu items. Please try again.')
     } finally {
-      setIsCreating(false);
+      setIsCreating(false)
     }
-  };
+  }
 
-  const validItemsCount = items.filter((item) => item.name.trim()).length;
+  const validItemsCount = items.filter(item => item.name.trim()).length
 
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Review Menu Items</h2>
-        <p className="text-muted-foreground">
-          Review and edit the parsed menu items before adding them to your menu
-        </p>
+        <p className="text-muted-foreground">Review and edit the parsed menu items before adding them to your menu</p>
       </div>
 
       {/* Category Selection */}
@@ -156,7 +127,7 @@ export function ReviewStep({
                 <SelectValue placeholder="Choose a category for these items" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((category) => (
+                {categories.map(category => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
@@ -164,9 +135,7 @@ export function ReviewStep({
               </SelectContent>
             </Select>
             {categories.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                No categories available. Please create a category first.
-              </p>
+              <p className="text-sm text-muted-foreground">No categories available. Please create a category first.</p>
             )}
           </div>
         </CardContent>
@@ -175,9 +144,7 @@ export function ReviewStep({
       {/* Items List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">
-            Menu Items ({validItemsCount})
-          </h3>
+          <h3 className="text-lg font-semibold">Menu Items ({validItemsCount})</h3>
           <Button onClick={addNewItem} variant="outline" size="sm">
             <Plus className="w-4 h-4 mr-2" />
             Add Item
@@ -191,18 +158,12 @@ export function ReviewStep({
                 <div className="flex items-start gap-3">
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-muted-foreground">
-                        Item {index + 1}
-                      </span>
+                      <span className="text-sm font-medium text-muted-foreground">Item {index + 1}</span>
                       <div className="flex items-center gap-2">
                         {item.confidence && (
                           <Badge
                             variant={
-                              item.confidence > 0.8
-                                ? "default"
-                                : item.confidence > 0.6
-                                  ? "secondary"
-                                  : "destructive"
+                              item.confidence > 0.8 ? 'default' : item.confidence > 0.6 ? 'secondary' : 'destructive'
                             }
                             className="text-xs"
                           >
@@ -239,9 +200,7 @@ export function ReviewStep({
                         <Input
                           id={`name-${item.id}`}
                           value={item.name}
-                          onChange={(e) =>
-                            updateItem(item.id, "name", e.target.value)
-                          }
+                          onChange={e => updateItem(item.id, 'name', e.target.value)}
                           placeholder="Enter item name"
                           className="h-8"
                         />
@@ -256,13 +215,7 @@ export function ReviewStep({
                           step="0.01"
                           min="0"
                           value={item.price}
-                          onChange={(e) =>
-                            updateItem(
-                              item.id,
-                              "price",
-                              parseFloat(e.target.value) || 0,
-                            )
-                          }
+                          onChange={e => updateItem(item.id, 'price', parseFloat(e.target.value) || 0)}
                           placeholder="0.00"
                           className="h-8"
                         />
@@ -270,18 +223,13 @@ export function ReviewStep({
                     </div>
 
                     <div className="space-y-1">
-                      <Label
-                        htmlFor={`description-${item.id}`}
-                        className="text-xs"
-                      >
+                      <Label htmlFor={`description-${item.id}`} className="text-xs">
                         Description
                       </Label>
                       <Textarea
                         id={`description-${item.id}`}
                         value={item.description}
-                        onChange={(e) =>
-                          updateItem(item.id, "description", e.target.value)
-                        }
+                        onChange={e => updateItem(item.id, 'description', e.target.value)}
                         placeholder="Enter item description"
                         rows={2}
                         className="resize-none"
@@ -313,11 +261,7 @@ export function ReviewStep({
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
-        <Button
-          onClick={handleConfirm}
-          disabled={isCreating || validItemsCount === 0 || !selectedCategoryId}
-          size="lg"
-        >
+        <Button onClick={handleConfirm} disabled={isCreating || validItemsCount === 0 || !selectedCategoryId} size="lg">
           {isCreating ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -332,5 +276,5 @@ export function ReviewStep({
         </Button>
       </div>
     </div>
-  );
+  )
 }

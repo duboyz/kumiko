@@ -15,9 +15,7 @@ function detectLocale(request: NextRequest): string {
   const acceptLanguage = request.headers.get('Accept-Language')
   if (acceptLanguage) {
     // Simple language detection from Accept-Language header
-    const languages = acceptLanguage
-      .split(',')
-      .map(lang => lang.split(';')[0].trim().toLowerCase())
+    const languages = acceptLanguage.split(',').map(lang => lang.split(';')[0].trim().toLowerCase())
 
     for (const lang of languages) {
       if (lang === 'nb' || lang === 'no') return 'no' // Norwegian
@@ -64,14 +62,17 @@ async function refreshToken(request: NextRequest): Promise<NextResponse | null> 
 
   try {
     // Call the refresh endpoint
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5158'}/api/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cookie': `RefreshToken=${refreshTokenCookie.value}`,
-      },
-      body: JSON.stringify({ clientType: 'Web' }),
-    })
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5158'}/api/auth/refresh`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: `RefreshToken=${refreshTokenCookie.value}`,
+        },
+        body: JSON.stringify({ clientType: 'Web' }),
+      }
+    )
 
     if (response.ok) {
       // Get the new cookies from the response

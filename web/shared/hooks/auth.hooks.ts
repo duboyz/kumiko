@@ -9,7 +9,7 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: (credentials: Omit<LoginRdto, 'clientType'>) => authApi.login(credentials),
-    onSuccess: (data) => {
+    onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: ['currentUser'] })
       router.push('/dashboard')
     },
@@ -22,7 +22,7 @@ export const useRegister = () => {
 
   return useMutation({
     mutationFn: (credentials: Omit<RegisterRdto, 'clientType'>) => authApi.register(credentials),
-    onSuccess: (data) => {
+    onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: ['currentUser'] })
       router.push('/dashboard')
     },
@@ -56,7 +56,7 @@ export const useRefreshToken = () => {
 
   return useMutation({
     mutationFn: () => authApi.refresh(),
-    onSuccess: (data) => {
+    onSuccess: data => {
       // Token refresh successful, invalidate current user query to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ['currentUser'] })
     },

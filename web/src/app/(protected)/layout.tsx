@@ -14,11 +14,7 @@ import {
 import { usePathname } from 'next/navigation'
 import { Fragment } from 'react'
 
-export default function ProtectedLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const pathSegments = pathname.split('/').filter(Boolean)
 
@@ -54,9 +50,7 @@ export default function ProtectedLayout({
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          {children}
-        </div>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   )

@@ -34,7 +34,7 @@ export default function HospitalityOnboardingPage() {
         latitude: selectedBusiness.geometry.location.lat.toString(),
         longitude: selectedBusiness.geometry.location.lng.toString(),
         googlePlaceId: selectedBusiness.placeId,
-        description: `${selectedBusiness.name} - Hospitality business`
+        description: `${selectedBusiness.name} - Hospitality business`,
       })
 
       // Navigate to dashboard after successful creation
@@ -48,32 +48,21 @@ export default function HospitalityOnboardingPage() {
     <ContentContainer>
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold mb-2">Set up your hospitality business</h1>
-        <p className="text-muted-foreground">
-          Search for your hotel or hospitality business to get started
-        </p>
+        <p className="text-muted-foreground">Search for your hotel or hospitality business to get started</p>
       </div>
 
       <div className="max-w-2xl mx-auto">
-        <SearchBusiness
-          onBusinessSelect={handleBusinessSelect}
-          selectedBusiness={selectedBusiness}
-        />
+        <SearchBusiness onBusinessSelect={handleBusinessSelect} selectedBusiness={selectedBusiness} />
 
         {selectedBusiness && (
           <div className="mt-8 text-center">
             <h3 className="text-lg font-semibold mb-2">Selected Business</h3>
             <div className="bg-card p-4 rounded-lg border text-left mb-6">
               <h4 className="font-semibold">{selectedBusiness.name}</h4>
-              <p className="text-sm text-muted-foreground">
-                {selectedBusiness.formattedAddress}
-              </p>
+              <p className="text-sm text-muted-foreground">{selectedBusiness.formattedAddress}</p>
             </div>
 
-            <Button
-              onClick={handleCreateHospitality}
-              disabled={createHospitality.isPending}
-              size="lg"
-            >
+            <Button onClick={handleCreateHospitality} disabled={createHospitality.isPending} size="lg">
               {createHospitality.isPending ? (
                 <>
                   <LoadingSpinner size="sm" />

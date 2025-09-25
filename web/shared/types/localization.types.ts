@@ -4,7 +4,7 @@ export enum Language {
   English = 2,
   Swedish = 3,
   Danish = 4,
-  Thai = 5
+  Thai = 5,
 }
 
 export enum Currency {
@@ -15,7 +15,7 @@ export enum Currency {
   NOK = 4,
   SEK = 5,
   ISK = 6,
-  DKK = 7
+  DKK = 7,
 }
 
 // Settings command/result types

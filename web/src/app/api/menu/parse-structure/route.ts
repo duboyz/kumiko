@@ -1,75 +1,72 @@
-import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { NextRequest, NextResponse } from 'next/server'
+import OpenAI from 'openai'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+})
 
 export interface ParsedMenuStructure {
-  categories: ParsedCategory[];
-  suggestedMenuName: string;
-  suggestedMenuDescription: string;
+  categories: ParsedCategory[]
+  suggestedMenuName: string
+  suggestedMenuDescription: string
 }
 
 export interface ParsedCategory {
-  name: string;
-  description: string;
-  orderIndex: number;
-  items: ParsedMenuItem[];
+  name: string
+  description: string
+  orderIndex: number
+  items: ParsedMenuItem[]
 }
 
 export interface ParsedMenuItem {
-  name: string;
-  description: string;
-  price: number;
-  orderIndex: number;
+  name: string
+  description: string
+  price: number
+  orderIndex: number
 }
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("Menu structure parse API called");
+    console.log('Menu structure parse API called')
 
     // Check if OpenAI API key is configured
     if (!process.env.OPENAI_API_KEY) {
-      console.error("OpenAI API key not configured");
-      return NextResponse.json(
-        { error: "OpenAI API key not configured" },
-        { status: 500 },
-      );
+      console.error('OpenAI API key not configured')
+      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 })
     }
 
-    const formData = await request.formData();
-    const imageFile = formData.get("image") as File;
-    const annotationsData = formData.get("annotations") as string;
+    const formData = await request.formData()
+    const imageFile = formData.get('image') as File
+    const annotationsData = formData.get('annotations') as string
 
     if (!imageFile) {
-      console.error("No image file provided");
-      return NextResponse.json({ error: "No image provided" }, { status: 400 });
+      console.error('No image file provided')
+      return NextResponse.json({ error: 'No image provided' }, { status: 400 })
     }
 
     // Parse annotations if provided
-    let annotations = [];
+    let annotations = []
     if (annotationsData) {
       try {
-        annotations = JSON.parse(annotationsData);
-        console.log("Annotations received:", annotations.length);
+        annotations = JSON.parse(annotationsData)
+        console.log('Annotations received:', annotations.length)
       } catch (error) {
-        console.error("Failed to parse annotations:", error);
+        console.error('Failed to parse annotations:', error)
       }
     }
 
-    console.log("Image file received:", {
+    console.log('Image file received:', {
       name: imageFile.name,
       size: imageFile.size,
       type: imageFile.type,
-    });
+    })
 
     // Convert file to base64
-    const bytes = await imageFile.arrayBuffer();
-    const base64 = Buffer.from(bytes).toString("base64");
-    const mimeType = imageFile.type;
+    const bytes = await imageFile.arrayBuffer()
+    const base64 = Buffer.from(bytes).toString('base64')
+    const mimeType = imageFile.type
 
-    console.log("Image converted to base64, length:", base64.length);
+    console.log('Image converted to base64, length:', base64.length)
 
     // Create enhanced OpenAI vision prompt for structure parsing
     let prompt = `Analyze this menu image and extract the complete menu structure. This is a restaurant menu that needs to be parsed into categories and items.
@@ -113,17 +110,13 @@ export async function POST(request: NextRequest) {
       "suggestedMenuDescription": "Our carefully crafted selection of dishes"
     }
 
-    Only extract actual menu items (food/drinks), not headers, footers, or other text. Be accurate with prices and names.`;
+    Only extract actual menu items (food/drinks), not headers, footers, or other text. Be accurate with prices and names.`
 
     // Add annotation context if available
     if (annotations.length > 0) {
-      const categoryAnnotations = annotations.filter(
-        (a: any) => a.type === "category",
-      );
-      const itemAnnotations = annotations.filter((a: any) => a.type === "item");
-      const priceAnnotations = annotations.filter(
-        (a: any) => a.type === "price",
-      );
+      const categoryAnnotations = annotations.filter((a: any) => a.type === 'category')
+      const itemAnnotations = annotations.filter((a: any) => a.type === 'item')
+      const priceAnnotations = annotations.filter((a: any) => a.type === 'price')
 
       prompt += `\n\nIMPORTANT: This image has been annotated to help you understand the structure:
 
@@ -140,23 +133,23 @@ export async function POST(request: NextRequest) {
       4. Understand the menu layout and structure
       5. Maintain proper category boundaries
 
-      Pay special attention to the BLUE category markers - these will help you group items correctly and identify category boundaries.`;
+      Pay special attention to the BLUE category markers - these will help you group items correctly and identify category boundaries.`
     }
 
-    console.log("Calling OpenAI API...");
+    console.log('Calling OpenAI API...')
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: 'gpt-4o',
       messages: [
         {
-          role: "user",
+          role: 'user',
           content: [
             {
-              type: "text",
+              type: 'text',
               text: prompt,
             },
             {
-              type: "image_url",
+              type: 'image_url',
               image_url: {
                 url: `data:${mimeType};base64,${base64}`,
               },
@@ -166,78 +159,65 @@ export async function POST(request: NextRequest) {
       ],
       max_tokens: 4000,
       temperature: 0.1,
-    });
+    })
 
-    console.log("OpenAI API response received");
+    console.log('OpenAI API response received')
 
-    const content = response.choices[0]?.message?.content;
+    const content = response.choices[0]?.message?.content
     if (!content) {
-      throw new Error("No content received from OpenAI");
+      throw new Error('No content received from OpenAI')
     }
 
-    console.log("OpenAI response content:", content);
+    console.log('OpenAI response content:', content)
 
     // Parse the JSON response
-    let parsedStructure: ParsedMenuStructure;
+    let parsedStructure: ParsedMenuStructure
     try {
       // Extract JSON from the response (in case there's extra text)
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      const jsonMatch = content.match(/\{[\s\S]*\}/)
       if (!jsonMatch) {
-        throw new Error("No JSON found in response");
+        throw new Error('No JSON found in response')
       }
 
-      parsedStructure = JSON.parse(jsonMatch[0]);
+      parsedStructure = JSON.parse(jsonMatch[0])
     } catch (parseError) {
-      console.error("Failed to parse OpenAI response as JSON:", parseError);
-      console.error("Raw response:", content);
-      throw new Error("Failed to parse menu structure from AI response");
+      console.error('Failed to parse OpenAI response as JSON:', parseError)
+      console.error('Raw response:', content)
+      throw new Error('Failed to parse menu structure from AI response')
     }
 
     // Validate the parsed structure
-    if (
-      !parsedStructure.categories ||
-      !Array.isArray(parsedStructure.categories)
-    ) {
-      throw new Error("Invalid menu structure: missing or invalid categories");
+    if (!parsedStructure.categories || !Array.isArray(parsedStructure.categories)) {
+      throw new Error('Invalid menu structure: missing or invalid categories')
     }
 
     // Ensure all categories have required fields
-    parsedStructure.categories = parsedStructure.categories.map(
-      (category, index) => ({
-        name: category.name || `Category ${index + 1}`,
-        description: category.description || "",
-        orderIndex: category.orderIndex ?? index,
-        items: (category.items || []).map((item, itemIndex) => ({
-          name: item.name || `Item ${itemIndex + 1}`,
-          description: item.description || "",
-          price: typeof item.price === "number" ? item.price : 0,
-          orderIndex: item.orderIndex ?? itemIndex,
-        })),
-      }),
-    );
+    parsedStructure.categories = parsedStructure.categories.map((category, index) => ({
+      name: category.name || `Category ${index + 1}`,
+      description: category.description || '',
+      orderIndex: category.orderIndex ?? index,
+      items: (category.items || []).map((item, itemIndex) => ({
+        name: item.name || `Item ${itemIndex + 1}`,
+        description: item.description || '',
+        price: typeof item.price === 'number' ? item.price : 0,
+        orderIndex: item.orderIndex ?? itemIndex,
+      })),
+    }))
 
     // Set defaults for menu name and description
-    parsedStructure.suggestedMenuName =
-      parsedStructure.suggestedMenuName || "Main Menu";
+    parsedStructure.suggestedMenuName = parsedStructure.suggestedMenuName || 'Main Menu'
     parsedStructure.suggestedMenuDescription =
-      parsedStructure.suggestedMenuDescription ||
-      "Our carefully crafted selection of dishes";
+      parsedStructure.suggestedMenuDescription || 'Our carefully crafted selection of dishes'
 
-    console.log("Parsed menu structure:", {
+    console.log('Parsed menu structure:', {
       categoriesCount: parsedStructure.categories.length,
-      totalItems: parsedStructure.categories.reduce(
-        (sum, cat) => sum + cat.items.length,
-        0,
-      ),
+      totalItems: parsedStructure.categories.reduce((sum, cat) => sum + cat.items.length, 0),
       menuName: parsedStructure.suggestedMenuName,
-    });
+    })
 
-    return NextResponse.json(parsedStructure);
+    return NextResponse.json(parsedStructure)
   } catch (error) {
-    console.error("Error parsing menu structure:", error);
-    return NextResponse.json(
-      { error: "Failed to parse menu structure" },
-      { status: 500 },
-    );
+    console.error('Error parsing menu structure:', error)
+    return NextResponse.json({ error: 'Failed to parse menu structure' }, { status: 500 })
   }
 }

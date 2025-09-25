@@ -10,12 +10,11 @@ export const useLocationSelection = () => {
     setSelectedLocation,
     setSelectedRestaurant,
     setSelectedHospitality,
-    clearSelectedLocation
+    clearSelectedLocation,
   } = useLocationStore()
 
   const { data: restaurants, isLoading: restaurantsLoading } = useUserRestaurants()
   const { data: hospitalities, isLoading: hospitalitiesLoading } = useUserHospitalities()
-
 
   const isLoading = restaurantsLoading || hospitalitiesLoading
 
@@ -23,14 +22,22 @@ export const useLocationSelection = () => {
   const convertCurrencyFromApi = (apiCurrency: any): Currency => {
     if (typeof apiCurrency === 'string') {
       switch (apiCurrency) {
-        case 'EUR': return Currency.EUR
-        case 'USD': return Currency.USD
-        case 'GBP': return Currency.GBP
-        case 'NOK': return Currency.NOK
-        case 'SEK': return Currency.SEK
-        case 'ISK': return Currency.ISK
-        case 'DKK': return Currency.DKK
-        default: return Currency.USD
+        case 'EUR':
+          return Currency.EUR
+        case 'USD':
+          return Currency.USD
+        case 'GBP':
+          return Currency.GBP
+        case 'NOK':
+          return Currency.NOK
+        case 'SEK':
+          return Currency.SEK
+        case 'ISK':
+          return Currency.ISK
+        case 'DKK':
+          return Currency.DKK
+        default:
+          return Currency.USD
       }
     }
     return apiCurrency ?? Currency.USD
@@ -49,7 +56,7 @@ export const useLocationSelection = () => {
           address: restaurant.restaurant.address,
           city: restaurant.restaurant.city,
           role: restaurant.role,
-          currency: convertCurrencyFromApi(restaurant.restaurant.currency)
+          currency: convertCurrencyFromApi(restaurant.restaurant.currency),
         })
       })
     }
@@ -64,7 +71,7 @@ export const useLocationSelection = () => {
           address: hospitality.hospitality.address,
           city: hospitality.hospitality.city,
           role: hospitality.role,
-          currency: convertCurrencyFromApi(hospitality.hospitality.currency)
+          currency: convertCurrencyFromApi(hospitality.hospitality.currency),
         })
       })
     }
@@ -86,8 +93,8 @@ export const useLocationSelection = () => {
 
     // If a location is selected but no longer exists in the user's locations, clear it
     if (selectedLocation) {
-      const locationStillExists = userLocations.some(location =>
-        location.id === selectedLocation.id && location.type === selectedLocation.type
+      const locationStillExists = userLocations.some(
+        location => location.id === selectedLocation.id && location.type === selectedLocation.type
       )
 
       if (!locationStillExists) {
@@ -112,6 +119,6 @@ export const useLocationSelection = () => {
     clearSelectedLocation,
     // Backward compatibility
     selectedRestaurant: selectedLocation?.type === 'Restaurant' ? selectedLocation : null,
-    userRestaurants: restaurants?.restaurants || []
+    userRestaurants: restaurants?.restaurants || [],
   }
 }

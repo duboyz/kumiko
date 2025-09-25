@@ -68,35 +68,41 @@ export default function PublicWebsitePageWithSlug() {
       id: section.id,
       sortOrder: section.sortOrder,
       websitePageId: requestedPage.id,
-      heroSection: section.heroSection ? {
-        id: section.heroSection.id,
-        title: section.heroSection.title,
-        description: section.heroSection.description,
-        imageUrl: section.heroSection.imageUrl,
-        imageAlt: section.heroSection.imageAlt,
-        backgroundColor: section.heroSection.backgroundColor,
-        textColor: section.heroSection.textColor,
-        backgroundOverlayColor: section.heroSection.backgroundOverlayColor,
-        backgroundImageUrl: section.heroSection.backgroundImageUrl,
-        buttonText: section.heroSection.buttonText,
-        buttonUrl: section.heroSection.buttonUrl,
-        buttonTextColor: section.heroSection.buttonTextColor,
-        buttonBackgroundColor: section.heroSection.buttonBackgroundColor,
-        type: section.heroSection.type as any,
-      } : undefined,
-      textSection: section.textSection ? {
-        id: section.textSection.id,
-        title: section.textSection.title,
-        text: section.textSection.text,
-        alignText: section.textSection.alignText as any,
-        textColor: section.textSection.textColor,
-      } : undefined,
-      restaurantMenuSection: section.restaurantMenuSection ? {
-        id: section.restaurantMenuSection.id,
-        restaurantMenuId: section.restaurantMenuSection.restaurantMenuId,
-        allowOrdering: section.restaurantMenuSection.allowOrdering,
-      } : undefined,
-    }))
+      heroSection: section.heroSection
+        ? {
+            id: section.heroSection.id,
+            title: section.heroSection.title,
+            description: section.heroSection.description,
+            imageUrl: section.heroSection.imageUrl,
+            imageAlt: section.heroSection.imageAlt,
+            backgroundColor: section.heroSection.backgroundColor,
+            textColor: section.heroSection.textColor,
+            backgroundOverlayColor: section.heroSection.backgroundOverlayColor,
+            backgroundImageUrl: section.heroSection.backgroundImageUrl,
+            buttonText: section.heroSection.buttonText,
+            buttonUrl: section.heroSection.buttonUrl,
+            buttonTextColor: section.heroSection.buttonTextColor,
+            buttonBackgroundColor: section.heroSection.buttonBackgroundColor,
+            type: section.heroSection.type as any,
+          }
+        : undefined,
+      textSection: section.textSection
+        ? {
+            id: section.textSection.id,
+            title: section.textSection.title,
+            text: section.textSection.text,
+            alignText: section.textSection.alignText as any,
+            textColor: section.textSection.textColor,
+          }
+        : undefined,
+      restaurantMenuSection: section.restaurantMenuSection
+        ? {
+            id: section.restaurantMenuSection.id,
+            restaurantMenuId: section.restaurantMenuSection.restaurantMenuId,
+            allowOrdering: section.restaurantMenuSection.allowOrdering,
+          }
+        : undefined,
+    })),
   }
 
   return (
@@ -106,10 +112,7 @@ export default function PublicWebsitePageWithSlug() {
         pages={websiteData.pages.map(p => ({ id: p.id, title: p.title, slug: p.slug }))}
         currentPageSlug={slug}
       />
-      <WebsitePage
-        page={adaptedPage}
-        availableMenus={[]}
-      />
+      <WebsitePage page={adaptedPage} availableMenus={[]} />
     </div>
   )
 }

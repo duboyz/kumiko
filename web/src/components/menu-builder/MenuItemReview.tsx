@@ -1,45 +1,39 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Trash2, Plus, Check, AlertTriangle, TrendingUp } from "lucide-react";
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Trash2, Plus, Check, AlertTriangle, TrendingUp } from 'lucide-react'
 
 interface ParsedMenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  confidence?: number;
+  id: string
+  name: string
+  description: string
+  price: number
+  confidence?: number
 }
 
 interface MenuCategory {
-  id: string;
-  name: string;
-  description: string;
-  orderIndex: number;
-  restaurantMenuId: string;
+  id: string
+  name: string
+  description: string
+  orderIndex: number
+  restaurantMenuId: string
 }
 
 interface MenuItemReviewProps {
-  initialItems: ParsedMenuItem[];
-  categories: MenuCategory[];
-  selectedCategoryId: string;
-  onCategoryChange: (categoryId: string) => void;
-  onConfirm: (items: ParsedMenuItem[]) => void;
-  onCancel: () => void;
-  isLoading?: boolean;
+  initialItems: ParsedMenuItem[]
+  categories: MenuCategory[]
+  selectedCategoryId: string
+  onCategoryChange: (categoryId: string) => void
+  onConfirm: (items: ParsedMenuItem[]) => void
+  onCancel: () => void
+  isLoading?: boolean
 }
 
 export function MenuItemReview({
@@ -51,37 +45,31 @@ export function MenuItemReview({
   onCancel,
   isLoading = false,
 }: MenuItemReviewProps) {
-  const [items, setItems] = useState<ParsedMenuItem[]>(initialItems);
+  const [items, setItems] = useState<ParsedMenuItem[]>(initialItems)
 
-  const updateItem = (
-    id: string,
-    field: keyof ParsedMenuItem,
-    value: string | number,
-  ) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-    );
-  };
+  const updateItem = (id: string, field: keyof ParsedMenuItem, value: string | number) => {
+    setItems(prev => prev.map(item => (item.id === id ? { ...item, [field]: value } : item)))
+  }
 
   const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
+    setItems(prev => prev.filter(item => item.id !== id))
+  }
 
   const addNewItem = () => {
     const newItem: ParsedMenuItem = {
       id: `new-${Date.now()}`,
-      name: "",
-      description: "",
+      name: '',
+      description: '',
       price: 0,
-    };
-    setItems((prev) => [...prev, newItem]);
-  };
+    }
+    setItems(prev => [...prev, newItem])
+  }
 
   const handleConfirm = () => {
     // Filter out items with empty names
-    const validItems = items.filter((item) => item.name.trim() !== "");
-    onConfirm(validItems);
-  };
+    const validItems = items.filter(item => item.name.trim() !== '')
+    onConfirm(validItems)
+  }
 
   return (
     <div className="space-y-6">
@@ -89,8 +77,7 @@ export function MenuItemReview({
         <div>
           <h3 className="text-lg font-semibold">Review Menu Items</h3>
           <p className="text-sm text-muted-foreground">
-            Review and edit the parsed menu items before adding them to your
-            menu
+            Review and edit the parsed menu items before adding them to your menu
           </p>
         </div>
         <div className="flex gap-2">
@@ -111,7 +98,7 @@ export function MenuItemReview({
             <SelectValue placeholder="Choose a category for these items" />
           </SelectTrigger>
           <SelectContent>
-            {categories.map((category) => (
+            {categories.map(category => (
               <SelectItem key={category.id} value={category.id}>
                 {category.name}
               </SelectItem>
@@ -119,9 +106,7 @@ export function MenuItemReview({
           </SelectContent>
         </Select>
         {categories.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            No categories available. Please create a category first.
-          </p>
+          <p className="text-sm text-muted-foreground">No categories available. Please create a category first.</p>
         )}
       </div>
 
@@ -132,18 +117,12 @@ export function MenuItemReview({
               <div className="flex items-start gap-3">
                 <div className="flex-1 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Item {index + 1}
-                    </span>
+                    <span className="text-sm font-medium text-muted-foreground">Item {index + 1}</span>
                     <div className="flex items-center gap-2">
                       {item.confidence && (
                         <Badge
                           variant={
-                            item.confidence > 0.8
-                              ? "default"
-                              : item.confidence > 0.6
-                                ? "secondary"
-                                : "destructive"
+                            item.confidence > 0.8 ? 'default' : item.confidence > 0.6 ? 'secondary' : 'destructive'
                           }
                           className="text-xs"
                         >
@@ -180,9 +159,7 @@ export function MenuItemReview({
                       <Input
                         id={`name-${item.id}`}
                         value={item.name}
-                        onChange={(e) =>
-                          updateItem(item.id, "name", e.target.value)
-                        }
+                        onChange={e => updateItem(item.id, 'name', e.target.value)}
                         placeholder="Enter item name"
                         className="h-8"
                       />
@@ -197,13 +174,7 @@ export function MenuItemReview({
                         step="0.01"
                         min="0"
                         value={item.price}
-                        onChange={(e) =>
-                          updateItem(
-                            item.id,
-                            "price",
-                            parseFloat(e.target.value) || 0,
-                          )
-                        }
+                        onChange={e => updateItem(item.id, 'price', parseFloat(e.target.value) || 0)}
                         placeholder="0.00"
                         className="h-8"
                       />
@@ -211,18 +182,13 @@ export function MenuItemReview({
                   </div>
 
                   <div className="space-y-1">
-                    <Label
-                      htmlFor={`description-${item.id}`}
-                      className="text-xs"
-                    >
+                    <Label htmlFor={`description-${item.id}`} className="text-xs">
                       Description
                     </Label>
                     <Textarea
                       id={`description-${item.id}`}
                       value={item.description}
-                      onChange={(e) =>
-                        updateItem(item.id, "description", e.target.value)
-                      }
+                      onChange={e => updateItem(item.id, 'description', e.target.value)}
                       placeholder="Enter item description"
                       rows={1}
                       className="resize-none"
@@ -253,17 +219,11 @@ export function MenuItemReview({
         </Button>
         <Button
           onClick={handleConfirm}
-          disabled={
-            isLoading ||
-            items.filter((item) => item.name.trim()).length === 0 ||
-            !selectedCategoryId
-          }
+          disabled={isLoading || items.filter(item => item.name.trim()).length === 0 || !selectedCategoryId}
         >
-          {isLoading
-            ? "Adding Items..."
-            : `Add ${items.filter((item) => item.name.trim()).length} Items`}
+          {isLoading ? 'Adding Items...' : `Add ${items.filter(item => item.name.trim()).length} Items`}
         </Button>
       </div>
     </div>
-  );
+  )
 }

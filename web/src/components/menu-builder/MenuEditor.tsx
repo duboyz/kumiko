@@ -4,7 +4,15 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import {
   MenuCategoryDto,
@@ -12,8 +20,8 @@ import {
   MenuCategoryItemDto,
   RestaurantMenuDto,
   CreateMenuCategoryCommand,
-  CreateMenuItemCommand
-} from "../../../shared/types/menu.types"
+  CreateMenuItemCommand,
+} from '../../../shared/types/menu.types'
 import {
   useCreateMenuCategory,
   useUpdateMenuCategory,
@@ -25,7 +33,7 @@ import {
   useReorderCategories,
   useReorderMenuItems,
   useAllRestaurantMenuItems,
-  useLocationSelection
+  useLocationSelection,
 } from '@shared'
 import { MenuHeader } from './MenuHeader'
 import { AddCategoryForm } from './AddCategoryForm'
@@ -51,7 +59,11 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
   const { selectedLocation } = useLocationSelection()
   const restaurantId = selectedLocation?.type === 'Restaurant' ? selectedLocation.id : null
 
-  const { data: allMenuItemsData, isLoading: itemsLoading, error: itemsError } = useAllRestaurantMenuItems(restaurantId || '')
+  const {
+    data: allMenuItemsData,
+    isLoading: itemsLoading,
+    error: itemsError,
+  } = useAllRestaurantMenuItems(restaurantId || '')
 
   console.log('Debug - Restaurant ID:', restaurantId)
   console.log('Debug - Menu ID:', menu.id)
@@ -77,14 +89,22 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
     price: 0,
     isAvailable: true,
     restaurantMenuId: menu.id,
-    categoryId: ''
+    categoryId: '',
   })
   const [showNewItemForm, setShowNewItemForm] = useState<string | null>(null)
   const [addItemMode, setAddItemMode] = useState<'existing' | 'new' | null>(null)
   const [selectedExistingItem, setSelectedExistingItem] = useState<string>('')
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState<{ type: 'category' | 'item', id: string, categoryId?: string } | null>(null)
-  const [editDialogOpen, setEditDialogOpen] = useState<{ type: 'category' | 'item', id: string, categoryId?: string } | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<{
+    type: 'category' | 'item'
+    id: string
+    categoryId?: string
+  } | null>(null)
+  const [editDialogOpen, setEditDialogOpen] = useState<{
+    type: 'category' | 'item'
+    id: string
+    categoryId?: string
+  } | null>(null)
   const [menuTitle, setMenuTitle] = useState(menu.name)
   const [menuDescription, setMenuDescription] = useState(menu.description)
 
@@ -101,7 +121,7 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
     try {
       await createCategoryMutation.mutateAsync({
         ...newCategory,
-        restaurantMenuId: menu.id
+        restaurantMenuId: menu.id,
       })
     } catch (error) {
       console.error('Failed to create category:', error)
@@ -131,7 +151,7 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
         id: categoryId,
         name: updates.name || category.name,
         description: updates.description || category.description,
-        orderIndex: updates.orderIndex || category.orderIndex
+        orderIndex: updates.orderIndex || category.orderIndex,
       })
       setEditingCategory(null)
     } catch (error) {
@@ -148,7 +168,7 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
         description: newItem.description,
         price: newItem.price,
         isAvailable: newItem.isAvailable,
-        restaurantMenuId: menu.id
+        restaurantMenuId: menu.id,
       })
 
       const category = categories.find((cat: MenuCategoryDto) => cat.id === categoryId)
@@ -161,7 +181,7 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
       await addItemToCategoryMutation.mutateAsync({
         menuItemId: itemResult.id,
         menuCategoryId: categoryId,
-        orderIndex: orderIndex
+        orderIndex: orderIndex,
       })
 
       closeAddItemForm()
@@ -180,7 +200,7 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
       await addItemToCategoryMutation.mutateAsync({
         menuItemId: selectedExistingItem,
         menuCategoryId: categoryId,
-        orderIndex: orderIndex
+        orderIndex: orderIndex,
       })
 
       closeAddItemForm()
@@ -199,7 +219,7 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
       price: 0,
       isAvailable: true,
       restaurantMenuId: menu.id,
-      categoryId: ''
+      categoryId: '',
     })
   }
 
@@ -219,7 +239,7 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
       price: 0,
       isAvailable: true,
       restaurantMenuId: menu.id,
-      categoryId: ''
+      categoryId: '',
     })
   }
 
@@ -227,12 +247,16 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
     const allMenuItems = allMenuItemsData?.menuItems || []
     const currentCategoryId = showNewItemForm
     const currentCategory = categories.find((cat: MenuCategoryDto) => cat.id === currentCategoryId)
-    const usedItemIdsInCurrentCategory = currentCategory?.menuCategoryItems.map((categoryItem: MenuCategoryItemDto) => categoryItem.menuItemId) || []
+    const usedItemIdsInCurrentCategory =
+      currentCategory?.menuCategoryItems.map((categoryItem: MenuCategoryItemDto) => categoryItem.menuItemId) || []
 
     console.log('Debug - All menu items:', allMenuItems.length)
     console.log('Debug - Current category:', currentCategoryId)
     console.log('Debug - Used item IDs in current category:', usedItemIdsInCurrentCategory)
-    console.log('Debug - Available items:', allMenuItems.filter(item => !usedItemIdsInCurrentCategory.includes(item.id)).length)
+    console.log(
+      'Debug - Available items:',
+      allMenuItems.filter(item => !usedItemIdsInCurrentCategory.includes(item.id)).length
+    )
 
     // Show all menu items that aren't already in the current category
     return allMenuItems.filter(item => !usedItemIdsInCurrentCategory.includes(item.id))
@@ -265,7 +289,7 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
         name: updates.name || item.name,
         description: updates.description || item.description,
         price: updates.price !== undefined ? updates.price : item.price,
-        isAvailable: updates.isAvailable !== undefined ? updates.isAvailable : item.isAvailable
+        isAvailable: updates.isAvailable !== undefined ? updates.isAvailable : item.isAvailable,
       })
       setEditingItem(null)
     } catch (error) {
@@ -300,11 +324,19 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
         )
 
         if (category) {
-          const activeCategoryItemIndex = category.menuCategoryItems.findIndex((ci: MenuCategoryItemDto) => ci.id === activeId)
-          const overCategoryItemIndex = category.menuCategoryItems.findIndex((ci: MenuCategoryItemDto) => ci.id === overId)
+          const activeCategoryItemIndex = category.menuCategoryItems.findIndex(
+            (ci: MenuCategoryItemDto) => ci.id === activeId
+          )
+          const overCategoryItemIndex = category.menuCategoryItems.findIndex(
+            (ci: MenuCategoryItemDto) => ci.id === overId
+          )
 
           if (activeCategoryItemIndex !== -1 && overCategoryItemIndex !== -1) {
-            const reorderedItems = arrayMove([...category.menuCategoryItems], activeCategoryItemIndex, overCategoryItemIndex)
+            const reorderedItems = arrayMove(
+              [...category.menuCategoryItems],
+              activeCategoryItemIndex,
+              overCategoryItemIndex
+            )
             const categoryItemIds = reorderedItems.map((ci: MenuCategoryItemDto) => ci.id)
 
             try {
@@ -346,7 +378,7 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
       <ClientOnlyWrapper
         fallback={
           <div className="space-y-6">
-            {sortedCategories.map((category) => (
+            {sortedCategories.map(category => (
               <SortableCategory
                 key={category.id}
                 category={category}
@@ -361,8 +393,12 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
                 onDeleteCategory={() => setDeleteDialogOpen({ type: 'category', id: category.id })}
                 onAddItemClick={handleAddItemClick}
                 onModeSelect={handleModeSelect}
-                onEditItem={(itemId: string) => setEditDialogOpen({ type: 'item', id: itemId, categoryId: category.id })}
-                onDeleteItem={(categoryItemId: string) => setDeleteDialogOpen({ type: 'item', id: categoryItemId, categoryId: category.id })}
+                onEditItem={(itemId: string) =>
+                  setEditDialogOpen({ type: 'item', id: itemId, categoryId: category.id })
+                }
+                onDeleteItem={(categoryItemId: string) =>
+                  setDeleteDialogOpen({ type: 'item', id: categoryItemId, categoryId: category.id })
+                }
                 onUpdateCategory={updateCategory}
                 onUpdateMenuItem={updateMenuItem}
                 onAddExistingMenuItem={addExistingMenuItem}
@@ -378,20 +414,16 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
           </div>
         }
       >
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext
             items={[
               ...sortedCategories.map(cat => cat.id),
-              ...sortedCategories.flatMap(cat => cat.menuCategoryItems.map(categoryItem => categoryItem.id))
+              ...sortedCategories.flatMap(cat => cat.menuCategoryItems.map(categoryItem => categoryItem.id)),
             ]}
             strategy={verticalListSortingStrategy}
           >
             <div className="space-y-6">
-              {sortedCategories.map((category) => (
+              {sortedCategories.map(category => (
                 <SortableCategory
                   key={category.id}
                   category={category}
@@ -406,8 +438,12 @@ export function MenuEditor({ menu, onBackToList }: MenuEditorProps) {
                   onDeleteCategory={() => setDeleteDialogOpen({ type: 'category', id: category.id })}
                   onAddItemClick={handleAddItemClick}
                   onModeSelect={handleModeSelect}
-                  onEditItem={(itemId: string) => setEditDialogOpen({ type: 'item', id: itemId, categoryId: category.id })}
-                  onDeleteItem={(categoryItemId: string) => setDeleteDialogOpen({ type: 'item', id: categoryItemId, categoryId: category.id })}
+                  onEditItem={(itemId: string) =>
+                    setEditDialogOpen({ type: 'item', id: itemId, categoryId: category.id })
+                  }
+                  onDeleteItem={(categoryItemId: string) =>
+                    setDeleteDialogOpen({ type: 'item', id: categoryItemId, categoryId: category.id })
+                  }
                   onUpdateCategory={updateCategory}
                   onUpdateMenuItem={updateMenuItem}
                   onAddExistingMenuItem={addExistingMenuItem}

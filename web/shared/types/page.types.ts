@@ -1,23 +1,23 @@
-import { WebsitePageDto } from "./website.types";
+import { WebsitePageDto } from './website.types'
 
 // Website Page operation types
 export interface CreateWebsitePageCommand {
-  slug: string;
-  title: string;
-  seoTitle?: string;
-  seoDescription?: string;
-  seoKeywords?: string;
-  websiteId: string;
+  slug: string
+  title: string
+  seoTitle?: string
+  seoDescription?: string
+  seoKeywords?: string
+  websiteId: string
 }
 
 export interface CreateWebsitePageResult {
-  pageId: string;
+  pageId: string
 }
 
 export interface GetWebsitePagesQuery {
-  websiteId: string;
+  websiteId: string
 }
 
 export interface GetWebsitePagesResult {
-  pages: WebsitePageDto[];
+  pages: WebsitePageDto[]
 }

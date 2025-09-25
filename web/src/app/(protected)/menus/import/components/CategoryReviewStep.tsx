@@ -1,45 +1,26 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Plus,
-  Trash2,
-  Edit3,
-  Check,
-  X,
-  FolderOpen,
-  GripVertical,
-} from "lucide-react";
-import {
-  ParsedMenuStructure,
-  EditableMenuStructure,
-  EditableCategory,
-} from "@shared/types/menu-structure.types";
-import { cn } from "@/lib/utils";
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
+import { ArrowLeft, ArrowRight, Plus, Trash2, Edit3, Check, X, FolderOpen, GripVertical } from 'lucide-react'
+import { ParsedMenuStructure, EditableMenuStructure, EditableCategory } from '@shared/types/menu-structure.types'
+import { cn } from '@/lib/utils'
 
 interface CategoryReviewStepProps {
-  parsedStructure: ParsedMenuStructure;
-  onConfirm: (editableStructure: EditableMenuStructure) => void;
-  onBack: () => void;
+  parsedStructure: ParsedMenuStructure
+  onConfirm: (editableStructure: EditableMenuStructure) => void
+  onBack: () => void
 }
 
-export function CategoryReviewStep({
-  parsedStructure,
-  onConfirm,
-  onBack,
-}: CategoryReviewStepProps) {
-  const [editableStructure, setEditableStructure] =
-    useState<EditableMenuStructure | null>(null);
-  const [editingCategory, setEditingCategory] = useState<string | null>(null);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategoryDescription, setNewCategoryDescription] = useState("");
+export function CategoryReviewStep({ parsedStructure, onConfirm, onBack }: CategoryReviewStepProps) {
+  const [editableStructure, setEditableStructure] = useState<EditableMenuStructure | null>(null)
+  const [editingCategory, setEditingCategory] = useState<string | null>(null)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [newCategoryDescription, setNewCategoryDescription] = useState('')
 
   // Initialize editable structure from parsed structure
   useEffect(() => {
@@ -63,27 +44,22 @@ export function CategoryReviewStep({
           })),
           isExpanded: true,
         })),
-      };
-      setEditableStructure(editable);
+      }
+      setEditableStructure(editable)
     }
-  }, [parsedStructure]);
+  }, [parsedStructure])
 
-  const updateCategory = (
-    categoryId: string,
-    updates: Partial<EditableCategory>,
-  ) => {
-    if (!editableStructure) return;
+  const updateCategory = (categoryId: string, updates: Partial<EditableCategory>) => {
+    if (!editableStructure) return
 
     setEditableStructure({
       ...editableStructure,
-      categories: editableStructure.categories.map((cat) =>
-        cat.id === categoryId ? { ...cat, ...updates } : cat,
-      ),
-    });
-  };
+      categories: editableStructure.categories.map(cat => (cat.id === categoryId ? { ...cat, ...updates } : cat)),
+    })
+  }
 
   const addCategory = () => {
-    if (!editableStructure || !newCategoryName.trim()) return;
+    if (!editableStructure || !newCategoryName.trim()) return
 
     const newCategory: EditableCategory = {
       id: `cat-${Date.now()}`,
@@ -92,61 +68,53 @@ export function CategoryReviewStep({
       orderIndex: editableStructure.categories.length,
       items: [],
       isExpanded: true,
-    };
+    }
 
     setEditableStructure({
       ...editableStructure,
       categories: [...editableStructure.categories, newCategory],
-    });
+    })
 
-    setNewCategoryName("");
-    setNewCategoryDescription("");
-  };
+    setNewCategoryName('')
+    setNewCategoryDescription('')
+  }
 
   const removeCategory = (categoryId: string) => {
-    if (!editableStructure) return;
+    if (!editableStructure) return
 
     setEditableStructure({
       ...editableStructure,
-      categories: editableStructure.categories.filter(
-        (cat) => cat.id !== categoryId,
-      ),
-    });
-  };
+      categories: editableStructure.categories.filter(cat => cat.id !== categoryId),
+    })
+  }
 
-  const moveCategory = (categoryId: string, direction: "up" | "down") => {
-    if (!editableStructure) return;
+  const moveCategory = (categoryId: string, direction: 'up' | 'down') => {
+    if (!editableStructure) return
 
-    const categories = [...editableStructure.categories];
-    const index = categories.findIndex((cat) => cat.id === categoryId);
+    const categories = [...editableStructure.categories]
+    const index = categories.findIndex(cat => cat.id === categoryId)
 
-    if (
-      (direction === "up" && index > 0) ||
-      (direction === "down" && index < categories.length - 1)
-    ) {
-      const newIndex = direction === "up" ? index - 1 : index + 1;
-      [categories[index], categories[newIndex]] = [
-        categories[newIndex],
-        categories[index],
-      ];
+    if ((direction === 'up' && index > 0) || (direction === 'down' && index < categories.length - 1)) {
+      const newIndex = direction === 'up' ? index - 1 : index + 1
+      ;[categories[index], categories[newIndex]] = [categories[newIndex], categories[index]]
 
       // Update order indices
       categories.forEach((cat, i) => {
-        cat.orderIndex = i;
-      });
+        cat.orderIndex = i
+      })
 
       setEditableStructure({
         ...editableStructure,
         categories,
-      });
+      })
     }
-  };
+  }
 
   const handleConfirm = () => {
     if (editableStructure) {
-      onConfirm(editableStructure);
+      onConfirm(editableStructure)
     }
-  };
+  }
 
   if (!editableStructure) {
     return (
@@ -156,21 +124,17 @@ export function CategoryReviewStep({
           <p className="text-muted-foreground">Loading categories...</p>
         </div>
       </div>
-    );
+    )
   }
 
-  const totalItems = editableStructure.categories.reduce(
-    (sum, cat) => sum + cat.items.length,
-    0,
-  );
+  const totalItems = editableStructure.categories.reduce((sum, cat) => sum + cat.items.length, 0)
 
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Review Categories</h2>
         <p className="text-muted-foreground">
-          AI detected {editableStructure.categories.length} categories with{" "}
-          {totalItems} items
+          AI detected {editableStructure.categories.length} categories with {totalItems} items
         </p>
         <p className="text-sm text-muted-foreground mt-2">
           Edit category names, descriptions, and order before proceeding
@@ -190,7 +154,7 @@ export function CategoryReviewStep({
             <label className="text-sm font-medium">Menu Name</label>
             <Input
               value={editableStructure.menuName}
-              onChange={(e) =>
+              onChange={e =>
                 setEditableStructure({
                   ...editableStructure,
                   menuName: e.target.value,
@@ -203,7 +167,7 @@ export function CategoryReviewStep({
             <label className="text-sm font-medium">Menu Description</label>
             <Textarea
               value={editableStructure.menuDescription}
-              onChange={(e) =>
+              onChange={e =>
                 setEditableStructure({
                   ...editableStructure,
                   menuDescription: e.target.value,
@@ -224,14 +188,10 @@ export function CategoryReviewStep({
             <Input
               placeholder="New category name"
               value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
+              onChange={e => setNewCategoryName(e.target.value)}
               className="w-48"
             />
-            <Button
-              onClick={addCategory}
-              disabled={!newCategoryName.trim()}
-              size="sm"
-            >
+            <Button onClick={addCategory} disabled={!newCategoryName.trim()} size="sm">
               <Plus className="w-4 h-4 mr-1" />
               Add
             </Button>
@@ -251,7 +211,7 @@ export function CategoryReviewStep({
                         <div className="flex items-center gap-2">
                           <Input
                             value={category.name}
-                            onChange={(e) =>
+                            onChange={e =>
                               updateCategory(category.id, {
                                 name: e.target.value,
                               })
@@ -259,11 +219,7 @@ export function CategoryReviewStep({
                             className="font-semibold"
                             autoFocus
                           />
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setEditingCategory(null)}
-                          >
+                          <Button size="sm" variant="ghost" onClick={() => setEditingCategory(null)}>
                             <Check className="w-4 h-4" />
                           </Button>
                         </div>
@@ -278,14 +234,12 @@ export function CategoryReviewStep({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
-                      {category.items.length} items
-                    </Badge>
+                    <Badge variant="secondary">{category.items.length} items</Badge>
                     <div className="flex items-center gap-1">
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => moveCategory(category.id, "up")}
+                        onClick={() => moveCategory(category.id, 'up')}
                         disabled={index === 0}
                       >
                         ↑
@@ -293,18 +247,12 @@ export function CategoryReviewStep({
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => moveCategory(category.id, "down")}
-                        disabled={
-                          index === editableStructure.categories.length - 1
-                        }
+                        onClick={() => moveCategory(category.id, 'down')}
+                        disabled={index === editableStructure.categories.length - 1}
                       >
                         ↓
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setEditingCategory(category.id)}
-                      >
+                      <Button size="sm" variant="ghost" onClick={() => setEditingCategory(category.id)}>
                         <Edit3 className="w-4 h-4" />
                       </Button>
                       <Button
@@ -325,7 +273,7 @@ export function CategoryReviewStep({
                     <label className="text-sm font-medium">Description</label>
                     <Textarea
                       value={category.description}
-                      onChange={(e) =>
+                      onChange={e =>
                         updateCategory(category.id, {
                           description: e.target.value,
                         })
@@ -339,22 +287,15 @@ export function CategoryReviewStep({
                   {/* Preview of items in this category */}
                   {category.items.length > 0 && (
                     <div>
-                      <label className="text-sm font-medium">
-                        Items Preview
-                      </label>
+                      <label className="text-sm font-medium">Items Preview</label>
                       <div className="mt-1 space-y-1">
-                        {category.items.slice(0, 3).map((item) => (
-                          <div
-                            key={item.id}
-                            className="text-sm text-muted-foreground bg-gray-50 px-2 py-1 rounded"
-                          >
+                        {category.items.slice(0, 3).map(item => (
+                          <div key={item.id} className="text-sm text-muted-foreground bg-gray-50 px-2 py-1 rounded">
                             {item.name} - ${item.price}
                           </div>
                         ))}
                         {category.items.length > 3 && (
-                          <div className="text-xs text-muted-foreground">
-                            +{category.items.length - 3} more items
-                          </div>
+                          <div className="text-xs text-muted-foreground">+{category.items.length - 3} more items</div>
                         )}
                       </div>
                     </div>
@@ -378,5 +319,5 @@ export function CategoryReviewStep({
         </Button>
       </div>
     </div>
-  );
+  )
 }

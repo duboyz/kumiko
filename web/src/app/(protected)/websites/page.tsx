@@ -3,7 +3,14 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -19,14 +26,15 @@ export default function WebsitesPage() {
   const [formData, setFormData] = useState({
     name: '',
     subdomain: '',
-    description: ''
+    description: '',
   })
 
   const { selectedLocation } = useLocationSelection()
-  const { data: websites, isLoading, error } = useRestaurantWebsites(
-    selectedLocation?.id,
-    selectedLocation?.type || 'Restaurant'
-  )
+  const {
+    data: websites,
+    isLoading,
+    error,
+  } = useRestaurantWebsites(selectedLocation?.id, selectedLocation?.type || 'Restaurant')
   const createWebsite = useCreateWebsite()
   const updateWebsite = useUpdateWebsite()
 
@@ -39,7 +47,7 @@ export default function WebsitesPage() {
         subdomain: formData.subdomain,
         description: formData.description || undefined,
         entityId: selectedLocation?.id,
-        entityType: selectedLocation?.type || 'Restaurant'
+        entityType: selectedLocation?.type || 'Restaurant',
       })
 
       setIsCreateOpen(false)
@@ -53,7 +61,7 @@ export default function WebsitesPage() {
     try {
       await updateWebsite.mutateAsync({
         websiteId,
-        updates: { isPublished: !isCurrentlyPublished }
+        updates: { isPublished: !isCurrentlyPublished },
       })
     } catch (error) {
       console.error('Failed to toggle website publish status:', error)
@@ -101,9 +109,7 @@ export default function WebsitesPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New Website</DialogTitle>
-              <DialogDescription>
-                Create a new website for your restaurant with a custom subdomain.
-              </DialogDescription>
+              <DialogDescription>Create a new website for your restaurant with a custom subdomain.</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -111,7 +117,7 @@ export default function WebsitesPage() {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="My Restaurant Website"
                   required
                 />
@@ -123,7 +129,9 @@ export default function WebsitesPage() {
                   <Input
                     id="subdomain"
                     value={formData.subdomain}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, subdomain: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setFormData(prev => ({ ...prev, subdomain: e.target.value }))
+                    }
                     placeholder="myrestaurant"
                     className="rounded-r-none"
                     required
@@ -139,17 +147,13 @@ export default function WebsitesPage() {
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="A brief description of your website"
                 />
               </div>
 
               <div className="flex justify-end space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsCreateOpen(false)}
-                >
+                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
                   Cancel
                 </Button>
                 <Button type="submit" disabled={createWebsite.isPending}>
@@ -162,29 +166,26 @@ export default function WebsitesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {websites?.websites.map((website) => (
+        {websites?.websites.map(website => (
           <Card key={website.id}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
                 {website.name}
               </CardTitle>
-              <CardDescription>
-                {website.subdomain}.kumiko.no
-              </CardDescription>
+              <CardDescription>{website.subdomain}.kumiko.no</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {website.description && (
-                  <p className="text-sm text-muted-foreground">{website.description}</p>
-                )}
+                {website.description && <p className="text-sm text-muted-foreground">{website.description}</p>}
 
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>{website.restaurantName}</span>
-                  <span className={`px-2 py-1 rounded-full ${website.isPublished
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                  <span
+                    className={`px-2 py-1 rounded-full ${
+                      website.isPublished ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    }`}
+                  >
                     {website.isPublished ? 'Published' : 'Draft'}
                   </span>
                 </div>
@@ -203,7 +204,7 @@ export default function WebsitesPage() {
                     size="sm"
                     variant="outline"
                     className="flex-1"
-                    onClick={() => window.location.href = `/websites/${website.id}/pages`}
+                    onClick={() => (window.location.href = `/websites/${website.id}/pages`)}
                   >
                     <Settings className="h-4 w-4 mr-1" />
                     Manage
@@ -212,7 +213,7 @@ export default function WebsitesPage() {
 
                 <Button
                   size="sm"
-                  variant={website.isPublished ? "destructive" : "default"}
+                  variant={website.isPublished ? 'destructive' : 'default'}
                   className="w-full mt-2"
                   onClick={() => handleTogglePublish(website.id, website.isPublished)}
                   disabled={updateWebsite.isPending}

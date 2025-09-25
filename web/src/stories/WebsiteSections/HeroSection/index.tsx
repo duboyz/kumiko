@@ -41,7 +41,7 @@ export function HeroSection({
   className = '',
   isEditing,
   onUpdate,
-  onTypeChange
+  onTypeChange,
 }: HeroSectionProps) {
   if (type === HeroSectionType.ImageRight) {
     return (

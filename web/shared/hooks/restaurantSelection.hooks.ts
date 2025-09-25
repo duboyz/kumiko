@@ -30,9 +30,7 @@ export const useRestaurantSelection = () => {
     }
 
     // Verify current selection is still valid
-    const currentSelection = restaurants.find(
-      r => r.restaurant.id === selectedRestaurant.restaurant.id
-    )
+    const currentSelection = restaurants.find(r => r.restaurant.id === selectedRestaurant.restaurant.id)
 
     if (!currentSelection) {
       // Current selection is no longer valid, clear it
@@ -48,6 +46,6 @@ export const useRestaurantSelection = () => {
     isLoading,
     error,
     needsSelection: userRestaurants && userRestaurants.restaurants.length > 1 && !selectedRestaurant,
-    hasNoRestaurants: userRestaurants && userRestaurants.restaurants.length === 0
+    hasNoRestaurants: userRestaurants && userRestaurants.restaurants.length === 0,
   }
 }

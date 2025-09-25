@@ -24,7 +24,7 @@ export default function SearchBusiness({ onBusinessSelect, selectedBusiness }: S
     searchMutation.mutate({
       query: query.trim(),
       country: 'NO',
-      limit: 10
+      limit: 10,
     })
   }
 
@@ -38,26 +38,17 @@ export default function SearchBusiness({ onBusinessSelect, selectedBusiness }: S
             type="text"
             placeholder="Search for your restaurant (e.g., 'Pizza Express Oslo')"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSearch()}
             className="flex-1"
           />
-          <Button
-            onClick={handleSearch}
-            disabled={!query.trim() || searchMutation.isPending}
-          >
-            {searchMutation.isPending ? (
-              <LoadingSpinner size="sm" />
-            ) : (
-              'Search'
-            )}
+          <Button onClick={handleSearch} disabled={!query.trim() || searchMutation.isPending}>
+            {searchMutation.isPending ? <LoadingSpinner size="sm" /> : 'Search'}
           </Button>
         </div>
 
         {searchMutation.error && (
-          <div className="text-red-600 text-sm">
-            Error searching: {searchMutation.error.message}
-          </div>
+          <div className="text-red-600 text-sm">Error searching: {searchMutation.error.message}</div>
         )}
       </div>
 
@@ -65,14 +56,13 @@ export default function SearchBusiness({ onBusinessSelect, selectedBusiness }: S
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Found {businesses.length} businesses</h3>
           <div className="grid gap-4">
-            {businesses.map((business) => {
+            {businesses.map(business => {
               const isSelected = selectedBusiness?.placeId === business.placeId
 
               return (
                 <Card
                   key={business.placeId}
-                  className={`cursor-pointer transition-all hover:shadow-md ${isSelected ? 'ring-2 ring-primary' : ''
-                    }`}
+                  className={`cursor-pointer transition-all hover:shadow-md ${isSelected ? 'ring-2 ring-primary' : ''}`}
                   onClick={() => onBusinessSelect(business)}
                 >
                   <CardHeader className="pb-3">
@@ -84,9 +74,7 @@ export default function SearchBusiness({ onBusinessSelect, selectedBusiness }: S
                           {business.formattedAddress}
                         </CardDescription>
                       </div>
-                      {isSelected && (
-                        <Badge variant="default">Selected</Badge>
-                      )}
+                      {isSelected && <Badge variant="default">Selected</Badge>}
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
@@ -95,9 +83,7 @@ export default function SearchBusiness({ onBusinessSelect, selectedBusiness }: S
                         <div className="flex items-center gap-1">
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                           <span>{business.rating}</span>
-                          {business.userRatingsTotal && (
-                            <span>({business.userRatingsTotal} reviews)</span>
-                          )}
+                          {business.userRatingsTotal && <span>({business.userRatingsTotal} reviews)</span>}
                         </div>
                       )}
                       {business.formattedPhoneNumber && (
@@ -115,7 +101,7 @@ export default function SearchBusiness({ onBusinessSelect, selectedBusiness }: S
                     </div>
                     {business.types.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {business.types.slice(0, 3).map((type) => (
+                        {business.types.slice(0, 3).map(type => (
                           <Badge key={type} variant="outline" className="text-xs">
                             {type.replace(/_/g, ' ')}
                           </Badge>

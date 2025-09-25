@@ -4,7 +4,14 @@ import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -25,7 +32,7 @@ export default function WebsitePagesPage() {
     title: '',
     seoTitle: '',
     seoDescription: '',
-    seoKeywords: ''
+    seoKeywords: '',
   })
 
   const { data: pagesData, isLoading, error } = usePages(websiteId)
@@ -41,7 +48,7 @@ export default function WebsitePagesPage() {
         seoTitle: formData.seoTitle || undefined,
         seoDescription: formData.seoDescription || undefined,
         seoKeywords: formData.seoKeywords || undefined,
-        websiteId
+        websiteId,
       })
 
       setIsCreateOpen(false)
@@ -78,10 +85,7 @@ export default function WebsitePagesPage() {
     <ContentContainer>
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/websites')}
-          >
+          <Button variant="ghost" onClick={() => router.push('/websites')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Websites
           </Button>
@@ -116,7 +120,7 @@ export default function WebsitePagesPage() {
                     <Input
                       id="slug"
                       value={formData.slug}
-                      onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+                      onChange={e => setFormData(prev => ({ ...prev, slug: e.target.value }))}
                       placeholder="about-us"
                       required
                     />
@@ -130,7 +134,7 @@ export default function WebsitePagesPage() {
                     <Input
                       id="title"
                       value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="About Us"
                       required
                     />
@@ -142,7 +146,7 @@ export default function WebsitePagesPage() {
                   <Input
                     id="seoTitle"
                     value={formData.seoTitle}
-                    onChange={(e) => setFormData(prev => ({ ...prev, seoTitle: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, seoTitle: e.target.value }))}
                     placeholder="About Us - Your Restaurant Name"
                   />
                 </div>
@@ -152,7 +156,7 @@ export default function WebsitePagesPage() {
                   <Textarea
                     id="seoDescription"
                     value={formData.seoDescription}
-                    onChange={(e) => setFormData(prev => ({ ...prev, seoDescription: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, seoDescription: e.target.value }))}
                     placeholder="Learn more about our restaurant, our story, and our commitment to quality."
                   />
                 </div>
@@ -162,17 +166,13 @@ export default function WebsitePagesPage() {
                   <Input
                     id="seoKeywords"
                     value={formData.seoKeywords}
-                    onChange={(e) => setFormData(prev => ({ ...prev, seoKeywords: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, seoKeywords: e.target.value }))}
                     placeholder="restaurant, about, story, quality"
                   />
                 </div>
 
                 <div className="flex justify-end space-x-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsCreateOpen(false)}
-                  >
+                  <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
                     Cancel
                   </Button>
                   <Button type="submit" disabled={createPage.isPending}>
@@ -185,28 +185,24 @@ export default function WebsitePagesPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pages.map((page) => (
+          {pages.map(page => (
             <Card key={page.id}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
                   {page.title}
                 </CardTitle>
-                <CardDescription>
-                  /{page.slug}
-                </CardDescription>
+                <CardDescription>/{page.slug}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {page.seoDescription && (
-                    <p className="text-sm text-muted-foreground">{page.seoDescription}</p>
-                  )}
+                  {page.seoDescription && <p className="text-sm text-muted-foreground">{page.seoDescription}</p>}
 
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{page.sections.length} section{page.sections.length !== 1 ? 's' : ''}</span>
-                    <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800">
-                      Draft
+                    <span>
+                      {page.sections.length} section{page.sections.length !== 1 ? 's' : ''}
                     </span>
+                    <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800">Draft</span>
                   </div>
 
                   <div className="flex space-x-2">

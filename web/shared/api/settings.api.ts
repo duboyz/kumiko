@@ -1,4 +1,9 @@
-import { UpdateUserSettingsCommand, UpdateRestaurantSettingsCommand, UpdateHospitalitySettingsCommand, ApiResponse } from '@shared'
+import {
+  UpdateUserSettingsCommand,
+  UpdateRestaurantSettingsCommand,
+  UpdateHospitalitySettingsCommand,
+  ApiResponse,
+} from '@shared'
 import apiClient from './client'
 
 export const settingsApi = {
@@ -16,7 +21,10 @@ export const settingsApi = {
     }
   },
 
-  updateHospitalitySettings: async (hospitalityId: string, command: UpdateHospitalitySettingsCommand): Promise<void> => {
+  updateHospitalitySettings: async (
+    hospitalityId: string,
+    command: UpdateHospitalitySettingsCommand
+  ): Promise<void> => {
     const { data } = await apiClient.put<ApiResponse<null>>(`/api/hospitality/${hospitalityId}/settings`, command)
     if (!data.success) {
       throw new Error(data.message || 'Failed to update hospitality settings')

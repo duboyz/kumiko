@@ -5,7 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { useCurrentUser, useUpdateUserSettings, Language, Currency, useLocationSelection, useUpdateRestaurantSettings, useUpdateHospitalitySettings } from '@shared'
+import {
+  useCurrentUser,
+  useUpdateUserSettings,
+  Language,
+  Currency,
+  useLocationSelection,
+  useUpdateRestaurantSettings,
+  useUpdateHospitalitySettings,
+} from '@shared'
 import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components'
 import { useState, useEffect } from 'react'
@@ -27,12 +35,18 @@ export default function SettingsPage() {
   const convertLanguageFromApi = (apiLanguage: any): Language => {
     if (typeof apiLanguage === 'string') {
       switch (apiLanguage) {
-        case 'Norwegian': return Language.Norwegian
-        case 'English': return Language.English
-        case 'Swedish': return Language.Swedish
-        case 'Danish': return Language.Danish
-        case 'Thai': return Language.Thai
-        default: return Language.English
+        case 'Norwegian':
+          return Language.Norwegian
+        case 'English':
+          return Language.English
+        case 'Swedish':
+          return Language.Swedish
+        case 'Danish':
+          return Language.Danish
+        case 'Thai':
+          return Language.Thai
+        default:
+          return Language.English
       }
     }
     return apiLanguage ?? Language.English
@@ -41,14 +55,22 @@ export default function SettingsPage() {
   const convertCurrencyFromApi = (apiCurrency: any): Currency => {
     if (typeof apiCurrency === 'string') {
       switch (apiCurrency) {
-        case 'EUR': return Currency.EUR
-        case 'USD': return Currency.USD
-        case 'GBP': return Currency.GBP
-        case 'NOK': return Currency.NOK
-        case 'SEK': return Currency.SEK
-        case 'ISK': return Currency.ISK
-        case 'DKK': return Currency.DKK
-        default: return Currency.USD
+        case 'EUR':
+          return Currency.EUR
+        case 'USD':
+          return Currency.USD
+        case 'GBP':
+          return Currency.GBP
+        case 'NOK':
+          return Currency.NOK
+        case 'SEK':
+          return Currency.SEK
+        case 'ISK':
+          return Currency.ISK
+        case 'DKK':
+          return Currency.DKK
+        default:
+          return Currency.USD
       }
     }
     return apiCurrency ?? Currency.USD
@@ -56,7 +78,8 @@ export default function SettingsPage() {
 
   // Use user data directly for initial values, local state only for changes
   const currentUserLanguage = userLanguage !== null ? userLanguage : convertLanguageFromApi(user?.preferredLanguage)
-  const currentLocationCurrency = locationCurrency !== null ? locationCurrency : convertCurrencyFromApi(selectedLocation?.currency)
+  const currentLocationCurrency =
+    locationCurrency !== null ? locationCurrency : convertCurrencyFromApi(selectedLocation?.currency)
 
   const handleUserLanguageUpdate = async () => {
     if (currentUserLanguage === undefined || !user) return
@@ -71,7 +94,7 @@ export default function SettingsPage() {
         [Language.Norwegian]: 'no',
         [Language.Swedish]: 'sv',
         [Language.Danish]: 'da',
-        [Language.Thai]: 'th'
+        [Language.Thai]: 'th',
       }
       const locale = localeMap[currentUserLanguage] || 'en'
       document.cookie = `locale=${locale}; path=/; max-age=${60 * 60 * 24 * 365}`
@@ -97,12 +120,12 @@ export default function SettingsPage() {
       if (selectedLocation.type === 'Restaurant') {
         await updateRestaurantSettings.mutateAsync({
           restaurantId: selectedLocation.id,
-          command: { currency: currentLocationCurrency }
+          command: { currency: currentLocationCurrency },
         })
       } else if (selectedLocation.type === 'Hospitality') {
         await updateHospitalitySettings.mutateAsync({
           hospitalityId: selectedLocation.id,
-          command: { currency: currentLocationCurrency }
+          command: { currency: currentLocationCurrency },
         })
       }
       toast.success(t('settings.settingsUpdated'))
@@ -118,8 +141,6 @@ export default function SettingsPage() {
   if (isLoadingUser) return <LoadingSpinner />
   if (userError) return <ErrorMessage message="Failed to load user data" />
   if (!user) return <ErrorMessage message="User not found" />
-
-
 
   return (
     <ContentContainer>
@@ -141,7 +162,7 @@ export default function SettingsPage() {
               <div className="flex gap-2">
                 <Select
                   value={currentUserLanguage.toString()}
-                  onValueChange={(value) => setUserLanguage(Number(value) as Language)}
+                  onValueChange={value => setUserLanguage(Number(value) as Language)}
                 >
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder={t('settings.selectLanguage')} />
@@ -156,7 +177,11 @@ export default function SettingsPage() {
                 </Select>
                 <Button
                   onClick={handleUserLanguageUpdate}
-                  disabled={updateUserSettings.isPending || userLanguage === null || currentUserLanguage === user.preferredLanguage}
+                  disabled={
+                    updateUserSettings.isPending ||
+                    userLanguage === null ||
+                    currentUserLanguage === user.preferredLanguage
+                  }
                 >
                   {updateUserSettings.isPending ? 'Updating...' : t('common.save')}
                 </Button>
@@ -180,7 +205,7 @@ export default function SettingsPage() {
                 <div className="flex gap-2">
                   <Select
                     value={currentLocationCurrency.toString()}
-                    onValueChange={(value) => setLocationCurrency(Number(value) as Currency)}
+                    onValueChange={value => setLocationCurrency(Number(value) as Currency)}
                   >
                     <SelectTrigger className="w-[200px]">
                       <SelectValue placeholder={t('settings.selectCurrency')} />
@@ -197,9 +222,16 @@ export default function SettingsPage() {
                   </Select>
                   <Button
                     onClick={handleLocationCurrencyUpdate}
-                    disabled={updateRestaurantSettings.isPending || updateHospitalitySettings.isPending || locationCurrency === null || currentLocationCurrency === selectedLocation.currency}
+                    disabled={
+                      updateRestaurantSettings.isPending ||
+                      updateHospitalitySettings.isPending ||
+                      locationCurrency === null ||
+                      currentLocationCurrency === selectedLocation.currency
+                    }
                   >
-                    {(updateRestaurantSettings.isPending || updateHospitalitySettings.isPending) ? 'Updating...' : t('common.save')}
+                    {updateRestaurantSettings.isPending || updateHospitalitySettings.isPending
+                      ? 'Updating...'
+                      : t('common.save')}
                   </Button>
                 </div>
               </div>

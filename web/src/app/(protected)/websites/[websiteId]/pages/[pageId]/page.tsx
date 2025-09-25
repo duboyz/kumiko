@@ -4,7 +4,18 @@ import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Plus, Eye, Edit, Save, Trash2 } from 'lucide-react'
-import { usePages, useAddSectionWithDefaults, useUpdateHeroSection, useUpdateTextSection, useUpdateRestaurantMenuSection, useDeleteSection, useRestaurantMenus, useLocationSelection, HeroSectionType, TextAlignment } from '@shared'
+import {
+  usePages,
+  useAddSectionWithDefaults,
+  useUpdateHeroSection,
+  useUpdateTextSection,
+  useUpdateRestaurantMenuSection,
+  useDeleteSection,
+  useRestaurantMenus,
+  useLocationSelection,
+  HeroSectionType,
+  TextAlignment,
+} from '@shared'
 import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components'
 import { ContentContainer } from '@/components/ContentContainer'
@@ -21,7 +32,9 @@ export default function PageEditorPage() {
   const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit')
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null)
-  const [sectionUpdates, setSectionUpdates] = useState<Record<string, Partial<HeroSectionDto> | Partial<TextSectionDto> | Partial<RestaurantMenuSectionDto>>>({})
+  const [sectionUpdates, setSectionUpdates] = useState<
+    Record<string, Partial<HeroSectionDto> | Partial<TextSectionDto> | Partial<RestaurantMenuSectionDto>>
+  >({})
 
   const { data: pagesData, isLoading, error } = usePages(websiteId)
 
@@ -33,8 +46,12 @@ export default function PageEditorPage() {
   const { data: menusData, isLoading: isLoadingMenus } = useRestaurantMenus(restaurantId || '')
   const firstMenuId = menusData?.menus && menusData.menus.length > 0 ? menusData.menus[0].id : undefined
 
-
-  const { addHeroSection, addTextSection, addRestaurantMenuSection, isLoading: isAddingSection } = useAddSectionWithDefaults(websiteId, pageId, firstMenuId)
+  const {
+    addHeroSection,
+    addTextSection,
+    addRestaurantMenuSection,
+    isLoading: isAddingSection,
+  } = useAddSectionWithDefaults(websiteId, pageId, firstMenuId)
 
   const updateHeroSection = useUpdateHeroSection(websiteId, () => {
     // Clear editing state after successful save
@@ -98,9 +115,9 @@ export default function PageEditorPage() {
       ...prev,
       [sectionId]: {
         ...prev[sectionId],
-        [field]: value
-      }
-    }));
+        [field]: value,
+      },
+    }))
   }
 
   const handleTypeChange = (sectionId: string, newType: HeroSectionType) => {
@@ -108,8 +125,8 @@ export default function PageEditorPage() {
       ...prev,
       [sectionId]: {
         ...prev[sectionId],
-        type: newType
-      }
+        type: newType,
+      },
     }))
   }
 
@@ -143,7 +160,7 @@ export default function PageEditorPage() {
 
       updateHeroSection.mutate({
         heroSectionId: section.heroSection.id,
-        updates: updateCommand
+        updates: updateCommand,
       })
     }
     // Handle Text Section
@@ -158,7 +175,7 @@ export default function PageEditorPage() {
 
       updateTextSection.mutate({
         textSectionId: section.textSection.id,
-        updates: updateCommand
+        updates: updateCommand,
       })
     }
     // Handle Restaurant Menu Section
@@ -172,7 +189,7 @@ export default function PageEditorPage() {
 
       updateRestaurantMenuSection.mutate({
         restaurantMenuSectionId: section.restaurantMenuSection.id,
-        updates: updateCommand
+        updates: updateCommand,
       })
     }
   }
@@ -192,11 +209,7 @@ export default function PageEditorPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push(`/websites/${websiteId}/pages`)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => router.push(`/websites/${websiteId}/pages`)}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Pages
           </Button>
@@ -220,21 +233,21 @@ export default function PageEditorPage() {
               </Button>
               <Button
                 onClick={() => handleSaveSection(editingSectionId)}
-                disabled={updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending}
+                disabled={
+                  updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending
+                }
                 className="bg-green-600 hover:bg-green-700"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {(updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending) ? 'Saving...' : 'Save Changes'}
+                {updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending
+                  ? 'Saving...'
+                  : 'Save Changes'}
               </Button>
             </>
           )}
 
           <div className="flex items-center border rounded-lg p-1">
-            <Button
-              variant={viewMode === 'edit' ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('edit')}
-            >
+            <Button variant={viewMode === 'edit' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('edit')}>
               <Edit className="w-4 h-4 mr-2" />
               Edit
             </Button>
@@ -248,10 +261,7 @@ export default function PageEditorPage() {
             </Button>
           </div>
 
-          <Button
-            onClick={() => setIsAddSectionModalOpen(true)}
-            disabled={isAddingSection}
-          >
+          <Button onClick={() => setIsAddSectionModalOpen(true)} disabled={isAddingSection}>
             <Plus className="w-4 h-4 mr-2" />
             Add Section
           </Button>
@@ -276,10 +286,7 @@ export default function PageEditorPage() {
                   <p className="text-gray-500 max-w-sm mx-auto">
                     Start building your page by adding sections with different types of content.
                   </p>
-                  <Button
-                    onClick={() => setIsAddSectionModalOpen(true)}
-                    className="mt-4"
-                  >
+                  <Button onClick={() => setIsAddSectionModalOpen(true)} className="mt-4">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Your First Section
                   </Button>
@@ -288,7 +295,7 @@ export default function PageEditorPage() {
             ) : (
               page.sections
                 .sort((a, b) => a.sortOrder - b.sortOrder)
-                .map((section) => (
+                .map(section => (
                   <div
                     key={section.id}
                     className="group relative border rounded-lg overflow-hidden bg-white"
@@ -306,69 +313,116 @@ export default function PageEditorPage() {
                     {/* Section content */}
                     {section.heroSection && (
                       <HeroSection
-                        title={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.title ?? section.heroSection.title}
-                        description={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.description ?? section.heroSection.description}
-                        imageUrl={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.imageUrl ?? section.heroSection.imageUrl}
-                        imageAlt={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.imageAlt ?? section.heroSection.imageAlt}
-                        backgroundColor={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.backgroundColor ?? section.heroSection.backgroundColor}
-                        textColor={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.textColor ?? section.heroSection.textColor}
-                        backgroundOverlayColor={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.backgroundOverlayColor ?? section.heroSection.backgroundOverlayColor}
-                        backgroundImageUrl={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.backgroundImageUrl ?? section.heroSection.backgroundImageUrl}
-                        buttonText={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonText ?? section.heroSection.buttonText}
-                        buttonUrl={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonUrl ?? section.heroSection.buttonUrl}
-                        buttonTextColor={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonTextColor ?? section.heroSection.buttonTextColor}
-                        buttonBackgroundColor={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonBackgroundColor ?? section.heroSection.buttonBackgroundColor}
-                        type={(sectionUpdates[section.id] as Partial<HeroSectionDto>)?.type as HeroSectionType ?? section.heroSection.type}
+                        title={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.title ?? section.heroSection.title
+                        }
+                        description={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.description ??
+                          section.heroSection.description
+                        }
+                        imageUrl={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.imageUrl ??
+                          section.heroSection.imageUrl
+                        }
+                        imageAlt={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.imageAlt ??
+                          section.heroSection.imageAlt
+                        }
+                        backgroundColor={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.backgroundColor ??
+                          section.heroSection.backgroundColor
+                        }
+                        textColor={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.textColor ??
+                          section.heroSection.textColor
+                        }
+                        backgroundOverlayColor={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.backgroundOverlayColor ??
+                          section.heroSection.backgroundOverlayColor
+                        }
+                        backgroundImageUrl={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.backgroundImageUrl ??
+                          section.heroSection.backgroundImageUrl
+                        }
+                        buttonText={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonText ??
+                          section.heroSection.buttonText
+                        }
+                        buttonUrl={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonUrl ??
+                          section.heroSection.buttonUrl
+                        }
+                        buttonTextColor={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonTextColor ??
+                          section.heroSection.buttonTextColor
+                        }
+                        buttonBackgroundColor={
+                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonBackgroundColor ??
+                          section.heroSection.buttonBackgroundColor
+                        }
+                        type={
+                          ((sectionUpdates[section.id] as Partial<HeroSectionDto>)?.type as HeroSectionType) ??
+                          section.heroSection.type
+                        }
                         isEditing={editingSectionId === section.id}
                         onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
-                        onTypeChange={(newType) => handleTypeChange(section.id, newType)}
+                        onTypeChange={newType => handleTypeChange(section.id, newType)}
                       />
                     )}
 
                     {section.textSection && (
                       <TextSection
-                        title={(sectionUpdates[section.id] as Partial<TextSectionDto>)?.title ?? section.textSection.title}
+                        title={
+                          (sectionUpdates[section.id] as Partial<TextSectionDto>)?.title ?? section.textSection.title
+                        }
                         text={(sectionUpdates[section.id] as Partial<TextSectionDto>)?.text ?? section.textSection.text}
-                        alignText={(sectionUpdates[section.id] as Partial<TextSectionDto>)?.alignText as TextAlignment ?? section.textSection.alignText}
-                        textColor={(sectionUpdates[section.id] as Partial<TextSectionDto>)?.textColor ?? section.textSection.textColor}
+                        alignText={
+                          ((sectionUpdates[section.id] as Partial<TextSectionDto>)?.alignText as TextAlignment) ??
+                          section.textSection.alignText
+                        }
+                        textColor={
+                          (sectionUpdates[section.id] as Partial<TextSectionDto>)?.textColor ??
+                          section.textSection.textColor
+                        }
                         isEditing={editingSectionId === section.id}
                         onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
                       />
                     )}
 
-                    {section.restaurantMenuSection && (() => {
-                      const menuSection = section.restaurantMenuSection;
-                      const menuUpdates = sectionUpdates[section.id] as Partial<RestaurantMenuSectionDto>;
+                    {section.restaurantMenuSection &&
+                      (() => {
+                        const menuSection = section.restaurantMenuSection
+                        const menuUpdates = sectionUpdates[section.id] as Partial<RestaurantMenuSectionDto>
 
-                      // Use updated values if they exist, otherwise use original values
-                      const currentMenuId = menuUpdates?.restaurantMenuId ?? menuSection.restaurantMenuId;
-                      const currentAllowOrdering = menuUpdates?.allowOrdering ?? menuSection.allowOrdering;
+                        // Use updated values if they exist, otherwise use original values
+                        const currentMenuId = menuUpdates?.restaurantMenuId ?? menuSection.restaurantMenuId
+                        const currentAllowOrdering = menuUpdates?.allowOrdering ?? menuSection.allowOrdering
 
-                      const menu = menusData?.menus?.find(m => m.id === currentMenuId);
+                        const menu = menusData?.menus?.find(m => m.id === currentMenuId)
 
-                      if (!menu) {
+                        if (!menu) {
+                          return (
+                            <div className="py-12 px-4 text-center text-gray-500">
+                              <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
+                              <p>The selected menu (ID: {currentMenuId}) could not be loaded.</p>
+                              {editingSectionId === section.id && (
+                                <p className="mt-2 text-sm">Please select a different menu in the section settings.</p>
+                              )}
+                            </div>
+                          )
+                        }
+
                         return (
-                          <div className="py-12 px-4 text-center text-gray-500">
-                            <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
-                            <p>The selected menu (ID: {currentMenuId}) could not be loaded.</p>
-                            {editingSectionId === section.id && (
-                              <p className="mt-2 text-sm">Please select a different menu in the section settings.</p>
-                            )}
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <RestaurantMenuSection
-                          restaurantMenu={menu}
-                          allowOrdering={currentAllowOrdering}
-                          currentMenuId={currentMenuId}
-                          isEditing={editingSectionId === section.id}
-                          availableMenus={menusData?.menus || []}
-                          onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
-                        />
-                      );
-                    })()}
+                          <RestaurantMenuSection
+                            restaurantMenu={menu}
+                            allowOrdering={currentAllowOrdering}
+                            currentMenuId={currentMenuId}
+                            isEditing={editingSectionId === section.id}
+                            availableMenus={menusData?.menus || []}
+                            onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
+                          />
+                        )
+                      })()}
                   </div>
                 ))
             )}

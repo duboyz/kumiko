@@ -22,22 +22,22 @@ const locationTypes: LocationTypeOption[] = [
     title: 'Restaurant',
     description: 'Manage your restaurant operations, menu, and orders',
     icon: Building2,
-    available: true
+    available: true,
   },
   {
     type: 'salon',
     title: 'Salon',
     description: 'Manage appointments, services, and beauty treatments',
     icon: Scissors,
-    available: false
+    available: false,
   },
   {
     type: 'hotel',
     title: 'Hotel',
     description: 'Manage bookings, rooms, and hospitality services',
     icon: Hotel,
-    available: true
-  }
+    available: true,
+  },
 ]
 
 export default function OnboardingPage() {
@@ -57,13 +57,11 @@ export default function OnboardingPage() {
     <ContentContainer>
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">Welcome! Let's set up your business</h1>
-        <p className="text-muted-foreground">
-          Choose the type of business you want to manage with our platform
-        </p>
+        <p className="text-muted-foreground">Choose the type of business you want to manage with our platform</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {locationTypes.map((option) => (
+        {locationTypes.map(option => (
           <LocationTypeCard
             key={option.type}
             title={option.title}
@@ -77,11 +75,7 @@ export default function OnboardingPage() {
       </div>
 
       <div className="text-center">
-        <Button
-          onClick={handleContinue}
-          disabled={!selectedType}
-          size="lg"
-        >
+        <Button onClick={handleContinue} disabled={!selectedType} size="lg">
           Continue with {selectedType ? locationTypes.find(t => t.type === selectedType)?.title : 'Selection'}
         </Button>
       </div>

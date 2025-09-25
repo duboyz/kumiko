@@ -4,6 +4,6 @@ import { RequestSearchAddress } from '../types'
 
 export const useSearchBusiness = () => {
   return useMutation({
-    mutationFn: (data: RequestSearchAddress) => searchApi.searchBusiness(data)
+    mutationFn: (data: RequestSearchAddress) => searchApi.searchBusiness(data),
   })
 }

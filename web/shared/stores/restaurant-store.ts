@@ -10,13 +10,13 @@ interface RestaurantStore {
 
 export const useRestaurantStore = create<RestaurantStore>()(
   persist(
-    (set) => ({
+    set => ({
       selectedRestaurant: null,
-      setSelectedRestaurant: (restaurant) => set({ selectedRestaurant: restaurant }),
-      clearSelectedRestaurant: () => set({ selectedRestaurant: null })
+      setSelectedRestaurant: restaurant => set({ selectedRestaurant: restaurant }),
+      clearSelectedRestaurant: () => set({ selectedRestaurant: null }),
     }),
     {
-      name: 'restaurant-storage'
+      name: 'restaurant-storage',
     }
   )
 )

@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { restaurantApi } from '../api'
-import { CreateRestaurantCommand, CreateRestaurantResult, GetUserRestaurantsResult, GetUserRestaurantsParams } from '../types'
+import {
+  CreateRestaurantCommand,
+  CreateRestaurantResult,
+  GetUserRestaurantsResult,
+  GetUserRestaurantsParams,
+} from '../types'
 
 export const useCreateRestaurant = () => {
   const queryClient = useQueryClient()
@@ -10,7 +15,7 @@ export const useCreateRestaurant = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurants'] })
       queryClient.invalidateQueries({ queryKey: ['user-restaurants'] })
-    }
+    },
   })
 }
 

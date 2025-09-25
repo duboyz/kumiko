@@ -9,9 +9,9 @@ export const useCreatePage = () => {
     mutationFn: (command: CreateWebsitePageCommand) => pageApi.createPage(command),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ['pages', variables.websiteId]
+        queryKey: ['pages', variables.websiteId],
       })
-    }
+    },
   })
 }
 

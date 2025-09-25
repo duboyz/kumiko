@@ -1,27 +1,21 @@
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, ArrowLeft, ArrowRight, Package, Eye } from "lucide-react";
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { CheckCircle, ArrowLeft, ArrowRight, Package, Eye } from 'lucide-react'
 
 interface CompleteStepProps {
-  onComplete: () => void;
-  onBack: () => void;
-  showSuccess: boolean;
+  onComplete: () => void
+  onBack: () => void
+  showSuccess: boolean
 }
 
-export function CompleteStep({
-  onComplete,
-  onBack,
-  showSuccess,
-}: CompleteStepProps) {
+export function CompleteStep({ onComplete, onBack, showSuccess }: CompleteStepProps) {
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Import Complete!</h2>
-        <p className="text-muted-foreground">
-          Your menu items have been successfully added to your menu
-        </p>
+        <p className="text-muted-foreground">Your menu items have been successfully added to your menu</p>
       </div>
 
       {/* Success Animation */}
@@ -30,9 +24,7 @@ export function CompleteStep({
           <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center animate-pulse">
             <CheckCircle className="w-12 h-12 text-green-600" />
           </div>
-          {showSuccess && (
-            <div className="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-75"></div>
-          )}
+          {showSuccess && <div className="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-75"></div>}
         </div>
       </div>
 
@@ -44,12 +36,10 @@ export function CompleteStep({
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-green-900 mb-2">
-                Menu Items Added Successfully!
-              </h3>
+              <h3 className="text-lg font-semibold text-green-900 mb-2">Menu Items Added Successfully!</h3>
               <p className="text-sm text-green-700">
-                Your menu items have been processed and added to your menu. You
-                can now view and manage them in your menu items list.
+                Your menu items have been processed and added to your menu. You can now view and manage them in your
+                menu items list.
               </p>
             </div>
           </div>
@@ -78,9 +68,7 @@ export function CompleteStep({
               </div>
               <div>
                 <p className="font-medium text-sm">Organize Categories</p>
-                <p className="text-xs text-muted-foreground">
-                  Arrange items into categories for better organization
-                </p>
+                <p className="text-xs text-muted-foreground">Arrange items into categories for better organization</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -89,9 +77,7 @@ export function CompleteStep({
               </div>
               <div>
                 <p className="font-medium text-sm">Publish Your Menu</p>
-                <p className="text-xs text-muted-foreground">
-                  Your menu is ready to be shared with customers
-                </p>
+                <p className="text-xs text-muted-foreground">Your menu is ready to be shared with customers</p>
               </div>
             </div>
           </div>
@@ -110,5 +96,5 @@ export function CompleteStep({
         </Button>
       </div>
     </div>
-  );
+  )
 }

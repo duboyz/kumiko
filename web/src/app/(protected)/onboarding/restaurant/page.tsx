@@ -30,7 +30,7 @@ export default function RestaurantOnboardingPage() {
       country: 'NO',
       latitude: selectedBusiness.geometry.location.lat.toString(),
       longitude: selectedBusiness.geometry.location.lng.toString(),
-      googlePlaceId: selectedBusiness.placeId
+      googlePlaceId: selectedBusiness.placeId,
     }
 
     try {
@@ -45,19 +45,14 @@ export default function RestaurantOnboardingPage() {
   return (
     <ContentContainer>
       <div>
-        <Button
-          variant="ghost"
-          onClick={() => router.push('/onboarding')}
-        >
+        <Button variant="ghost" onClick={() => router.push('/onboarding')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to business type selection
         </Button>
 
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-2">Set up your restaurant</h1>
-          <p className="text-muted-foreground">
-            Search for your restaurant to get started with our platform
-          </p>
+          <p className="text-muted-foreground">Search for your restaurant to get started with our platform</p>
         </div>
       </div>
 
@@ -69,10 +64,7 @@ export default function RestaurantOnboardingPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <SearchBusiness
-            onBusinessSelect={handleBusinessSelect}
-            selectedBusiness={selectedBusiness}
-          />
+          <SearchBusiness onBusinessSelect={handleBusinessSelect} selectedBusiness={selectedBusiness} />
         </CardContent>
       </Card>
 
@@ -86,16 +78,26 @@ export default function RestaurantOnboardingPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p><strong>Name:</strong> {selectedBusiness.name}</p>
-              <p><strong>Address:</strong> {selectedBusiness.formattedAddress}</p>
+              <p>
+                <strong>Name:</strong> {selectedBusiness.name}
+              </p>
+              <p>
+                <strong>Address:</strong> {selectedBusiness.formattedAddress}
+              </p>
               {selectedBusiness.formattedPhoneNumber && (
-                <p><strong>Phone:</strong> {selectedBusiness.formattedPhoneNumber}</p>
+                <p>
+                  <strong>Phone:</strong> {selectedBusiness.formattedPhoneNumber}
+                </p>
               )}
               {selectedBusiness.website && (
-                <p><strong>Website:</strong> {selectedBusiness.website}</p>
+                <p>
+                  <strong>Website:</strong> {selectedBusiness.website}
+                </p>
               )}
               {selectedBusiness.rating && (
-                <p><strong>Rating:</strong> {selectedBusiness.rating} ⭐ ({selectedBusiness.userRatingsTotal} reviews)</p>
+                <p>
+                  <strong>Rating:</strong> {selectedBusiness.rating} ⭐ ({selectedBusiness.userRatingsTotal} reviews)
+                </p>
               )}
             </div>
           </CardContent>
@@ -112,9 +114,7 @@ export default function RestaurantOnboardingPage() {
         </Button>
 
         {createRestaurantMutation.error && (
-          <p className="text-red-600 text-sm mt-2">
-            Error: {createRestaurantMutation.error.message}
-          </p>
+          <p className="text-red-600 text-sm mt-2">Error: {createRestaurantMutation.error.message}</p>
         )}
       </div>
     </ContentContainer>

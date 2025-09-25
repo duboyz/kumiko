@@ -16,13 +16,7 @@ const EditableTextWrapper = (args: any) => {
     console.log(`Field "${field}" updated to:`, value)
   }
 
-  return (
-    <TextSection
-      {...args}
-      {...state}
-      onUpdate={handleUpdate}
-    />
-  )
+  return <TextSection {...args} {...state} onUpdate={handleUpdate} />
 }
 
 const meta = {
@@ -86,7 +80,7 @@ export const DarkText: StoryObj<typeof meta> = {
 }
 
 export const EditableMode: StoryObj<typeof meta> = {
-  render: (args) => <EditableTextWrapper {...args} />,
+  render: args => <EditableTextWrapper {...args} />,
   args: {
     title: 'Editable Text Section',
     text: 'This is an editable text section. You can modify the title and text content in real-time. Try clicking on the fields to see the editing functionality.',

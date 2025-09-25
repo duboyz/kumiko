@@ -14,12 +14,12 @@ interface LocationStore {
 
 export const useLocationStore = create<LocationStore>()(
   persist(
-    (set) => ({
+    set => ({
       selectedLocation: null,
-      setSelectedLocation: (location) => set({ selectedLocation: location }),
+      setSelectedLocation: location => set({ selectedLocation: location }),
       clearSelectedLocation: () => set({ selectedLocation: null }),
 
-      setSelectedRestaurant: (restaurant) => {
+      setSelectedRestaurant: restaurant => {
         if (restaurant) {
           const location: LocationOption = {
             id: restaurant.restaurant.id,
@@ -28,7 +28,7 @@ export const useLocationStore = create<LocationStore>()(
             address: restaurant.restaurant.address,
             city: restaurant.restaurant.city,
             role: restaurant.role,
-            currency: restaurant.restaurant.currency
+            currency: restaurant.restaurant.currency,
           }
           set({ selectedLocation: location })
         } else {
@@ -36,7 +36,7 @@ export const useLocationStore = create<LocationStore>()(
         }
       },
 
-      setSelectedHospitality: (hospitality) => {
+      setSelectedHospitality: hospitality => {
         if (hospitality) {
           const location: LocationOption = {
             id: hospitality.hospitality.id,
@@ -45,16 +45,16 @@ export const useLocationStore = create<LocationStore>()(
             address: hospitality.hospitality.address,
             city: hospitality.hospitality.city,
             role: hospitality.role,
-            currency: hospitality.hospitality.currency
+            currency: hospitality.hospitality.currency,
           }
           set({ selectedLocation: location })
         } else {
           set({ selectedLocation: null })
         }
-      }
+      },
     }),
     {
-      name: 'location-storage'
+      name: 'location-storage',
     }
   )
 )

@@ -6,9 +6,5 @@ interface ContentContainerProps {
 }
 
 export function ContentContainer({ children }: ContentContainerProps) {
-  return (
-    <div className={cn('flex flex-col gap-4 p-4')}>
-      {children}
-    </div>
-  )
+  return <div className={cn('flex flex-col gap-4 p-4')}>{children}</div>
 }

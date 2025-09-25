@@ -34,7 +34,7 @@ export const useUpdateWebsite = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ websiteId, updates }: { websiteId: string, updates: UpdateWebsiteCommand }) =>
+    mutationFn: ({ websiteId, updates }: { websiteId: string; updates: UpdateWebsiteCommand }) =>
       websiteApi.updateWebsite(websiteId, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurant-websites'] })

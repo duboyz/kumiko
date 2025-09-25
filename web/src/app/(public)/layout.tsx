@@ -1,10 +1,6 @@
 import Link from 'next/link'
 
-export default function PublicLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b">
@@ -31,9 +27,7 @@ export default function PublicLayout({
           </nav>
         </div>
       </header>
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
       <footer className="border-t">
         <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
           © 2024 Kumiko. All rights reserved.
