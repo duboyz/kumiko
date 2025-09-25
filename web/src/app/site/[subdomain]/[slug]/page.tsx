@@ -14,14 +14,10 @@ export default function PublicWebsitePageWithSlug() {
 
   const { data: websiteData, isLoading, error } = useWebsiteBySubdomain(subdomain)
 
-  // Get menus for restaurant menu sections (if any)
-  const { data: menusData } = useRestaurantMenus(websiteData?.type === 'Restaurant' ? 'get-all' : '')
-
   if (isLoading) return <LoadingSpinner />
   if (error) return <ErrorMessage message={error instanceof Error ? error.message : 'Website not found'} />
   if (!websiteData) return <ErrorMessage message="Website not found" />
 
-  // If the website is not published, show a message
   if (!websiteData.isPublished) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">

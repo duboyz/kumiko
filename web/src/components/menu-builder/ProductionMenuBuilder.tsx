@@ -18,8 +18,6 @@ import {
   MenuCategoryItemDto,
   CreateMenuCategoryCommand,
   CreateMenuItemCommand,
-} from '../../../shared/types/menu.types'
-import {
   useRestaurantMenus,
   useCreateRestaurantMenu,
   useCreateMenuCategory,

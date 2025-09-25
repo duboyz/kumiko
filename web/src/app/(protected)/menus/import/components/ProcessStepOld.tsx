@@ -4,10 +4,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ArrowLeft, ArrowRight, X, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react'
-import { ParsedMenuItem } from '../hooks/useImportFlow'
-import { parseMenuStructure } from '@/shared/api/menu-structure.api'
-import { ParsedMenuStructure } from '@/shared/types/menu-structure.types'
-
+import { ParsedMenuStructure } from '@shared/types/menu-structure.types'
 interface ProcessStepProps {
   imageFile: File | null
   imagePreview: string | null

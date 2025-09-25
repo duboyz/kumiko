@@ -6,9 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, ArrowRight, Plus, Trash2, Edit3, Check, X, FolderOpen, GripVertical } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Plus, Trash2, Edit3, Check, FolderOpen, GripVertical } from 'lucide-react'
 import { ParsedMenuStructure, EditableMenuStructure, EditableCategory } from '@shared/types/menu-structure.types'
-import { cn } from '@/lib/utils'
 
 interface CategoryReviewStepProps {
   parsedStructure: ParsedMenuStructure

@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { AlertTriangle } from 'lucide-react'
-import { MenuCategoryDto } from '../../../shared/types/menu.types'
+import { MenuCategoryDto } from '@shared'
 
 interface DeleteConfirmDialogProps {
   isOpen: boolean
