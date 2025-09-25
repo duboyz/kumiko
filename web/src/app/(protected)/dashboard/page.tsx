@@ -1,6 +1,8 @@
 import { ContentContainer } from '@/components/ContentContainer'
 import { useTranslations } from 'next-intl'
 import { LanguageSelector } from '@/components/LanguageSelector'
+import { MenuItemRow } from '@/stories/RestaurantMenu/MenuItemRow/MenuItemRow'
+import { LabeledInput } from '@/stories/LabeledInput/LabeledInput'
 
 export default function DashboardPage() {
   const t = useTranslations('navigation')
