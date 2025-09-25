@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, ArrowRight, Undo, X } from 'lucide-react'
-import { Stage, Layer, Rect, Circle as KonvaCircle, Image as KonvaImage } from 'react-konva'
+import { Stage, Layer, Rect, Image as KonvaImage } from 'react-konva'
 import Konva from 'konva'
 
 export interface Annotation {
@@ -177,13 +177,6 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
     if (historyIndex > 0) {
       setHistoryIndex(historyIndex - 1)
       setAnnotations([...history[historyIndex - 1]])
-    }
-  }, [historyIndex, history])
-
-  const redo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1)
-      setAnnotations([...history[historyIndex + 1]])
     }
   }, [historyIndex, history])
 

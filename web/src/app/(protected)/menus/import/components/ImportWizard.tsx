@@ -14,7 +14,34 @@ import { ProcessStep } from './ProcessStep'
 import { useImportFlow } from '../hooks/useImportFlow'
 import { StructureReviewStep } from './StructureReviewStep'
 
-export type ImportStep = 'upload' | 'preview' | 'process' | 'review'
+export enum ImportStep {
+  UPLOAD = 'upload',
+  PREVIEW = 'preview',
+  PROCESS = 'process',
+  REVIEW = 'review',
+}
+
+export type ImportStepType = ImportStep.UPLOAD | ImportStep.PREVIEW | ImportStep.PROCESS | ImportStep.REVIEW
+
+// Helper functions for step management
+const getStepNumber = (step: ImportStepType): number => {
+  switch (step) {
+    case ImportStep.UPLOAD:
+      return 1
+    case ImportStep.PREVIEW:
+      return 2
+    case ImportStep.PROCESS:
+      return 3
+    case ImportStep.REVIEW:
+      return 4
+    default:
+      return 1
+  }
+}
+
+const getStepProgress = (step: ImportStepType): number => {
+  return (getStepNumber(step) / 4) * 100
+}
 
 export function ImportWizard() {
   const router = useRouter()
@@ -28,37 +55,30 @@ export function ImportWizard() {
     setImageFile,
     imagePreview,
     setImagePreview,
-    parsedItems,
-    setParsedItems,
-    selectedCategoryId,
-    setSelectedCategoryId,
     isProcessing,
     setIsProcessing,
     processingStep,
     setProcessingStep,
     errorMessage,
     setErrorMessage,
-    showSuccess,
     setShowSuccess,
     annotations,
     setAnnotations,
     parsedStructure,
     setParsedStructure,
-    editableStructure,
-    setEditableStructure,
     resetImportFlow,
   } = useImportFlow()
 
   // Handle URL state
   useEffect(() => {
-    const step = searchParams.get('step') as ImportStep
-    if (step && ['upload', 'preview', 'process', 'review'].includes(step)) {
+    const step = searchParams.get('step') as ImportStepType
+    if (step && Object.values(ImportStep).includes(step as ImportStep)) {
       setCurrentStep(step)
     }
   }, [searchParams, setCurrentStep])
 
   // Update URL when step changes
-  const handleStepChange = (step: ImportStep) => {
+  const handleStepChange = (step: ImportStepType) => {
     setCurrentStep(step)
     const url = new URL(window.location.href)
     url.searchParams.set('step', step)
@@ -66,14 +86,14 @@ export function ImportWizard() {
   }
 
   const handleBack = () => {
-    if (currentStep === 'upload') {
+    if (currentStep === ImportStep.UPLOAD) {
       router.push('/menu-items')
-    } else if (currentStep === 'preview') {
-      handleStepChange('upload')
-    } else if (currentStep === 'process') {
-      handleStepChange('preview')
-    } else if (currentStep === 'review') {
-      handleStepChange('process')
+    } else if (currentStep === ImportStep.PREVIEW) {
+      handleStepChange(ImportStep.UPLOAD)
+    } else if (currentStep === ImportStep.PROCESS) {
+      handleStepChange(ImportStep.PREVIEW)
+    } else if (currentStep === ImportStep.REVIEW) {
+      handleStepChange(ImportStep.PROCESS)
     }
   }
 
@@ -160,31 +180,14 @@ export function ImportWizard() {
         <div className="lg:hidden mb-6">
           <div className="bg-white rounded-lg border p-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-              <span>
-                Step{' '}
-                {currentStep === 'upload'
-                  ? '1'
-                  : currentStep === 'preview'
-                    ? '2'
-                    : currentStep === 'process'
-                      ? '3'
-                      : '4'}{' '}
-                of 4
-              </span>
-              <span>
-                {Math.round(
-                  ((currentStep === 'upload' ? 1 : currentStep === 'preview' ? 2 : currentStep === 'process' ? 3 : 4) /
-                    4) *
-                    100
-                )}
-                %
-              </span>
+              <span>Step {getStepNumber(currentStep)} of 4</span>
+              <span>{Math.round(getStepProgress(currentStep))}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
                 className="bg-primary h-2 rounded-full transition-all duration-500"
                 style={{
-                  width: `${((currentStep === 'upload' ? 1 : currentStep === 'preview' ? 2 : currentStep === 'process' ? 3 : 4) / 4) * 100}%`,
+                  width: `${getStepProgress(currentStep)}%`,
                 }}
               />
             </div>
@@ -201,30 +204,30 @@ export function ImportWizard() {
           <div className="lg:col-span-3">
             <Card>
               <CardContent className="p-4 sm:p-6">
-                {currentStep === 'upload' && (
+                {currentStep === ImportStep.UPLOAD && (
                   <UploadStep
                     onImageSelect={(file, preview) => {
                       setImageFile(file)
                       setImagePreview(preview)
-                      handleStepChange('preview')
+                      handleStepChange(ImportStep.PREVIEW)
                     }}
                     onBack={handleBack}
                   />
                 )}
 
-                {currentStep === 'preview' && (
+                {currentStep === ImportStep.PREVIEW && (
                   <AnnotationStep
                     imagePreview={imagePreview!}
                     onAnnotate={newAnnotations => {
                       setAnnotations(newAnnotations)
-                      handleStepChange('process')
+                      handleStepChange(ImportStep.PROCESS)
                     }}
                     onBack={handleBack}
-                    onSkip={() => handleStepChange('process')}
+                    onSkip={() => handleStepChange(ImportStep.PROCESS)}
                   />
                 )}
 
-                {currentStep === 'process' && (
+                {currentStep === ImportStep.PROCESS && (
                   <ProcessStep
                     imageFile={imageFile}
                     imagePreview={imagePreview}
@@ -232,7 +235,7 @@ export function ImportWizard() {
                     restaurantId={selectedLocation.id}
                     onProcess={structure => {
                       setParsedStructure(structure)
-                      handleStepChange('review')
+                      handleStepChange(ImportStep.REVIEW)
                     }}
                     onBack={handleBack}
                     onError={setErrorMessage}
@@ -244,7 +247,7 @@ export function ImportWizard() {
                   />
                 )}
 
-                {currentStep === 'review' && parsedStructure && (
+                {currentStep === ImportStep.REVIEW && parsedStructure && (
                   <StructureReviewStep
                     parsedStructure={parsedStructure}
                     onConfirm={() => {
