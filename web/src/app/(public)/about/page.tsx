@@ -1,5 +1,5 @@
 import { ContentContainer } from '@/components/ContentContainer'
-import { MenuBuilder } from '@/components/menu-builder/MenuBuilder'
+import { MenuBuilder } from '@/components'
 
 export default function AboutPage() {
   return (

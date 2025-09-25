@@ -1,6 +1,6 @@
 'use client'
 
-import { MenuList } from '@/components/menu-builder/MenuList'
+import { MenuList } from '@/components'
 import { useRestaurantMenus, useCreateRestaurantMenu } from '@shared'
 import { useLocationSelection } from '@shared'
 import { Card, CardContent } from '@/components/ui/card'

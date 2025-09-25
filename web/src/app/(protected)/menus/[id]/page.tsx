@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, AlertCircle } from 'lucide-react'
 import { useRestaurantMenus, useLocationSelection } from '@shared'
-import { MenuEditor } from '@/components/menu-builder/MenuEditor'
+import { MenuEditor } from '@/components'
 
 export default function MenuEditPage() {
   const params = useParams()

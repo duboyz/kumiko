@@ -1,30 +1,36 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 
-// Mock category data
+// Simplified mock data for Storybook
 const mockCategories = [
   {
     id: '1',
     name: 'Appetizers',
     description: 'Light starters',
-    sortOrder: 1,
+    orderIndex: 1,
+    restaurantMenuId: '1',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     menuCategoryItems: [
-      { id: '1', name: 'Bruschetta', description: 'Toasted bread with tomatoes', price: 8.99 },
-      { id: '2', name: 'Calamari', description: 'Fried squid rings', price: 12.99 },
-      { id: '3', name: 'Wings', description: 'Buffalo chicken wings', price: 10.99 },
+      { length: 3 } as any,
+      { length: 3 } as any,
+      { length: 3 } as any,
     ]
   },
   {
     id: '2',
     name: 'Main Courses',
     description: 'Hearty entrees',
-    sortOrder: 2,
+    orderIndex: 2,
+    restaurantMenuId: '1',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     menuCategoryItems: [
-      { id: '4', name: 'Grilled Salmon', description: 'Fresh Atlantic salmon', price: 24.99 },
-      { id: '5', name: 'Ribeye Steak', description: '12oz prime cut', price: 32.99 },
+      { length: 2 } as any,
+      { length: 2 } as any,
     ]
   }
-]
+] as any[]
 
 const meta: Meta<typeof DeleteConfirmDialog> = {
   component: DeleteConfirmDialog,
@@ -92,10 +98,13 @@ export const DeleteEmptyCategory: Story = {
         id: '3',
         name: 'Desserts',
         description: 'Sweet treats',
-        sortOrder: 3,
+        orderIndex: 3,
+        restaurantMenuId: '1',
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
         menuCategoryItems: []
       }
-    ],
+    ] as any[],
     onOpenChange: (open: boolean) => console.log('Dialog open changed:', open),
     onConfirmDelete: () => console.log('Delete empty category confirmed'),
   },
