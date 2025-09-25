@@ -7,7 +7,7 @@ import SearchBusiness from '@/components/SearchBusiness'
 import { useCreateHospitality } from '@shared'
 import type { ResponseBusinessDetails } from '@shared'
 import { LoadingSpinner } from '@/components'
-import { ErrorMessage } from '@/components/ErrorMessage'
+import { ErrorMessage } from '@/components'
 import { ContentContainer } from '@/components/ContentContainer'
 
 export default function HospitalityOnboardingPage() {

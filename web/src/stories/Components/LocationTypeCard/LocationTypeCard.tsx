@@ -1,10 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { LucideProps } from 'lucide-react'
 
 interface LocationTypeCardProps {
   title: string
   description: string
-  icon: React.ComponentType<any>
+  icon: React.ComponentType<LucideProps>
   available: boolean
   isSelected: boolean
   onClick: () => void
@@ -16,7 +17,7 @@ export function LocationTypeCard({
   icon: Icon,
   available,
   isSelected,
-  onClick
+  onClick,
 }: LocationTypeCardProps) {
   return (
     <Card

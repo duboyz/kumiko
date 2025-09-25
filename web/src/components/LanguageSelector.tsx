@@ -11,7 +11,7 @@ const localeMap = {
   no: Language.Norwegian,
   sv: Language.Swedish,
   da: Language.Danish,
-  th: Language.Thai
+  th: Language.Thai,
 }
 
 export function LanguageSelector() {
@@ -27,8 +27,7 @@ export function LanguageSelector() {
       try {
         await updateUserSettings.mutateAsync({ preferredLanguage: language })
 
-        // Set locale cookie and refresh the page to apply new locale
-        document.cookie = `locale=${newLocale}; path=/; max-age=${60 * 60 * 24 * 365}` // 1 year
+        document.cookie = `locale=${newLocale}; path=/; max-age=${60 * 60 * 24 * 365}`
         router.refresh()
       } catch (error) {
         console.error('Failed to update user language preference:', error)

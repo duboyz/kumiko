@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Plus, FileText, ArrowLeft, Edit } from 'lucide-react'
 import { usePages, useCreatePage } from '@shared'
 import { LoadingSpinner } from '@/components'
-import { ErrorMessage } from '@/components/ErrorMessage'
+import { ErrorMessage } from '@/components'
 import { ContentContainer } from '@/components/ContentContainer'
 
 export default function WebsitePagesPage() {

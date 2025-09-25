@@ -3,9 +3,9 @@
 import { useParams } from 'next/navigation'
 import { useWebsiteBySubdomain, useRestaurantMenus } from '@shared'
 import { LoadingSpinner } from '@/components'
-import { ErrorMessage } from '@/components/ErrorMessage'
+import { ErrorMessage } from '@/components'
 import { WebsitePage } from '@/components/sections'
-import { PublicWebsiteHeader } from '@/components/PublicWebsiteHeader'
+import { PublicWebsiteHeader } from '@/components'
 
 export default function PublicWebsitePageWithSlug() {
   const params = useParams()

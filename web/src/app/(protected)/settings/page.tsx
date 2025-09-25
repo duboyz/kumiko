@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button'
 import { useCurrentUser, useUpdateUserSettings, Language, Currency, useLocationSelection, useUpdateRestaurantSettings, useUpdateHospitalitySettings } from '@shared'
 import { LoadingSpinner } from '@/components'
-import { ErrorMessage } from '@/components/ErrorMessage'
+import { ErrorMessage } from '@/components'
 import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'

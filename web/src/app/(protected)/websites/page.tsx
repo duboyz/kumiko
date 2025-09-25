@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Plus, Globe, Settings, Eye, Power, PowerOff } from 'lucide-react'
 import { useRestaurantWebsites, useCreateWebsite, useUpdateWebsite, useLocationSelection } from '@shared'
 import { LoadingSpinner } from '@/components'
-import { ErrorMessage } from '@/components/ErrorMessage'
+import { ErrorMessage } from '@/components'
 import { ContentContainer } from '@/components/ContentContainer'
 import { openSubdomainUrl } from '@/lib/subdomain'
 
