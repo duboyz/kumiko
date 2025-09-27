@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ArrowLeft, ArrowRight, X, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react'
-import { parseMenuStructure } from '@shared/api/menu-structure.api'
 import { ParsedMenuStructure } from '@shared/types/menu-structure.types'
+import { useParseMenuStructure } from '@shared/hooks/menu.hooks'
 import { Stage, Layer, Rect, Image as KonvaImage } from 'react-konva'
 import Konva from 'konva'
 
@@ -66,6 +66,8 @@ export function ProcessStep({
   const [image, setImage] = useState<HTMLImageElement | null>(null)
   const [stageSize, setStageSize] = useState({ width: 600, height: 450 })
   const stageRef = useRef<Konva.Stage>(null)
+
+  const parseMenuStructureMutation = useParseMenuStructure()
 
   // Load image and calculate proper dimensions
   useEffect(() => {
@@ -132,7 +134,11 @@ export function ProcessStep({
       await new Promise(resolve => setTimeout(resolve, 400))
 
       setProcessingStep('Detecting categories and items...')
-      const structure = await parseMenuStructure(imageFile, annotations, restaurantId)
+      const structure = await parseMenuStructureMutation.mutateAsync({
+        imageFile,
+        annotations,
+        restaurantId,
+      })
 
       // Step 3: Processing results
       setProcessingStep('Validating detected structure...')

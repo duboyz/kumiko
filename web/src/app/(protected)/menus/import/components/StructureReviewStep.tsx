@@ -27,10 +27,13 @@ import {
   X,
   GripVertical,
 } from 'lucide-react'
-import { ParsedMenuStructure, ParsedCategory, ParsedMenuItem } from '@shared/types/menu-structure.types'
-// No longer need these imports since we're using createMenuStructure API
-import { createMenuStructure } from '@shared/api/menu-structure.api'
-import { CreateMenuStructureRequest } from '@shared/types/menu-structure.types'
+import {
+  ParsedMenuStructure,
+  ParsedCategory,
+  ParsedMenuItem,
+  CreateMenuStructureRequest,
+} from '@shared/types/menu-structure.types'
+import { useCreateMenuStructure } from '@shared/hooks/menu.hooks'
 
 interface StructureReviewStepProps {
   parsedStructure: ParsedMenuStructure
@@ -46,7 +49,7 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
   const [editingItem, setEditingItem] = useState<{ categoryIndex: number; itemIndex: number } | null>(null)
   const [editingCategory, setEditingCategory] = useState<number | null>(null)
 
-  // No longer need these since we're using createMenuStructure API
+  const createMenuStructureMutation = useCreateMenuStructure()
 
   const toggleCategory = (index: number) => {
     const newExpanded = new Set(expandedCategories)
@@ -163,7 +166,7 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
         })),
       }
 
-      const result = await createMenuStructure(request)
+      const result = await createMenuStructureMutation.mutateAsync(request)
 
       console.log('Menu structure created successfully:', result)
       onConfirm()
