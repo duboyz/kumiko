@@ -1,0 +1,310 @@
+.landing-page {
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  background-color: #000;
+  color: #fff;
+  width: 100%;
+  height: 100%;
+}
+
+.landing-page * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.landing-page img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.landing-page section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+.landing-page .hero {
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5%;
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-page .hero-content {
+  flex: 1;
+  max-width: 600px;
+  z-index: 10;
+}
+
+.landing-page .hero-title {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: translateY(100px) scale(0.8);
+}
+
+.landing-page .hero-subtitle {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2.5rem;
+  max-width: 500px;
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+.landing-page .hero-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.landing-page .title-line {
+  display: block;
+  font-size: 0.6em;
+  font-weight: 400;
+  opacity: 0.9;
+  margin-bottom: 0.2em;
+}
+
+.landing-page .title-brand {
+  display: block;
+  background: linear-gradient(45deg, #fff, #f0f0f0, #fff);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.landing-page .btn-primary,
+.landing-page .btn-secondary {
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+  font-size: 1.1rem;
+}
+
+.landing-page .btn-primary {
+  background: #fff;
+  color: #667eea;
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+}
+
+.landing-page .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(255, 255, 255, 0.4);
+}
+
+.landing-page .btn-secondary {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.landing-page .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+  transform: translateY(-2px);
+}
+
+.hero .img {
+  width: 45%;
+  aspect-ratio: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 5;
+}
+
+@media (max-width: 768px) {
+  .landing-page .hero {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .landing-page .hero .img {
+    width: 80%;
+    margin-top: 2rem;
+  }
+
+  .landing-page .hero-buttons {
+    justify-content: center;
+  }
+}
+
+.landing-page .footer {
+  height: 50vh;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+.landing-page .footer a {
+  font-size: 4vw;
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.landing-page .footer a:hover {
+  color: #667eea;
+}
+
+.landing-page .main {
+  width: 100vw;
+  height: 150vh;
+  flex-direction: column;
+  background: linear-gradient(180deg, #000 0%, #1a1a1a 50%, #000 100%);
+}
+
+.landing-page .row {
+  position: relative;
+  width: 100%;
+  margin: 1em 0;
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+}
+
+.landing-page .card {
+  position: relative;
+  width: 40%;
+  height: 360px;
+  border-radius: 0.75em;
+  overflow: hidden;
+  will-change: transform;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.landing-page .card:hover {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+}
+
+.landing-page .main-content {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.landing-page .logo {
+  width: 150px;
+  height: 150px;
+  border: 2px solid #fff;
+  border-radius: 100%;
+  overflow: hidden;
+  transform: scale(0);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.5s ease;
+}
+
+/* Fallback for when GSAP doesn't load */
+.landing-page .logo.gsap-loaded {
+  transform: scale(1);
+}
+
+/* Debug styles removed - animations are now working properly */
+
+.landing-page .copy {
+  margin: 2em 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.landing-page .line {
+  position: relative;
+  margin: 0.5em 0;
+  width: max-content;
+  height: 28px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+.landing-page .line p {
+  position: relative;
+  font-size: 24px;
+  font-weight: 500;
+  transform: translateY(30px);
+}
+
+.landing-page button {
+  position: relative;
+  padding: 1em 2em;
+  font-size: 18px;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 8em;
+  background: none;
+  outline: none;
+  transform: translateY(30px);
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  pointer-events: auto;
+}
+
+.landing-page button:hover {
+  background: #fff;
+  color: #000;
+  transform: translateY(25px) scale(1.05);
+}
+
+@media (max-width: 900px) {
+  .landing-page .card {
+    width: 50%;
+    height: 240px;
+  }
+
+  .landing-page .line p {
+    font-size: 20px;
+  }
+
+  .footer a {
+    font-size: 6vw;
+  }
+}
