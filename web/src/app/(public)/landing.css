@@ -1,0 +1,364 @@
+.landing-page {
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  background-color: #000;
+  color: #fff;
+  width: 100%;
+  height: 100%;
+}
+
+.landing-page * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.landing-page img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.landing-page section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+/* Loading Animation */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+}
+
+.loading-text {
+  font-size: clamp(4rem, 12vw, 8rem);
+  font-weight: 900;
+  color: #fff;
+  opacity: 0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: linear-gradient(45deg, #667eea, #764ba2, #667eea);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.landing-page .hero {
+  height: 100vh;
+  background: linear-gradient(135deg, #000 0%, #1a1a1a 50%, #000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-page .hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  max-width: 100vw;
+  z-index: 10;
+  padding: 0 2rem;
+}
+
+.landing-page .hero-title {
+  font-size: clamp(6rem, 15vw, 12rem);
+  font-weight: 900;
+  line-height: 0.9;
+  margin-bottom: 2rem;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.landing-page .title-word {
+  display: inline-block;
+  position: relative;
+}
+
+.landing-page .char {
+  display: inline-block;
+  transform-origin: center bottom;
+}
+
+.landing-page .hero-subtitle {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 3rem;
+  max-width: 600px;
+  opacity: 0;
+  transform: translateY(50px);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+.landing-page .hero-buttons {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.landing-page .title-line {
+  display: block;
+  font-size: 0.6em;
+  font-weight: 400;
+  opacity: 0.9;
+  margin-bottom: 0.2em;
+}
+
+.landing-page .title-brand {
+  display: block;
+  background: linear-gradient(45deg, #fff, #f0f0f0, #fff);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.landing-page .btn-primary,
+.landing-page .btn-secondary {
+  padding: 1.2rem 2.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.4s ease;
+  display: inline-block;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-page .btn-primary {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  border: none;
+}
+
+.landing-page .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+.landing-page .btn-secondary {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+}
+
+.landing-page .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-3px);
+  backdrop-filter: blur(20px);
+}
+
+@media (max-width: 768px) {
+  .landing-page .hero {
+    padding: 1rem;
+  }
+
+  .landing-page .hero-content {
+    padding: 0 1rem;
+  }
+
+  .landing-page .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .landing-page .btn-primary,
+  .landing-page .btn-secondary {
+    width: 100%;
+    max-width: 280px;
+    text-align: center;
+  }
+}
+
+.landing-page .footer {
+  height: 50vh;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+.landing-page .footer a {
+  font-size: 4vw;
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.landing-page .footer a:hover {
+  color: #667eea;
+}
+
+.landing-page .main {
+  width: 100vw;
+  height: 150vh;
+  flex-direction: column;
+  background: linear-gradient(180deg, #000 0%, #1a1a1a 50%, #000 100%);
+}
+
+.landing-page .row {
+  position: relative;
+  width: 100%;
+  margin: 1em 0;
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+}
+
+.landing-page .card {
+  position: relative;
+  width: 40%;
+  height: 360px;
+  border-radius: 0.75em;
+  overflow: hidden;
+  will-change: transform;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.landing-page .card:hover {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+}
+
+.landing-page .main-content {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.landing-page .logo {
+  width: 150px;
+  height: 150px;
+  border: 2px solid #fff;
+  border-radius: 100%;
+  overflow: hidden;
+  transform: scale(0);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.5s ease;
+}
+
+/* Fallback for when GSAP doesn't load */
+.landing-page .logo.gsap-loaded {
+  transform: scale(1);
+}
+
+/* Debug styles removed - animations are now working properly */
+
+.landing-page .copy {
+  margin: 2em 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.landing-page .line {
+  position: relative;
+  margin: 0.5em 0;
+  width: max-content;
+  height: 28px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+.landing-page .line p {
+  position: relative;
+  font-size: 24px;
+  font-weight: 500;
+  transform: translateY(30px);
+}
+
+.landing-page button {
+  position: relative;
+  padding: 1em 2em;
+  font-size: 18px;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 8em;
+  background: none;
+  outline: none;
+  transform: translateY(30px);
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  pointer-events: auto;
+}
+
+.landing-page button:hover {
+  background: #fff;
+  color: #000;
+  transform: translateY(25px) scale(1.05);
+}
+
+@media (max-width: 900px) {
+  .landing-page .card {
+    width: 50%;
+    height: 240px;
+  }
+
+  .landing-page .line p {
+    font-size: 20px;
+  }
+
+  .footer a {
+    font-size: 6vw;
+  }
+}
