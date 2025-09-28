@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -10,54 +10,105 @@ import './landing.css'
 gsap.registerPlugin(ScrollTrigger)
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(true)
+  const loadingRef = useRef<HTMLDivElement>(null)
+  const isMountedRef = useRef(true)
   useEffect(() => {
-    // Hero section title animation
-    const heroTitle = gsap.timeline()
-
-    heroTitle
-      .fromTo(
-        '.hero-title',
-        {
-          y: 100,
-          opacity: 0,
-          scale: 0.8,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 1.2,
-          ease: 'power3.out',
+    // Loading animation
+    const loadingTl = gsap.timeline({
+      onComplete: () => {
+        if (isMountedRef.current) {
+          setIsLoading(false)
         }
-      )
-      .fromTo(
-        '.hero-subtitle',
-        {
-          y: 50,
-          opacity: 0,
-        },
-        {
-          y: 0,
+      },
+    })
+
+    if (loadingRef.current) {
+      const loadingText = loadingRef.current.querySelector('.loading-text')
+
+      loadingTl
+        .to(loadingText, {
           opacity: 1,
+          duration: 0.5,
+          ease: 'power2.out',
+        })
+        .to(loadingText, {
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+          delay: 1,
+        })
+        .to(loadingRef.current, {
+          opacity: 0,
           duration: 0.8,
           ease: 'power2.out',
-        },
-        '-=0.6'
-      )
-      .fromTo(
-        '.hero-buttons',
-        {
-          y: 30,
-          opacity: 0,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          ease: 'power2.out',
-        },
-        '-=0.4'
-      )
+        })
+    }
+
+    // Hero section title animation (starts after loading)
+    const heroTimeout = setTimeout(() => {
+      if (!isMountedRef.current) return // Don't run if component is unmounting
+
+      const heroTitle = gsap.timeline()
+
+      // Split text animation for the title
+      const titleElement = document.querySelector('.title-word')
+      if (titleElement) {
+        const text = titleElement.textContent || ''
+        titleElement.innerHTML = text
+          .split('')
+          .map(char => `<span class="char">${char === ' ' ? '&nbsp;' : char}</span>`)
+          .join('')
+
+        const chars = titleElement.querySelectorAll('.char')
+
+        heroTitle
+          .fromTo(
+            chars,
+            {
+              y: 100,
+              opacity: 0,
+              rotationX: -90,
+            },
+            {
+              y: 0,
+              opacity: 1,
+              rotationX: 0,
+              duration: 0.8,
+              ease: 'back.out(1.7)',
+              stagger: 0.05,
+            }
+          )
+          .fromTo(
+            '.hero-subtitle',
+            {
+              y: 50,
+              opacity: 0,
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              ease: 'power2.out',
+            },
+            '-=0.4'
+          )
+          .fromTo(
+            '.hero-buttons',
+            {
+              y: 30,
+              opacity: 0,
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              ease: 'power2.out',
+            },
+            '-=0.3'
+          )
+      }
+    }, 2000)
 
     // Main content animations
     const scrollTriggerSettings = {
@@ -97,8 +148,13 @@ export default function Home() {
     })
 
     return () => {
+      isMountedRef.current = false
+      clearTimeout(heroTimeout)
       ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-      heroTitle.kill()
+      loadingTl.kill()
+      // Clean up any hero animations if they exist
+      const heroAnimations = gsap.getTweensOf('.hero-title, .hero-subtitle, .hero-buttons, .char')
+      heroAnimations.forEach(tween => tween.kill())
     }
   }, [])
 
@@ -138,18 +194,20 @@ export default function Home() {
 
   return (
     <ReactLenis root>
+      {isLoading && (
+        <div ref={loadingRef} className="loading-overlay">
+          <div className="loading-text">Kumiko</div>
+        </div>
+      )}
       <div className="landing-page">
         <section className="hero">
           <div className="hero-content">
             <h1 className="hero-title">
-              <span className="title-line">Welcome to</span>
-              <span className="title-brand">Kumiko</span>
+              <span className="title-word" data-word="Kumiko">
+                Kumiko
+              </span>
             </h1>
-            <p className="hero-subtitle">
-              Your modern booking and business management platform.
-              <br />
-              Streamline operations, delight customers, and grow your business.
-            </p>
+            <p className="hero-subtitle">Your modern booking and business management platform</p>
             <div className="hero-buttons">
               <Link href="/register" className="btn-primary">
                 Get Started Free
@@ -158,14 +216,6 @@ export default function Home() {
                 Learn More
               </Link>
             </div>
-          </div>
-          <div className="img">
-            <img
-              src="https://images.pexels.com/photos/33728147/pexels-photo-33728147.jpeg"
-              alt="Kumiko Platform"
-              width={100}
-              height={100}
-            />
           </div>
         </section>
 
