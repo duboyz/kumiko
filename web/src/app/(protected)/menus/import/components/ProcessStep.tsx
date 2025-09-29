@@ -19,6 +19,7 @@ interface ProcessStepProps {
   processingStep: string
   setProcessingStep: (step: string) => void
   errorMessage: string | null
+  restaurantId: string
 }
 
 export function ProcessStep({
@@ -33,6 +34,7 @@ export function ProcessStep({
   processingStep,
   setProcessingStep,
   errorMessage,
+  restaurantId,
 }: ProcessStepProps) {
   const [abortController, setAbortController] = useState<AbortController | null>(null)
 
@@ -49,7 +51,7 @@ export function ProcessStep({
       await new Promise(resolve => setTimeout(resolve, 500))
 
       setProcessingStep('Sending to AI for structure analysis...')
-      const structure = await parseMenuStructure(imageFile, annotations)
+      const structure = await parseMenuStructure(imageFile, restaurantId, annotations)
 
       setProcessingStep('Processing menu structure...')
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -173,11 +175,10 @@ export function ProcessStep({
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  processingStep === 'Preparing image...' || isProcessing
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${processingStep === 'Preparing image...' || isProcessing
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-gray-200 text-gray-600'
+                  }`}
               >
                 1
               </div>
@@ -187,11 +188,10 @@ export function ProcessStep({
             </div>
             <div className="flex items-center gap-3">
               <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  processingStep.includes('Sending to AI') || processingStep.includes('AI is analyzing')
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${processingStep.includes('Sending to AI') || processingStep.includes('AI is analyzing')
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-gray-200 text-gray-600'
+                  }`}
               >
                 2
               </div>
@@ -207,11 +207,10 @@ export function ProcessStep({
             </div>
             <div className="flex items-center gap-3">
               <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                  processingStep === 'Processing menu structure...' || processingStep === 'Complete!'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${processingStep === 'Processing menu structure...' || processingStep === 'Complete!'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-gray-200 text-gray-600'
+                  }`}
               >
                 3
               </div>

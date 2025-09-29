@@ -205,7 +205,7 @@ export function ImportWizard() {
                               ? 6
                               : 7) /
                     7) *
-                    100
+                  100
                 )}
                 %
               </span>
@@ -254,7 +254,7 @@ export function ImportWizard() {
                   />
                 )}
 
-                {currentStep === 'process' && (
+                {currentStep === 'process' && selectedLocation && (
                   <ProcessStep
                     imageFile={imageFile}
                     imagePreview={imagePreview}
@@ -270,6 +270,7 @@ export function ImportWizard() {
                     processingStep={processingStep}
                     setProcessingStep={setProcessingStep}
                     errorMessage={errorMessage}
+                    restaurantId={selectedLocation.id}
                   />
                 )}
 

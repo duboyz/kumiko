@@ -4,6 +4,7 @@ export interface ParsedMenuStructure {
   categories: ParsedCategory[]
   suggestedMenuName: string
   suggestedMenuDescription: string
+  menuId?: string // Added when menu is created in backend
 }
 
 export interface ParsedCategory {
