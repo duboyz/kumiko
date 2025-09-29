@@ -35,7 +35,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         variant={variant}
         size={size}
         disabled={disabled}
-        className={className}
+        className={className + ' rounded-none'}
         aria-label={ariaLabel}
         {...props}
       >

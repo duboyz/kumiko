@@ -6,6 +6,7 @@ import {
   MenuCategoryItemDto,
   CreateMenuCategoryCommand,
   CreateMenuItemCommand,
+  UpdateRestaurantMenuCommand,
   AddMenuItemToCategoryCommand,
   BulkAddMenuItemsToCategoryCommand,
   BulkAddMenuItemsToCategoryResult,
@@ -102,6 +103,13 @@ export const menuApi = {
   }): Promise<ResponseData<CreateRestaurantMenuData>> => {
     const { data } = await client.post<ApiResponse<CreateRestaurantMenuData>>('/api/restaurant-menus', command)
     if (!data.success) throw new Error(data.message || 'Failed to create restaurant menu')
+    return data.data
+  },
+
+  // Update restaurant menu
+  updateRestaurantMenu: async (command: UpdateRestaurantMenuCommand): Promise<ResponseData<RestaurantMenuDto>> => {
+    const { data } = await client.put<ApiResponse<RestaurantMenuDto>>(`/api/restaurant-menus/${command.id}`, command)
+    if (!data.success) throw new Error(data.message || 'Failed to update restaurant menu')
     return data.data
   },
 

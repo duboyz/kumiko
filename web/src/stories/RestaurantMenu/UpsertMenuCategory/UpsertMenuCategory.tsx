@@ -1,5 +1,5 @@
-import { LabeledInput } from '@/stories/LabeledInput/LabeledInput'
-import { IconButton } from '@/stories/IconButton'
+import { LabeledInput } from '@/stories/atoms/LabeledInput/LabeledInput'
+import { IconButton } from '@/stories/molecules/IconButton'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { MenuItemRow, MenuItem } from '../MenuItemRow/MenuItemRow'

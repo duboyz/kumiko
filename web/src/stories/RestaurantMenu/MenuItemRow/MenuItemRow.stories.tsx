@@ -21,10 +21,10 @@ export const Default: Story = {
       price: 99,
       isAvailable: true,
     },
-    handleChange: () => {},
-    onEdit: () => {},
-    onDelete: () => {},
-    onSave: () => {},
+    handleChange: () => { },
+    onEdit: () => { },
+    onDelete: () => { },
+    onSave: () => { },
   },
   render: args => {
     const [menuItem, setMenuItem] = useState(args.menuItem)

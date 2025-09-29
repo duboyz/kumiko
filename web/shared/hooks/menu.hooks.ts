@@ -41,6 +41,18 @@ export const useCreateRestaurantMenu = () => {
   })
 }
 
+// Update restaurant menu
+export const useUpdateRestaurantMenu = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: menuApi.updateRestaurantMenu,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['restaurant-menus'] })
+    },
+  })
+}
+
 // Create menu category
 export const useCreateMenuCategory = () => {
   const queryClient = useQueryClient()
@@ -152,6 +164,7 @@ export const useAddMenuItemToCategory = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurant-menus'] })
       queryClient.invalidateQueries({ queryKey: ['restaurant-menu-items'] })
+      queryClient.invalidateQueries({ queryKey: ['all-restaurant-menu-items'] })
     },
   })
 }

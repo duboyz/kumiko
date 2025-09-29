@@ -1,4 +1,4 @@
-import { LabeledInput } from '@/stories/LabeledInput/LabeledInput'
+import { LabeledInput } from '@/stories/atoms/LabeledInput/LabeledInput'
 import { MenuItem } from './MenuItemRow'
 import { Save, Trash } from 'lucide-react'
 

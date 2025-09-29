@@ -2,7 +2,7 @@
 import { useLocationSelection } from "@shared/hooks/locationSelection.hooks"
 import { useRestaurantMenus } from "@shared/hooks/menu.hooks"
 import { RestaurantMenuDto } from "@shared/types/menu.types"
-import { Button } from "../Button/Button"
+import { Button } from "../atoms/Button/Button"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 
 interface RestaurantMenusProps {

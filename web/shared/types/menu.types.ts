@@ -40,7 +40,7 @@ export interface MenuCategoryItemDto {
   menuItemId: string
   orderIndex: number
   menuCategory?: MenuCategoryDto
-  menuItem?: MenuItemDto
+  menuItem: MenuItemDto
   createdAt: string
   updatedAt: string
 }
@@ -63,7 +63,13 @@ export interface AllergenDto {
   updatedAt: string
 }
 
-// Create/Update types
+
+export interface UpdateRestaurantMenuCommand {
+  id: string
+  name: string
+  description: string
+}
+
 export interface CreateMenuCategoryCommand {
   name: string
   description: string

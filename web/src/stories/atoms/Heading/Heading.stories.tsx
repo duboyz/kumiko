@@ -1,8 +1,10 @@
 import { Heading } from './Heading'
 
 const meta = {
-  title: 'Components/Heading',
   component: Heading,
+  parameters: {
+    layout: 'padded',
+  },
 }
 
 export default meta

@@ -2,14 +2,14 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import { useRestaurantMenus, useLocationSelection } from '@shared'
-import { LoadingSpinner, MenuEditor } from '@/components'
+import { LoadingSpinner } from '@/components'
 import { ContentLoadingError } from '@/stories/Components/ContentLoadingError/ContentLoadingError'
 import { ContentNotFound } from '@/stories/Components/ContentNotFound/ContentNotFound'
 import { ContentContainer } from '@/components/ContentContainer'
+import { RestaurantMenu } from '@/stories/RestaurantMenu/Upsert/RestaurantMenu'
 
 export default function MenuEditPage() {
   const params = useParams()
-  const router = useRouter()
   const { selectedLocation } = useLocationSelection()
 
   const menuId = params.id as string
@@ -28,7 +28,7 @@ export default function MenuEditPage() {
     <ContentContainer>
       {/* <MenuEditor menu={menu} onBackToList={() => router.push('/menus')} /> */}
 
-
+      <RestaurantMenu menu={menu} />
 
     </ContentContainer>
   )

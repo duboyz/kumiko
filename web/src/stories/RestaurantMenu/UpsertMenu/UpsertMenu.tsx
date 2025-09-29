@@ -1,5 +1,5 @@
-import { LabeledInput } from '@/stories/LabeledInput/LabeledInput'
-import { IconButton } from '@/stories/IconButton'
+import { LabeledInput } from '@/stories/atoms/LabeledInput/LabeledInput'
+import { IconButton } from '@/stories/molecules/IconButton'
 import { Plus, Trash2 } from 'lucide-react'
 import { UpsertMenuCategory } from '../UpsertMenuCategory/UpsertMenuCategory'
 import { MenuItem } from '../MenuItemRow/MenuItemRow'
@@ -34,9 +34,14 @@ export const UpsertMenu = ({
   onItemUpdate,
   onItemDelete,
 }: UpsertMenuProps) => {
+  const { selectedLocation } = useLocationSelection()
+
+  const { data: menus, isLoading: menusLoading } = useRestaurantMenus(selectedLocation?.id || '')
 
   return (
     <div className="border-1 border-gray-300 p-8 border-dashed flex flex-col gap-8">
+      <h1 className="text-2xl font-bold">{selectedLocation?.name}</h1>
+      <pre>{JSON.stringify(menus, null, 2)}</pre>
       <div className="flex items-center justify-between">
         <LabeledInput
           label="Menu Name"

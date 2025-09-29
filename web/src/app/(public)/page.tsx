@@ -1,6 +1,6 @@
 'use client'
 
-import { Heading } from '@/stories/Heading/Heading'
+import { Heading } from '@/stories/atoms/Heading/Heading'
 
 export default function Home() {
   return (
