@@ -17,6 +17,7 @@ import {
   UpdateMenuItemCommand,
   UpdateMenuCategoryItemCommand,
   GetMenuByIdResult,
+  SimpleGenerateMenuFromImageResult,
 } from '../types/menu.types'
 import { ApiResponse, ResponseData } from '../types/apiResponse.types'
 
@@ -228,5 +229,97 @@ export const menuApi = {
     const { data } = await client.get<ApiResponse<GetMenuByIdResult>>(`/api/menu/${menuId}`)
     if (!data.success) throw new Error(data.message || 'Failed to get menu')
     return data.data
+  },
+
+  // Parse menu from image using AI
+  parseMenuFromImage: async (
+    file: File,
+    restaurantId: string
+  ): Promise<ResponseData<any>> => {
+    const formData = new FormData()
+    formData.append('Image', file)
+    formData.append('RestaurantId', restaurantId)
+
+    const { data } = await client.post<ApiResponse<any>>(
+      '/api/menu-import/parse-image',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    )
+    if (!data.success) throw new Error(data.message || 'Failed to parse menu from image')
+    return data.data
+  },
+
+  // Generate complete menu from image (parse + create)
+  simpleGenerateMenuFromImage: async (
+    file: File,
+    restaurantId: string
+  ): Promise<ResponseData<SimpleGenerateMenuFromImageResult>> => {
+    // First parse the image to get menu structure
+    const parsedMenu = await menuApi.parseMenuFromImage(file, restaurantId)
+
+    // Create the menu with parsed data
+    const createdMenu = await menuApi.createRestaurantMenu({
+      name: parsedMenu.menuName || 'Generated Menu',
+      description: parsedMenu.menuDescription || 'Menu generated from image',
+      restaurantId: restaurantId
+    })
+
+    if (!createdMenu) {
+      throw new Error('Failed to create menu')
+    }
+
+    // If there are categories and items in the parsed data, create them
+    if (parsedMenu.categories && parsedMenu.categories.length > 0) {
+      for (let i = 0; i < parsedMenu.categories.length; i++) {
+        const category = parsedMenu.categories[i]
+        const createdCategory = await menuApi.createMenuCategory({
+          name: category.name,
+          description: category.description || '',
+          orderIndex: i,
+          restaurantMenuId: createdMenu.id
+        })
+
+        if (!createdCategory) {
+          console.warn(`Failed to create category: ${category.name}`)
+          continue
+        }
+
+        // Create items for this category
+        if (category.items && category.items.length > 0) {
+          const menuItemIds = []
+          for (const item of category.items) {
+            const createdItem = await menuApi.createMenuItem({
+              name: item.name,
+              description: item.description || '',
+              price: item.price || 0,
+              isAvailable: true,
+              restaurantMenuId: createdMenu.id
+            })
+            if (createdItem) {
+              menuItemIds.push(createdItem.id)
+            }
+          }
+
+          // Add items to category
+          if (menuItemIds.length > 0) {
+            await menuApi.bulkAddMenuItemsToCategory({
+              menuItemIds,
+              menuCategoryId: createdCategory.id
+            })
+          }
+        }
+      }
+    }
+
+    return {
+      id: createdMenu.id,
+      name: createdMenu.name,
+      description: createdMenu.description,
+      restaurantId: createdMenu.restaurantId
+    }
   },
 }

@@ -287,3 +287,21 @@ export const useMenuById = (menuId: string) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
+
+// Generate menu from image
+export const useGenerateMenuFromImage = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ file, restaurantId }: { file: File; restaurantId: string }) =>
+      menuApi.simpleGenerateMenuFromImage(file, restaurantId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['restaurant-menus', variables.restaurantId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['all-restaurant-menu-items', variables.restaurantId],
+      })
+    },
+  })
+}

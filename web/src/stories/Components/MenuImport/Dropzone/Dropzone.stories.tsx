@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { Dropzone } from './Dropzone'
 
 const meta: Meta<typeof Dropzone> = {
-    title: 'Components/MenuImport/Dropzone',
     component: Dropzone,
     parameters: {
         layout: 'padded',
@@ -46,70 +45,6 @@ export const Default: Story = {
         docs: {
             description: {
                 story: 'Default dropzone for image uploads. Supports drag-and-drop, file browsing, and camera capture.',
-            },
-        },
-    },
-}
-
-export const ImagesOnly: Story = {
-    args: {
-        onFileSelect: (file: File) => {
-            console.log('Selected image:', file.name, file.type, file.size)
-        },
-        accept: 'image/*',
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: 'Dropzone configured to accept only image files.',
-            },
-        },
-    },
-}
-
-export const MultipleFiles: Story = {
-    args: {
-        onFileSelect: (file: File) => {
-            console.log('Selected file:', file.name, file.type, file.size)
-        },
-        multiple: true,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: 'Dropzone that allows multiple file selection.',
-            },
-        },
-    },
-}
-
-export const CustomStyling: Story = {
-    args: {
-        onFileSelect: (file: File) => {
-            console.log('Selected file:', file.name, file.type, file.size)
-        },
-        className: 'border-blue-300 bg-blue-50',
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: 'Dropzone with custom styling applied via className prop.',
-            },
-        },
-    },
-}
-
-export const SpecificFileTypes: Story = {
-    args: {
-        onFileSelect: (file: File) => {
-            console.log('Selected file:', file.name, file.type, file.size)
-        },
-        accept: 'image/png,image/jpeg,image/webp',
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: 'Dropzone configured to accept only specific image formats (PNG, JPEG, WebP).',
             },
         },
     },

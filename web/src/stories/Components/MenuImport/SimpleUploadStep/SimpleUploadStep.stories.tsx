@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import { UploadStep } from './UploadStep'
+import { SimpleUploadStep } from './SimpleUploadStep'
 
-const meta: Meta<typeof UploadStep> = {
-    component: UploadStep,
+const meta: Meta<typeof SimpleUploadStep> = {
+    component: SimpleUploadStep,
     parameters: {
         layout: 'padded',
         docs: {
             description: {
-                component: 'Upload step component for menu import flow. Allows users to upload menu images via drag-and-drop, file selection, or camera capture. Provides image preview and file validation.',
+                component: 'Simple upload step component for menu import flow. Allows users to upload menu images via drag-and-drop, file selection, or camera capture. Provides image preview and file validation.',
             },
         },
     },
@@ -25,7 +25,7 @@ const meta: Meta<typeof UploadStep> = {
 }
 
 export default meta
-type Story = StoryObj<typeof UploadStep>
+type Story = StoryObj<typeof SimpleUploadStep>
 
 export const Default: Story = {
     args: {

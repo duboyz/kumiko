@@ -109,7 +109,10 @@ export function ProcessStep({
   }
 
   const handleProcess = async () => {
-    if (!imageFile) return
+    if (!imageFile) {
+      onError('No image file found. Please go back and upload an image.')
+      return
+    }
 
     const controller = new AbortController()
     setAbortController(controller)
@@ -180,10 +183,10 @@ export function ProcessStep({
 
   // Auto-start processing when component mounts (coming from annotation step)
   useEffect(() => {
-    if (imageFile && !isProcessing && !errorMessage) {
+    if (imageFile && imagePreview && !isProcessing && !errorMessage) {
       handleProcess()
     }
-  }, [imageFile])
+  }, [imageFile, imagePreview])
 
   const totalItems = annotations.filter(a => a.type === 'item').length
   const totalCategories = annotations.filter(a => a.type === 'category').length

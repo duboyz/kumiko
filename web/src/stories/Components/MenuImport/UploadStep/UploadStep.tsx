@@ -2,16 +2,16 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { FileImage, ArrowRight, ArrowLeft, X } from 'lucide-react'
+import { ArrowRight, ArrowLeft, X } from 'lucide-react'
 import { Dropzone } from '../Dropzone/Dropzone'
 
 interface UploadStepProps {
     onImageSelect: (file: File, preview: string) => void
     onBack: () => void
+    isSimple?: boolean
 }
 
-export function UploadStep({ onImageSelect, onBack }: UploadStepProps) {
+export function UploadStep({ onImageSelect, onBack, isSimple = false }: UploadStepProps) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
@@ -43,14 +43,19 @@ export function UploadStep({ onImageSelect, onBack }: UploadStepProps) {
             {!selectedFile && <Dropzone onFileSelect={handleFileSelect} />}
             {selectedFile && <SelectedFile file={selectedFile} previewUrl={previewUrl!} onRemoveFile={handleRemoveFile} />}
 
-            <div className="flex justify-between">
-                <Button variant="outline" onClick={onBack}>
-                    <ArrowLeft className="w-4 h-4 mr-2" />
+            <div className="flex items-center justify-between pt-6">
+                <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
+                    <ArrowLeft className="w-4 h-4" />
                     Back
                 </Button>
-                <Button onClick={handleContinue} disabled={!selectedFile} size="lg">
+                <Button
+                    onClick={handleContinue}
+                    disabled={!selectedFile}
+                    size="lg"
+                    className="flex items-center gap-2"
+                >
                     Continue
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <ArrowRight className="w-4 h-4" />
                 </Button>
             </div>
         </div>

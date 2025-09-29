@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@/components'
 import { ArrowLeft, AlertCircle } from 'lucide-react'
 import { ProgressSidebar } from './ProgressSidebar'
 import { UploadStep } from '@/stories/Components/MenuImport/UploadStep/UploadStep'
-import { AnnotationStep } from './AnnotationStep'
+import { AnnotationStep } from '@/stories/Components/MenuImport/AnnotationStep/AnnotationStep'
 import { ProcessStep } from './ProcessStep'
 import { useImportFlow } from '../hooks/useImportFlow'
 import { StructureReviewStep } from './StructureReviewStep'
@@ -73,9 +73,18 @@ export function ImportWizard() {
   useEffect(() => {
     const step = searchParams.get('step') as ImportStepType
     if (step && Object.values(ImportStep).includes(step as ImportStep)) {
-      setCurrentStep(step)
+      // Only change step if we have the required data for that step
+      if (step === ImportStep.PREVIEW && (!imageFile || !imagePreview)) {
+        setCurrentStep(ImportStep.UPLOAD)
+      } else if (step === ImportStep.PROCESS && (!imageFile || !imagePreview)) {
+        setCurrentStep(ImportStep.UPLOAD)
+      } else if (step === ImportStep.REVIEW && !parsedStructure) {
+        setCurrentStep(ImportStep.UPLOAD)
+      } else {
+        setCurrentStep(step)
+      }
     }
-  }, [searchParams, setCurrentStep])
+  }, [searchParams, setCurrentStep, imageFile, imagePreview, parsedStructure])
 
   // Update URL when step changes
   const handleStepChange = (step: ImportStepType) => {

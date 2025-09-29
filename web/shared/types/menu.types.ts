@@ -167,3 +167,10 @@ export interface PublicMenuItemDto {
   price: number
   isAvailable: boolean
 }
+
+export interface SimpleGenerateMenuFromImageResult {
+  id: string
+  name: string
+  description: string
+  restaurantId: string
+}

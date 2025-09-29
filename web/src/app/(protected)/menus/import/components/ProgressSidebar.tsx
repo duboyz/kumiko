@@ -53,7 +53,7 @@ export function ProgressSidebar({ currentStep, onStepClick }: ProgressSidebarPro
             return (
               <button
                 key={step.id}
-                onClick={() => isClickable && onStepClick(step.id)}
+                onClick={() => isClickable && onStepClick(step.id as ImportStep)}
                 disabled={!isClickable}
                 className={cn(
                   'w-full flex items-start gap-3 p-3 rounded-lg text-left transition-colors',
