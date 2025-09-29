@@ -29,27 +29,9 @@ const steps = [
     icon: Eye,
   },
   {
-    id: 'review-categories' as const,
-    title: 'Review Categories',
-    description: 'Edit detected categories',
-    icon: FolderOpen,
-  },
-  {
-    id: 'review-items' as const,
-    title: 'Review Items',
-    description: 'Edit items within categories',
-    icon: Edit,
-  },
-  {
-    id: 'preview-structure' as const,
-    title: 'Preview Structure',
-    description: 'Review final menu layout',
-    icon: Layout,
-  },
-  {
-    id: 'complete' as const,
-    title: 'Complete',
-    description: 'Menu structure created',
+    id: 'review' as const,
+    title: 'Review & Complete',
+    description: 'Review parsed items and finish import',
     icon: CheckCircle,
   },
 ]

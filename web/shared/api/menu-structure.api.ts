@@ -5,43 +5,39 @@ import {
 } from '../types/menu-structure.types'
 import { apiClient } from './client'
 
-export async function parseMenuStructure(imageFile: File, restaurantId: string, annotations?: any[]): Promise<ParsedMenuStructure> {
+export async function parseMenuStructure(
+  imageFile: File,
+  annotations?: any[],
+  restaurantId?: string
+): Promise<ParsedMenuStructure> {
   const formData = new FormData()
   formData.append('image', imageFile)
-  formData.append('restaurantId', restaurantId)
+
+  if (restaurantId) {
+    formData.append('restaurantId', restaurantId)
+  }
 
   if (annotations && annotations.length > 0) {
     formData.append('annotations', JSON.stringify(annotations))
   }
 
-  const response = await apiClient.post('/api/restaurant-menu/parse-image', formData, {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5158'
+  const response = await fetch(`${API_BASE_URL}api/menu-import/parse-image`, {
+    method: 'POST',
+    body: formData,
     headers: {
-      'Content-Type': 'multipart/form-data',
+      // Don't set Content-Type, let the browser set it with boundary for FormData
     },
+    credentials: 'include', // Include cookies for authentication
   })
 
-  if (!response.data.success) {
-    throw new Error(response.data.message || 'Failed to parse menu structure')
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.message || 'Failed to parse menu structure')
   }
 
-  // Map backend response to frontend structure
-  const backendData = response.data.data
-  return {
-    categories: backendData.categories.map((cat: any) => ({
-      name: cat.name,
-      description: cat.description,
-      orderIndex: cat.orderIndex,
-      items: cat.items.map((item: any) => ({
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        orderIndex: item.orderIndex,
-      })),
-    })),
-    suggestedMenuName: backendData.menuName,
-    suggestedMenuDescription: backendData.menuDescription,
-    menuId: backendData.menuId, // Add the created menu ID
-  }
+  const result = await response.json()
+  return result.data // Backend returns { success: true, data: ParsedMenuStructure }
 }
 
 export async function createMenuStructure(request: CreateMenuStructureRequest): Promise<CreateMenuStructureResponse> {

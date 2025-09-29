@@ -2,31 +2,15 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import {
-  ArrowLeft,
-  ArrowRight,
-  Undo,
-  Redo,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  Palette,
-  MousePointer,
-  Square,
-  Type,
-  Eraser,
-  Circle,
-  X,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Stage, Layer, Rect, Circle as KonvaCircle, Image as KonvaImage } from 'react-konva'
+import { ArrowLeft, ArrowRight, Undo, X } from 'lucide-react'
+import { Stage, Layer, Rect, Image as KonvaImage } from 'react-konva'
 import Konva from 'konva'
 
 export interface Annotation {
   id: string
-  type: 'category' | 'item' | 'price' | 'note' | 'description'
+  type: 'category' | 'item' | 'price' | 'description'
   color: string
   x: number
   y: number
@@ -48,35 +32,24 @@ const ANNOTATION_TYPES = [
     type: 'category' as const,
     label: 'Categories',
     color: '#3B82F6',
-    icon: Square,
     description: 'Menu sections (Appetizers, Main Courses, etc.)',
   },
   {
     type: 'item' as const,
     label: 'Menu Items',
     color: '#10B981',
-    icon: Type,
     description: 'Individual dishes and food items',
   },
   {
     type: 'price' as const,
     label: 'Prices',
     color: '#F59E0B',
-    icon: Type,
     description: 'Price text and numbers',
-  },
-  {
-    type: 'note' as const,
-    label: 'Special Notes',
-    color: '#EF4444',
-    icon: Type,
-    description: 'Spicy, Vegetarian, etc.',
   },
   {
     type: 'description' as const,
     label: 'Descriptions',
     color: '#8B5CF6',
-    icon: Type,
     description: 'Item descriptions and details',
   },
 ]
@@ -92,7 +65,6 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
     width: number
     height: number
   } | null>(null)
-  const [tool, setTool] = useState<'rectangle' | 'circle' | 'highlight'>('rectangle')
   const [zoom, setZoom] = useState(1)
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
   const [history, setHistory] = useState<Annotation[][]>([])
@@ -103,6 +75,55 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
   const stageRef = useRef<Konva.Stage>(null)
 
   const selectedAnnotationType = ANNOTATION_TYPES.find(t => t.type === selectedType)
+
+  // Helper functions for step-by-step guidance
+  const getAnnotationCount = (type: Annotation['type']) => {
+    return annotations.filter(a => a.type === type).length
+  }
+
+  const getNextStep = () => {
+    const steps = [
+      {
+        type: 'category' as const,
+        label: 'Mark Categories',
+        description: 'Draw rectangles around menu sections like "Appetizers", "Main Courses", etc.',
+      },
+      {
+        type: 'item' as const,
+        label: 'Mark Menu Items',
+        description: 'Draw rectangles around individual dishes and food items',
+      },
+      { type: 'price' as const, label: 'Mark Prices', description: 'Draw rectangles around price text and numbers' },
+      {
+        type: 'description' as const,
+        label: 'Mark Descriptions',
+        description: 'Draw rectangles around item descriptions and details',
+      },
+    ]
+
+    for (const step of steps) {
+      if (getAnnotationCount(step.type) === 0) {
+        return step
+      }
+    }
+    return null // All steps completed
+  }
+
+  const getProgressPercentage = () => {
+    const totalSteps = ANNOTATION_TYPES.length
+    const completedSteps = ANNOTATION_TYPES.filter(type => getAnnotationCount(type.type) > 0).length
+    return (completedSteps / totalSteps) * 100
+  }
+
+  const nextStep = getNextStep()
+  const progressPercentage = getProgressPercentage()
+
+  // Auto-advance to next step when current step is completed
+  useEffect(() => {
+    if (nextStep && selectedType !== nextStep.type) {
+      setSelectedType(nextStep.type)
+    }
+  }, [nextStep, selectedType])
 
   // Load image and calculate proper dimensions
   useEffect(() => {
@@ -159,13 +180,6 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
     }
   }, [historyIndex, history])
 
-  const redo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1)
-      setAnnotations([...history[historyIndex + 1]])
-    }
-  }, [historyIndex, history])
-
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
     if (!image) return
 
@@ -191,25 +205,10 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
       y: (pos.y - stagePos.y) / zoom,
     }
 
-    if (tool === 'rectangle' || tool === 'circle') {
-      setIsDrawing(true)
-      setStartPos(imagePos)
-      setCurrentRect({ x: imagePos.x, y: imagePos.y, width: 0, height: 0 })
-    } else if (tool === 'highlight') {
-      // Create a small highlight circle
-      const newAnnotation: Annotation = {
-        id: Date.now().toString(),
-        type: selectedType,
-        color: selectedAnnotationType?.color || '#000000',
-        x: imagePos.x - 10,
-        y: imagePos.y - 10,
-        width: 20,
-        height: 20,
-      }
-
-      saveToHistory()
-      setAnnotations(prev => [...prev, newAnnotation])
-    }
+    // Always use rectangle tool for simplicity
+    setIsDrawing(true)
+    setStartPos(imagePos)
+    setCurrentRect({ x: imagePos.x, y: imagePos.y, width: 0, height: 0 })
   }
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -227,16 +226,15 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
       y: (pos.y - stagePos.y) / zoom,
     }
 
-    if (tool === 'rectangle' || tool === 'circle') {
-      const width = imagePos.x - startPos.x
-      const height = imagePos.y - startPos.y
-      setCurrentRect({
-        x: Math.min(startPos.x, imagePos.x),
-        y: Math.min(startPos.y, imagePos.y),
-        width: Math.abs(width),
-        height: Math.abs(height),
-      })
-    }
+    // Always use rectangle tool for simplicity
+    const width = imagePos.x - startPos.x
+    const height = imagePos.y - startPos.y
+    setCurrentRect({
+      x: Math.min(startPos.x, imagePos.x),
+      y: Math.min(startPos.y, imagePos.y),
+      width: Math.abs(width),
+      height: Math.abs(height),
+    })
   }
 
   const handleMouseUp = () => {
@@ -292,21 +290,6 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
     setStagePos(newPos)
   }
 
-  const resetView = () => {
-    if (stageRef.current) {
-      stageRef.current.scale({ x: 1, y: 1 })
-      stageRef.current.position({ x: 0, y: 0 })
-      stageRef.current.batchDraw()
-      setZoom(1)
-      setStagePos({ x: 0, y: 0 })
-    }
-  }
-
-  const clearAnnotations = () => {
-    saveToHistory()
-    setAnnotations([])
-  }
-
   const handleContinue = () => {
     onAnnotate(annotations)
   }
@@ -325,87 +308,58 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Annotate Your Menu</h2>
-        <p className="text-muted-foreground">
-          Mark categories, items, and prices with different colors to help AI understand your menu structure
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          This step is optional but will significantly improve AI accuracy
-        </p>
-        <div className="text-xs text-muted-foreground mt-2">
-          <strong>Tip:</strong> Hold <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Shift</kbd> + drag to pan
-          around the image
+        {/* Progress Bar */}
+        <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+          <div
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${progressPercentage}%` }}
+          />
         </div>
+
+        {/* Current Step Guidance */}
+        {nextStep ? (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                {ANNOTATION_TYPES.findIndex(t => t.type === nextStep.type) + 1}
+              </div>
+              <h3 className="text-lg font-semibold text-blue-900">{nextStep.label}</h3>
+            </div>
+            <p className="text-blue-800 text-sm mt-1">{nextStep.description}</p>
+          </div>
+        ) : (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-5 h-5 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                ✓
+              </div>
+              <h3 className="text-lg font-semibold text-green-900">All Done!</h3>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">
-        {/* Compact Toolbar */}
-        <div className="flex flex-wrap items-center gap-2 p-4 bg-gray-50 rounded-lg">
-          {/* Tools */}
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-medium text-gray-700 mr-2">Tools:</span>
-            <Button
-              variant={tool === 'rectangle' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTool('rectangle')}
-            >
-              <Square className="w-4 h-4" />
-            </Button>
-            <Button variant={tool === 'circle' ? 'default' : 'outline'} size="sm" onClick={() => setTool('circle')}>
-              <Circle className="w-4 h-4" />
-            </Button>
-            <Button
-              variant={tool === 'highlight' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTool('highlight')}
-            >
-              <Type className="w-4 h-4" />
-            </Button>
+        {/* Minimal Toolbar - Only show what's needed */}
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          {/* Current Step Info */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-4 h-4 rounded-full border-2 border-gray-400"
+                style={{ backgroundColor: selectedAnnotationType?.color }}
+              />
+              <span className="text-sm font-medium text-gray-700">Marking: {selectedAnnotationType?.label}</span>
+              {getAnnotationCount(selectedType) > 0 && (
+                <Badge variant="secondary" className="text-xs">
+                  {getAnnotationCount(selectedType)} marked
+                </Badge>
+              )}
+            </div>
           </div>
 
-          <div className="h-4 w-px bg-gray-300" />
-
-          {/* Colors */}
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-medium text-gray-700 mr-2">Colors:</span>
-            {ANNOTATION_TYPES.map(type => {
-              const count = annotations.filter(a => a.type === type.type).length
-              return (
-                <Button
-                  key={type.type}
-                  variant={selectedType === type.type ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedType(type.type)}
-                  className="relative"
-                >
-                  <div className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: type.color }} />
-                  {type.label}
-                  {count > 0 && (
-                    <Badge variant="secondary" className="ml-1 text-xs">
-                      {count}
-                    </Badge>
-                  )}
-                </Button>
-              )
-            })}
-          </div>
-
-          <div className="h-4 w-px bg-gray-300" />
-
-          {/* Actions */}
-          <div className="flex items-center gap-1">
-            <Button variant="outline" size="sm" onClick={undo} disabled={historyIndex <= 0}>
-              <Undo className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="sm" onClick={redo} disabled={historyIndex >= history.length - 1}>
-              <Redo className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="sm" onClick={resetView}>
-              <RotateCcw className="w-4 h-4" />
-            </Button>
-            <Button variant="destructive" size="sm" onClick={clearAnnotations}>
-              <Eraser className="w-4 h-4" />
-            </Button>
+          {/* Minimal Actions - Only essential */}
+          <div className="flex items-center gap-2">
             {selectedAnnotationId && (
               <Button
                 variant="destructive"
@@ -418,8 +372,39 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
                 <X className="w-4 h-4" />
               </Button>
             )}
+            <Button variant="ghost" size="sm" onClick={undo} disabled={historyIndex <= 0}>
+              <Undo className="w-4 h-4" />
+            </Button>
           </div>
         </div>
+
+        {/* Quick Type Switcher - Only show if not following the guided flow */}
+        {!nextStep && (
+          <div className="flex flex-wrap items-center gap-2 p-3 bg-blue-50 rounded-lg">
+            <span className="text-sm font-medium ">Switch to different type:</span>
+            {ANNOTATION_TYPES.map(type => {
+              const count = getAnnotationCount(type.type)
+              const isCompleted = count > 0
+              return (
+                <Button
+                  key={type.type}
+                  variant={selectedType === type.type ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedType(type.type)}
+                  className={`relative ${isCompleted ? 'bg-green-50 border-green-200 text-black' : ''}`}
+                >
+                  <div className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: type.color }} />
+                  {type.label}
+                  {isCompleted && (
+                    <Badge variant="secondary" className="ml-1 text-xs bg-green-100 text-black border-green-200">
+                      ✓
+                    </Badge>
+                  )}
+                </Button>
+              )
+            })}
+          </div>
+        )}
 
         {/* Canvas Area */}
         <div>
@@ -456,60 +441,32 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
 
                       const isSelected = selectedAnnotationId === annotation.id
 
-                      if (tool === 'circle') {
-                        return (
-                          <KonvaCircle
-                            key={annotation.id}
-                            x={annotation.x + annotation.width / 2}
-                            y={annotation.y + annotation.height / 2}
-                            radius={Math.max(annotation.width, annotation.height) / 2}
-                            stroke={typeConfig.color}
-                            strokeWidth={isSelected ? 3 : 2}
-                            fill={`${typeConfig.color}20`}
-                            draggable
-                            onClick={() => setSelectedAnnotationId(annotation.id)}
-                            onDragEnd={e => {
-                              const newAnnotations = annotations.map(a =>
-                                a.id === annotation.id
-                                  ? {
-                                      ...a,
-                                      x: e.target.x() - a.width / 2,
-                                      y: e.target.y() - a.height / 2,
-                                    }
-                                  : a
-                              )
-                              setAnnotations(newAnnotations)
-                            }}
-                          />
-                        )
-                      } else {
-                        return (
-                          <Rect
-                            key={annotation.id}
-                            x={annotation.x}
-                            y={annotation.y}
-                            width={annotation.width}
-                            height={annotation.height}
-                            stroke={typeConfig.color}
-                            strokeWidth={isSelected ? 3 : 2}
-                            fill={`${typeConfig.color}20`}
-                            draggable
-                            onClick={() => setSelectedAnnotationId(annotation.id)}
-                            onDragEnd={e => {
-                              const newAnnotations = annotations.map(a =>
-                                a.id === annotation.id
-                                  ? {
-                                      ...a,
-                                      x: e.target.x(),
-                                      y: e.target.y(),
-                                    }
-                                  : a
-                              )
-                              setAnnotations(newAnnotations)
-                            }}
-                          />
-                        )
-                      }
+                      return (
+                        <Rect
+                          key={annotation.id}
+                          x={annotation.x}
+                          y={annotation.y}
+                          width={annotation.width}
+                          height={annotation.height}
+                          stroke={typeConfig.color}
+                          strokeWidth={isSelected ? 3 : 2}
+                          fill={`${typeConfig.color}20`}
+                          draggable
+                          onClick={() => setSelectedAnnotationId(annotation.id)}
+                          onDragEnd={e => {
+                            const newAnnotations = annotations.map(a =>
+                              a.id === annotation.id
+                                ? {
+                                  ...a,
+                                  x: e.target.x(),
+                                  y: e.target.y(),
+                                }
+                                : a
+                            )
+                            setAnnotations(newAnnotations)
+                          }}
+                        />
+                      )
                     })}
 
                     {/* Resize Handles for Selected Annotation */}
@@ -518,47 +475,32 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
                         const selectedAnnotation = annotations.find(a => a.id === selectedAnnotationId)
                         if (!selectedAnnotation) return null
 
-                        const handleSize = 8
+                        const handleSize = 10
                         const handles = [
+                          // Corner handles
                           {
                             x: selectedAnnotation.x - handleSize / 2,
                             y: selectedAnnotation.y - handleSize / 2,
                             cursor: 'nw-resize',
-                          },
-                          {
-                            x: selectedAnnotation.x + selectedAnnotation.width / 2 - handleSize / 2,
-                            y: selectedAnnotation.y - handleSize / 2,
-                            cursor: 'n-resize',
+                            type: 'nw' as const,
                           },
                           {
                             x: selectedAnnotation.x + selectedAnnotation.width - handleSize / 2,
                             y: selectedAnnotation.y - handleSize / 2,
                             cursor: 'ne-resize',
-                          },
-                          {
-                            x: selectedAnnotation.x + selectedAnnotation.width - handleSize / 2,
-                            y: selectedAnnotation.y + selectedAnnotation.height / 2 - handleSize / 2,
-                            cursor: 'e-resize',
+                            type: 'ne' as const,
                           },
                           {
                             x: selectedAnnotation.x + selectedAnnotation.width - handleSize / 2,
                             y: selectedAnnotation.y + selectedAnnotation.height - handleSize / 2,
                             cursor: 'se-resize',
-                          },
-                          {
-                            x: selectedAnnotation.x + selectedAnnotation.width / 2 - handleSize / 2,
-                            y: selectedAnnotation.y + selectedAnnotation.height - handleSize / 2,
-                            cursor: 's-resize',
+                            type: 'se' as const,
                           },
                           {
                             x: selectedAnnotation.x - handleSize / 2,
                             y: selectedAnnotation.y + selectedAnnotation.height - handleSize / 2,
                             cursor: 'sw-resize',
-                          },
-                          {
-                            x: selectedAnnotation.x - handleSize / 2,
-                            y: selectedAnnotation.y + selectedAnnotation.height / 2 - handleSize / 2,
-                            cursor: 'w-resize',
+                            type: 'sw' as const,
                           },
                         ]
 
@@ -570,16 +512,59 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
                             width={handleSize}
                             height={handleSize}
                             fill="#ffffff"
-                            stroke="#000000"
-                            strokeWidth={1}
+                            stroke="#3B82F6"
+                            strokeWidth={2}
                             draggable
-                            onDragEnd={e => {
+                            onDragMove={e => {
                               const newAnnotations = annotations.map(a => {
                                 if (a.id === selectedAnnotationId) {
-                                  const newWidth = Math.max(20, selectedAnnotation.width + (e.target.x() - handle.x))
-                                  const newHeight = Math.max(20, selectedAnnotation.height + (e.target.y() - handle.y))
+                                  const deltaX = e.target.x() - handle.x
+                                  const deltaY = e.target.y() - handle.y
+
+                                  let newX = selectedAnnotation.x
+                                  let newY = selectedAnnotation.y
+                                  let newWidth = selectedAnnotation.width
+                                  let newHeight = selectedAnnotation.height
+
+                                  switch (handle.type) {
+                                    case 'nw':
+                                      newX = Math.min(
+                                        selectedAnnotation.x + selectedAnnotation.width - 20,
+                                        selectedAnnotation.x + deltaX
+                                      )
+                                      newY = Math.min(
+                                        selectedAnnotation.y + selectedAnnotation.height - 20,
+                                        selectedAnnotation.y + deltaY
+                                      )
+                                      newWidth = selectedAnnotation.width - (newX - selectedAnnotation.x)
+                                      newHeight = selectedAnnotation.height - (newY - selectedAnnotation.y)
+                                      break
+                                    case 'ne':
+                                      newY = Math.min(
+                                        selectedAnnotation.y + selectedAnnotation.height - 20,
+                                        selectedAnnotation.y + deltaY
+                                      )
+                                      newWidth = Math.max(20, selectedAnnotation.width + deltaX)
+                                      newHeight = selectedAnnotation.height - (newY - selectedAnnotation.y)
+                                      break
+                                    case 'se':
+                                      newWidth = Math.max(20, selectedAnnotation.width + deltaX)
+                                      newHeight = Math.max(20, selectedAnnotation.height + deltaY)
+                                      break
+                                    case 'sw':
+                                      newX = Math.min(
+                                        selectedAnnotation.x + selectedAnnotation.width - 20,
+                                        selectedAnnotation.x + deltaX
+                                      )
+                                      newWidth = selectedAnnotation.width - (newX - selectedAnnotation.x)
+                                      newHeight = Math.max(20, selectedAnnotation.height + deltaY)
+                                      break
+                                  }
+
                                   return {
                                     ...a,
+                                    x: newX,
+                                    y: newY,
                                     width: newWidth,
                                     height: newHeight,
                                   }
@@ -587,6 +572,11 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
                                 return a
                               })
                               setAnnotations(newAnnotations)
+                            }}
+                            onDragEnd={e => {
+                              // Reset handle position
+                              e.target.x(handle.x)
+                              e.target.y(handle.y)
                             }}
                           />
                         ))
@@ -608,42 +598,26 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
                   </Layer>
                 </Stage>
 
-                {/* Zoom Controls */}
-                <div className="absolute top-2 right-2 flex flex-col gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (stageRef.current) {
-                        const newScale = Math.min(3, zoom * 1.2)
-                        stageRef.current.scale({ x: newScale, y: newScale })
-                        setZoom(newScale)
-                      }
-                    }}
-                  >
-                    <ZoomIn className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (stageRef.current) {
-                        const newScale = Math.max(0.1, zoom / 1.2)
-                        stageRef.current.scale({ x: newScale, y: newScale })
-                        setZoom(newScale)
-                      }
-                    }}
-                  >
-                    <ZoomOut className="w-4 h-4" />
-                  </Button>
-                </div>
-
                 {/* Instructions Overlay */}
-                <div className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
-                  {tool === 'rectangle' && 'Click and drag to draw rectangles'}
-                  {tool === 'circle' && 'Click and drag to draw circles'}
-                  {tool === 'highlight' && 'Click to highlight areas'}
-                  {selectedAnnotationId && ' • Click to select • Drag handles to resize • Delete key to remove'}
+                <div className="absolute bottom-2 left-2 bg-black/70 text-white px-3 py-2 rounded text-sm">
+                  {nextStep ? (
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full border-2 border-white"
+                        style={{ backgroundColor: ANNOTATION_TYPES.find(t => t.type === nextStep.type)?.color }}
+                      />
+                      <span>Click and drag to draw rectangles around {nextStep.type}s</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span>✓ All elements marked! Ready to continue.</span>
+                    </div>
+                  )}
+                  {selectedAnnotationId && (
+                    <div className="mt-1 text-xs opacity-80">
+                      • Drag corner handles to resize • Delete key to remove
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -661,9 +635,22 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
           <Button variant="outline" onClick={onSkip}>
             Skip Annotation
           </Button>
-          <Button onClick={handleContinue}>
-            Continue with {annotations.length} annotations
-            <ArrowRight className="w-4 h-4 ml-2" />
+          <Button
+            onClick={handleContinue}
+            className={nextStep ? 'opacity-75' : ''}
+            disabled={false} // Allow continuing even if not all steps completed
+          >
+            {nextStep ? (
+              <>
+                Process with {annotations.length} annotations
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </>
+            ) : (
+              <>
+                Perfect! Process with {annotations.length} annotations
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </>
+            )}
           </Button>
         </div>
       </div>

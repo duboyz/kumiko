@@ -13,21 +13,6 @@ interface CompleteStepProps {
 export function CompleteStep({ onComplete, onBack, showSuccess }: CompleteStepProps) {
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Import Complete!</h2>
-        <p className="text-muted-foreground">Your menu items have been successfully added to your menu</p>
-      </div>
-
-      {/* Success Animation */}
-      <div className="flex justify-center">
-        <div className="relative">
-          <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center animate-pulse">
-            <CheckCircle className="w-12 h-12 text-green-600" />
-          </div>
-          {showSuccess && <div className="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-75"></div>}
-        </div>
-      </div>
-
       {/* Success Message */}
       <Card className="border-green-200 bg-green-50">
         <CardContent className="p-6 text-center">

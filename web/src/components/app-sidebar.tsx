@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Home, Settings2, Globe, ChefHat, LogOut } from 'lucide-react'
+import { Home, Settings2, Globe, ChefHat, LogOut, List } from 'lucide-react'
 
 import {
   Sidebar,
@@ -37,7 +37,7 @@ const items = [
   {
     title: 'Menu items',
     url: '/menu-items',
-    icon: ChefHat,
+    icon: List,
     restaurantOnly: true,
   },
   {
