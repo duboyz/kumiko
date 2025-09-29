@@ -20,8 +20,48 @@ const mockMenus = [
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
         menuCategoryItems: [
-          { id: '1', menuCategoryId: '1', menuItemId: '1', orderIndex: 1, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
-          { id: '2', menuCategoryId: '1', menuItemId: '2', orderIndex: 2, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
+          {
+            id: '1',
+            menuCategoryId: '1',
+            menuItemId: '1',
+            orderIndex: 1,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+            menuItem: {
+              id: '1',
+              name: 'Caesar Salad',
+              description: 'Fresh romaine lettuce with caesar dressing',
+              price: 12.99,
+              isAvailable: true,
+              restaurantMenuId: '1',
+              menuCategoryItems: [],
+              options: [],
+              allergens: [],
+              createdAt: '2024-01-01T00:00:00Z',
+              updatedAt: '2024-01-01T00:00:00Z'
+            }
+          },
+          {
+            id: '2',
+            menuCategoryId: '1',
+            menuItemId: '2',
+            orderIndex: 2,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+            menuItem: {
+              id: '2',
+              name: 'Bruschetta',
+              description: 'Toasted bread with tomatoes and basil',
+              price: 8.99,
+              isAvailable: true,
+              restaurantMenuId: '1',
+              menuCategoryItems: [],
+              options: [],
+              allergens: [],
+              createdAt: '2024-01-01T00:00:00Z',
+              updatedAt: '2024-01-01T00:00:00Z'
+            }
+          },
         ]
       },
       {
@@ -33,9 +73,69 @@ const mockMenus = [
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
         menuCategoryItems: [
-          { id: '3', menuCategoryId: '2', menuItemId: '3', orderIndex: 1, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
-          { id: '4', menuCategoryId: '2', menuItemId: '4', orderIndex: 2, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
-          { id: '5', menuCategoryId: '2', menuItemId: '5', orderIndex: 3, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
+          {
+            id: '3',
+            menuCategoryId: '2',
+            menuItemId: '3',
+            orderIndex: 1,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+            menuItem: {
+              id: '3',
+              name: 'Grilled Salmon',
+              description: 'Fresh Atlantic salmon with herbs',
+              price: 24.99,
+              isAvailable: true,
+              restaurantMenuId: '1',
+              menuCategoryItems: [],
+              options: [],
+              allergens: [],
+              createdAt: '2024-01-01T00:00:00Z',
+              updatedAt: '2024-01-01T00:00:00Z'
+            }
+          },
+          {
+            id: '4',
+            menuCategoryId: '2',
+            menuItemId: '4',
+            orderIndex: 2,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+            menuItem: {
+              id: '4',
+              name: 'Beef Tenderloin',
+              description: 'Premium cut with red wine sauce',
+              price: 32.99,
+              isAvailable: true,
+              restaurantMenuId: '1',
+              menuCategoryItems: [],
+              options: [],
+              allergens: [],
+              createdAt: '2024-01-01T00:00:00Z',
+              updatedAt: '2024-01-01T00:00:00Z'
+            }
+          },
+          {
+            id: '5',
+            menuCategoryId: '2',
+            menuItemId: '5',
+            orderIndex: 3,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+            menuItem: {
+              id: '5',
+              name: 'Pasta Carbonara',
+              description: 'Classic Italian pasta with cream sauce',
+              price: 18.99,
+              isAvailable: true,
+              restaurantMenuId: '1',
+              menuCategoryItems: [],
+              options: [],
+              allergens: [],
+              createdAt: '2024-01-01T00:00:00Z',
+              updatedAt: '2024-01-01T00:00:00Z'
+            }
+          },
         ]
       }
     ]
@@ -58,7 +158,27 @@ const mockMenus = [
         createdAt: '2024-01-10T00:00:00Z',
         updatedAt: '2024-01-10T00:00:00Z',
         menuCategoryItems: [
-          { id: '6', menuCategoryId: '3', menuItemId: '6', orderIndex: 1, createdAt: '2024-01-10T00:00:00Z', updatedAt: '2024-01-10T00:00:00Z' },
+          {
+            id: '6',
+            menuCategoryId: '3',
+            menuItemId: '6',
+            orderIndex: 1,
+            createdAt: '2024-01-10T00:00:00Z',
+            updatedAt: '2024-01-10T00:00:00Z',
+            menuItem: {
+              id: '6',
+              name: 'Greek Salad',
+              description: 'Mixed greens with feta and olives',
+              price: 14.99,
+              isAvailable: true,
+              restaurantMenuId: '2',
+              menuCategoryItems: [],
+              options: [],
+              allergens: [],
+              createdAt: '2024-01-10T00:00:00Z',
+              updatedAt: '2024-01-10T00:00:00Z'
+            }
+          },
         ]
       }
     ]

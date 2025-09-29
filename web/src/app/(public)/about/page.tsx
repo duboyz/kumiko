@@ -1,10 +1,9 @@
 import { ContentContainer } from '@/components/ContentContainer'
-import { MenuBuilder } from '@/components'
 
 export default function AboutPage() {
   return (
     <ContentContainer>
-      <MenuBuilder />
+      <h1 className="text-3xl font-bold">About</h1>
     </ContentContainer>
   )
 }
