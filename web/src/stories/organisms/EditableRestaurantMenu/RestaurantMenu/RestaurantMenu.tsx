@@ -47,25 +47,41 @@ export const RestaurantMenu = ({ menu }: RestaurantMenuProps) => {
                             onChange={e => setMenuName(e)}
                             id="menuName"
                         />
+                        <LabeledInput
+                            srOnly={false}
+                            label="Menu Description"
+                            placeholder="Menu Description"
+                            type="text"
+                            value={menuDescription}
+                            onChange={e => setMenuDescription(e)}
+                            id="menuDescription"
+                        />
                     </div>
                 ) : (
                     <div>
                         <p>
                             {menuName}
                         </p>
+                        <p>
+                            {menuDescription}
+                        </p>
                     </div>
                 )
             }
 
-            <Button variant="outline" onClick={() => setIsEditable(true)}>Edit</Button>
 
             {
-                isEditable && (
+                isEditable ? (
                     <div>
                         <Button variant="outline" onClick={handleSave}>Save</Button>
                         <Button variant="outline" onClick={() => setIsEditable(false)}>Cancel</Button>
                     </div>
                 )
+                    : (
+                        <div>
+                            <Button variant="outline" onClick={() => setIsEditable(true)}>Edit</Button>
+                        </div>
+                    )
             }
 
         </div>

@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button"
 import { LabeledInput } from "@/stories/molecules/LabeledInput/LabeledInput"
 import { MenuCategoryDto, useUpdateMenuCategory } from "@shared"
 import { useMemo, useState } from "react"
 import { MenuItem } from "../MenuItem"
 import { NewMenuItemForm } from "../NewMenuItemForm"
+import { Button } from "@/stories/atoms/Button/Button"
 
 export const MenuCategory = ({ category }: { category: MenuCategoryDto }) => {
 
@@ -49,7 +49,7 @@ export const MenuCategory = ({ category }: { category: MenuCategoryDto }) => {
                 onChange={e => setCategoryDescription(e)}
                 id="categoryDescription"
             />
-            <Button onClick={handleSave}>Save</Button>
+            <Button onClick={handleSave} variant="outline">Save</Button>
             <Button onClick={() => setIsEditable(false)} variant="outline">Cancel</Button>
         </div>
     }
@@ -57,7 +57,7 @@ export const MenuCategory = ({ category }: { category: MenuCategoryDto }) => {
     return <div className="border-1 border-gray-300 p-8 border-dashed flex flex-col gap-8">
         <div className="text-lg font-bold flex flex-row gap-2">
             {category.name}
-            <Button variant="outline" size="sm" onClick={() => setIsEditable(true)}>Edit</Button>
+            <Button variant="outline" fit onClick={() => setIsEditable(true)}>Edit</Button>
         </div>
         <div className="flex flex-col gap-4">
             {menuItems.map(item => (

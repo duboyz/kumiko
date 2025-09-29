@@ -7,6 +7,7 @@ import {
   CreateMenuCategoryCommand,
   CreateMenuItemCommand,
   UpdateRestaurantMenuCommand,
+  DeleteRestaurantMenuCommand,
   AddMenuItemToCategoryCommand,
   BulkAddMenuItemsToCategoryCommand,
   BulkAddMenuItemsToCategoryResult,
@@ -32,7 +33,7 @@ interface GetAllRestaurantMenuItemsData {
   menuItems: MenuItemDto[]
 }
 
-interface CreateRestaurantMenuData {
+export interface CreateRestaurantMenuData {
   id: string
   name: string
   description: string
@@ -95,7 +96,6 @@ export const menuApi = {
     return data.data
   },
 
-  // Create a new restaurant menu
   createRestaurantMenu: async (command: {
     name: string
     description: string
@@ -111,6 +111,12 @@ export const menuApi = {
     const { data } = await client.put<ApiResponse<RestaurantMenuDto>>(`/api/restaurant-menus/${command.id}`, command)
     if (!data.success) throw new Error(data.message || 'Failed to update restaurant menu')
     return data.data
+  },
+
+  // Delete restaurant menu
+  deleteRestaurantMenu: async (menuId: string): Promise<void> => {
+    const { data } = await client.delete<ApiResponse<null>>(`/api/restaurant-menus/${menuId}`)
+    if (!data.success) throw new Error(data.message || 'Failed to delete restaurant menu')
   },
 
   // Create a new menu category

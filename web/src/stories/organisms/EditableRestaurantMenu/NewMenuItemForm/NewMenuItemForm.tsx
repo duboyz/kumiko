@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/stories/atoms/Button/Button";
 import { LabeledInput } from "@/stories/molecules/LabeledInput/LabeledInput";
 import { MenuCategoryDto, useCreateMenuItem, useAddMenuItemToCategory } from "@shared";
 import { useState } from "react";
@@ -55,7 +55,7 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
         }
     }
 
-    if (!isVisible) return <Button onClick={() => setIsVisible(true)} variant="outline">Add New Item</Button>
+    if (!isVisible) return <Button onClick={() => setIsVisible(true)} variant="outline" fit>Add New Item</Button>
 
     return (
         <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg">

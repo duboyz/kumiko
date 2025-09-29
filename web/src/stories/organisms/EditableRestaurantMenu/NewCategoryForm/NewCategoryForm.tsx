@@ -22,22 +22,19 @@ export const NewCategoryForm = ({ onCancel, menu, isVisible, setIsVisible }: New
             description: categoryData.description,
             orderIndex: menu.categories.length,
             restaurantMenuId: menu.id,
-        }, {
-            onSuccess: () => {
-                onCancel()
-            }
-        })
+        }, { onSuccess: () => onCancel() })
     }
 
     const handleSubmit = () => {
         if (name.trim()) {
             handleCreateCategory({ name: name.trim(), description: description.trim() })
+
             setName('')
             setDescription('')
         }
     }
 
-    if (!isVisible) return <Button onClick={() => setIsVisible(true)} variant="outline"> Add New Category</Button>
+    if (!isVisible) return <Button onClick={() => setIsVisible(true)} variant="outline" fit> Add New Category</Button>
 
     return (
         <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg">

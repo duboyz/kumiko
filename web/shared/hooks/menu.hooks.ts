@@ -53,6 +53,18 @@ export const useUpdateRestaurantMenu = () => {
   })
 }
 
+// Delete restaurant menu
+export const useDeleteRestaurantMenu = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: menuApi.deleteRestaurantMenu,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['restaurant-menus'] })
+    },
+  })
+}
+
 // Create menu category
 export const useCreateMenuCategory = () => {
   const queryClient = useQueryClient()

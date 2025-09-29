@@ -134,6 +134,10 @@ export interface UpdateMenuCategoryItemCommand {
   orderIndex: number
 }
 
+export interface DeleteRestaurantMenuCommand {
+  id: string
+}
+
 // Public menu types
 export interface GetMenuByIdResult {
   id: string
