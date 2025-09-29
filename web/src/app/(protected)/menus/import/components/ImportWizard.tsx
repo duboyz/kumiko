@@ -1,13 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useLocationSelection } from '@shared'
 import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components'
-import { ArrowLeft, AlertCircle } from 'lucide-react'
-import { ProgressSidebar } from './ProgressSidebar'
 import { UploadStep } from '@/stories/Components/MenuImport/UploadStep/UploadStep'
 import { AnnotationStep } from '@/stories/Components/MenuImport/AnnotationStep/AnnotationStep'
 import { ProcessStep } from './ProcessStep'
@@ -15,7 +12,6 @@ import { useImportFlow } from '../hooks/useImportFlow'
 import { StructureReviewStep } from './StructureReviewStep'
 import { NoLocation } from '@/stories/Components/NoLocation/NoLocation'
 import { RestaurantRequired } from '@/stories/Components/RestaurantRequired/RestaurantRequired'
-import { ContentContainer } from '@/components/ContentContainer'
 import { ProgressBar } from './ProgressBar'
 
 export enum ImportStep {
