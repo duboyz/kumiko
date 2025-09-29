@@ -16,14 +16,14 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     menuName: 'My Restaurant Menu',
-    setMenuName: () => {},
+    setMenuName: () => { },
     categories: [],
-    onCategoryAdd: () => {},
-    onCategoryDelete: () => {},
-    onCategoryNameChange: () => {},
-    onItemAdd: () => {},
-    onItemUpdate: () => {},
-    onItemDelete: () => {},
+    onCategoryAdd: () => { },
+    onCategoryDelete: () => { },
+    onCategoryNameChange: () => { },
+    onItemAdd: () => { },
+    onItemUpdate: () => { },
+    onItemDelete: () => { },
   },
   render: () => {
     const [menuName, setMenuName] = useState('My Restaurant Menu')

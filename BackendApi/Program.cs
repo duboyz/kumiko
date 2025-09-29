@@ -1,6 +1,5 @@
 using BackendApi.Configuration;
 using BackendApi.Middleware;
-// using BackendApi.Services.SeedData; // DEPRECATED: Service removed
 
 var builder = WebApplication.CreateBuilder(args);
 
