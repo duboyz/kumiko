@@ -20,6 +20,7 @@ import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components'
 import { ContentContainer } from '@/components/ContentContainer'
 import { openSubdomainUrl } from '@/lib/subdomain'
+import { Websites } from '@/stories/pages/Websites/Websites'
 
 export default function WebsitesPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
@@ -165,96 +166,9 @@ export default function WebsitesPage() {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {websites?.websites.map(website => (
-          <Card key={website.id}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                {website.name}
-              </CardTitle>
-              <CardDescription>{website.subdomain}.kumiko.no</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {website.description && <p className="text-sm text-muted-foreground">{website.description}</p>}
+      <Websites />
 
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{website.restaurantName}</span>
-                  <span
-                    className={`px-2 py-1 rounded-full ${
-                      website.isPublished ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                    }`}
-                  >
-                    {website.isPublished ? 'Published' : 'Draft'}
-                  </span>
-                </div>
 
-                <div className="flex space-x-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => openSubdomainUrl(website.subdomain)}
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    Preview
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => (window.location.href = `/websites/${website.id}/pages`)}
-                  >
-                    <Settings className="h-4 w-4 mr-1" />
-                    Manage
-                  </Button>
-                </div>
-
-                <Button
-                  size="sm"
-                  variant={website.isPublished ? 'destructive' : 'default'}
-                  className="w-full mt-2"
-                  onClick={() => handleTogglePublish(website.id, website.isPublished)}
-                  disabled={updateWebsite.isPending}
-                >
-                  {website.isPublished ? (
-                    <>
-                      <PowerOff className="h-4 w-4 mr-1" />
-                      Unpublish
-                    </>
-                  ) : (
-                    <>
-                      <Power className="h-4 w-4 mr-1" />
-                      Publish
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-
-        {(!websites?.websites || websites.websites.length === 0) && (
-          <Card className="col-span-full">
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Globe className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No websites yet</h3>
-              <p className="text-muted-foreground text-center mb-6">
-                Create your first website to start building your online presence.
-              </p>
-              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Your First Website
-                  </Button>
-                </DialogTrigger>
-              </Dialog>
-            </CardContent>
-          </Card>
-        )}
-      </div>
     </ContentContainer>
   )
 }

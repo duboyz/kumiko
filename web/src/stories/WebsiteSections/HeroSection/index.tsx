@@ -1,23 +1,11 @@
 'use client'
 
-import { HeroSectionType } from '@shared'
+import { HeroSectionDto, HeroSectionType } from '@shared'
 import { HeroImageRight } from './HeroImageRight'
 import { HeroBackgroundImage } from './HeroBackgroundImage'
 
 interface HeroSectionProps {
-  title: string
-  description: string
-  imageUrl?: string
-  imageAlt?: string
-  backgroundColor?: string
-  textColor?: string
-  backgroundOverlayColor?: string
-  backgroundImageUrl?: string
-  buttonText?: string
-  buttonUrl?: string
-  buttonTextColor?: string
-  buttonBackgroundColor?: string
-  type: HeroSectionType
+  section: HeroSectionDto
   className?: string
   isEditing?: boolean
   onUpdate?: (field: string, value: string) => void
@@ -25,38 +13,27 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({
-  title,
-  description,
-  imageUrl,
-  imageAlt,
-  backgroundColor,
-  textColor,
-  backgroundOverlayColor,
-  backgroundImageUrl,
-  buttonText,
-  buttonUrl,
-  buttonTextColor,
-  buttonBackgroundColor,
-  type,
+  section,
+
   className = '',
   isEditing,
   onUpdate,
   onTypeChange,
 }: HeroSectionProps) {
-  if (type === HeroSectionType.ImageRight) {
+  if (section.type === HeroSectionType.ImageRight) {
     return (
       <HeroImageRight
-        title={title}
-        description={description}
-        imageUrl={imageUrl}
-        imageAlt={imageAlt}
-        backgroundColor={backgroundColor}
-        textColor={textColor}
-        buttonText={buttonText}
-        buttonUrl={buttonUrl}
-        buttonTextColor={buttonTextColor}
-        buttonBackgroundColor={buttonBackgroundColor}
-        type={type}
+        title={section.title}
+        description={section.description}
+        imageUrl={section.imageUrl}
+        imageAlt={section.imageAlt}
+        backgroundColor={section.backgroundColor}
+        textColor={section.textColor}
+        buttonText={section.buttonText}
+        buttonUrl={section.buttonUrl}
+        buttonTextColor={section.buttonTextColor}
+        buttonBackgroundColor={section.buttonBackgroundColor}
+        type={section.type}
         className={className}
         isEditing={isEditing}
         onUpdate={onUpdate}
@@ -67,17 +44,17 @@ export function HeroSection({
 
   return (
     <HeroBackgroundImage
-      title={title}
-      description={description}
-      backgroundColor={backgroundColor}
-      textColor={textColor}
-      backgroundOverlayColor={backgroundOverlayColor}
-      backgroundImageUrl={backgroundImageUrl}
-      buttonText={buttonText}
-      buttonUrl={buttonUrl}
-      buttonTextColor={buttonTextColor}
-      buttonBackgroundColor={buttonBackgroundColor}
-      type={type}
+      title={section.title}
+      description={section.description}
+      backgroundColor={section.backgroundColor}
+      textColor={section.textColor}
+      backgroundOverlayColor={section.backgroundOverlayColor}
+      backgroundImageUrl={section.backgroundImageUrl}
+      buttonText={section.buttonText}
+      buttonUrl={section.buttonUrl}
+      buttonTextColor={section.buttonTextColor}
+      buttonBackgroundColor={section.buttonBackgroundColor}
+      type={section.type}
       className={className}
       isEditing={isEditing}
       onUpdate={onUpdate}

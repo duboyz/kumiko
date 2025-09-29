@@ -215,7 +215,6 @@ export default function PageEditorPage() {
           </Button>
           <div>
             <h1 className="text-2xl font-semibold">{page.title}</h1>
-            <p className="text-gray-500 text-sm">Edit your page content</p>
           </div>
         </div>
 
@@ -313,57 +312,7 @@ export default function PageEditorPage() {
                     {/* Section content */}
                     {section.heroSection && (
                       <HeroSection
-                        title={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.title ?? section.heroSection.title
-                        }
-                        description={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.description ??
-                          section.heroSection.description
-                        }
-                        imageUrl={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.imageUrl ??
-                          section.heroSection.imageUrl
-                        }
-                        imageAlt={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.imageAlt ??
-                          section.heroSection.imageAlt
-                        }
-                        backgroundColor={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.backgroundColor ??
-                          section.heroSection.backgroundColor
-                        }
-                        textColor={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.textColor ??
-                          section.heroSection.textColor
-                        }
-                        backgroundOverlayColor={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.backgroundOverlayColor ??
-                          section.heroSection.backgroundOverlayColor
-                        }
-                        backgroundImageUrl={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.backgroundImageUrl ??
-                          section.heroSection.backgroundImageUrl
-                        }
-                        buttonText={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonText ??
-                          section.heroSection.buttonText
-                        }
-                        buttonUrl={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonUrl ??
-                          section.heroSection.buttonUrl
-                        }
-                        buttonTextColor={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonTextColor ??
-                          section.heroSection.buttonTextColor
-                        }
-                        buttonBackgroundColor={
-                          (sectionUpdates[section.id] as Partial<HeroSectionDto>)?.buttonBackgroundColor ??
-                          section.heroSection.buttonBackgroundColor
-                        }
-                        type={
-                          ((sectionUpdates[section.id] as Partial<HeroSectionDto>)?.type as HeroSectionType) ??
-                          section.heroSection.type
-                        }
+                        section={section.heroSection}
                         isEditing={editingSectionId === section.id}
                         onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
                         onTypeChange={newType => handleTypeChange(section.id, newType)}
