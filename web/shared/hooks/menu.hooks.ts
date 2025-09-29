@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { menuApi } from '../api/menu.api'
+import { createMenuStructure, parseMenuStructure } from '@shared/api/menu-structure.api'
+import { CreateMenuStructureRequest } from '@shared/types/menu-structure.types'
 // Get restaurant menus
 export const useRestaurantMenus = (restaurantId: string) => {
   return useQuery({
@@ -15,6 +17,36 @@ export const useRestaurantMenuItems = (restaurantMenuId: string) => {
     queryKey: ['restaurant-menu-items', restaurantMenuId],
     queryFn: () => menuApi.getRestaurantMenuItems(restaurantMenuId),
     enabled: !!restaurantMenuId,
+  })
+}
+
+export const useCreateMenuStructure = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (request: CreateMenuStructureRequest) => createMenuStructure(request),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['restaurant-menus', variables.restaurantId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['all-restaurant-menu-items', variables.restaurantId],
+      })
+    },
+  })
+}
+
+export const useParseMenuStructure = () => {
+  return useMutation({
+    mutationFn: ({
+      imageFile,
+      annotations,
+      restaurantId,
+    }: {
+      imageFile: File
+      annotations?: any[]
+      restaurantId?: string
+    }) => parseMenuStructure(imageFile, annotations, restaurantId),
   })
 }
 

@@ -22,7 +22,7 @@ export async function parseMenuStructure(
   }
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5158'
-  const response = await fetch(`${API_BASE_URL}api/menu-import/parse-image`, {
+  const response = await fetch(`${API_BASE_URL}/api/menu-import/parse-image`, {
     method: 'POST',
     body: formData,
     headers: {

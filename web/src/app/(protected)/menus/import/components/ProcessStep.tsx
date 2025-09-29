@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ArrowLeft, ArrowRight, X, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react'
 import { ParsedMenuStructure } from '@shared/types/menu-structure.types'
-import { useParseMenuStructure } from '@shared/hooks/menu.hooks'
+import { parseMenuStructure } from '@shared/api/menu-structure.api'
 import { Stage, Layer, Rect, Image as KonvaImage } from 'react-konva'
 import Konva from 'konva'
+import { useParseMenuStructure } from '@shared'
 
 // Annotation types (matching AnnotationStep)
 const ANNOTATION_TYPES = [
@@ -61,7 +62,6 @@ export function ProcessStep({
   processingStep,
   setProcessingStep,
   errorMessage,
-  restaurantId,
 }: ProcessStepProps) {
   const [abortController, setAbortController] = useState<AbortController | null>(null)
   const [image, setImage] = useState<HTMLImageElement | null>(null)

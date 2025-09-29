@@ -8,24 +8,17 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   ArrowLeft,
   ArrowRight,
   Trash2,
-  Plus,
-  Check,
-  AlertTriangle,
-  TrendingUp,
-  Loader2,
+  Plus, Loader2,
   ChevronDown,
   ChevronRight,
   FolderOpen,
   DollarSign,
   Edit3,
-  Save,
-  X,
-  GripVertical,
+  Save, GripVertical
 } from 'lucide-react'
 import {
   ParsedMenuStructure,
@@ -75,9 +68,9 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
         categories: prev.categories.map((cat, catIndex) =>
           catIndex === categoryIndex
             ? {
-                ...cat,
-                items: cat.items.map((item, idx) => (idx === itemIndex ? { ...item, [field]: value } : item)),
-              }
+              ...cat,
+              items: cat.items.map((item, idx) => (idx === itemIndex ? { ...item, [field]: value } : item)),
+            }
             : cat
         ),
       }))
@@ -91,9 +84,9 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
       categories: prev.categories.map((cat, catIndex) =>
         catIndex === categoryIndex
           ? {
-              ...cat,
-              items: cat.items.filter((_, idx) => idx !== itemIndex),
-            }
+            ...cat,
+            items: cat.items.filter((_, idx) => idx !== itemIndex),
+          }
           : cat
       ),
     }))
@@ -113,9 +106,9 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
         categories: prev.categories.map((cat, catIndex) =>
           catIndex === categoryIndex
             ? {
-                ...cat,
-                items: [...cat.items, newItem],
-              }
+              ...cat,
+              items: [...cat.items, newItem],
+            }
             : cat
         ),
       }))
@@ -129,15 +122,15 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
       categories: prev.categories.map((cat, catIdx) =>
         catIdx === categoryIndex
           ? {
-              ...cat,
-              items: (() => {
-                const items = [...cat.items]
-                const [movedItem] = items.splice(fromIndex, 1)
-                items.splice(toIndex, 0, movedItem)
-                // Update order indices
-                return items.map((item, idx) => ({ ...item, orderIndex: idx }))
-              })(),
-            }
+            ...cat,
+            items: (() => {
+              const items = [...cat.items]
+              const [movedItem] = items.splice(fromIndex, 1)
+              items.splice(toIndex, 0, movedItem)
+              // Update order indices
+              return items.map((item, idx) => ({ ...item, orderIndex: idx }))
+            })(),
+          }
           : cat
       ),
     }))
