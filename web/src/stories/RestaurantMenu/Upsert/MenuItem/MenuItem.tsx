@@ -1,5 +1,4 @@
-import { Button } from "@/stories/atoms/Button/Button"
-import { LabeledInput } from "@/stories/atoms/LabeledInput/LabeledInput"
+import { LabeledInput } from "@/stories/molecules/LabeledInput/LabeledInput"
 import { MenuItemDto, useDeleteMenuItem, useUpdateMenuItem } from "@shared"
 import { Edit, Save, Trash } from "lucide-react"
 import { useState } from "react"

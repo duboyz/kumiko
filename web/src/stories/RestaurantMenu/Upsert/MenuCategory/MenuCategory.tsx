@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button"
-import { LabeledInput } from "@/stories/atoms/LabeledInput/LabeledInput"
+import { LabeledInput } from "@/stories/molecules/LabeledInput/LabeledInput"
 import { MenuCategoryDto, useUpdateMenuCategory } from "@shared"
 import { useMemo, useState } from "react"
-import { MenuItem } from "./MenuItem"
-import { NewMenuItemForm } from "./NewMenuItemForm"
+import { MenuItem } from "../MenuItem"
+import { NewMenuItemForm } from "../NewMenuItemForm"
 
 export const MenuCategory = ({ category }: { category: MenuCategoryDto }) => {
 

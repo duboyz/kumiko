@@ -1,5 +1,5 @@
 import { Button } from "@/stories/atoms/Button/Button";
-import { LabeledInput } from "@/stories/atoms/LabeledInput/LabeledInput";
+import { LabeledInput } from "@/stories/molecules/LabeledInput/LabeledInput";
 import { RestaurantMenuDto, useCreateMenuCategory } from "@shared";
 import { useState } from "react";
 

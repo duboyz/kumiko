@@ -3,7 +3,7 @@ import { useState } from "react"
 import { MenuCategory } from "./MenuCategory"
 import { NewCategoryForm } from "./NewCategoryForm"
 import { Button } from "@/stories/atoms/Button/Button"
-import { LabeledInput } from "@/stories/atoms/LabeledInput/LabeledInput"
+import { LabeledInput } from "@/stories/molecules/LabeledInput/LabeledInput"
 
 interface RestaurantMenuProps {
     menu?: RestaurantMenuDto
