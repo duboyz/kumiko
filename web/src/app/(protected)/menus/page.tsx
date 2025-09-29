@@ -1,7 +1,7 @@
 'use client'
 
 import { LoadingSpinner } from '@/components'
-import { useRestaurantMenus, useCreateRestaurantMenu, ResponseData } from '@shared'
+import { useCreateRestaurantMenu, ResponseData } from '@shared'
 import { useLocationSelection } from '@shared'
 import { ContentContainer } from '@/components/ContentContainer'
 import { RestaurantMenus } from '@/stories/pages/RestaurantMenus'
@@ -10,16 +10,16 @@ import { NoLocation } from '@/stories/Components/NoLocation/NoLocation'
 import { RestaurantRequired } from '@/stories/Components/RestaurantRequired/RestaurantRequired'
 import { Button } from '@/stories/atoms/Button/Button'
 import { CreateRestaurantMenuData } from '@shared'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { SimpleImportWizard } from './import/components/SimpleImportWizard'
+import { useTranslations } from 'next-intl'
+
 export default function MenusPage() {
   const { selectedLocation, isLoading, hasNoLocations } = useLocationSelection()
   const restaurantId = selectedLocation?.type === 'Restaurant' ? selectedLocation.id : null
 
-  const { data: menusData, isLoading: menusLoading, error } = useRestaurantMenus(restaurantId || '')
   const { mutate: createMenuMutation } = useCreateRestaurantMenu()
   const router = useRouter()
 
+  const t = useTranslations()
   if (isLoading) return <LoadingSpinner />
   if (hasNoLocations) return <NoLocation />
   if (!selectedLocation || selectedLocation.type !== 'Restaurant') return <RestaurantRequired />
@@ -42,40 +42,15 @@ export default function MenusPage() {
     }
   }
 
-  const handleGenerateMenu = async (file: File, restaurantId: string) => {
-    console.log('Generating menu from image...', file.name, 'for restaurant:', restaurantId)
-  }
-
 
   return (
     <ContentContainer>
+      <div className="flex items-center gap-2">
+        <Button variant="default" onClick={createMenu} fit={true}>{t('menus.createMenu')}</Button>
+        <Button variant="secondary" onClick={() => router.push('/menus/import')} fit={true}>{t('menus.importMenu')}</Button>
 
-      <Button variant="default" onClick={createMenu}>Create Menu</Button>
-
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="default">Create Menu from image</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Menu from image</DialogTitle>
-          </DialogHeader>
-          <SimpleImportWizard onGenerateMenu={handleGenerateMenu} />
-        </DialogContent>
-
-
-      </Dialog>
-
+      </div>
       <RestaurantMenus router={router} />
-      {/* <MenuList
-        menus={menusData?.menus || []}
-        restaurantId={restaurantId || ''}
-        restaurantName={selectedLocation?.name || 'Restaurant'}
-        isLoading={menusLoading}
-        onCreateMenu={createMenu}
-        onDeleteMenu={deleteMenu}
-        createMenuLoading={createMenuMutation.isPending}
-      /> */}
-    </ContentContainer>
+    </ContentContainer >
   )
 }

@@ -13,6 +13,10 @@ import { AnnotationStep } from '@/stories/Components/MenuImport/AnnotationStep/A
 import { ProcessStep } from './ProcessStep'
 import { useImportFlow } from '../hooks/useImportFlow'
 import { StructureReviewStep } from './StructureReviewStep'
+import { NoLocation } from '@/stories/Components/NoLocation/NoLocation'
+import { RestaurantRequired } from '@/stories/Components/RestaurantRequired/RestaurantRequired'
+import { ContentContainer } from '@/components/ContentContainer'
+import { ProgressBar } from './ProgressBar'
 
 export enum ImportStep {
   UPLOAD = 'upload',
@@ -106,172 +110,105 @@ export function ImportWizard() {
     }
   }
 
-  const handleComplete = () => {
-    router.push('/menu-items')
-  }
+  const handleComplete = () => router.push('/menu-items')
+  if (isLoading) return <LoadingSpinner size="lg" />
+  if (hasNoLocations) <NoLocation />
+  if (!selectedLocation || selectedLocation.type !== 'Restaurant') return <RestaurantRequired />
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    )
-  }
-
-  if (hasNoLocations) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No Restaurants Found</h2>
-            <p className="text-muted-foreground mb-6">You need to add a restaurant before you can import menu items.</p>
-            <Button asChild>
-              <a href="/onboarding/restaurant">Add Restaurant</a>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  if (!selectedLocation || selectedLocation.type !== 'Restaurant') {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Restaurant Required</h2>
-            <p className="text-muted-foreground mb-6">
-              Menu item import is only available for restaurant locations. Please select a restaurant from the sidebar.
-            </p>
-            <Button onClick={() => router.push('/menu-items')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Menu Items
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push('/menu-items')}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Menu Items
-              </Button>
-              <div className="h-6 w-px bg-border" />
-              <div>
-                <h1 className="text-lg font-semibold">Import Menu Items</h1>
-                <p className="text-sm text-muted-foreground">{selectedLocation.name}</p>
-              </div>
-            </div>
-            <Button variant="outline" onClick={resetImportFlow} className="text-muted-foreground">
-              Start Over
-            </Button>
+    <>
+
+      {/* Mobile Progress Indicator */}
+      <div className="lg:hidden mb-6">
+        <div className="bg-white rounded-lg border p-4">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+            <span>Step {getStepNumber(currentStep)} of 4</span>
+            <span>{Math.round(getStepProgress(currentStep))}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-primary h-2 rounded-full transition-all duration-500"
+              style={{
+                width: `${getStepProgress(currentStep)}%`,
+              }}
+            />
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Mobile Progress Indicator */}
-        <div className="lg:hidden mb-6">
-          <div className="bg-white rounded-lg border p-4">
-            <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-              <span>Step {getStepNumber(currentStep)} of 4</span>
-              <span>{Math.round(getStepProgress(currentStep))}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-primary h-2 rounded-full transition-all duration-500"
-                style={{
-                  width: `${getStepProgress(currentStep)}%`,
-                }}
-              />
-            </div>
-          </div>
-        </div>
+      <div className="flex flex-col gap-4">
+        {/* Sidebar - Hidden on mobile, shown on desktop */}
+        {/* <div className="hidden lg:block lg:col-span-1">
+          <ProgressSidebar currentStep={currentStep} onStepClick={handleStepChange} />
+        </div> */}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-8">
-          {/* Sidebar - Hidden on mobile, shown on desktop */}
-          <div className="hidden lg:block lg:col-span-1">
-            <ProgressSidebar currentStep={currentStep} onStepClick={handleStepChange} />
-          </div>
+        <ProgressBar currentStep={currentStep} onStepClick={handleStepChange} />
 
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            <Card>
-              <CardContent className="p-4 sm:p-6">
-                {currentStep === ImportStep.UPLOAD && (
-                  <UploadStep
-                    onImageSelect={(file, preview) => {
-                      setImageFile(file)
-                      setImagePreview(preview)
-                      handleStepChange(ImportStep.PREVIEW)
-                    }}
-                    onBack={handleBack}
-                  />
-                )}
 
-                {currentStep === ImportStep.PREVIEW && (
-                  <AnnotationStep
-                    imagePreview={imagePreview!}
-                    onAnnotate={newAnnotations => {
-                      setAnnotations(newAnnotations)
-                      handleStepChange(ImportStep.PROCESS)
-                    }}
-                    onBack={handleBack}
-                    onSkip={() => handleStepChange(ImportStep.PROCESS)}
-                  />
-                )}
 
-                {currentStep === ImportStep.PROCESS && (
-                  <ProcessStep
-                    imageFile={imageFile}
-                    imagePreview={imagePreview}
-                    annotations={annotations}
-                    restaurantId={selectedLocation.id}
-                    onProcess={structure => {
-                      setParsedStructure(structure)
-                      handleStepChange(ImportStep.REVIEW)
-                    }}
-                    onBack={handleBack}
-                    onError={setErrorMessage}
-                    isProcessing={isProcessing}
-                    setIsProcessing={setIsProcessing}
-                    processingStep={processingStep}
-                    setProcessingStep={setProcessingStep}
-                    errorMessage={errorMessage}
-                  />
-                )}
+        {/* Main Content */}
+        <div className="lg:col-span-3">
+          <Card>
+            <CardContent className="p-4 sm:p-6">
+              {currentStep === ImportStep.UPLOAD && (
+                <UploadStep
+                  onImageSelect={(file, preview) => {
+                    setImageFile(file)
+                    setImagePreview(preview)
+                    handleStepChange(ImportStep.PREVIEW)
+                  }}
+                  onBack={handleBack}
+                />
+              )}
 
-                {currentStep === ImportStep.REVIEW && parsedStructure && (
-                  <StructureReviewStep
-                    parsedStructure={parsedStructure}
-                    onConfirm={() => {
-                      setShowSuccess(true)
-                      handleComplete()
-                    }}
-                    onBack={handleBack}
-                    restaurantId={selectedLocation.id}
-                  />
-                )}
-              </CardContent>
-            </Card>
-          </div>
+              {currentStep === ImportStep.PREVIEW && (
+                <AnnotationStep
+                  imagePreview={imagePreview!}
+                  onAnnotate={newAnnotations => {
+                    setAnnotations(newAnnotations)
+                    handleStepChange(ImportStep.PROCESS)
+                  }}
+                  onBack={handleBack}
+                  onSkip={() => handleStepChange(ImportStep.PROCESS)}
+                />
+              )}
+
+              {currentStep === ImportStep.PROCESS && (
+                <ProcessStep
+                  imageFile={imageFile}
+                  imagePreview={imagePreview}
+                  annotations={annotations}
+                  restaurantId={selectedLocation.id}
+                  onProcess={structure => {
+                    setParsedStructure(structure)
+                    handleStepChange(ImportStep.REVIEW)
+                  }}
+                  onBack={handleBack}
+                  onError={setErrorMessage}
+                  isProcessing={isProcessing}
+                  setIsProcessing={setIsProcessing}
+                  processingStep={processingStep}
+                  setProcessingStep={setProcessingStep}
+                  errorMessage={errorMessage}
+                />
+              )}
+
+              {currentStep === ImportStep.REVIEW && parsedStructure && (
+                <StructureReviewStep
+                  parsedStructure={parsedStructure}
+                  onConfirm={() => {
+                    setShowSuccess(true)
+                    handleComplete()
+                  }}
+                  onBack={handleBack}
+                  restaurantId={selectedLocation.id}
+                />
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
-    </div>
+    </>
   )
 }
