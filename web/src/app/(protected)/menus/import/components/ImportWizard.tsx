@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components'
 import { ArrowLeft, AlertCircle } from 'lucide-react'
 import { ProgressSidebar } from './ProgressSidebar'
-import { UploadStep } from './UploadStep'
+import { UploadStep } from '@/stories/Components/MenuImport/UploadStep/UploadStep'
 import { AnnotationStep } from './AnnotationStep'
 import { ProcessStep } from './ProcessStep'
 import { useImportFlow } from '../hooks/useImportFlow'
@@ -244,7 +244,6 @@ export function ImportWizard() {
                     processingStep={processingStep}
                     setProcessingStep={setProcessingStep}
                     errorMessage={errorMessage}
-                    restaurantId={selectedLocation.id}
                   />
                 )}
 
