@@ -38,7 +38,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
 import { MenuItemDto, RestaurantMenuDto, useBulkDeleteMenuItems } from '@shared'
-import { DeleteConfirmDialog } from '../DeleteConfirmDialog/DeleteConfirmDialog'
+import { DeleteConfirmDialog } from '../../Components/DeleteConfirmDialog/DeleteConfirmDialog'
 
 interface MenuItemTableViewProps {
   menuItems: MenuItemDto[]
@@ -646,7 +646,7 @@ export default function MenuItemTableView({
                     onCheckedChange={handleSelectAll}
                     ref={el => {
                       if (el) {
-                        ;(el as any).indeterminate = isIndeterminate
+                        ; (el as any).indeterminate = isIndeterminate
                       }
                     }}
                   />
@@ -813,10 +813,7 @@ export default function MenuItemTableView({
                               <Edit className="mr-2 h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onEditItem?.(item)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit in Modal
-                            </DropdownMenuItem>
+
                             <DropdownMenuItem onClick={() => handleDelete(item)} className="text-red-600">
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
@@ -825,15 +822,6 @@ export default function MenuItemTableView({
                         </DropdownMenu>
                       ) : (
                         <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => onEditItem?.(item)}
-                            className="h-8 w-8 p-0"
-                            title="Edit in Modal"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
@@ -1031,8 +1019,7 @@ export default function MenuItemTableView({
       <DeleteConfirmDialog
         isOpen={!!deleteConfirmItem}
         onOpenChange={(open) => !open && setDeleteConfirmItem(null)}
-        deleteTarget={deleteConfirmItem ? { type: 'item', id: deleteConfirmItem.id } : null}
-        categories={[]} // Empty since we're just deleting a single item
+        content={`Are you sure you want to delete this item? This action cannot be undone.`}
         onConfirmDelete={confirmDelete}
       />
 

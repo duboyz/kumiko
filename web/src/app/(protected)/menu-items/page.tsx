@@ -3,8 +3,7 @@
 import { ContentContainer } from '@/components/ContentContainer'
 import { LoadingSpinner } from '@/components'
 import { DeleteConfirmDialog } from '@/components'
-import { MenuItemForm } from '@/components'
-import MenuItemTableView from '@/stories/Components/MenuBuilder/MenuItemTableView/MenuItemTableView'
+import MenuItemTableView from '@/stories/organisms/MenuItemTableView/MenuItemTableView'
 import {
   useAllRestaurantMenuItems,
   useCreateMenuItem,
@@ -208,39 +207,7 @@ function MenuItemsPageContent() {
           <h1 className="text-2xl font-bold">Menu Items</h1>
           <p className="text-muted-foreground">Manage all menu items for {selectedLocation.name}</p>
         </div>
-        <div className="flex gap-2">
-          {/* <Button variant="outline" asChild>
-            <Link href="/menu-items/import">
-              <Upload className="w-4 h-4 mr-2" />
-              Import from Photo
-            </Link>
-          </Button> */}
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Menu Item
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Menu Item</DialogTitle>
-              </DialogHeader>
-              <MenuItemForm
-                mode="create"
-                menus={menusData?.menus || []}
-                initialData={
-                  {
-                    restaurantId: restaurantId!,
-                  } as Partial<CreateMenuItemCommand>
-                }
-                onSubmit={handleCreateMenuItem as (data: CreateMenuItemCommand | UpdateMenuItemCommand) => void}
-                onCancel={() => setIsCreateDialogOpen(false)}
-                isLoading={createMenuItemMutation.isPending}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
+
       </div>
 
       <Tabs value={activeView} onValueChange={value => setActiveView(value as 'cards' | 'table')} className="w-full">
@@ -355,29 +322,11 @@ function MenuItemsPageContent() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Menu Item</DialogTitle>
-          </DialogHeader>
-          {editingItem && (
-            <MenuItemForm
-              mode="edit"
-              menus={menusData?.menus || []}
-              initialData={editingItem as Partial<UpdateMenuItemCommand>}
-              onSubmit={handleUpdateMenuItem as (data: CreateMenuItemCommand | UpdateMenuItemCommand) => void}
-              onCancel={() => setIsEditDialogOpen(false)}
-              isLoading={updateMenuItemMutation.isPending}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
 
       <DeleteConfirmDialog
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        deleteTarget={deleteTarget}
-        categories={[]}
+        content={`Are you sure you want to delete "${deleteTarget}"? This action cannot be undone.`}
         onConfirmDelete={confirmDelete}
       />
     </ContentContainer>

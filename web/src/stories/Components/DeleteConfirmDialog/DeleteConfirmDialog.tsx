@@ -11,22 +11,19 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { AlertTriangle } from 'lucide-react'
-import { MenuCategoryDto } from '@shared'
 
 interface DeleteConfirmDialogProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
-  deleteTarget: { type: 'category' | 'item'; id: string; categoryId?: string } | null
-  categories: MenuCategoryDto[]
   onConfirmDelete: () => void
+  content: string
 }
 
 export function DeleteConfirmDialog({
   isOpen,
   onOpenChange,
-  deleteTarget,
-  categories,
   onConfirmDelete,
+  content,
 }: DeleteConfirmDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -37,15 +34,8 @@ export function DeleteConfirmDialog({
             Confirm Deletion
           </AlertDialogTitle>
           <AlertDialogDescription>
-            {deleteTarget?.type === 'category' ? (
-              <>
-                Are you sure you want to delete this category? This will permanently remove the category and all{' '}
-                {categories.find(cat => cat.id === deleteTarget.id)?.menuCategoryItems.length || 0} menu items within
-                it. This action cannot be undone.
-              </>
-            ) : (
-              <>Are you sure you want to delete this menu item? This action cannot be undone.</>
-            )}
+            {content}
+
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

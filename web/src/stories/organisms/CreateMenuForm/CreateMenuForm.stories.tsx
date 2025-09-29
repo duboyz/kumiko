@@ -20,10 +20,6 @@ const meta: Meta<typeof CreateMenuForm> = {
       control: 'text',
       description: 'ID of the restaurant',
     },
-    onCreateMenu: {
-      action: 'menu created',
-      description: 'Function called when menu is created',
-    },
   },
 }
 
@@ -35,7 +31,6 @@ export const Default: Story = {
   args: {
     restaurantId: '1',
     restaurantName: 'Bella Vista Restaurant',
-    onCreateMenu: (menuData) => console.log('Create menu:', menuData),
     isLoading: false,
   },
 }
