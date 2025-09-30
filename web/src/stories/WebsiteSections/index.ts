@@ -1,7 +1,4 @@
 // Hero Sections
-export { HeroSection } from '../organisms/HeroSection/index'
-export { HeroBackgroundImage } from '../organisms/HeroSection/HeroBackgroundImage'
-export { HeroImageRight } from '../organisms/HeroSection/HeroImageRight'
 
 // Text Sections
 export { TextSection } from '../organisms/TextSection/TextSection'

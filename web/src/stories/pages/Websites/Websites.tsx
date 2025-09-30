@@ -1,143 +1,92 @@
-import { useLocationSelection, usePages, useRestaurantWebsites, useUpdateWebsite } from '@shared'
-import { useState, useEffect } from 'react'
-import { WebsitePages } from '@/stories/organisms/WebsitePages'
-import { Globe, ExternalLink, Eye, Settings, Power, PowerOff } from 'lucide-react'
-import { FormField } from '@/components/FormField'
-import { EmptyState } from '@/components/EmptyState'
-import { SelectWebsite } from '@/stories/components/SelectWebsite/SelectWebsite'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ContentContainer } from '@/components/ContentContainer'
+import { Select, SelectItem, SelectTrigger } from '@/components/ui/select'
+import { SelectValue } from '@/components/ui/select'
+import { SelectContent } from '@/components/ui/select'
+
+import { useLocationSelection, usePages, useRestaurantWebsites, WebsiteDto, WebsitePageDto } from '@shared'
+import { useMemo, useState, useEffect } from 'react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 
 export function Websites() {
-    const { selectedLocation } = useLocationSelection()
-    const { data: websites } = useRestaurantWebsites(selectedLocation?.id, selectedLocation?.type || 'Restaurant')
-    const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('')
-    const updateWebsite = useUpdateWebsite()
+  const { selectedLocation } = useLocationSelection()
+  const {
+    data: websites,
+    isLoading,
+    error,
+  } = useRestaurantWebsites(selectedLocation?.id, selectedLocation?.type || 'Restaurant')
+  const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('')
 
-    const { data: websitePages } = usePages(selectedWebsiteId || '')
+  const {
+    data: websitePages,
+    isLoading: isLoadingWebsitePages,
+    error: errorWebsitePages,
+  } = usePages(selectedWebsiteId || '')
 
-    const selectedWebsite = websites?.find(w => w.id === selectedWebsiteId)
-
-    useEffect(() => {
-        if (websites && websites.length === 1 && !selectedWebsiteId) {
-            setSelectedWebsiteId(websites[0].id)
-        }
-    }, [websites, selectedWebsiteId])
-
-    const handleTogglePublish = async () => {
-        if (!selectedWebsite) return
-
-        try {
-            await updateWebsite.mutateAsync({
-                websiteId: selectedWebsite.id,
-                updates: { isPublished: !selectedWebsite.isPublished }
-            })
-        } catch (error) {
-            console.error('Failed to toggle publish status:', error)
-        }
+  useEffect(() => {
+    if (websites?.websites?.length === 1 && !selectedWebsiteId) {
+      setSelectedWebsiteId(websites.websites[0].id)
     }
+  }, [websites?.websites, selectedWebsiteId])
 
-    const getWebsiteUrl = (subdomain: string) => {
-        return `https://${subdomain}.kumiko.no`
-    }
+  return (
+    <ContentContainer>
+      <SelectWebsite
+        websites={websites?.websites || []}
+        selectedWebsiteId={selectedWebsiteId}
+        onSelectWebsite={setSelectedWebsiteId}
+      />
 
-    if (websites && websites.length === 0) {
-        return (
-            <EmptyState
-                icon={Globe}
-                title="No websites yet"
-                description="Create your first website to start building your online presence."
-                variant="compact"
-            />
-        )
-    }
-
-    return (
-        <div className="space-y-8">
-            {(websites?.length || 0) > 1 && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg">Select Website</CardTitle>
-                        <CardDescription>Choose which website you want to manage</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <SelectWebsite
-                            websites={websites || []}
-                            selectedWebsiteId={selectedWebsiteId}
-                            onSelectWebsite={setSelectedWebsiteId}
-                        />
-                    </CardContent>
-                </Card>
-            )}
-
-            {selectedWebsite && (
-                <Card>
-                    <CardHeader>
-                        <div className="flex items-start justify-between">
-                            <div className="space-y-1">
-                                <CardTitle className="flex items-center gap-2">
-                                    <Globe className="w-5 h-5 text-muted-foreground" />
-                                    {selectedWebsite.name}
-                                </CardTitle>
-                                <CardDescription>
-                                    {selectedWebsite.description || 'No description provided'}
-                                </CardDescription>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Badge variant={selectedWebsite.isPublished ? 'default' : 'secondary'}>
-                                    {selectedWebsite.isPublished ? 'Published' : 'Draft'}
-                                </Badge>
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                                <div className="space-y-1">
-                                    <p className="text-sm font-medium">Website URL</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {getWebsiteUrl(selectedWebsite.subdomain)}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {selectedWebsite.isPublished && (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => window.open(getWebsiteUrl(selectedWebsite.subdomain), '_blank')}
-                                        >
-                                            <ExternalLink className="w-4 h-4 mr-2" />
-                                            Visit Site
-                                        </Button>
-                                    )}
-                                    <Button
-                                        variant={selectedWebsite.isPublished ? 'secondary' : 'default'}
-                                        size="sm"
-                                        onClick={handleTogglePublish}
-                                        disabled={updateWebsite.isPending}
-                                    >
-                                        {selectedWebsite.isPublished ? (
-                                            <>
-                                                <PowerOff className="w-4 h-4 mr-2" />
-                                                Unpublish
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Power className="w-4 h-4 mr-2" />
-                                                Publish
-                                            </>
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-            {selectedWebsiteId && <WebsitePages websitePages={websitePages?.pages || []} websiteId={selectedWebsiteId} />}
+      {selectedWebsiteId && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {websitePages?.pages.map(page => (
+            <WebsitePages key={page.id} websitePage={page} />
+          ))}
         </div>
-    )
+      )}
+    </ContentContainer>
+  )
 }
 
+const WebsitePages = ({ websitePage }: { websitePage: WebsitePageDto }) => {
+  return (
+    <div className="border-1 border-gray-200 rounded-md p-4 flex flex-col gap-2">
+      <div className="flex gap-2 items-center justify-between">
+        <h1 className="text-2xl font-bold">{websitePage.title}</h1>
+        <p>/{websitePage.slug}</p>
+      </div>
+      <div className="flex gap-2">
+        <Button variant="outline">Edit</Button>
+        <Button variant="outline">Delete</Button>
+        <Link href={`/websites/${websitePage.websiteId}/pages/${websitePage.id}`}>Edit</Link>
+      </div>
+    </div>
+  )
+}
+
+interface SelectWebsiteProps {
+  websites: WebsiteDto[]
+  selectedWebsiteId: string
+  onSelectWebsite: (websiteId: string) => void
+}
+export const SelectWebsite = ({ websites, selectedWebsiteId, onSelectWebsite }: SelectWebsiteProps) => {
+  // Don't show selector if there's only one website
+  if (websites.length <= 1) {
+    return null
+  }
+
+  return (
+    <Select onValueChange={onSelectWebsite} value={selectedWebsiteId}>
+      <SelectTrigger>
+        <SelectValue placeholder="Select a website" />
+      </SelectTrigger>
+      <SelectContent>
+        {websites.map(website => (
+          <SelectItem key={website.id} value={website.id}>
+            {website.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
