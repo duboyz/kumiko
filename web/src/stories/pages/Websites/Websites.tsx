@@ -7,6 +7,7 @@ import { HeroSection } from "@/stories/WebsiteSections/HeroSection";
 import { useLocationSelection, usePages, useRestaurantWebsites, WebsiteDto, WebsitePageDto } from "@shared";
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
+import { WebsitePages } from "@/stories/organisms/WebsitePages";
 
 export function Websites() {
     const { selectedLocation } = useLocationSelection()
@@ -16,21 +17,25 @@ export function Websites() {
     const { data: websitePages, isLoading: isLoadingWebsitePages, error: errorWebsitePages } = usePages(selectedWebsiteId || '')
 
     useEffect(() => {
-        if (websites?.websites?.length === 1 && !selectedWebsiteId) {
-            setSelectedWebsiteId(websites.websites[0].id)
+        if (websites?.length === 1 && !selectedWebsiteId) {
+            setSelectedWebsiteId(websites[0].id)
         }
-    }, [websites?.websites, selectedWebsiteId])
+    }, [websites, selectedWebsiteId])
 
     return (
         <ContentContainer>
-            <SelectWebsite websites={websites?.websites || []} selectedWebsiteId={selectedWebsiteId} onSelectWebsite={setSelectedWebsiteId} />
+
+            {
+                (websites?.length || 0) > 1 && (<SelectWebsite websites={websites || []} selectedWebsiteId={selectedWebsiteId} onSelectWebsite={setSelectedWebsiteId} />)
+            }
 
             {
                 selectedWebsiteId && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {websitePages?.pages.map(page => (
-                            <WebsitePages key={page.id} websitePage={page} />
-                        ))}
+
+                        <WebsitePages websitePages={websitePages?.pages || []} websiteId={selectedWebsiteId} />
+                        <p>http://{websites?.find(w => w.id === selectedWebsiteId)?.subdomain}.{process.env.NEXT_PUBLIC_SITE_URL?.split('//')[1]}</p>
+
                     </div>
                 )
             }
@@ -40,27 +45,6 @@ export function Websites() {
 }
 
 
-const WebsitePages = ({ websitePage }: { websitePage: WebsitePageDto }) => {
-
-    return (
-        <div className="border-1 border-gray-200 rounded-md p-4 flex flex-col gap-2">
-
-            <div className="flex gap-2 items-center justify-between">
-                <h1 className="text-2xl font-bold">{websitePage.title}</h1>
-                <p>/{websitePage.slug}</p>
-
-            </div>
-            <div className="flex gap-2">
-                <Button variant="outline">Edit</Button>
-                <Button variant="outline">Delete</Button>
-                <Link href={`/websites/${websitePage.websiteId}/pages/${websitePage.id}`}>Edit</Link>
-            </div>
-        </div>
-
-
-    )
-}
-
 
 interface SelectWebsiteProps {
     websites: WebsiteDto[]
@@ -68,11 +52,6 @@ interface SelectWebsiteProps {
     onSelectWebsite: (websiteId: string) => void
 }
 export const SelectWebsite = ({ websites, selectedWebsiteId, onSelectWebsite }: SelectWebsiteProps) => {
-    // Don't show selector if there's only one website
-    if (websites.length <= 1) {
-        return null
-    }
-
     return (
         <Select onValueChange={onSelectWebsite} value={selectedWebsiteId}>
             <SelectTrigger>

@@ -12,7 +12,7 @@ namespace BackendApi.Features.Website.GetRestaurantWebsites;
 public class GetRestaurantWebsitesController(IMediator mediator) : BaseController(mediator)
 {
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<GetRestaurantWebsitesResult>>> GetRestaurantWebsites(
+    public async Task<ActionResult<ApiResponse<List<WebsiteDto>>>> GetRestaurantWebsites(
         [FromQuery] Guid? entityId = null,
         [FromQuery] string? entityType = null)
     {

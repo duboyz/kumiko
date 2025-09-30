@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl'
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useState } from 'react'
 import { CreateMenuForm } from '@/components'
-import { Modal } from '@/stories/molecules/Modal'
+import { Modal } from '@/stories/molecules/Modal/Modal'
 
 export default function MenusPage() {
   const { selectedLocation, isLoading, hasNoLocations } = useLocationSelection()

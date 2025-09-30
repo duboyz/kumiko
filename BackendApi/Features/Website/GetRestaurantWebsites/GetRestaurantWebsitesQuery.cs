@@ -5,9 +5,7 @@ namespace BackendApi.Features.Website.GetRestaurantWebsites;
 public record GetRestaurantWebsitesQuery(
     Guid? EntityId = null,
     string? EntityType = null
-) : IQuery<GetRestaurantWebsitesResult>;
-
-public record GetRestaurantWebsitesResult(List<WebsiteDto> Websites);
+) : IQuery<List<WebsiteDto>>;
 
 public record WebsiteDto(
     Guid Id,

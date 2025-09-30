@@ -9,9 +9,9 @@ public class GetRestaurantWebsitesHandler(
     IWebsiteRepository websiteRepository,
     IUserRestaurantRepository userRestaurantRepository,
     IUserHospitalityRepository userHospitalityRepository,
-    IHttpContextAccessor httpContextAccessor) : IQueryHandler<GetRestaurantWebsitesQuery, GetRestaurantWebsitesResult>
+    IHttpContextAccessor httpContextAccessor) : IQueryHandler<GetRestaurantWebsitesQuery, List<WebsiteDto>>
 {
-    public async Task<GetRestaurantWebsitesResult> Handle(GetRestaurantWebsitesQuery request, CancellationToken cancellationToken)
+    public async Task<List<WebsiteDto>> Handle(GetRestaurantWebsitesQuery request, CancellationToken cancellationToken)
     {
         var userId = httpContextAccessor.GetCurrentUserId();
 
@@ -30,7 +30,7 @@ public class GetRestaurantWebsitesHandler(
                 }
                 else
                 {
-                    return new GetRestaurantWebsitesResult(new List<WebsiteDto>());
+                    return new List<WebsiteDto>();
                 }
             }
 
@@ -50,7 +50,7 @@ public class GetRestaurantWebsitesHandler(
                 ))
                 .ToList();
 
-            return new GetRestaurantWebsitesResult(hospitalityWebsiteDtos);
+            return hospitalityWebsiteDtos;
         }
         else
         {
@@ -67,7 +67,7 @@ public class GetRestaurantWebsitesHandler(
                 }
                 else
                 {
-                    return new GetRestaurantWebsitesResult(new List<WebsiteDto>());
+                    return new List<WebsiteDto>();
                 }
             }
 
@@ -87,7 +87,7 @@ public class GetRestaurantWebsitesHandler(
                 ))
                 .ToList();
 
-            return new GetRestaurantWebsitesResult(restaurantWebsiteDtos);
+            return restaurantWebsiteDtos;
         }
     }
 }

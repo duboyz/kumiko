@@ -22,9 +22,7 @@ export interface CreateWebsiteResult {
   websiteId: string
 }
 
-export interface GetRestaurantWebsitesResult {
-  websites: WebsiteDto[]
-}
+export type GetRestaurantWebsitesResult = WebsiteDto[]
 
 // Hero Section types
 export enum HeroSectionType {
