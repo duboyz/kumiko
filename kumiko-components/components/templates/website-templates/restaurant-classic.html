@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bella Italia - Restaurant Classic Template</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 300;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+
+        /* NAVIGATION */
+        .nav {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-size: 20px;
+            font-weight: 100;
+            letter-spacing: 4px;
+            color: #000000;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: #666666;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #000000;
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero-title {
+            font-size: 72px;
+            font-weight: 100;
+            letter-spacing: 12px;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            color: #666666;
+            letter-spacing: 1px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            gap: 16px;
+        }
+
+        .btn-primary {
+            background: #000000;
+            border: 1px solid #000000;
+            color: #ffffff;
+            padding: 20px 40px;
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            cursor: pointer;
+            font-family: 'Noto Sans JP', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #333333;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #000000;
+            color: #000000;
+            padding: 20px 40px;
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            cursor: pointer;
+            font-family: 'Noto Sans JP', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #000000;
+            color: white;
+        }
+
+        /* TEXT SECTION */
+        .text-section {
+            padding: 120px 40px;
+            background: white;
+        }
+
+        .text-section-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .text-section-title {
+            font-size: 40px;
+            font-weight: 100;
+            letter-spacing: 4px;
+            margin-bottom: 32px;
+        }
+
+        .text-section-body {
+            font-size: 16px;
+            color: #666666;
+            letter-spacing: 0.5px;
+            line-height: 1.9;
+        }
+
+        .text-section-body p {
+            margin-bottom: 24px;
+        }
+
+        /* FEATURES */
+        .features-section {
+            padding: 120px 40px;
+            background: #fafafa;
+        }
+
+        .features-header {
+            max-width: 800px;
+            margin: 0 auto 80px;
+            text-align: center;
+        }
+
+        .features-title {
+            font-size: 40px;
+            font-weight: 100;
+            letter-spacing: 4px;
+            margin-bottom: 16px;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+        }
+
+        .feature-item {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 24px;
+            font-weight: 100;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .feature-description {
+            font-size: 15px;
+            color: #666666;
+            line-height: 1.7;
+            letter-spacing: 0.5px;
+        }
+
+        /* CTA SECTION */
+        .cta-section {
+            padding: 120px 40px;
+            background: #000000;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: 40px;
+            font-weight: 100;
+            letter-spacing: 4px;
+            margin-bottom: 24px;
+        }
+
+        .cta-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 0.5px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        .btn-white {
+            background: white;
+            border: 1px solid white;
+            color: #000000;
+            padding: 20px 40px;
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            cursor: pointer;
+            font-family: 'Noto Sans JP', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-white:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+
+        /* FOOTER */
+        .footer {
+            padding: 60px 40px 40px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section-title {
+            font-size: 12px;
+            font-weight: 400;
+            color: #999999;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-link {
+            font-size: 14px;
+            color: #666666;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: #000000;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 12px;
+            color: #999999;
+            letter-spacing: 1px;
+        }
+
+        /* TEMPLATE INFO BANNER */
+        .template-info {
+            background: #000000;
+            color: white;
+            padding: 12px 40px;
+            text-align: center;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .template-info a {
+            color: white;
+            text-decoration: underline;
+            margin-left: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 40px;
+                letter-spacing: 6px;
+            }
+
+            .nav-menu {
+                gap: 20px;
+                font-size: 12px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-primary,
+            .btn-secondary,
+            .btn-white {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Template Info Banner -->
+    <div class="template-info">
+        Kumiko Restaurant Classic Template
+        <a href="../../index.html">← Back to Library</a>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="#home" class="nav-logo">BELLA ITALIA</a>
+        <div class="nav-menu">
+            <a href="#home" class="nav-link active">Home</a>
+            <a href="#menu" class="nav-link">Menu</a>
+            <a href="#about" class="nav-link">About</a>
+            <a href="#contact" class="nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <!-- HOME PAGE -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">BELLA ITALIA</h1>
+            <p class="hero-description">
+                Authentic Italian cuisine in the heart of Oslo. 
+                Experience traditional recipes passed down through generations, 
+                crafted with passion and the finest ingredients.
+            </p>
+            <div class="hero-cta">
+                <a href="#menu" class="btn-primary">View Our Menu</a>
+                <a href="#contact" class="btn-secondary">Reserve a Table</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="text-section">
+        <div class="text-section-content">
+            <h2 class="text-section-title">Our Story</h2>
+            <div class="text-section-body">
+                <p>
+                    Founded in 1995, Bella Italia has been serving authentic Italian cuisine 
+                    to the Oslo community for over 25 years. Our journey began with a simple 
+                    passion: to bring the true flavors of Italy to Norway.
+                </p>
+                <p>
+                    Every dish is crafted with care, using traditional recipes passed down 
+                    through generations. We source the finest ingredients, from San Marzano 
+                    tomatoes to Parmigiano-Reggiano, ensuring authenticity in every bite.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features-section">
+        <div class="features-header">
+            <h2 class="features-title">Why Choose Us</h2>
+        </div>
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">🍝</div>
+                <h3 class="feature-title">Authentic Recipes</h3>
+                <p class="feature-description">
+                    Traditional Italian dishes prepared using time-honored methods 
+                    and family recipes from Italy.
+                </p>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">🌿</div>
+                <h3 class="feature-title">Fresh Ingredients</h3>
+                <p class="feature-description">
+                    We source the highest quality ingredients daily, supporting 
+                    local producers and Italian importers.
+                </p>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">👨‍🍳</div>
+                <h3 class="feature-title">Expert Chefs</h3>
+                <p class="feature-description">
+                    Our experienced chefs trained in Italy bring passion and 
+                    expertise to every dish we serve.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Dine With Us?</h2>
+            <p class="cta-description">
+                Reserve your table today and experience the authentic taste of Italy. 
+                We look forward to welcoming you to Bella Italia.
+            </p>
+            <a href="#contact" class="btn-white">Make a Reservation</a>
+        </div>
+    </section>
+
+    <!-- MENU PAGE (Simplified) -->
+    <section id="menu" class="text-section" style="background: #fafafa;">
+        <div class="text-section-content">
+            <h2 class="text-section-title">OUR MENU</h2>
+            <div class="text-section-body">
+                <p>
+                    Explore our carefully curated selection of authentic Italian dishes. 
+                    From handmade pasta to wood-fired pizzas, every item is crafted with 
+                    passion and the finest ingredients.
+                </p>
+                <p style="margin-top: 40px;">
+                    <a href="../page-templates/menu-page.html" class="btn-primary">View Full Menu</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT PAGE (Simplified) -->
+    <section id="about" class="text-section">
+        <div class="text-section-content">
+            <h2 class="text-section-title">About Bella Italia</h2>
+            <div class="text-section-body">
+                <p>
+                    For over 25 years, we've been bringing the warmth and flavors of Italy 
+                    to Oslo. Our story is one of passion, tradition, and an unwavering commitment 
+                    to quality.
+                </p>
+                <p>
+                    From our family to yours, we invite you to experience authentic Italian 
+                    hospitality and cuisine that tells a story in every bite.
+                </p>
+                <p style="margin-top: 40px;">
+                    <a href="../page-templates/about-page.html" class="btn-secondary">Read Our Full Story</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT PAGE (Simplified) -->
+    <section id="contact" class="text-section" style="background: #fafafa;">
+        <div class="text-section-content">
+            <h2 class="text-section-title">Visit Us</h2>
+            <div class="text-section-body">
+                <p>
+                    <strong>Address:</strong><br>
+                    Storgata 25, 0184 Oslo, Norway
+                </p>
+                <p>
+                    <strong>Phone:</strong><br>
+                    +47 22 12 34 56
+                </p>
+                <p>
+                    <strong>Email:</strong><br>
+                    hello@bellaitalia.no
+                </p>
+                <p>
+                    <strong>Opening Hours:</strong><br>
+                    Monday: Closed<br>
+                    Tue-Thu: 11:00 - 22:00<br>
+                    Fri-Sat: 11:00 - 23:00<br>
+                    Sunday: 12:00 - 21:00
+                </p>
+                <p style="margin-top: 40px;">
+                    <a href="../page-templates/contact-page.html" class="btn-primary">Get in Touch</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <div class="footer-section-title">About</div>
+                <p class="footer-text">
+                    Authentic Italian restaurant serving Oslo since 1995. 
+                    Traditional recipes, fresh ingredients, warm hospitality.
+                </p>
+            </div>
+
+            <div>
+                <div class="footer-section-title">Quick Links</div>
+                <div class="footer-links">
+                    <a href="#home" class="footer-link">Home</a>
+                    <a href="#menu" class="footer-link">Menu</a>
+                    <a href="#about" class="footer-link">About Us</a>
+                    <a href="#contact" class="footer-link">Contact</a>
+                </div>
+            </div>
+
+            <div>
+                <div class="footer-section-title">Contact</div>
+                <p class="footer-text">
+                    Storgata 25<br>
+                    0184 Oslo, Norway<br>
+                    <br>
+                    +47 22 12 34 56<br>
+                    hello@bellaitalia.no
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2025 Bella Italia. All rights reserved. | Powered by Kumiko
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Update active nav link
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    if (this.classList.contains('nav-link')) {
+                        this.classList.add('active');
+                    }
+                }
+            });
+        });
+
+        // Update active nav on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const scrollY = window.pageYOffset;
+
+            sections.forEach(section => {
+                const sectionHeight = section.offsetHeight;
+                const sectionTop = section.offsetTop - 100;
+                const sectionId = section.getAttribute('id');
+                
+                if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${sectionId}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

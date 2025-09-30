@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kumiko - Menu Section Component</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 300;
+            background: #fafafa;
+            color: #000000;
+            line-height: 1.6;
+            padding: 60px 40px;
+        }
+
+        .component-header {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            text-align: center;
+        }
+
+        .component-title {
+            font-size: 48px;
+            font-weight: 100;
+            letter-spacing: 8px;
+            margin-bottom: 16px;
+        }
+
+        .component-subtitle {
+            font-size: 14px;
+            color: #666666;
+            letter-spacing: 1px;
+        }
+
+        .variant-section {
+            max-width: 1400px;
+            margin: 0 auto 60px;
+            background: white;
+            padding: 60px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .variant-title {
+            font-size: 12px;
+            font-weight: 400;
+            color: #999999;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+        }
+
+        .variant-demo {
+            margin-bottom: 32px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .variant-description {
+            font-size: 14px;
+            color: #666666;
+            letter-spacing: 0.5px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .usage-code {
+            background: #000000;
+            color: #ffffff;
+            padding: 24px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            line-height: 1.8;
+        }
+
+        /* MENU SECTION COMPONENTS */
+        .menu-section {
+            padding: 80px 40px;
+            background: white;
+        }
+
+        .menu-section-header {
+            max-width: 1000px;
+            margin: 0 auto 60px;
+            text-align: center;
+        }
+
+        .menu-section-title {
+            font-size: 40px;
+            font-weight: 100;
+            letter-spacing: 6px;
+            margin-bottom: 16px;
+        }
+
+        .menu-section-description {
+            font-size: 16px;
+            color: #666666;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .menu-category {
+            margin-bottom: 80px;
+        }
+
+        .menu-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .menu-category-header {
+            margin-bottom: 40px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .menu-category-name {
+            font-size: 24px;
+            font-weight: 200;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .menu-category-description {
+            font-size: 14px;
+            color: #999999;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .menu-item-content {
+            flex: 1;
+        }
+
+        .menu-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .menu-item-name {
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .menu-item-price {
+            font-size: 16px;
+            color: #666666;
+            font-weight: 300;
+            white-space: nowrap;
+        }
+
+        .menu-item-description {
+            font-size: 14px;
+            color: #999999;
+            line-height: 1.7;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item-allergens {
+            font-size: 12px;
+            color: #cccccc;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item-options {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .menu-item-option {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            color: #666666;
+        }
+
+        .menu-item-option-name {
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item-option-price {
+            font-weight: 300;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .menu-section-compact {
+            padding: 60px 40px;
+        }
+
+        .menu-section-compact .menu-category {
+            margin-bottom: 60px;
+        }
+
+        .menu-section-compact .menu-items {
+            gap: 24px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #999999;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: #666666;
+        }
+
+        @media (max-width: 768px) {
+            .menu-section-title {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .menu-item {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .menu-item-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div style="max-width: 1400px; margin: 0 auto 40px; text-align: center;">
+        <a href="../../index.html" class="back-link">← Back to Component Library</a>
+    </div>
+
+    <div class="component-header">
+        <h1 class="component-title">MENU SECTION</h1>
+        <p class="component-subtitle">Display restaurant menu with categories, items, and pricing</p>
+    </div>
+
+    <!-- Basic Menu Section -->
+    <div class="variant-section">
+        <h2 class="variant-title">Basic Menu Section</h2>
+        <p class="variant-description">
+            Clean menu display with categories and items. Shows name, description, allergens, and price.
+        </p>
+
+        <div class="variant-demo">
+            <section class="menu-section">
+                <div class="menu-section-header">
+                    <h2 class="menu-section-title">OUR MENU</h2>
+                    <p class="menu-section-description">Fresh, authentic Italian cuisine</p>
+                </div>
+
+                <div class="menu-container">
+                    <div class="menu-category">
+                        <div class="menu-category-header">
+                            <h3 class="menu-category-name">Starters</h3>
+                        </div>
+                        <div class="menu-items">
+                            <div class="menu-item">
+                                <div class="menu-item-content">
+                                    <div class="menu-item-header">
+                                        <div class="menu-item-name">Bruschetta</div>
+                                        <div class="menu-item-price">95 kr</div>
+                                    </div>
+                                    <div class="menu-item-description">
+                                        Toasted bread with fresh tomatoes and basil
+                                    </div>
+                                    <div class="menu-item-allergens">Gluten</div>
+                                </div>
+                            </div>
+
+                            <div class="menu-item">
+                                <div class="menu-item-content">
+                                    <div class="menu-item-header">
+                                        <div class="menu-item-name">Caprese Salad</div>
+                                        <div class="menu-item-price">120 kr</div>
+                                    </div>
+                                    <div class="menu-item-description">
+                                        Fresh mozzarella, tomatoes, and basil
+                                    </div>
+                                    <div class="menu-item-allergens">Dairy</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="usage-code">&lt;section class="menu-section"&gt;
+    &lt;div class="menu-section-header"&gt;
+        &lt;h2 class="menu-section-title"&gt;OUR MENU&lt;/h2&gt;
+    &lt;/div&gt;
+    &lt;div class="menu-container"&gt;
+        &lt;div class="menu-category"&gt;
+            &lt;div class="menu-category-header"&gt;
+                &lt;h3 class="menu-category-name"&gt;Category&lt;/h3&gt;
+            &lt;/div&gt;
+            &lt;div class="menu-items"&gt;
+                &lt;div class="menu-item"&gt;
+                    &lt;div class="menu-item-content"&gt;
+                        &lt;div class="menu-item-header"&gt;
+                            &lt;div class="menu-item-name"&gt;Name&lt;/div&gt;
+                            &lt;div class="menu-item-price"&gt;190 kr&lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class="menu-item-description"&gt;Description&lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/section&gt;</div>
+    </div>
+
+    <!-- Menu with Options -->
+    <div class="variant-section">
+        <h2 class="variant-title">Menu with Item Options</h2>
+        <p class="variant-description">
+            Menu items with size or portion options. Price displayed per option.
+        </p>
+
+        <div class="variant-demo">
+            <section class="menu-section">
+                <div class="menu-container">
+                    <div class="menu-category">
+                        <div class="menu-category-header">
+                            <h3 class="menu-category-name">Pizza</h3>
+                        </div>
+                        <div class="menu-items">
+                            <div class="menu-item">
+                                <div class="menu-item-content">
+                                    <div class="menu-item-name">Margherita</div>
+                                    <div class="menu-item-description">
+                                        Tomatoes, mozzarella, fresh basil
+                                    </div>
+                                    <div class="menu-item-allergens">Gluten, Dairy</div>
+                                    <div class="menu-item-options">
+                                        <div class="menu-item-option">
+                                            <span class="menu-item-option-name">Small (25cm)</span>
+                                            <span class="menu-item-option-price">160 kr</span>
+                                        </div>
+                                        <div class="menu-item-option">
+                                            <span class="menu-item-option-name">Large (35cm)</span>
+                                            <span class="menu-item-option-price">220 kr</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="usage-code">&lt;div class="menu-item-options"&gt;
+    &lt;div class="menu-item-option"&gt;
+        &lt;span class="menu-item-option-name"&gt;Small&lt;/span&gt;
+        &lt;span class="menu-item-option-price"&gt;160 kr&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+    </div>
+
+    <!-- Menu Grid Layout -->
+    <div class="variant-section">
+        <h2 class="variant-title">Menu Grid Layout</h2>
+        <p class="variant-description">
+            Two-column layout for wider displays. Automatically stacks on mobile.
+        </p>
+
+        <div class="variant-demo">
+            <section class="menu-section">
+                <div class="menu-section-header">
+                    <h2 class="menu-section-title">DRINKS MENU</h2>
+                </div>
+                <div class="menu-container">
+                    <div class="menu-grid">
+                        <div class="menu-category">
+                            <div class="menu-category-header">
+                                <h3 class="menu-category-name">Wine</h3>
+                            </div>
+                            <div class="menu-items">
+                                <div class="menu-item">
+                                    <div class="menu-item-content">
+                                        <div class="menu-item-header">
+                                            <div class="menu-item-name">Chianti Classico</div>
+                                            <div class="menu-item-price">680 kr</div>
+                                        </div>
+                                        <div class="menu-item-description">Tuscany, Italy</div>
+                                    </div>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="menu-item-content">
+                                        <div class="menu-item-header">
+                                            <div class="menu-item-name">Prosecco</div>
+                                            <div class="menu-item-price">580 kr</div>
+                                        </div>
+                                        <div class="menu-item-description">Veneto, Italy</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-category">
+                            <div class="menu-category-header">
+                                <h3 class="menu-category-name">Beer</h3>
+                            </div>
+                            <div class="menu-items">
+                                <div class="menu-item">
+                                    <div class="menu-item-content">
+                                        <div class="menu-item-header">
+                                            <div class="menu-item-name">Peroni</div>
+                                            <div class="menu-item-price">95 kr</div>
+                                        </div>
+                                        <div class="menu-item-description">Italian lager</div>
+                                    </div>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="menu-item-content">
+                                        <div class="menu-item-header">
+                                            <div class="menu-item-name">IPA</div>
+                                            <div class="menu-item-price">105 kr</div>
+                                        </div>
+                                        <div class="menu-item-description">Local craft beer</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="usage-code">&lt;div class="menu-container"&gt;
+    &lt;div class="menu-grid"&gt;
+        &lt;div class="menu-category"&gt;...&lt;/div&gt;
+        &lt;div class="menu-category"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+    </div>
+
+    <!-- Compact Menu -->
+    <div class="variant-section">
+        <h2 class="variant-title">Compact Menu</h2>
+        <p class="variant-description">
+            Tighter spacing for menus with many items.
+        </p>
+
+        <div class="variant-demo">
+            <section class="menu-section menu-section-compact">
+                <div class="menu-section-header">
+                    <h2 class="menu-section-title">LUNCH SPECIAL</h2>
+                </div>
+                <div class="menu-container">
+                    <div class="menu-category">
+                        <div class="menu-category-header">
+                            <h3 class="menu-category-name">Today's Options</h3>
+                        </div>
+                        <div class="menu-items">
+                            <div class="menu-item">
+                                <div class="menu-item-content">
+                                    <div class="menu-item-header">
+                                        <div class="menu-item-name">Pasta of the Day</div>
+                                        <div class="menu-item-price">135 kr</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="menu-item">
+                                <div class="menu-item-content">
+                                    <div class="menu-item-header">
+                                        <div class="menu-item-name">Soup & Salad</div>
+                                        <div class="menu-item-price">125 kr</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="usage-code">&lt;section class="menu-section menu-section-compact"&gt;
+    &lt;!-- Same structure as basic menu --&gt;
+&lt;/section&gt;</div>
+    </div>
+</body>
+</html>

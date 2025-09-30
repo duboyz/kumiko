@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kumiko - Select Component</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 300;
+            background: #fafafa;
+            color: #000000;
+            line-height: 1.6;
+            padding: 60px 40px;
+        }
+
+        .component-header {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            text-align: center;
+        }
+
+        .component-title {
+            font-size: 48px;
+            font-weight: 100;
+            letter-spacing: 8px;
+            margin-bottom: 16px;
+        }
+
+        .component-subtitle {
+            font-size: 14px;
+            color: #666666;
+            letter-spacing: 1px;
+        }
+
+        .variant-section {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            background: white;
+            padding: 60px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .variant-title {
+            font-size: 12px;
+            font-weight: 400;
+            color: #999999;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+        }
+
+        .variant-demo {
+            padding: 40px;
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
+            margin-bottom: 32px;
+        }
+
+        .variant-description {
+            font-size: 14px;
+            color: #666666;
+            letter-spacing: 0.5px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .usage-code {
+            background: #000000;
+            color: #ffffff;
+            padding: 24px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            line-height: 1.8;
+        }
+
+        /* SELECT COMPONENTS */
+        .select-group {
+            margin-bottom: 32px;
+        }
+
+        .select-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .select-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 400;
+            color: #999999;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        /* Native Select Styling */
+        .select {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-bottom: 1px solid #e0e0e0;
+            background: transparent;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 15px;
+            font-weight: 300;
+            color: #000000;
+            letter-spacing: 0.5px;
+            transition: border-color 0.2s ease;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3e%3cpath fill='%23999999' d='M6 8L0 0h12z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right center;
+            background-size: 12px;
+            padding-right: 24px;
+        }
+
+        .select:focus {
+            border-bottom-color: #000000;
+        }
+
+        .select:disabled {
+            color: #999999;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .select option {
+            background: white;
+            color: #000000;
+            padding: 12px;
+        }
+
+        /* Custom Select (for more control) */
+        .select-custom {
+            position: relative;
+            width: 100%;
+        }
+
+        .select-custom-trigger {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-bottom: 1px solid #e0e0e0;
+            background: transparent;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 15px;
+            font-weight: 300;
+            color: #000000;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s ease;
+        }
+
+        .select-custom-trigger:hover {
+            border-bottom-color: #cccccc;
+        }
+
+        .select-custom.open .select-custom-trigger {
+            border-bottom-color: #000000;
+        }
+
+        .select-custom-trigger .placeholder {
+            color: #cccccc;
+        }
+
+        .select-custom-arrow {
+            width: 12px;
+            height: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .select-custom.open .select-custom-arrow {
+            transform: rotate(180deg);
+        }
+
+        .select-custom-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            margin-top: 8px;
+            max-height: 240px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .select-custom.open .select-custom-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .select-custom-option {
+            padding: 12px 16px;
+            font-size: 15px;
+            font-weight: 300;
+            color: #000000;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .select-custom-option:hover {
+            background: #fafafa;
+        }
+
+        .select-custom-option.selected {
+            background: #f0f0f0;
+            font-weight: 400;
+        }
+
+        /* Error State */
+        .select-group.error .select,
+        .select-group.error .select-custom-trigger {
+            border-bottom-color: #d32f2f;
+        }
+
+        .select-group.error .select-label {
+            color: #d32f2f;
+        }
+
+        .select-error-message {
+            font-size: 12px;
+            color: #d32f2f;
+            margin-top: 8px;
+        }
+
+        /* Helper Text */
+        .select-helper {
+            font-size: 12px;
+            color: #999999;
+            margin-top: 8px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #999999;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: #666666;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div style="max-width: 1200px; margin: 0 auto 40px; text-align: center;">
+        <a href="../../index.html" class="back-link">← Back to Component Library</a>
+    </div>
+
+    <div class="component-header">
+        <h1 class="component-title">SELECT</h1>
+        <p class="component-subtitle">Dropdown selection with clean minimal styling</p>
+    </div>
+
+    <!-- Native Select -->
+    <div class="variant-section">
+        <h2 class="variant-title">Native Select</h2>
+        <p class="variant-description">
+            Standard HTML select element with minimal custom styling. Clean underline border.
+        </p>
+
+        <div class="variant-demo">
+            <div class="select-group">
+                <label class="select-label">Business Type</label>
+                <select class="select">
+                    <option value="">Select type...</option>
+                    <option value="restaurant">Restaurant</option>
+                    <option value="hotel">Hotel</option>
+                    <option value="street-food">Street Food</option>
+                </select>
+            </div>
+
+            <div class="select-group">
+                <label class="select-label">Currency</label>
+                <select class="select">
+                    <option value="NOK">Norwegian Krone (kr)</option>
+                    <option value="EUR">Euro (€)</option>
+                    <option value="USD">US Dollar ($)</option>
+                    <option value="GBP">British Pound (£)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="usage-code">&lt;div class="select-group"&gt;
+    &lt;label class="select-label"&gt;Business Type&lt;/label&gt;
+    &lt;select class="select"&gt;
+        &lt;option value=""&gt;Select type...&lt;/option&gt;
+        &lt;option value="restaurant"&gt;Restaurant&lt;/option&gt;
+        &lt;option value="hotel"&gt;Hotel&lt;/option&gt;
+    &lt;/select&gt;
+&lt;/div&gt;</div>
+    </div>
+
+    <!-- Custom Select -->
+    <div class="variant-section">
+        <h2 class="variant-title">Custom Select</h2>
+        <p class="variant-description">
+            Custom-built select with more control over styling and behavior. Click to interact.
+        </p>
+
+        <div class="variant-demo">
+            <div class="select-group">
+                <label class="select-label">Select Menu</label>
+                <div class="select-custom" id="custom-select-1">
+                    <div class="select-custom-trigger">
+                        <span class="placeholder">Choose a menu...</span>
+                        <svg class="select-custom-arrow" viewBox="0 0 12 8">
+                            <path fill="#999999" d="M6 8L0 0h12z"/>
+                        </svg>
+                    </div>
+                    <div class="select-custom-dropdown">
+                        <div class="select-custom-option" data-value="lunch">Lunch Menu</div>
+                        <div class="select-custom-option" data-value="dinner">Dinner Menu</div>
+                        <div class="select-custom-option" data-value="drinks">Drinks Menu</div>
+                        <div class="select-custom-option" data-value="desserts">Desserts Menu</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="select-group">
+                <label class="select-label">Section Type</label>
+                <div class="select-custom" id="custom-select-2">
+                    <div class="select-custom-trigger">
+                        <span class="placeholder">Choose section type...</span>
+                        <svg class="select-custom-arrow" viewBox="0 0 12 8">
+                            <path fill="#999999" d="M6 8L0 0h12z"/>
+                        </svg>
+                    </div>
+                    <div class="select-custom-dropdown">
+                        <div class="select-custom-option" data-value="hero">Hero Section</div>
+                        <div class="select-custom-option" data-value="text">Text Section</div>
+                        <div class="select-custom-option" data-value="menu">Menu Display</div>
+                        <div class="select-custom-option" data-value="contact">Contact Section</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="usage-code">&lt;div class="select-custom" id="custom-select"&gt;
+    &lt;div class="select-custom-trigger"&gt;
+        &lt;span class="placeholder"&gt;Choose...&lt;/span&gt;
+        &lt;svg class="select-custom-arrow"&gt;...&lt;/svg&gt;
+    &lt;/div&gt;
+    &lt;div class="select-custom-dropdown"&gt;
+        &lt;div class="select-custom-option" data-value="1"&gt;Option 1&lt;/div&gt;
+        &lt;div class="select-custom-option" data-value="2"&gt;Option 2&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+    </div>
+
+    <!-- Select States -->
+    <div class="variant-section">
+        <h2 class="variant-title">Select States</h2>
+        <p class="variant-description">
+            Different states: default, disabled, and error.
+        </p>
+
+        <div class="variant-demo">
+            <div class="demo-grid">
+                <div class="select-group">
+                    <label class="select-label">Default State</label>
+                    <select class="select">
+                        <option value="">Select option...</option>
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                    </select>
+                </div>
+
+                <div class="select-group">
+                    <label class="select-label">Disabled State</label>
+                    <select class="select" disabled>
+                        <option value="1">Cannot change</option>
+                    </select>
+                </div>
+
+                <div class="select-group error">
+                    <label class="select-label">Error State</label>
+                    <select class="select">
+                        <option value="">Select option...</option>
+                        <option value="1">Option 1</option>
+                    </select>
+                    <div class="select-error-message">Please select an option</div>
+                </div>
+
+                <div class="select-group">
+                    <label class="select-label">With Helper Text</label>
+                    <select class="select">
+                        <option value="">Select...</option>
+                        <option value="1">Option 1</option>
+                    </select>
+                    <div class="select-helper">Choose the best option for your needs</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Example -->
+    <div class="variant-section">
+        <h2 class="variant-title">Complete Form Example</h2>
+        <p class="variant-description">
+            Example showing selects in a typical form context.
+        </p>
+
+        <div class="variant-demo">
+            <div style="background: white; padding: 40px; border: 1px solid #e0e0e0;">
+                <h3 style="font-size: 24px; font-weight: 200; letter-spacing: 2px; margin-bottom: 40px;">Business Settings</h3>
+                
+                <div class="select-group">
+                    <label class="select-label">Business Type</label>
+                    <select class="select">
+                        <option value="">Select your business type...</option>
+                        <option value="restaurant">Restaurant</option>
+                        <option value="hotel">Hotel</option>
+                        <option value="street-food">Street Food</option>
+                    </select>
+                    <div class="select-helper">This helps us customize your experience</div>
+                </div>
+
+                <div class="demo-grid">
+                    <div class="select-group">
+                        <label class="select-label">Currency</label>
+                        <select class="select">
+                            <option value="NOK">NOK (kr)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="USD">USD ($)</option>
+                        </select>
+                    </div>
+
+                    <div class="select-group">
+                        <label class="select-label">Timezone</label>
+                        <select class="select">
+                            <option value="Europe/Oslo">Europe/Oslo</option>
+                            <option value="Europe/London">Europe/London</option>
+                            <option value="America/New_York">America/New York</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Custom select functionality
+        function initCustomSelect(selectId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+
+            const trigger = select.querySelector('.select-custom-trigger');
+            const dropdown = select.querySelector('.select-custom-dropdown');
+            const options = select.querySelectorAll('.select-custom-option');
+            const placeholder = trigger.querySelector('.placeholder');
+
+            // Toggle dropdown
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                select.classList.toggle('open');
+            });
+
+            // Select option
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    const value = option.getAttribute('data-value');
+                    const text = option.textContent;
+
+                    // Update selected state
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+
+                    // Update trigger text
+                    placeholder.textContent = text;
+                    placeholder.classList.remove('placeholder');
+
+                    // Close dropdown
+                    select.classList.remove('open');
+
+                    // Dispatch change event
+                    select.dispatchEvent(new CustomEvent('change', { 
+                        detail: { value, text } 
+                    }));
+                });
+            });
+
+            // Close on outside click
+            document.addEventListener('click', () => {
+                select.classList.remove('open');
+            });
+        }
+
+        // Initialize all custom selects
+        initCustomSelect('custom-select-1');
+        initCustomSelect('custom-select-2');
+    </script>
+</body>
+</html>

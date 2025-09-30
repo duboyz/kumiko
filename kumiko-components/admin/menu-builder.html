@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kumiko - Menu Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 300;
+            background: #fafafa;
+            color: #000000;
+            line-height: 1.6;
+        }
+
+        /* HEADER */
+        .admin-header {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-logo {
+            font-size: 20px;
+            font-weight: 100;
+            letter-spacing: 4px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* CONTAINER */
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 100;
+            letter-spacing: 4px;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #666666;
+            letter-spacing: 0.5px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 12px 24px;
+            font-size: 13px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-family: 'Noto Sans JP', sans-serif;
+            border-radius: 0;
+            transition: all 0.2s ease;
+            border: 1px solid;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #000000;
+            border-color: #000000;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #333333;
+        }
+
+        .btn-secondary {
+            background: white;
+            border-color: #e0e0e0;
+            color: #666666;
+        }
+
+        .btn-secondary:hover {
+            border-color: #cccccc;
+            background: #fafafa;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 1px solid #e0e0e0;
+            color: #999999;
+        }
+
+        .btn-icon:hover {
+            border-color: #cccccc;
+            color: #666666;
+        }
+
+        /* MENU HEADER CARD */
+        .menu-header-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 40px;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 400;
+            color: #999999;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .input-text {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-bottom: 1px solid #e0e0e0;
+            background: transparent;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 15px;
+            font-weight: 300;
+            color: #000000;
+            letter-spacing: 0.5px;
+            transition: border-color 0.2s ease;
+            outline: none;
+        }
+
+        .input-text::placeholder {
+            color: #cccccc;
+        }
+
+        .input-text:focus {
+            border-bottom-color: #000000;
+        }
+
+        /* CATEGORY CARD */
+        .category-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* MENU ITEMS */
+        .menu-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .menu-item-row {
+            display: grid;
+            grid-template-columns: 3fr 100px 140px 3fr 120px;
+            gap: 20px;
+            align-items: start;
+            padding: 16px;
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
+        }
+
+        .menu-item-row:hover {
+            border-color: #e0e0e0;
+        }
+
+        .menu-item-name {
+            font-size: 15px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item-price {
+            font-size: 15px;
+            color: #666666;
+        }
+
+        .menu-item-allergens {
+            font-size: 13px;
+            color: #999999;
+        }
+
+        .menu-item-description {
+            font-size: 13px;
+            color: #999999;
+            line-height: 1.6;
+        }
+
+        .menu-item-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        /* OPTIONS */
+        .menu-item-options {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .option-row {
+            display: grid;
+            grid-template-columns: 2fr 120px 40px;
+            gap: 16px;
+            padding: 8px 0;
+            font-size: 14px;
+            color: #666666;
+        }
+
+        /* ADD BUTTON */
+        .add-item-btn {
+            width: 100%;
+            padding: 20px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            color: #999999;
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-family: 'Noto Sans JP', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .add-item-btn:hover {
+            border-color: #cccccc;
+            color: #666666;
+            background: #fafafa;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+            color: #999999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .menu-item-row {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .admin-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="admin-logo">KUMIKO</div>
+        <div class="admin-actions">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-primary">Save Menu</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="admin-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Menu Builder</h1>
+            <p class="page-subtitle">Create and organize your menu items</p>
+        </div>
+
+        <!-- Menu Header Card -->
+        <div class="menu-header-card">
+            <div class="input-group">
+                <label class="input-label">Menu Name</label>
+                <input type="text" class="input-text" placeholder="e.g., Lunch Menu, Dinner Menu" value="Main Menu">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Description (Optional)</label>
+                <input type="text" class="input-text" placeholder="Brief description of this menu">
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div id="categories-container">
+            <!-- Category 1: Starters -->
+            <div class="category-card">
+                <div class="category-header">
+                    <input type="text" class="input-text category-title" value="Starters" placeholder="Category name">
+                    <div class="category-actions">
+                        <button class="btn-icon" title="Move up">↑</button>
+                        <button class="btn-icon" title="Move down">↓</button>
+                        <button class="btn-icon" title="Delete category">×</button>
+                    </div>
+                </div>
+
+                <div class="menu-items-list">
+                    <!-- Menu Item 1 -->
+                    <div class="menu-item-row">
+                        <div class="menu-item-name">Bruschetta al Pomodoro</div>
+                        <div class="menu-item-price">95 kr</div>
+                        <div class="menu-item-allergens">Gluten</div>
+                        <div class="menu-item-description">Toasted bread with fresh tomatoes, basil, and olive oil</div>
+                        <div class="menu-item-actions">
+                            <button class="btn-icon" title="Add option">+</button>
+                            <button class="btn-icon" title="Edit">✎</button>
+                            <button class="btn-icon" title="Delete">×</button>
+                        </div>
+                    </div>
+
+                    <!-- Menu Item 2 -->
+                    <div class="menu-item-row">
+                        <div class="menu-item-name">Caprese Salad</div>
+                        <div class="menu-item-price">120 kr</div>
+                        <div class="menu-item-allergens">Dairy</div>
+                        <div class="menu-item-description">Fresh mozzarella, tomatoes, and basil</div>
+                        <div class="menu-item-actions">
+                            <button class="btn-icon" title="Add option">+</button>
+                            <button class="btn-icon" title="Edit">✎</button>
+                            <button class="btn-icon" title="Delete">×</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="add-item-btn">+ Add Item</button>
+            </div>
+
+            <!-- Category 2: Pizza (with options) -->
+            <div class="category-card">
+                <div class="category-header">
+                    <input type="text" class="input-text category-title" value="Pizza" placeholder="Category name">
+                    <div class="category-actions">
+                        <button class="btn-icon" title="Move up">↑</button>
+                        <button class="btn-icon" title="Move down">↓</button>
+                        <button class="btn-icon" title="Delete category">×</button>
+                    </div>
+                </div>
+
+                <div class="menu-items-list">
+                    <!-- Menu Item with Options -->
+                    <div class="menu-item-row">
+                        <div>
+                            <div class="menu-item-name">Margherita</div>
+                            <div class="menu-item-options">
+                                <div class="option-row">
+                                    <span>Regular (30cm)</span>
+                                    <span>160 kr</span>
+                                    <button class="btn-icon" title="Delete">×</button>
+                                </div>
+                                <div class="option-row">
+                                    <span>Large (40cm)</span>
+                                    <span>220 kr</span>
+                                    <button class="btn-icon" title="Delete">×</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="menu-item-price">-</div>
+                        <div class="menu-item-allergens">Gluten, Dairy</div>
+                        <div class="menu-item-description">Tomatoes, mozzarella, fresh basil</div>
+                        <div class="menu-item-actions">
+                            <button class="btn-icon" title="Add option">+</button>
+                            <button class="btn-icon" title="Edit">✎</button>
+                            <button class="btn-icon" title="Delete">×</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="add-item-btn">+ Add Item</button>
+            </div>
+
+            <!-- Empty Category -->
+            <div class="category-card">
+                <div class="category-header">
+                    <input type="text" class="input-text category-title" value="" placeholder="New Category">
+                    <div class="category-actions">
+                        <button class="btn-icon" title="Move up">↑</button>
+                        <button class="btn-icon" title="Move down">↓</button>
+                        <button class="btn-icon" title="Delete category">×</button>
+                    </div>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <div class="empty-state-text">No items yet. Click below to add your first item.</div>
+                </div>
+
+                <button class="add-item-btn">+ Add First Item</button>
+            </div>
+        </div>
+
+        <!-- Add Category Button -->
+        <button class="add-item-btn" style="margin-top: 24px;">+ Add Category</button>
+    </div>
+
+    <script>
+        // Add interactivity here
+        console.log('Menu Builder loaded');
+        
+        // Example: Add category button click handler
+        document.querySelectorAll('.add-item-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                alert('This would open a modal to add a new item');
+            });
+        });
+
+        // Example: Delete button handlers
+        document.querySelectorAll('.btn-icon[title="Delete"], .btn-icon[title="Delete category"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to delete this?')) {
+                    // Handle delete
+                    console.log('Delete clicked');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

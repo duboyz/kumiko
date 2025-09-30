@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kumiko - About Page Template</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 300;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+
+        /* NAVIGATION */
+        .nav {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-size: 20px;
+            font-weight: 100;
+            letter-spacing: 4px;
+            color: #000000;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: #666666;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #000000;
+        }
+
+        /* HERO MINIMAL */
+        .hero-minimal {
+            padding: 100px 40px;
+            background: #fafafa;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 56px;
+            font-weight: 100;
+            letter-spacing: 8px;
+            margin-bottom: 24px;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            color: #666666;
+            letter-spacing: 0.5px;
+            line-height: 1.8;
+        }
+
+        /* TEXT SECTION */
+        .text-section {
+            padding: 120px 40px;
+            background: white;
+        }
+
+        .text-section-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .text-section-title {
+            font-size: 40px;
+            font-weight: 100;
+            letter-spacing: 4px;
+            margin-bottom: 32px;
+        }
+
+        .text-section-body {
+            font-size: 16px;
+            color: #666666;
+            letter-spacing: 0.5px;
+            line-height: 1.9;
+        }
+
+        .text-section-body p {
+            margin-bottom: 24px;
+        }
+
+        .text-section-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* TEXT SECTION LEFT */
+        .text-section-left .text-section-content {
+            text-align: left;
+        }
+
+        /* TEXT SECTION BACKGROUND */
+        .text-section-bg {
+            background: #fafafa;
+        }
+
+        /* QUOTE */
+        .text-quote {
+            font-size: 24px;
+            font-weight: 200;
+            font-style: italic;
+            color: #000000;
+            text-align: center;
+            margin: 40px 0;
+            padding: 40px;
+            border-left: 2px solid #e0e0e0;
+            border-right: 2px solid #e0e0e0;
+        }
+
+        .text-quote-author {
+            font-size: 14px;
+            font-style: normal;
+            color: #999999;
+            margin-top: 16px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* FOOTER */
+        .footer {
+            padding: 60px 40px 40px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section-title {
+            font-size: 12px;
+            font-weight: 400;
+            color: #999999;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-link {
+            font-size: 14px;
+            color: #666666;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: #000000;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 12px;
+            color: #999999;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 40px;
+                letter-spacing: 4px;
+            }
+
+            .nav-menu {
+                gap: 20px;
+                font-size: 12px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .text-quote {
+                font-size: 20px;
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="#" class="nav-logo">BELLA ITALIA</a>
+        <div class="nav-menu">
+            <a href="#" class="nav-link">Home</a>
+            <a href="#" class="nav-link">Menu</a>
+            <a href="#" class="nav-link active">About</a>
+            <a href="#" class="nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-minimal">
+        <div class="hero-content">
+            <h1 class="hero-title">OUR STORY</h1>
+            <p class="hero-description">
+                A passion for authentic Italian cuisine that has been serving Oslo for over 25 years
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Story Section -->
+    <section class="text-section">
+        <div class="text-section-content">
+            <h2 class="text-section-title">The Beginning</h2>
+            <div class="text-section-body">
+                <p>
+                    Founded in 1995, Bella Italia began as a dream to bring authentic Italian flavors 
+                    to the heart of Oslo. Our founder, Giovanni Rossi, came from a small town in Tuscany 
+                    where food was more than sustenance—it was a celebration of life, family, and tradition.
+                </p>
+                <p>
+                    Starting with just five tables and a wood-fired oven, Giovanni poured his heart into 
+                    every dish, using recipes passed down through three generations of his family. Word 
+                    spread quickly, and what began as a modest trattoria grew into one of Oslo's most 
+                    beloved Italian restaurants.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section class="text-section text-section-bg text-section-left">
+        <div class="text-section-content">
+            <h2 class="text-section-title">Our Philosophy</h2>
+            <div class="text-section-body">
+                <p>
+                    At Bella Italia, we believe that great food starts with great ingredients. Every morning, 
+                    we select the freshest produce, the finest meats, and the most authentic Italian imports. 
+                    Our pasta is made by hand, our sauces simmer for hours, and our pizzas are fired in a 
+                    traditional wood oven at precisely 485°C.
+                </p>
+                <p>
+                    But ingredients alone don't make a meal memorable. It's the care, the technique, and 
+                    the love that goes into each dish. Our chefs, many of whom trained in Italy, bring not 
+                    just skill but passion to their work. They understand that cooking is an art form, one 
+                    that requires both precision and intuition.
+                </p>
+                
+                <blockquote class="text-quote">
+                    "Food is not just eating energy. It's an experience."
+                    <div class="text-quote-author">— Giovanni Rossi, Founder</div>
+                </blockquote>
+                
+                <p>
+                    This philosophy extends beyond our kitchen. From the moment you enter our doors, we want 
+                    you to feel like family. The warm atmosphere, the attentive service, the carefully curated 
+                    wine list—every detail is designed to transport you to Italy, if only for an evening.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="text-section text-section-left">
+        <div class="text-section-content">
+            <h2 class="text-section-title">What We Stand For</h2>
+            <div class="text-section-body">
+                <p>
+                    <strong>Authenticity:</strong> We stay true to traditional Italian recipes and methods, 
+                    resisting the temptation to take shortcuts or follow fleeting trends. What worked for 
+                    centuries in Italy works here too.
+                </p>
+                <p>
+                    <strong>Quality:</strong> We source the finest ingredients, from San Marzano tomatoes 
+                    to Parmigiano-Reggiano aged for 24 months. When you can't find perfection locally, we 
+                    import directly from Italy.
+                </p>
+                <p>
+                    <strong>Sustainability:</strong> We partner with local farms and suppliers who share our 
+                    commitment to environmental responsibility. Our seafood comes from certified sustainable 
+                    sources, and we minimize waste through careful planning and composting.
+                </p>
+                <p>
+                    <strong>Community:</strong> Bella Italia is more than a restaurant—it's a gathering place. 
+                    We've hosted countless celebrations, first dates, business dinners, and family reunions. 
+                    Being part of Oslo's community is an honor we don't take lightly.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Today Section -->
+    <section class="text-section text-section-bg">
+        <div class="text-section-content">
+            <h2 class="text-section-title">Today</h2>
+            <div class="text-section-body">
+                <p>
+                    Twenty-five years later, we remain committed to Giovanni's original vision. While our 
+                    restaurant has grown, our values haven't changed. We still make our pasta by hand, still 
+                    import our ingredients from the same Italian suppliers, and still treat every guest like 
+                    family.
+                </p>
+                <p>
+                    We've been honored to receive recognition from food critics and industry experts, but the 
+                    greatest reward is seeing familiar faces return week after week, year after year. When 
+                    customers tell us that dining at Bella Italia reminds them of their travels in Italy—or 
+                    better yet, of their grandmother's kitchen—we know we're doing something right.
+                </p>
+                <p>
+                    Thank you for being part of our story. We look forward to welcoming you to our table.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <div class="footer-section-title">About</div>
+                <p class="footer-text">
+                    Authentic Italian restaurant serving Oslo since 1995. 
+                    Traditional recipes, fresh ingredients, warm hospitality.
+                </p>
+            </div>
+
+            <div>
+                <div class="footer-section-title">Quick Links</div>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Home</a>
+                    <a href="#" class="footer-link">Menu</a>
+                    <a href="#" class="footer-link">About Us</a>
+                    <a href="#" class="footer-link">Contact</a>
+                </div>
+            </div>
+
+            <div>
+                <div class="footer-section-title">Contact</div>
+                <p class="footer-text">
+                    Storgata 25<br>
+                    0184 Oslo, Norway<br>
+                    <br>
+                    +47 22 12 34 56<br>
+                    hello@bellaitalia.no
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2025 Bella Italia. All rights reserved.
+        </div>
+    </footer>
+</body>
+</html>
