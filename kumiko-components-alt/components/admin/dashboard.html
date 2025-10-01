@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Kumiko Components</title>
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+    <div class="container" style="padding: 3rem 0;">
+        <h1>Dashboard Components</h1>
+        <p class="text-muted" style="margin-bottom: 2rem;">Admin dashboard stats and overview components</p>
+
+        <!-- Stats Overview -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Stats Cards</h2>
+            <div class="grid grid-cols-4 gap-6">
+                <!-- Revenue Card -->
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <div class="stats-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stats-value">¥847K</div>
+                    <div class="stats-label">Total Revenue</div>
+                    <div class="stats-change positive">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        +12.5% from last month
+                    </div>
+                </div>
+
+                <!-- Orders Card -->
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <div class="stats-icon" style="background-color: hsl(var(--success) / 0.1); color: hsl(var(--success));">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" stroke="currentColor" stroke-width="2"/>
+                                <path d="M9 9V5a3 3 0 0 1 6 0v4" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stats-value">1,234</div>
+                    <div class="stats-label">Orders Today</div>
+                    <div class="stats-change positive">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        +8.2% from yesterday
+                    </div>
+                </div>
+
+                <!-- Customers Card -->
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <div class="stats-icon" style="background-color: hsl(var(--warning) / 0.1); color: hsl(var(--warning));">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stats-value">892</div>
+                    <div class="stats-label">New Customers</div>
+                    <div class="stats-change positive">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        +23.1% this month
+                    </div>
+                </div>
+
+                <!-- Rating Card -->
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <div class="stats-icon" style="background-color: hsl(var(--destructive) / 0.1); color: hsl(var(--destructive));">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="currentColor"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stats-value">4.8</div>
+                    <div class="stats-label">Average Rating</div>
+                    <div class="stats-change negative">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 5v14M19 12l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        -0.2 from last week
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Recent Activity</h2>
+            <div class="grid grid-cols-2 gap-6">
+                <!-- Recent Orders -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Orders</h3>
+                        <button class="btn btn-ghost btn-sm">View All</button>
+                    </div>
+                    <div class="card-content" style="padding: 0;">
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Order</th>
+                                        <th>Customer</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="font-semibold">#1234</span></td>
+                                        <td>Sarah J.</td>
+                                        <td><span class="font-semibold">¥2,400</span></td>
+                                        <td><span class="badge badge-success">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="font-semibold">#1235</span></td>
+                                        <td>Mike C.</td>
+                                        <td><span class="font-semibold">¥1,800</span></td>
+                                        <td><span class="badge badge-default">Preparing</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="font-semibold">#1236</span></td>
+                                        <td>Emily R.</td>
+                                        <td><span class="font-semibold">¥3,200</span></td>
+                                        <td><span class="badge badge-warning">Pending</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Items -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Top Selling Items</h3>
+                        <button class="btn btn-ghost btn-sm">View Report</button>
+                    </div>
+                    <div class="card-content">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <div style="width: 3rem; height: 3rem; border-radius: var(--radius-md); background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); flex-shrink: 0;"></div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Spicy Ramen</div>
+                                    <div class="text-sm text-muted">234 orders today</div>
+                                </div>
+                                <div class="font-bold">¥280K</div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div style="width: 3rem; height: 3rem; border-radius: var(--radius-md); background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); flex-shrink: 0;"></div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Salmon Sushi Set</div>
+                                    <div class="text-sm text-muted">189 orders today</div>
+                                </div>
+                                <div class="font-bold">¥453K</div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div style="width: 3rem; height: 3rem; border-radius: var(--radius-md); background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); flex-shrink: 0;"></div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Chicken Teriyaki</div>
+                                    <div class="text-sm text-muted">156 orders today</div>
+                                </div>
+                                <div class="font-bold">¥218K</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Charts Placeholder -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Performance Overview</h2>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Revenue & Orders</h3>
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline btn-sm">Day</button>
+                        <button class="btn btn-primary btn-sm">Week</button>
+                        <button class="btn btn-outline btn-sm">Month</button>
+                        <button class="btn btn-outline btn-sm">Year</button>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <!-- Chart placeholder -->
+                    <div style="height: 300px; background: linear-gradient(180deg, hsl(var(--primary) / 0.1) 0%, transparent 100%); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                        <div style="text-align: center;">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto 1rem; opacity: 0.5;">
+                                <line x1="12" y1="20" x2="12" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="18" y1="20" x2="18" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="6" y1="20" x2="6" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <div class="text-muted">Chart visualization placeholder</div>
+                            <div class="text-sm text-muted">Integrate with your charting library</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Quick Actions</h2>
+            <div class="grid grid-cols-4 gap-4">
+                <button class="card card-interactive" style="padding: 1.5rem; border: 2px dashed hsl(var(--border)); background-color: transparent;">
+                    <div style="text-align: center;">
+                        <div style="width: 3rem; height: 3rem; background-color: hsl(var(--primary) / 0.1); color: hsl(var(--primary)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="font-semibold text-sm">Add Menu Item</div>
+                    </div>
+                </button>
+
+                <button class="card card-interactive" style="padding: 1.5rem; border: 2px dashed hsl(var(--border)); background-color: transparent;">
+                    <div style="text-align: center;">
+                        <div style="width: 3rem; height: 3rem; background-color: hsl(var(--success) / 0.1); color: hsl(var(--success)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <path d="M3 10h18" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="font-semibold text-sm">New Reservation</div>
+                    </div>
+                </button>
+
+                <button class="card card-interactive" style="padding: 1.5rem; border: 2px dashed hsl(var(--border)); background-color: transparent;">
+                    <div style="text-align: center;">
+                        <div style="width: 3rem; height: 3rem; background-color: hsl(var(--warning) / 0.1); color: hsl(var(--warning)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="8.5" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                                <path d="M20 8v6M23 11h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="font-semibold text-sm">Add Staff Member</div>
+                    </div>
+                </button>
+
+                <button class="card card-interactive" style="padding: 1.5rem; border: 2px dashed hsl(var(--border)); background-color: transparent;">
+                    <div style="text-align: center;">
+                        <div style="width: 3rem; height: 3rem; background-color: hsl(var(--destructive) / 0.1); color: hsl(var(--destructive)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
+                                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="font-semibold text-sm">Generate Report</div>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Alerts Dashboard -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">System Alerts</h2>
+            <div class="space-y-3">
+                <div class="alert alert-warning">
+                    <div class="alert-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 9v4M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-title">Low Stock Alert</div>
+                        <div class="alert-description">
+                            5 ingredients are running low. Check inventory to avoid stockouts.
+                        </div>
+                    </div>
+                    <button class="btn btn-warning btn-sm" style="margin-left: auto;">Review</button>
+                </div>
+
+                <div class="alert alert-success">
+                    <div class="alert-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2"/>
+                            <polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-title">Peak Performance</div>
+                        <div class="alert-description">
+                            Yesterday was your best day this month with ¥847K in revenue!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-default">
+                    <div class="alert-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-title">New Reviews</div>
+                        <div class="alert-description">
+                            12 new customer reviews pending moderation.
+                        </div>
+                    </div>
+                    <button class="btn btn-outline btn-sm" style="margin-left: auto;">View</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage -->
+        <section style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid hsl(var(--border));">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Usage</h2>
+            <pre style="background-color: hsl(var(--muted)); padding: 1rem; border-radius: var(--radius-md); overflow-x: auto; font-size: 0.875rem;"><code>&lt;!-- Stats Card --&gt;
+&lt;div class="stats-card"&gt;
+    &lt;div class="stats-header"&gt;
+        &lt;div class="stats-icon"&gt;
+            &lt;svg&gt;...&lt;/svg&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="stats-value"&gt;¥847K&lt;/div&gt;
+    &lt;div class="stats-label"&gt;Total Revenue&lt;/div&gt;
+    &lt;div class="stats-change positive"&gt;
+        &lt;svg&gt;...&lt;/svg&gt;
+        +12.5% from last month
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+        </section>
+    </div>
+</body>
+</html>

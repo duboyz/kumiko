@@ -16,12 +16,12 @@ import {
   HeroSectionType,
   TextAlignment,
 } from '@shared'
-import { LoadingSpinner } from '@/components'
-import { ErrorMessage } from '@/components'
+import { LoadingState, ErrorState, EmptyState } from '@/components'
 import { ContentContainer } from '@/components/ContentContainer'
 import { WebsitePage, HeroSection, TextSection, SectionSelectionModal } from '@/components/sections'
-import { RestaurantMenuSection } from '@/stories/WebsiteSections/RestaurantMenuSection/RestaurantMenuSection'
+import { RestaurantMenuSection } from '@/stories/organisms/RestaurantMenuSection/RestaurantMenuSection'
 import type { WebsiteSectionDto, HeroSectionDto, TextSectionDto, RestaurantMenuSectionDto } from '@shared'
+import { FileText } from 'lucide-react'
 
 export default function PageEditorPage() {
   const params = useParams()
@@ -200,25 +200,25 @@ export default function PageEditorPage() {
     }
   }
 
-  if (isLoading) return <LoadingSpinner />
-  if (error) return <ErrorMessage message={error instanceof Error ? error.message : 'An error occurred'} />
-  if (!page) return <ErrorMessage message="Page not found" />
+  if (isLoading) return <LoadingState variant="page" />
+  if (error) return <ErrorState message={error instanceof Error ? error.message : 'An error occurred'} />
+  if (!page) return <ErrorState message="Page not found" />
 
   return (
-    <ContentContainer>
+    <ContentContainer className="bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
+      <div className="flex items-center justify-between pb-8 border-b">
+        <div className="flex items-center gap-6">
           <Button variant="ghost" size="sm" onClick={() => router.push(`/websites/${websiteId}/pages`)}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Pages
+            <ArrowLeft />
+            Back
           </Button>
           <div>
-            <h1 className="text-2xl font-semibold">{page.title}</h1>
+            <h1 className="text-3xl font-light">{page.title}</h1>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-3">
           {editingSectionId && (
             <>
               <Button
@@ -227,7 +227,7 @@ export default function PageEditorPage() {
                 variant="destructive"
                 size="sm"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 />
                 {deleteSection.isPending ? 'Deleting...' : 'Delete'}
               </Button>
               <Button
@@ -235,19 +235,19 @@ export default function PageEditorPage() {
                 disabled={
                   updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending
                 }
-                className="bg-green-600 hover:bg-green-700"
+                variant="default"
               >
-                <Save className="w-4 h-4 mr-2" />
+                <Save />
                 {updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending
                   ? 'Saving...'
-                  : 'Save Changes'}
+                  : 'Save'}
               </Button>
             </>
           )}
 
-          <div className="flex items-center border rounded-lg p-1">
+          <div className="flex items-center border bg-white">
             <Button variant={viewMode === 'edit' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('edit')}>
-              <Edit className="w-4 h-4 mr-2" />
+              <Edit />
               Edit
             </Button>
             <Button
@@ -255,41 +255,37 @@ export default function PageEditorPage() {
               size="sm"
               onClick={() => setViewMode('preview')}
             >
-              <Eye className="w-4 h-4 mr-2" />
+              <Eye />
               Preview
             </Button>
           </div>
 
-          <Button onClick={() => setIsAddSectionModalOpen(true)} disabled={isAddingSection}>
-            <Plus className="w-4 h-4 mr-2" />
+          <Button onClick={() => setIsAddSectionModalOpen(true)} disabled={isAddingSection} variant="default">
+            <Plus />
             Add Section
           </Button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="space-y-6">
+      <div className="space-y-8">
         {viewMode === 'preview' ? (
-          <div className="border rounded-lg overflow-hidden bg-white">
+          <div className="border overflow-hidden bg-white shadow-sm">
             <WebsitePage page={page} availableMenus={menusData?.menus || []} />
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {page.sections.length === 0 ? (
-              <div className="text-center py-16 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                <div className="space-y-4">
-                  <div className="w-16 h-16 mx-auto bg-gray-200 rounded-full flex items-center justify-center">
-                    <Plus className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-600">No sections yet</h3>
-                  <p className="text-gray-500 max-w-sm mx-auto">
-                    Start building your page by adding sections with different types of content.
-                  </p>
-                  <Button onClick={() => setIsAddSectionModalOpen(true)} className="mt-4">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Your First Section
-                  </Button>
-                </div>
+              <div className="text-center py-20 bg-white border-2 border-dashed">
+                <EmptyState
+                  icon={FileText}
+                  title="No sections yet"
+                  description="Start building your page by adding sections with different types of content."
+                  action={{
+                    label: 'Add Your First Section',
+                    onClick: () => setIsAddSectionModalOpen(true),
+                  }}
+                />
               </div>
             ) : (
               page.sections
@@ -297,14 +293,14 @@ export default function PageEditorPage() {
                 .map(section => (
                   <div
                     key={section.id}
-                    className="group relative border rounded-lg overflow-hidden bg-white"
+                    className="group relative border overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow"
                     onClick={() => handleSectionEdit(section.id)}
                   >
                     {/* Edit overlay */}
                     {editingSectionId !== section.id && (
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all cursor-pointer z-10 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <div className="bg-white shadow-lg rounded-lg p-3">
-                          <Edit className="w-5 h-5 text-gray-600" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all cursor-pointer z-10 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div className="bg-white shadow-lg p-4 border">
+                          <Edit className="w-5 h-5 text-muted-foreground" />
                         </div>
                       </div>
                     )}

@@ -12,13 +12,15 @@ import {
   ArrowLeft,
   ArrowRight,
   Trash2,
-  Plus, Loader2,
+  Plus,
+  Loader2,
   ChevronDown,
   ChevronRight,
   FolderOpen,
   DollarSign,
   Edit3,
-  Save, GripVertical
+  Save,
+  GripVertical,
 } from 'lucide-react'
 import {
   ParsedMenuStructure,
@@ -68,9 +70,9 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
         categories: prev.categories.map((cat, catIndex) =>
           catIndex === categoryIndex
             ? {
-              ...cat,
-              items: cat.items.map((item, idx) => (idx === itemIndex ? { ...item, [field]: value } : item)),
-            }
+                ...cat,
+                items: cat.items.map((item, idx) => (idx === itemIndex ? { ...item, [field]: value } : item)),
+              }
             : cat
         ),
       }))
@@ -84,9 +86,9 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
       categories: prev.categories.map((cat, catIndex) =>
         catIndex === categoryIndex
           ? {
-            ...cat,
-            items: cat.items.filter((_, idx) => idx !== itemIndex),
-          }
+              ...cat,
+              items: cat.items.filter((_, idx) => idx !== itemIndex),
+            }
           : cat
       ),
     }))
@@ -106,9 +108,9 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
         categories: prev.categories.map((cat, catIndex) =>
           catIndex === categoryIndex
             ? {
-              ...cat,
-              items: [...cat.items, newItem],
-            }
+                ...cat,
+                items: [...cat.items, newItem],
+              }
             : cat
         ),
       }))
@@ -122,15 +124,15 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
       categories: prev.categories.map((cat, catIdx) =>
         catIdx === categoryIndex
           ? {
-            ...cat,
-            items: (() => {
-              const items = [...cat.items]
-              const [movedItem] = items.splice(fromIndex, 1)
-              items.splice(toIndex, 0, movedItem)
-              // Update order indices
-              return items.map((item, idx) => ({ ...item, orderIndex: idx }))
-            })(),
-          }
+              ...cat,
+              items: (() => {
+                const items = [...cat.items]
+                const [movedItem] = items.splice(fromIndex, 1)
+                items.splice(toIndex, 0, movedItem)
+                // Update order indices
+                return items.map((item, idx) => ({ ...item, orderIndex: idx }))
+              })(),
+            }
           : cat
       ),
     }))
@@ -419,19 +421,19 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
       {/* Action Buttons */}
       <div className="flex justify-between">
         <Button variant="outline" onClick={onBack} disabled={isCreating}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft />
           Back
         </Button>
         <Button onClick={handleConfirm} disabled={isCreating || totalItems === 0} size="lg">
           {isCreating ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader2 className="animate-spin" />
               Creating Menu...
             </>
           ) : (
             <>
               Create Menu with {totalItems} Items
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight />
             </>
           )}
         </Button>

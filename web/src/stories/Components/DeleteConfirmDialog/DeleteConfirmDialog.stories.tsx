@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 
-
 const meta: Meta<typeof DeleteConfirmDialog> = {
   component: DeleteConfirmDialog,
   parameters: {

@@ -338,7 +338,7 @@ export function ProcessStep({
                 </div>
 
                 <Button variant="outline" onClick={handleCancel} className="mt-4">
-                  <X className="w-4 h-4 mr-2" />
+                  <X />
                   Cancel Processing
                 </Button>
               </>
@@ -353,7 +353,7 @@ export function ProcessStep({
                   <h3 className="text-lg font-semibold mb-2 text-red-600">Processing Failed</h3>
                   <p className="text-muted-foreground mb-4">{errorMessage}</p>
                   <Button onClick={handleProcess} size="lg">
-                    <ArrowRight className="w-4 h-4 mr-2" />
+                    <ArrowRight />
                     Try Again
                   </Button>
                 </div>
@@ -375,17 +375,15 @@ export function ProcessStep({
         </CardContent>
       </Card>
 
-
-
       {/* Actions */}
       <div className="flex items-center justify-between pt-6">
         <Button variant="outline" onClick={onBack} disabled={isProcessing}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft />
           Back
         </Button>
         {!isProcessing && errorMessage && (
           <Button onClick={handleProcess} size="lg">
-            <ArrowRight className="w-4 h-4 mr-2" />
+            <ArrowRight />
             Try Again
           </Button>
         )}

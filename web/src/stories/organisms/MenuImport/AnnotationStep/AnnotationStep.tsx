@@ -341,9 +341,7 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
               <Button variant="ghost" size="sm" onClick={handleZoomOut} disabled={zoom <= 0.1}>
                 <Minus className="w-4 h-4" />
               </Button>
-              <span className="px-2 text-sm font-medium min-w-[4rem] text-center">
-                {Math.round(zoom * 100)}%
-              </span>
+              <span className="px-2 text-sm font-medium min-w-[4rem] text-center">{Math.round(zoom * 100)}%</span>
               <Button variant="ghost" size="sm" onClick={handleZoomIn} disabled={zoom >= 3}>
                 <Plus className="w-4 h-4" />
               </Button>
@@ -448,10 +446,10 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
                             const newAnnotations = annotations.map(a =>
                               a.id === annotation.id
                                 ? {
-                                  ...a,
-                                  x: e.target.x(),
-                                  y: e.target.y(),
-                                }
+                                    ...a,
+                                    x: e.target.x(),
+                                    y: e.target.y(),
+                                  }
                                 : a
                             )
                             setAnnotations(newAnnotations)
@@ -619,7 +617,7 @@ export function AnnotationStep({ imagePreview, onAnnotate, onBack, onSkip }: Ann
       {/* Action Buttons */}
       <div className="flex justify-between">
         <Button variant="outline" onClick={onBack}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft />
           Back
         </Button>
         <div className="flex gap-2">

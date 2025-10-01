@@ -20,15 +20,28 @@ export default function MenuEditPage() {
   const menu = menusData?.menus?.find(m => m.id === menuId)
 
   if (isLoading) return <LoadingSpinner />
-  if (error) return <ContentLoadingError message={error.message} title="Error Loading Menu" backToText="Back to Menus" backToLink="/menus" />
-  if (!menu) return <ContentNotFound message="The menu you're looking for doesn't exist or you don't have access to it." title="Menu Not Found" backToText="Back to Menus" backToLink="/menus" />
-
+  if (error)
+    return (
+      <ContentLoadingError
+        message={error.message}
+        title="Error Loading Menu"
+        backToText="Back to Menus"
+        backToLink="/menus"
+      />
+    )
+  if (!menu)
+    return (
+      <ContentNotFound
+        message="The menu you're looking for doesn't exist or you don't have access to it."
+        title="Menu Not Found"
+        backToText="Back to Menus"
+        backToLink="/menus"
+      />
+    )
 
   return (
-    <ContentContainer>
-
+    <ContentContainer className="bg-white">
       <RestaurantMenu menu={menu} />
-
     </ContentContainer>
   )
 }

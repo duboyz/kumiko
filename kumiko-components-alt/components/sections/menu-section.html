@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Section - Kumiko Components</title>
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <style>
+        .menu-section {
+            padding: 4rem 0;
+        }
+        .menu-category {
+            margin-bottom: 3rem;
+        }
+        .menu-category-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .menu-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+        .menu-list-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="padding: 3rem 0;">
+        <h1>Menu Sections</h1>
+        <p class="text-muted" style="margin-bottom: 2rem;">Website sections for displaying restaurant menus</p>
+
+        <!-- Menu Section - Grid Layout -->
+        <section class="menu-section" style="background-color: hsl(var(--background)); margin-bottom: 4rem;">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 3rem;">
+                    <div class="badge badge-primary" style="margin-bottom: 1rem;">Our Menu</div>
+                    <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Discover Our Dishes</h2>
+                    <p class="text-lg text-muted" style="max-width: 42rem; margin: 0 auto;">
+                        Authentic Japanese cuisine crafted with the finest ingredients
+                    </p>
+                </div>
+
+                <div class="menu-category">
+                    <div class="menu-category-header">
+                        <h3 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Ramen</h3>
+                        <p class="text-muted">Rich broths and perfect noodles</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-6">
+                        <div class="menu-item-card">
+                            <div class="menu-item-image" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);"></div>
+                            <div class="menu-item-content">
+                                <div class="menu-item-header">
+                                    <h3 class="menu-item-title">Spicy Miso Ramen</h3>
+                                    <span class="menu-item-price">¥1,200</span>
+                                </div>
+                                <p class="menu-item-description">
+                                    Rich miso broth with a spicy kick, topped with chashu pork and soft-boiled egg
+                                </p>
+                                <div class="menu-item-tags">
+                                    <span class="badge badge-destructive">Spicy</span>
+                                    <span class="badge badge-outline">Popular</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-item-card">
+                            <div class="menu-item-image" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);"></div>
+                            <div class="menu-item-content">
+                                <div class="menu-item-header">
+                                    <h3 class="menu-item-title">Tonkotsu Ramen</h3>
+                                    <span class="menu-item-price">¥1,100</span>
+                                </div>
+                                <p class="menu-item-description">
+                                    Creamy pork bone broth simmered for 18 hours, classic Hakata style
+                                </p>
+                                <div class="menu-item-tags">
+                                    <span class="badge badge-default">Classic</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-item-card">
+                            <div class="menu-item-image" style="background: linear-gradient(135deg, #96fbc4 0%, #f9f586 100%);"></div>
+                            <div class="menu-item-content">
+                                <div class="menu-item-header">
+                                    <h3 class="menu-item-title">Vegetable Ramen</h3>
+                                    <span class="menu-item-price">¥980</span>
+                                </div>
+                                <p class="menu-item-description">
+                                    Light vegetable broth with seasonal vegetables and tofu
+                                </p>
+                                <div class="menu-item-tags">
+                                    <span class="badge badge-success">Vegan</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Menu Section - List Layout -->
+        <section class="menu-section" style="background-color: hsl(var(--muted) / 0.3); border-radius: var(--radius-xl); padding: 4rem 0; margin-bottom: 4rem;">
+            <div class="container" style="max-width: 56rem;">
+                <div style="text-align: center; margin-bottom: 3rem;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Appetizers</h2>
+                    <p class="text-lg text-muted">Start your meal right</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-content" style="padding: 0;">
+                        <div class="menu-list-item">
+                            <div style="flex: 1;">
+                                <h4 class="font-semibold" style="margin-bottom: 0.5rem;">Edamame</h4>
+                                <p class="text-sm text-muted">Steamed soybeans with sea salt</p>
+                                <div style="margin-top: 0.5rem;">
+                                    <span class="badge badge-success">Vegan</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 1.25rem; font-weight: 700; color: hsl(var(--primary));">¥400</div>
+                        </div>
+
+                        <div class="menu-list-item">
+                            <div style="flex: 1;">
+                                <h4 class="font-semibold" style="margin-bottom: 0.5rem;">Gyoza</h4>
+                                <p class="text-sm text-muted">Pan-fried pork dumplings (6 pieces)</p>
+                                <div style="margin-top: 0.5rem;">
+                                    <span class="badge badge-outline">Popular</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 1.25rem; font-weight: 700; color: hsl(var(--primary));">¥680</div>
+                        </div>
+
+                        <div class="menu-list-item">
+                            <div style="flex: 1;">
+                                <h4 class="font-semibold" style="margin-bottom: 0.5rem;">Takoyaki</h4>
+                                <p class="text-sm text-muted">Octopus balls with bonito flakes (5 pieces)</p>
+                                <div style="margin-top: 0.5rem;">
+                                    <span class="badge badge-default">Classic</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 1.25rem; font-weight: 700; color: hsl(var(--primary));">¥720</div>
+                        </div>
+
+                        <div class="menu-list-item">
+                            <div style="flex: 1;">
+                                <h4 class="font-semibold" style="margin-bottom: 0.5rem;">Tempura Platter</h4>
+                                <p class="text-sm text-muted">Assorted vegetables and shrimp tempura</p>
+                                <div style="margin-top: 0.5rem;">
+                                    <span class="badge badge-warning">Crispy</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 1.25rem; font-weight: 700; color: hsl(var(--primary));">¥1,800</div>
+                        </div>
+
+                        <div class="menu-list-item">
+                            <div style="flex: 1;">
+                                <h4 class="font-semibold" style="margin-bottom: 0.5rem;">Agedashi Tofu</h4>
+                                <p class="text-sm text-muted">Deep-fried tofu in dashi broth</p>
+                                <div style="margin-top: 0.5rem;">
+                                    <span class="badge badge-success">Vegetarian</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 1.25rem; font-weight: 700; color: hsl(var(--primary));">¥580</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Menu with Tabs -->
+        <section class="menu-section" style="margin-bottom: 4rem;">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 3rem;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Full Menu</h2>
+                    <p class="text-lg text-muted">Explore all our categories</p>
+                </div>
+
+                <div class="tabs">
+                    <div class="tabs-list" style="justify-content: center; margin-bottom: 3rem;">
+                        <button class="tabs-trigger active">Ramen</button>
+                        <button class="tabs-trigger">Sushi</button>
+                        <button class="tabs-trigger">Appetizers</button>
+                        <button class="tabs-trigger">Drinks</button>
+                        <button class="tabs-trigger">Desserts</button>
+                    </div>
+
+                    <div class="tabs-content">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="card">
+                                <div class="card-content" style="padding: 1.5rem;">
+                                    <div class="flex gap-4">
+                                        <div style="width: 6rem; height: 6rem; border-radius: var(--radius-md); background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); flex-shrink: 0;"></div>
+                                        <div class="flex-1">
+                                            <div class="flex justify-between items-start" style="margin-bottom: 0.5rem;">
+                                                <h4 class="font-semibold">Spicy Miso Ramen</h4>
+                                                <span class="font-bold" style="color: hsl(var(--primary));">¥1,200</span>
+                                            </div>
+                                            <p class="text-sm text-muted" style="margin-bottom: 0.5rem;">Rich miso broth with a spicy kick</p>
+                                            <div class="flex gap-2">
+                                                <span class="badge badge-destructive">Spicy</span>
+                                                <span class="badge badge-outline">Popular</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-content" style="padding: 1.5rem;">
+                                    <div class="flex gap-4">
+                                        <div style="width: 6rem; height: 6rem; border-radius: var(--radius-md); background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); flex-shrink: 0;"></div>
+                                        <div class="flex-1">
+                                            <div class="flex justify-between items-start" style="margin-bottom: 0.5rem;">
+                                                <h4 class="font-semibold">Tonkotsu Ramen</h4>
+                                                <span class="font-bold" style="color: hsl(var(--primary));">¥1,100</span>
+                                            </div>
+                                            <p class="text-sm text-muted" style="margin-bottom: 0.5rem;">Creamy pork bone broth, Hakata style</p>
+                                            <div class="flex gap-2">
+                                                <span class="badge badge-default">Classic</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-content" style="padding: 1.5rem;">
+                                    <div class="flex gap-4">
+                                        <div style="width: 6rem; height: 6rem; border-radius: var(--radius-md); background: linear-gradient(135deg, #96fbc4 0%, #f9f586 100%); flex-shrink: 0;"></div>
+                                        <div class="flex-1">
+                                            <div class="flex justify-between items-start" style="margin-bottom: 0.5rem;">
+                                                <h4 class="font-semibold">Vegetable Ramen</h4>
+                                                <span class="font-bold" style="color: hsl(var(--primary));">¥980</span>
+                                            </div>
+                                            <p class="text-sm text-muted" style="margin-bottom: 0.5rem;">Light vegetable broth with tofu</p>
+                                            <div class="flex gap-2">
+                                                <span class="badge badge-success">Vegan</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-content" style="padding: 1.5rem;">
+                                    <div class="flex gap-4">
+                                        <div style="width: 6rem; height: 6rem; border-radius: var(--radius-md); background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); flex-shrink: 0;"></div>
+                                        <div class="flex-1">
+                                            <div class="flex justify-between items-start" style="margin-bottom: 0.5rem;">
+                                                <h4 class="font-semibold">Shoyu Ramen</h4>
+                                                <span class="font-bold" style="color: hsl(var(--primary));">¥1,050</span>
+                                            </div>
+                                            <p class="text-sm text-muted" style="margin-bottom: 0.5rem;">Soy sauce based broth, Tokyo style</p>
+                                            <div class="flex gap-2">
+                                                <span class="badge badge-secondary">Traditional</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Download Menu CTA -->
+        <section style="margin-bottom: 4rem;">
+            <div class="card" style="background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%); color: hsl(var(--primary-foreground)); border: none;">
+                <div class="card-content" style="padding: 3rem; text-align: center;">
+                    <h2 style="font-size: 2rem; margin-bottom: 1rem; color: inherit;">Want to see the full menu?</h2>
+                    <p style="font-size: 1.125rem; opacity: 0.9; max-width: 36rem; margin: 0 auto 2rem;">
+                        Download our complete menu with all dishes, prices, and dietary information
+                    </p>
+                    <div class="flex gap-4 justify-center">
+                        <button class="btn btn-primary btn-lg" style="background-color: white; color: hsl(var(--primary));">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Download PDF Menu
+                        </button>
+                        <button class="btn btn-outline btn-lg" style="border-color: white; color: white;">
+                            View Allergen Info
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage -->
+        <section style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid hsl(var(--border));">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Usage</h2>
+            <pre style="background-color: hsl(var(--muted)); padding: 1rem; border-radius: var(--radius-md); overflow-x: auto; font-size: 0.875rem;"><code>&lt;!-- Grid Menu --&gt;
+&lt;div class="grid grid-cols-3 gap-6"&gt;
+    &lt;div class="menu-item-card"&gt;
+        &lt;div class="menu-item-image"&gt;&lt;/div&gt;
+        &lt;div class="menu-item-content"&gt;
+            &lt;div class="menu-item-header"&gt;
+                &lt;h3 class="menu-item-title"&gt;Dish Name&lt;/h3&gt;
+                &lt;span class="menu-item-price"&gt;$12&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;p class="menu-item-description"&gt;Description&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- List Menu --&gt;
+&lt;div class="menu-list-item"&gt;
+    &lt;div&gt;
+        &lt;h4&gt;Dish Name&lt;/h4&gt;
+        &lt;p class="text-sm text-muted"&gt;Description&lt;/p&gt;
+        &lt;span class="badge badge-success"&gt;Vegan&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div&gt;$12&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+        </section>
+    </div>
+</body>
+</html>

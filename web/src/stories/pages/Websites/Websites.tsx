@@ -1,67 +1,67 @@
-import { ContentContainer } from "@/components/ContentContainer";
-import { Select, SelectItem, SelectTrigger } from "@/components/ui/select";
-import { SelectValue } from "@/components/ui/select";
-import { SelectContent } from "@/components/ui/select";
-import { Button } from "@/stories/atoms/Button/Button";
-import { HeroSection } from "@/stories/WebsiteSections/HeroSection";
-import { useLocationSelection, usePages, useRestaurantWebsites, WebsiteDto, WebsitePageDto } from "@shared";
-import { useMemo, useState, useEffect } from "react";
-import Link from "next/link";
-import { WebsitePages } from "@/stories/organisms/WebsitePages";
+import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select'
+import { useLocationSelection, usePages, useRestaurantWebsites, WebsiteDto } from '@shared'
+import { useState, useEffect } from 'react'
+import { WebsitePages } from '@/stories/organisms/WebsitePages'
+import { Globe } from 'lucide-react'
+import { FormField } from '@/components/FormField'
 
 export function Websites() {
-    const { selectedLocation } = useLocationSelection()
-    const { data: websites, isLoading, error } = useRestaurantWebsites(selectedLocation?.id, selectedLocation?.type || 'Restaurant')
-    const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('')
+  const { selectedLocation } = useLocationSelection()
+  const { data: websites } = useRestaurantWebsites(selectedLocation?.id, selectedLocation?.type || 'Restaurant')
+  const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('')
 
-    const { data: websitePages, isLoading: isLoadingWebsitePages, error: errorWebsitePages } = usePages(selectedWebsiteId || '')
+  const { data: websitePages } = usePages(selectedWebsiteId || '')
 
-    useEffect(() => {
-        if (websites?.length === 1 && !selectedWebsiteId) {
-            setSelectedWebsiteId(websites[0].id)
-        }
-    }, [websites, selectedWebsiteId])
+  useEffect(() => {
+    if (websites?.length === 1 && !selectedWebsiteId) {
+      setSelectedWebsiteId(websites[0].id)
+    }
+  }, [websites, selectedWebsiteId])
 
-    return (
-        <ContentContainer>
+  if (websites && websites.length === 0) {
+    return null
+  }
 
-            {
-                (websites?.length || 0) > 1 && (<SelectWebsite websites={websites || []} selectedWebsiteId={selectedWebsiteId} onSelectWebsite={setSelectedWebsiteId} />)
-            }
+  return (
+    <div className="space-y-8">
+      {(websites?.length || 0) > 1 && (
+        <div className="bg-white border p-6">
+          <FormField label="Select Website" htmlFor="selectWebsite">
+            <SelectWebsite
+              websites={websites || []}
+              selectedWebsiteId={selectedWebsiteId}
+              onSelectWebsite={setSelectedWebsiteId}
+            />
+          </FormField>
+        </div>
+      )}
 
-            {
-                selectedWebsiteId && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-                        <WebsitePages websitePages={websitePages?.pages || []} websiteId={selectedWebsiteId} />
-                        <p>http://{websites?.find(w => w.id === selectedWebsiteId)?.subdomain}.{process.env.NEXT_PUBLIC_SITE_URL?.split('//')[1]}</p>
-
-                    </div>
-                )
-            }
-
-        </ContentContainer>
-    )
+      {selectedWebsiteId && <WebsitePages websitePages={websitePages?.pages || []} websiteId={selectedWebsiteId} />}
+    </div>
+  )
 }
-
-
 
 interface SelectWebsiteProps {
-    websites: WebsiteDto[]
-    selectedWebsiteId: string
-    onSelectWebsite: (websiteId: string) => void
+  websites: WebsiteDto[]
+  selectedWebsiteId: string
+  onSelectWebsite: (websiteId: string) => void
 }
 export const SelectWebsite = ({ websites, selectedWebsiteId, onSelectWebsite }: SelectWebsiteProps) => {
-    return (
-        <Select onValueChange={onSelectWebsite} value={selectedWebsiteId}>
-            <SelectTrigger>
-                <SelectValue placeholder="Select a website" />
-            </SelectTrigger>
-            <SelectContent>
-                {websites.map(website => (
-                    <SelectItem key={website.id} value={website.id}>{website.name}</SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-    )
+  return (
+    <Select onValueChange={onSelectWebsite} value={selectedWebsiteId}>
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Select a website" />
+      </SelectTrigger>
+      <SelectContent>
+        {websites.map(website => (
+          <SelectItem key={website.id} value={website.id}>
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-muted-foreground" />
+              {website.name}
+            </div>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
 }

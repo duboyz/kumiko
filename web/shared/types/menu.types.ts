@@ -63,7 +63,6 @@ export interface AllergenDto {
   updatedAt: string
 }
 
-
 export interface UpdateRestaurantMenuCommand {
   id: string
   name: string

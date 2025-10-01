@@ -1,11 +1,12 @@
 'use client'
 
-import { HeroSection } from '../HeroSection'
-import { TextSection } from '../TextSection/TextSection'
-import { RestaurantMenuSection } from '../RestaurantMenuSection/RestaurantMenuSection'
-import { LoadingSpinner } from '@/components'
+import { HeroSection } from '../../organisms/HeroSection'
+import { TextSection } from '../../organisms/TextSection/TextSection'
+import { RestaurantMenuSection } from '../../organisms/RestaurantMenuSection/RestaurantMenuSection'
+import { LoadingState, ErrorState, EmptyState } from '@/components'
 import type { WebsitePageDto, RestaurantMenuDto } from '@shared'
 import { useMenuById } from '@shared'
+import { FileX } from 'lucide-react'
 
 interface WebsitePageProps {
   page: WebsitePageDto
@@ -25,9 +26,9 @@ function MenuSectionWithFetch({
 
   if (isLoading) {
     return (
-      <section className="relative py-12 px-4 md:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto flex justify-center">
-          <LoadingSpinner />
+      <section className="relative py-20 px-10 bg-white">
+        <div className="max-w-[1000px] mx-auto">
+          <LoadingState variant="centered" />
         </div>
       </section>
     )
@@ -35,10 +36,13 @@ function MenuSectionWithFetch({
 
   if (error || !menuData) {
     return (
-      <section className="relative py-12 px-4 md:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center text-gray-500">
-          <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
-          <p>The selected menu could not be loaded.</p>
+      <section className="relative py-20 px-10 bg-white">
+        <div className="max-w-[1000px] mx-auto">
+          <ErrorState
+            title="Menu Not Found"
+            message="The selected menu could not be loaded."
+            variant="inline"
+          />
         </div>
       </section>
     )
@@ -55,24 +59,7 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
       {sortedSections.map(section => {
         // Render Hero Sections
         if (section.heroSection) {
-          return (
-            <HeroSection
-              key={section.id}
-              title={section.heroSection.title}
-              description={section.heroSection.description}
-              imageUrl={section.heroSection.imageUrl}
-              imageAlt={section.heroSection.imageAlt}
-              backgroundColor={section.heroSection.backgroundColor}
-              textColor={section.heroSection.textColor}
-              backgroundOverlayColor={section.heroSection.backgroundOverlayColor}
-              backgroundImageUrl={section.heroSection.backgroundImageUrl}
-              buttonText={section.heroSection.buttonText}
-              buttonUrl={section.heroSection.buttonUrl}
-              buttonTextColor={section.heroSection.buttonTextColor}
-              buttonBackgroundColor={section.heroSection.buttonBackgroundColor}
-              type={section.heroSection.type}
-            />
-          )
+          return <HeroSection key={section.id} section={section.heroSection} />
         }
 
         // Render Text Sections
@@ -106,10 +93,15 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
 
           if (!menu) {
             return (
-              <div key={section.id} className="py-12 px-4 text-center text-gray-500">
-                <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
-                <p>The selected menu could not be loaded.</p>
-              </div>
+              <section key={section.id} className="relative py-20 px-10 bg-white">
+                <div className="max-w-[1000px] mx-auto">
+                  <ErrorState
+                    title="Menu Not Found"
+                    message="The selected menu could not be loaded."
+                    variant="inline"
+                  />
+                </div>
+              </section>
             )
           }
 
@@ -125,26 +117,22 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
 
         // Fallback for unknown sections
         return (
-          <div key={section.id} className="py-8 px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <p className="text-gray-500">Unknown section type</p>
+          <section key={section.id} className="py-20 px-10 bg-white">
+            <div className="max-w-[1000px] mx-auto text-center">
+              <p className="text-muted-foreground">Unknown section type</p>
             </div>
-          </div>
+          </section>
         )
       })}
 
       {/* Empty state when no sections */}
       {sortedSections.length === 0 && (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 mx-auto bg-gray-200 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-semibold text-gray-600">No content yet</h2>
-            <p className="text-gray-500">Add sections to start building your page</p>
-          </div>
+        <div className="min-h-screen flex items-center justify-center bg-muted/30">
+          <EmptyState
+            icon={FileX}
+            title="No content yet"
+            description="Add sections to start building your page"
+          />
         </div>
       )}
     </div>

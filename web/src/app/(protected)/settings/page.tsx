@@ -14,9 +14,8 @@ import {
   useUpdateRestaurantSettings,
   useUpdateHospitalitySettings,
 } from '@shared'
-import { LoadingSpinner } from '@/components'
-import { ErrorMessage } from '@/components'
-import { useState, useEffect } from 'react'
+import { ErrorState, LoadingSpinner } from '@/components'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
@@ -139,8 +138,8 @@ export default function SettingsPage() {
   }
 
   if (isLoadingUser) return <LoadingSpinner />
-  if (userError) return <ErrorMessage message="Failed to load user data" />
-  if (!user) return <ErrorMessage message="User not found" />
+  if (userError) return <ErrorState message="Failed to load user data" />
+  if (!user) return <ErrorState message="User not found" />
 
   return (
     <ContentContainer>

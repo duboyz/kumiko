@@ -545,7 +545,7 @@ export default function MenuItemTableView({
               {/* Import Button */}
               <Button variant="outline" size="sm" asChild>
                 <a href="/menu-items/import">
-                  <Upload className="w-4 h-4 mr-2" />
+                  <Upload />
                   Import
                 </a>
               </Button>
@@ -646,7 +646,7 @@ export default function MenuItemTableView({
                     onCheckedChange={handleSelectAll}
                     ref={el => {
                       if (el) {
-                        ; (el as any).indeterminate = isIndeterminate
+                        ;(el as any).indeterminate = isIndeterminate
                       }
                     }}
                   />
@@ -1018,7 +1018,7 @@ export default function MenuItemTableView({
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmDialog
         isOpen={!!deleteConfirmItem}
-        onOpenChange={(open) => !open && setDeleteConfirmItem(null)}
+        onOpenChange={open => !open && setDeleteConfirmItem(null)}
         content={`Are you sure you want to delete this item? This action cannot be undone.`}
         onConfirmDelete={confirmDelete}
       />

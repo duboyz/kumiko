@@ -111,10 +111,8 @@ export function ImportWizard() {
   if (hasNoLocations) <NoLocation />
   if (!selectedLocation || selectedLocation.type !== 'Restaurant') return <RestaurantRequired />
 
-
   return (
     <>
-
       {/* Mobile Progress Indicator */}
       <div className="lg:hidden mb-6">
         <div className="bg-white rounded-lg border p-4">
@@ -140,8 +138,6 @@ export function ImportWizard() {
         </div> */}
 
         <ProgressBar currentStep={currentStep} onStepClick={handleStepChange} />
-
-
 
         {/* Main Content */}
         <div className="lg:col-span-3">

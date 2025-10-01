@@ -17,9 +17,11 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Plus, FileText, ArrowLeft, Edit } from 'lucide-react'
 import { usePages, useCreatePage } from '@shared'
-import { LoadingSpinner } from '@/components'
-import { ErrorMessage } from '@/components'
 import { ContentContainer } from '@/components/ContentContainer'
+import { LoadingState } from '@/components/LoadingState'
+import { ErrorState } from '@/components/ErrorState'
+import { EmptyState } from '@/components/EmptyState'
+import { FormField } from '@/components/FormField'
 
 export default function WebsitePagesPage() {
   const params = useParams()
@@ -61,9 +63,7 @@ export default function WebsitePagesPage() {
   if (isLoading) {
     return (
       <ContentContainer>
-        <div className="flex items-center justify-center h-64">
-          <LoadingSpinner />
-        </div>
+        <LoadingState />
       </ContentContainer>
     )
   }
@@ -71,7 +71,7 @@ export default function WebsitePagesPage() {
   if (error) {
     return (
       <ContentContainer>
-        <ErrorMessage
+        <ErrorState
           title="Failed to load pages"
           message="There was an error loading your website pages. Please try again."
         />
@@ -115,8 +115,12 @@ export default function WebsitePagesPage() {
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="slug">Page Slug</Label>
+                  <FormField
+                    label="Page Slug"
+                    htmlFor="slug"
+                    required
+                    helperText="URL-friendly version (e.g., about-us, contact, menu)"
+                  >
                     <Input
                       id="slug"
                       value={formData.slug}
@@ -124,13 +128,9 @@ export default function WebsitePagesPage() {
                       placeholder="about-us"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">
-                      URL-friendly version (e.g., about-us, contact, menu)
-                    </p>
-                  </div>
+                  </FormField>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Page Title</Label>
+                  <FormField label="Page Title" htmlFor="title" required>
                     <Input
                       id="title"
                       value={formData.title}
@@ -138,45 +138,42 @@ export default function WebsitePagesPage() {
                       placeholder="About Us"
                       required
                     />
-                  </div>
+                  </FormField>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="seoTitle">SEO Title (optional)</Label>
+                <FormField label="SEO Title (optional)" htmlFor="seoTitle">
                   <Input
                     id="seoTitle"
                     value={formData.seoTitle}
                     onChange={e => setFormData(prev => ({ ...prev, seoTitle: e.target.value }))}
                     placeholder="About Us - Your Restaurant Name"
                   />
-                </div>
+                </FormField>
 
-                <div className="space-y-2">
-                  <Label htmlFor="seoDescription">SEO Description (optional)</Label>
+                <FormField label="SEO Description (optional)" htmlFor="seoDescription">
                   <Textarea
                     id="seoDescription"
                     value={formData.seoDescription}
                     onChange={e => setFormData(prev => ({ ...prev, seoDescription: e.target.value }))}
                     placeholder="Learn more about our restaurant, our story, and our commitment to quality."
                   />
-                </div>
+                </FormField>
 
-                <div className="space-y-2">
-                  <Label htmlFor="seoKeywords">SEO Keywords (optional)</Label>
+                <FormField label="SEO Keywords (optional)" htmlFor="seoKeywords">
                   <Input
                     id="seoKeywords"
                     value={formData.seoKeywords}
                     onChange={e => setFormData(prev => ({ ...prev, seoKeywords: e.target.value }))}
                     placeholder="restaurant, about, story, quality"
                   />
-                </div>
+                </FormField>
 
                 <div className="flex justify-end space-x-2">
                   <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
                     Cancel
                   </Button>
                   <Button type="submit" disabled={createPage.isPending}>
-                    {createPage.isPending ? <LoadingSpinner size="sm" /> : 'Create Page'}
+                    {createPage.isPending ? 'Creating...' : 'Create Page'}
                   </Button>
                 </div>
               </form>
@@ -222,23 +219,17 @@ export default function WebsitePagesPage() {
           ))}
 
           {pages.length === 0 && (
-            <Card className="col-span-full">
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No pages yet</h3>
-                <p className="text-muted-foreground text-center mb-6">
-                  Create your first page to start building your website content.
-                </p>
-                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Your First Page
-                    </Button>
-                  </DialogTrigger>
-                </Dialog>
-              </CardContent>
-            </Card>
+            <div className="col-span-full">
+              <EmptyState
+                icon={FileText}
+                title="No pages yet"
+                description="Create your first page to start building your website content."
+                action={{
+                  label: 'Create Your First Page',
+                  onClick: () => setIsCreateOpen(true),
+                }}
+              />
+            </div>
           )}
         </div>
       </div>

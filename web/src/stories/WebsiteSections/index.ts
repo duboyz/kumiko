@@ -1,13 +1,13 @@
 // Hero Sections
-export { HeroSection } from './HeroSection/index'
-export { HeroBackgroundImage } from './HeroSection/HeroBackgroundImage'
-export { HeroImageRight } from './HeroSection/HeroImageRight'
+export { HeroSection } from '../organisms/HeroSection/index'
+export { HeroBackgroundImage } from '../organisms/HeroSection/HeroBackgroundImage'
+export { HeroImageRight } from '../organisms/HeroSection/HeroImageRight'
 
 // Text Sections
-export { TextSection } from './TextSection/TextSection'
+export { TextSection } from '../organisms/TextSection/TextSection'
 
 // Menu Sections
-export { RestaurantMenuSection } from './RestaurantMenuSection/RestaurantMenuSection'
+export { RestaurantMenuSection } from '../organisms/RestaurantMenuSection/RestaurantMenuSection'
 
 // Page Components
 export { WebsitePage } from './WebsitePage/WebsitePage'

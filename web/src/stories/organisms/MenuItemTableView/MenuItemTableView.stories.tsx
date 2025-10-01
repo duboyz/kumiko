@@ -13,20 +13,20 @@ const mockMenuItems = [
     updatedAt: '2024-01-01T00:00:00Z',
     menuCategoryItems: [],
     options: [],
-    allergens: []
+    allergens: [],
   },
   {
     id: '2',
     name: 'Caesar Salad',
     description: 'Crisp romaine lettuce with parmesan',
-    price: 12.50,
+    price: 12.5,
     isAvailable: true,
     restaurantMenuId: '1',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     menuCategoryItems: [],
     options: [],
-    allergens: []
+    allergens: [],
   },
   {
     id: '3',
@@ -39,7 +39,7 @@ const mockMenuItems = [
     updatedAt: '2024-01-01T00:00:00Z',
     menuCategoryItems: [],
     options: [],
-    allergens: []
+    allergens: [],
   },
   {
     id: '4',
@@ -52,21 +52,21 @@ const mockMenuItems = [
     updatedAt: '2024-01-01T00:00:00Z',
     menuCategoryItems: [],
     options: [],
-    allergens: []
+    allergens: [],
   },
   {
     id: '5',
     name: 'Vegetable Pasta',
     description: 'Fresh pasta with seasonal vegetables',
-    price: 16.50,
+    price: 16.5,
     isAvailable: true,
     restaurantMenuId: '2',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     menuCategoryItems: [],
     options: [],
-    allergens: []
-  }
+    allergens: [],
+  },
 ]
 
 const mockMenus = [
@@ -139,12 +139,12 @@ export const Default: Story = {
     menuItems: mockMenuItems,
     menus: mockMenus,
     isLoading: false,
-    onEditItem: (item) => console.log('Edit item:', item),
-    onDeleteItem: (id) => console.log('Delete item:', id),
-    onUpdateItem: (item) => console.log('Update item:', item),
-    onCreateItem: (item) => console.log('Create item:', item),
-    onBulkDelete: (ids) => console.log('Bulk delete:', ids),
-    onBulkUpdate: (updates) => console.log('Bulk update:', updates),
+    onEditItem: item => console.log('Edit item:', item),
+    onDeleteItem: id => console.log('Delete item:', id),
+    onUpdateItem: item => console.log('Update item:', item),
+    onCreateItem: item => console.log('Create item:', item),
+    onBulkDelete: ids => console.log('Bulk delete:', ids),
+    onBulkUpdate: updates => console.log('Bulk update:', updates),
   },
 }
 
@@ -153,12 +153,12 @@ export const Loading: Story = {
     menuItems: [],
     menus: mockMenus,
     isLoading: true,
-    onEditItem: (item) => console.log('Edit item:', item),
-    onDeleteItem: (id) => console.log('Delete item:', id),
-    onUpdateItem: (item) => console.log('Update item:', item),
-    onCreateItem: (item) => console.log('Create item:', item),
-    onBulkDelete: (ids) => console.log('Bulk delete:', ids),
-    onBulkUpdate: (updates) => console.log('Bulk update:', updates),
+    onEditItem: item => console.log('Edit item:', item),
+    onDeleteItem: id => console.log('Delete item:', id),
+    onUpdateItem: item => console.log('Update item:', item),
+    onCreateItem: item => console.log('Create item:', item),
+    onBulkDelete: ids => console.log('Bulk delete:', ids),
+    onBulkUpdate: updates => console.log('Bulk update:', updates),
   },
 }
 
@@ -167,12 +167,12 @@ export const Empty: Story = {
     menuItems: [],
     menus: mockMenus,
     isLoading: false,
-    onEditItem: (item) => console.log('Edit item:', item),
-    onDeleteItem: (id) => console.log('Delete item:', id),
-    onUpdateItem: (item) => console.log('Update item:', item),
-    onCreateItem: (item) => console.log('Create item:', item),
-    onBulkDelete: (ids) => console.log('Bulk delete:', ids),
-    onBulkUpdate: (updates) => console.log('Bulk update:', updates),
+    onEditItem: item => console.log('Edit item:', item),
+    onDeleteItem: id => console.log('Delete item:', id),
+    onUpdateItem: item => console.log('Update item:', item),
+    onCreateItem: item => console.log('Create item:', item),
+    onBulkDelete: ids => console.log('Bulk delete:', ids),
+    onBulkUpdate: updates => console.log('Bulk update:', updates),
   },
 }
 
@@ -181,12 +181,12 @@ export const SingleItem: Story = {
     menuItems: [mockMenuItems[0]],
     menus: mockMenus,
     isLoading: false,
-    onEditItem: (item) => console.log('Edit item:', item),
-    onDeleteItem: (id) => console.log('Delete item:', id),
-    onUpdateItem: (item) => console.log('Update item:', item),
-    onCreateItem: (item) => console.log('Create item:', item),
-    onBulkDelete: (ids) => console.log('Bulk delete:', ids),
-    onBulkUpdate: (updates) => console.log('Bulk update:', updates),
+    onEditItem: item => console.log('Edit item:', item),
+    onDeleteItem: id => console.log('Delete item:', id),
+    onUpdateItem: item => console.log('Update item:', item),
+    onCreateItem: item => console.log('Create item:', item),
+    onBulkDelete: ids => console.log('Bulk delete:', ids),
+    onBulkUpdate: updates => console.log('Bulk update:', updates),
   },
 }
 
@@ -199,12 +199,12 @@ export const LargeDataset: Story = {
     })),
     menus: mockMenus,
     isLoading: false,
-    onEditItem: (item) => console.log('Edit item:', item),
-    onDeleteItem: (id) => console.log('Delete item:', id),
-    onUpdateItem: (item) => console.log('Update item:', item),
-    onCreateItem: (item) => console.log('Create item:', item),
-    onBulkDelete: (ids) => console.log('Bulk delete:', ids),
-    onBulkUpdate: (updates) => console.log('Bulk update:', updates),
+    onEditItem: item => console.log('Edit item:', item),
+    onDeleteItem: id => console.log('Delete item:', id),
+    onUpdateItem: item => console.log('Update item:', item),
+    onCreateItem: item => console.log('Create item:', item),
+    onBulkDelete: ids => console.log('Bulk delete:', ids),
+    onBulkUpdate: updates => console.log('Bulk update:', updates),
   },
 }
 
@@ -214,34 +214,35 @@ export const InteractionDemo = () => {
       <div className="p-4 bg-gray-50 rounded">
         <h3 className="font-semibold mb-2">Menu Item Table</h3>
         <p className="text-sm text-gray-600 mb-4">
-          A comprehensive table view for managing menu items with search, filtering, bulk operations, and inline editing.
+          A comprehensive table view for managing menu items with search, filtering, bulk operations, and inline
+          editing.
         </p>
       </div>
       <MenuItemTableView
         menuItems={mockMenuItems}
         menus={mockMenus}
         isLoading={false}
-        onEditItem={(item) => {
+        onEditItem={item => {
           console.log('Demo edit item:', item)
           alert(`Editing ${item.name}`)
         }}
-        onDeleteItem={(id) => {
+        onDeleteItem={id => {
           console.log('Demo delete item:', id)
           alert(`Delete item ${id}?`)
         }}
-        onUpdateItem={(item) => {
+        onUpdateItem={item => {
           console.log('Demo update item:', item)
           alert(`Updated ${item.name}!`)
         }}
-        onCreateItem={(item) => {
+        onCreateItem={item => {
           console.log('Demo create item:', item)
           alert(`Created new item: ${item.name}!`)
         }}
-        onBulkDelete={(ids) => {
+        onBulkDelete={ids => {
           console.log('Demo bulk delete:', ids)
           alert(`Bulk delete ${ids.length} items?`)
         }}
-        onBulkUpdate={(updates) => {
+        onBulkUpdate={updates => {
           console.log('Demo bulk update:', updates)
           alert(`Bulk update ${updates.itemIds.length} items!`)
         }}

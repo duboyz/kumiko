@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Item Card - Kumiko Components</title>
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+    <div class="container" style="padding: 3rem 0;">
+        <h1>Menu Item Cards</h1>
+        <p class="text-muted" style="margin-bottom: 2rem;">Beautiful menu item cards for displaying dishes</p>
+
+        <!-- Menu Items Grid -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Menu Items</h2>
+            <div class="grid grid-cols-3 gap-6">
+                <!-- Menu Item 1 -->
+                <div class="menu-item-card">
+                    <div class="menu-item-image" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);"></div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-header">
+                            <h3 class="menu-item-title">Spicy Ramen</h3>
+                            <span class="menu-item-price">¥1,200</span>
+                        </div>
+                        <p class="menu-item-description">
+                            Rich tonkotsu broth with perfectly cooked noodles, topped with chashu pork, soft-boiled egg, and fresh scallions.
+                        </p>
+                        <div class="menu-item-tags">
+                            <span class="badge badge-secondary">Spicy</span>
+                            <span class="badge badge-outline">Popular</span>
+                        </div>
+                        <div class="menu-item-footer">
+                            <div class="text-sm text-muted">⏱️ 15 min</div>
+                            <button class="btn btn-primary btn-sm">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Item 2 -->
+                <div class="menu-item-card">
+                    <div class="menu-item-image" style="background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);"></div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-header">
+                            <h3 class="menu-item-title">Salmon Sushi Set</h3>
+                            <span class="menu-item-price">¥2,400</span>
+                        </div>
+                        <p class="menu-item-description">
+                            Premium selection of 10 pieces of fresh salmon nigiri and rolls, served with wasabi, ginger, and soy sauce.
+                        </p>
+                        <div class="menu-item-tags">
+                            <span class="badge badge-success">Fresh</span>
+                            <span class="badge badge-outline">Chef's Choice</span>
+                        </div>
+                        <div class="menu-item-footer">
+                            <div class="text-sm text-muted">⏱️ 10 min</div>
+                            <button class="btn btn-primary btn-sm">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Item 3 -->
+                <div class="menu-item-card">
+                    <div class="menu-item-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-header">
+                            <h3 class="menu-item-title">Tempura Platter</h3>
+                            <span class="menu-item-price">¥1,800</span>
+                        </div>
+                        <p class="menu-item-description">
+                            Assorted vegetables and shrimp tempura, lightly battered and fried to golden perfection.
+                        </p>
+                        <div class="menu-item-tags">
+                            <span class="badge badge-warning">Crispy</span>
+                            <span class="badge badge-outline">Vegetarian Option</span>
+                        </div>
+                        <div class="menu-item-footer">
+                            <div class="text-sm text-muted">⏱️ 12 min</div>
+                            <button class="btn btn-primary btn-sm">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Item 4 - Compact -->
+                <div class="menu-item-card">
+                    <div class="menu-item-image" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);"></div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-header">
+                            <h3 class="menu-item-title">Chicken Teriyaki</h3>
+                            <span class="menu-item-price">¥1,400</span>
+                        </div>
+                        <p class="menu-item-description">
+                            Grilled chicken glazed with house-made teriyaki sauce, served with steamed rice and vegetables.
+                        </p>
+                        <div class="menu-item-tags">
+                            <span class="badge badge-default">House Special</span>
+                        </div>
+                        <div class="menu-item-footer">
+                            <div class="text-sm text-muted">⏱️ 18 min</div>
+                            <button class="btn btn-primary btn-sm">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Item 5 - Sold Out -->
+                <div class="menu-item-card" style="opacity: 0.6;">
+                    <div class="menu-item-image" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);"></div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-header">
+                            <h3 class="menu-item-title">Wagyu Beef Bowl</h3>
+                            <span class="menu-item-price">¥3,200</span>
+                        </div>
+                        <p class="menu-item-description">
+                            Premium A5 Wagyu beef served over steaming rice with caramelized onions and a soft poached egg.
+                        </p>
+                        <div class="menu-item-tags">
+                            <span class="badge badge-destructive">Sold Out</span>
+                            <span class="badge badge-outline">Premium</span>
+                        </div>
+                        <div class="menu-item-footer">
+                            <div class="text-sm text-muted">⏱️ 20 min</div>
+                            <button class="btn btn-secondary btn-sm" disabled>Unavailable</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Item 6 - Vegetarian -->
+                <div class="menu-item-card">
+                    <div class="menu-item-image" style="background: linear-gradient(135deg, #96fbc4 0%, #f9f586 100%);"></div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-header">
+                            <h3 class="menu-item-title">Vegetable Udon</h3>
+                            <span class="menu-item-price">¥980</span>
+                        </div>
+                        <p class="menu-item-description">
+                            Thick udon noodles in a savory broth with seasonal vegetables and tofu.
+                        </p>
+                        <div class="menu-item-tags">
+                            <span class="badge badge-success">Vegan</span>
+                            <span class="badge badge-outline">Healthy</span>
+                        </div>
+                        <div class="menu-item-footer">
+                            <div class="text-sm text-muted">⏱️ 12 min</div>
+                            <button class="btn btn-primary btn-sm">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compact Menu List -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Compact Menu List</h2>
+            <div class="space-y-4" style="max-width: 48rem;">
+                <!-- Compact Item 1 -->
+                <div class="card">
+                    <div class="card-content" style="padding: 1rem;">
+                        <div class="flex gap-4">
+                            <div style="width: 5rem; height: 5rem; border-radius: var(--radius-md); background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); flex-shrink: 0;"></div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start" style="margin-bottom: 0.5rem;">
+                                    <h4 class="font-semibold">Spicy Ramen</h4>
+                                    <span class="font-bold" style="color: hsl(var(--primary));">¥1,200</span>
+                                </div>
+                                <p class="text-sm text-muted" style="margin-bottom: 0.5rem;">Rich tonkotsu broth with chashu pork and egg</p>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex gap-2">
+                                        <span class="badge badge-secondary">Spicy</span>
+                                        <span class="text-sm text-muted">⏱️ 15 min</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compact Item 2 -->
+                <div class="card">
+                    <div class="card-content" style="padding: 1rem;">
+                        <div class="flex gap-4">
+                            <div style="width: 5rem; height: 5rem; border-radius: var(--radius-md); background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); flex-shrink: 0;"></div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start" style="margin-bottom: 0.5rem;">
+                                    <h4 class="font-semibold">Salmon Sushi Set</h4>
+                                    <span class="font-bold" style="color: hsl(var(--primary));">¥2,400</span>
+                                </div>
+                                <p class="text-sm text-muted" style="margin-bottom: 0.5rem;">10 pieces of premium salmon nigiri and rolls</p>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex gap-2">
+                                        <span class="badge badge-success">Fresh</span>
+                                        <span class="text-sm text-muted">⏱️ 10 min</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage -->
+        <section style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid hsl(var(--border));">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Usage</h2>
+            <pre style="background-color: hsl(var(--muted)); padding: 1rem; border-radius: var(--radius-md); overflow-x: auto; font-size: 0.875rem;"><code>&lt;div class="menu-item-card"&gt;
+    &lt;div class="menu-item-image"&gt;&lt;/div&gt;
+    &lt;div class="menu-item-content"&gt;
+        &lt;div class="menu-item-header"&gt;
+            &lt;h3 class="menu-item-title"&gt;Dish Name&lt;/h3&gt;
+            &lt;span class="menu-item-price"&gt;$12.99&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;p class="menu-item-description"&gt;Description&lt;/p&gt;
+        &lt;div class="menu-item-tags"&gt;
+            &lt;span class="badge badge-secondary"&gt;Tag&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="menu-item-footer"&gt;
+            &lt;div class="text-sm text-muted"&gt;⏱️ 15 min&lt;/div&gt;
+            &lt;button class="btn btn-primary btn-sm"&gt;Add&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+        </section>
+    </div>
+</body>
+</html>

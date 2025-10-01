@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inputs - Kumiko Components</title>
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+    <div class="container" style="padding: 3rem 0;">
+        <h1>Input Fields</h1>
+        <p class="text-muted" style="margin-bottom: 2rem;">Modern input components with proper focus states and validation</p>
+
+        <!-- Basic Input -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Basic Input</h2>
+            <div class="space-y-4" style="max-width: 28rem;">
+                <div>
+                    <label class="label">Email</label>
+                    <input type="email" class="input" placeholder="Enter your email">
+                </div>
+                
+                <div>
+                    <label class="label">Password</label>
+                    <input type="password" class="input" placeholder="Enter your password">
+                </div>
+                
+                <div>
+                    <label class="label">Phone Number</label>
+                    <input type="tel" class="input" placeholder="+1 (555) 000-0000">
+                </div>
+                
+                <div>
+                    <label class="label">Disabled Input</label>
+                    <input type="text" class="input" placeholder="Disabled" disabled value="Can't edit this">
+                </div>
+            </div>
+        </section>
+
+        <!-- Input with Icon -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Input with Icon</h2>
+            <div class="space-y-4" style="max-width: 28rem;">
+                <div>
+                    <label class="label">Search</label>
+                    <div class="input-group">
+                        <input type="text" class="input" placeholder="Search menu items...">
+                        <span class="input-group-icon">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="label">Email Address</label>
+                    <div class="input-group">
+                        <input type="email" class="input" placeholder="you@example.com">
+                        <span class="input-group-icon">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 8l7 5 7-5M3 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Textarea -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Textarea</h2>
+            <div style="max-width: 28rem;">
+                <label class="label">Special Instructions</label>
+                <textarea class="textarea" placeholder="Add any special instructions for your order..."></textarea>
+            </div>
+        </section>
+
+        <!-- Select -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Select Dropdown</h2>
+            <div class="space-y-4" style="max-width: 28rem;">
+                <div>
+                    <label class="label">Restaurant Location</label>
+                    <select class="select">
+                        <option>Select a location</option>
+                        <option>Tokyo - Shibuya</option>
+                        <option>Tokyo - Shinjuku</option>
+                        <option>Osaka - Namba</option>
+                        <option>Kyoto - Gion</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="label">Party Size</label>
+                    <select class="select">
+                        <option>Select number of guests</option>
+                        <option>1 person</option>
+                        <option>2 people</option>
+                        <option>3 people</option>
+                        <option>4 people</option>
+                        <option>5+ people</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Checkbox & Switch -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Checkbox & Switch</h2>
+            <div class="space-y-4" style="max-width: 28rem;">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="remember" class="checkbox">
+                    <label for="remember" style="cursor: pointer; font-size: 0.875rem;">Remember me</label>
+                </div>
+                
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="newsletter" class="checkbox" checked>
+                    <label for="newsletter" style="cursor: pointer; font-size: 0.875rem;">Subscribe to newsletter</label>
+                </div>
+                
+                <div class="separator"></div>
+                
+                <div class="flex items-center justify-between">
+                    <label style="font-size: 0.875rem;">Email Notifications</label>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <label style="font-size: 0.875rem;">SMS Updates</label>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Complete Form Example -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Complete Form Example</h2>
+            <div style="max-width: 28rem;">
+                <form class="space-y-4">
+                    <div>
+                        <label class="label">Full Name</label>
+                        <input type="text" class="input" placeholder="John Doe" required>
+                    </div>
+                    
+                    <div>
+                        <label class="label">Email</label>
+                        <input type="email" class="input" placeholder="you@example.com" required>
+                    </div>
+                    
+                    <div>
+                        <label class="label">Location</label>
+                        <select class="select" required>
+                            <option value="">Select a location</option>
+                            <option>Tokyo - Shibuya</option>
+                            <option>Tokyo - Shinjuku</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="label">Message</label>
+                        <textarea class="textarea" placeholder="Your message..." rows="4"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-full">Submit Form</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Usage -->
+        <section style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid hsl(var(--border));">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Usage</h2>
+            <pre style="background-color: hsl(var(--muted)); padding: 1rem; border-radius: var(--radius-md); overflow-x: auto; font-size: 0.875rem;"><code>&lt;!-- Input --&gt;
+&lt;label class="label"&gt;Email&lt;/label&gt;
+&lt;input type="email" class="input" placeholder="Enter email"&gt;
+
+&lt;!-- Input with Icon --&gt;
+&lt;div class="input-group"&gt;
+    &lt;input type="text" class="input" placeholder="Search..."&gt;
+    &lt;span class="input-group-icon"&gt;
+        &lt;svg&gt;...&lt;/svg&gt;
+    &lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- Textarea --&gt;
+&lt;textarea class="textarea" placeholder="Message..."&gt;&lt;/textarea&gt;
+
+&lt;!-- Select --&gt;
+&lt;select class="select"&gt;
+    &lt;option&gt;Option 1&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;!-- Checkbox --&gt;
+&lt;div class="checkbox-wrapper"&gt;
+    &lt;input type="checkbox" id="check" class="checkbox"&gt;
+    &lt;label for="check"&gt;Label&lt;/label&gt;
+&lt;/div&gt;
+
+&lt;!-- Switch --&gt;
+&lt;label class="switch"&gt;
+    &lt;input type="checkbox"&gt;
+    &lt;span class="switch-slider"&gt;&lt;/span&gt;
+&lt;/label&gt;</code></pre>
+        </section>
+    </div>
+</body>
+</html>

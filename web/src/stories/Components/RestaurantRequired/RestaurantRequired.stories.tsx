@@ -1,12 +1,12 @@
-import { StoryObj } from "@storybook/nextjs-vite"
-import { RestaurantRequired } from "./RestaurantRequired"
+import { StoryObj } from '@storybook/nextjs-vite'
+import { RestaurantRequired } from './RestaurantRequired'
 
 const meta = {
-    component: RestaurantRequired,
-    parameters: {
-        layout: 'padded',
-    },
-    tags: ['autodocs'],
+  component: RestaurantRequired,
+  parameters: {
+    layout: 'padded',
+  },
+  tags: ['autodocs'],
 }
 
 export default meta
@@ -14,5 +14,5 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-    args: {},
+  args: {},
 }

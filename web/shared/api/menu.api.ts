@@ -232,23 +232,16 @@ export const menuApi = {
   },
 
   // Parse menu from image using AI
-  parseMenuFromImage: async (
-    file: File,
-    restaurantId: string
-  ): Promise<ResponseData<any>> => {
+  parseMenuFromImage: async (file: File, restaurantId: string): Promise<ResponseData<any>> => {
     const formData = new FormData()
     formData.append('Image', file)
     formData.append('RestaurantId', restaurantId)
 
-    const { data } = await client.post<ApiResponse<any>>(
-      '/api/menu-import/parse-image',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    )
+    const { data } = await client.post<ApiResponse<any>>('/api/menu-import/parse-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
     if (!data.success) throw new Error(data.message || 'Failed to parse menu from image')
     return data.data
   },
@@ -265,7 +258,7 @@ export const menuApi = {
     const createdMenu = await menuApi.createRestaurantMenu({
       name: parsedMenu.menuName || 'Generated Menu',
       description: parsedMenu.menuDescription || 'Menu generated from image',
-      restaurantId: restaurantId
+      restaurantId: restaurantId,
     })
 
     if (!createdMenu) {
@@ -280,7 +273,7 @@ export const menuApi = {
           name: category.name,
           description: category.description || '',
           orderIndex: i,
-          restaurantMenuId: createdMenu.id
+          restaurantMenuId: createdMenu.id,
         })
 
         if (!createdCategory) {
@@ -297,7 +290,7 @@ export const menuApi = {
               description: item.description || '',
               price: item.price || 0,
               isAvailable: true,
-              restaurantMenuId: createdMenu.id
+              restaurantMenuId: createdMenu.id,
             })
             if (createdItem) {
               menuItemIds.push(createdItem.id)
@@ -308,7 +301,7 @@ export const menuApi = {
           if (menuItemIds.length > 0) {
             await menuApi.bulkAddMenuItemsToCategory({
               menuItemIds,
-              menuCategoryId: createdCategory.id
+              menuCategoryId: createdCategory.id,
             })
           }
         }
@@ -319,7 +312,7 @@ export const menuApi = {
       id: createdMenu.id,
       name: createdMenu.name,
       description: createdMenu.description,
-      restaurantId: createdMenu.restaurantId
+      restaurantId: createdMenu.restaurantId,
     }
   },
 }

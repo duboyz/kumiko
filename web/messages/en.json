@@ -105,6 +105,7 @@
   },
   "menus": {
     "importMenu": "Import Menu",
-    "createMenu": "Create Menu"
+    "createMenu": "Create Menu",
+    "title": "Menus"
   }
 }

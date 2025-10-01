@@ -1,8 +1,7 @@
 'use client'
 
 import { ContentContainer } from '@/components/ContentContainer'
-import { LoadingSpinner } from '@/components'
-import { DeleteConfirmDialog } from '@/components'
+import { DeleteConfirmDialog, LoadingSpinner } from '@/components'
 import MenuItemTableView from '@/stories/organisms/MenuItemTableView/MenuItemTableView'
 import {
   useAllRestaurantMenuItems,
@@ -17,13 +16,16 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 import Link from 'next/link'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Building2, AlertCircle, Plus, Edit, Trash2, Package, Grid3X3, Table, Upload, CheckCircle } from 'lucide-react'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
+import { Plus, Edit, Trash2, Package, Upload, CheckCircle } from 'lucide-react'
 import { useState, useEffect, Suspense } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
-import { MenuItemDto, CreateMenuItemCommand, UpdateMenuItemCommand, RestaurantMenuDto } from '@shared'
+import { MenuItemDto, CreateMenuItemCommand, UpdateMenuItemCommand } from '@shared'
+import { NoLocation } from '@/stories/Components/NoLocation/NoLocation'
+import { RestaurantRequired } from '@/stories/Components/RestaurantRequired/RestaurantRequired'
+import { LoadingState } from '@/components/LoadingState'
+import { EmptyState } from '@/components/EmptyState'
 
 function MenuItemsPageContent() {
   const { selectedLocation, isLoading, hasNoLocations } = useLocationSelection()
@@ -62,69 +64,13 @@ function MenuItemsPageContent() {
   if (isLoading) {
     return (
       <div className="container mx-auto py-6">
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <LoadingSpinner size="lg" />
-            <p className="text-muted-foreground mt-2">Loading...</p>
-          </div>
-        </div>
+        <LoadingState message="Loading..." />
       </div>
     )
   }
 
-  if (hasNoLocations) {
-    return (
-      <div className="container mx-auto py-6">
-        <Card>
-          <CardContent className="text-center py-12">
-            <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No Restaurants Found</h2>
-            <p className="text-muted-foreground mb-6">You need to add a restaurant before you can manage menu items.</p>
-            <Button asChild>
-              <a href="/onboarding/restaurant">Add Restaurant</a>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  if (!selectedLocation || selectedLocation.type !== 'Restaurant') {
-    return (
-      <div className="container mx-auto py-6">
-        <Card>
-          <CardContent className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Restaurant Required</h2>
-            <p className="text-muted-foreground mb-6">
-              Menu item management is only available for restaurant locations. Please select a restaurant from the
-              sidebar.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  const handleCreateMenuItem = async (data: CreateMenuItemCommand) => {
-    try {
-      await createMenuItemMutation.mutateAsync(data)
-      setIsCreateDialogOpen(false)
-    } catch (error) {
-      console.error('Failed to create menu item:', error)
-    }
-  }
-
-  const handleUpdateMenuItem = async (data: UpdateMenuItemCommand) => {
-    try {
-      await updateMenuItemMutation.mutateAsync(data)
-      //   queryClient.invalidateQueries({ queryKey: ["restaurant-menu-items"] });
-      setIsEditDialogOpen(false)
-      setEditingItem(null)
-    } catch (error) {
-      console.error('Failed to update menu item:', error)
-    }
-  }
+  if (hasNoLocations) return <NoLocation />
+  if (!selectedLocation || selectedLocation.type !== 'Restaurant') return <RestaurantRequired />
 
   const handleDeleteMenuItem = async (itemId: string) => {
     setDeleteTarget({ type: 'item', id: itemId })
@@ -207,7 +153,6 @@ function MenuItemsPageContent() {
           <h1 className="text-2xl font-bold">Menu Items</h1>
           <p className="text-muted-foreground">Manage all menu items for {selectedLocation.name}</p>
         </div>
-
       </div>
 
       <Tabs value={activeView} onValueChange={value => setActiveView(value as 'cards' | 'table')} className="w-full">
@@ -224,31 +169,13 @@ function MenuItemsPageContent() {
 
         <TabsContent value="cards" className="mt-6">
           {menuItemsLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <LoadingSpinner size="lg" />
-            </div>
+            <LoadingState />
           ) : menuItems.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-12">
-                <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h2 className="text-xl font-semibold mb-2">No Menu Items</h2>
-                <p className="text-muted-foreground mb-6">
-                  Get started by creating your first menu item or importing from a photo.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button asChild size="lg">
-                    <Link href="/menu-items/import">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Import from Photo
-                    </Link>
-                  </Button>
-                  <Button onClick={() => setIsCreateDialogOpen(true)} variant="outline" size="lg">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Manually
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <EmptyState
+              icon={Package}
+              title="No Menu Items"
+              description="Get started by creating your first menu item or importing from a photo."
+            />
           ) : (
             <>
               {/* Quick Import Card - Show when user has items but might want to import more */}
@@ -321,7 +248,6 @@ function MenuItemsPageContent() {
           />
         </TabsContent>
       </Tabs>
-
 
       <DeleteConfirmDialog
         isOpen={isDeleteDialogOpen}

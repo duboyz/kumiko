@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from './providers'
-import { Noto_Sans_JP } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 
-const notoSansJP = Noto_Sans_JP({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-noto-sans-jp',
+  variable: '--font-inter',
   display: 'swap',
 })
 
@@ -27,7 +27,7 @@ export default async function RootLayout({
 
   return (
     <html suppressHydrationWarning>
-      <body className={notoSansJP.variable}>
+      <body className={inter.variable}>
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>

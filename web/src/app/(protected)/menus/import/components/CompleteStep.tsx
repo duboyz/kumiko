@@ -72,12 +72,12 @@ export function CompleteStep({ onComplete, onBack, showSuccess }: CompleteStepPr
       {/* Action Buttons */}
       <div className="flex justify-between">
         <Button variant="outline" onClick={onBack}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft />
           Back to Review
         </Button>
         <Button onClick={onComplete} size="lg">
           View Menu Items
-          <ArrowRight className="w-4 h-4 ml-2" />
+          <ArrowRight />
         </Button>
       </div>
     </div>

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -12,15 +11,16 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Globe, Settings, Eye, Power, PowerOff } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useRestaurantWebsites, useCreateWebsite, useUpdateWebsite, useLocationSelection } from '@shared'
 import { LoadingSpinner } from '@/components'
-import { ErrorMessage } from '@/components'
 import { ContentContainer } from '@/components/ContentContainer'
-import { openSubdomainUrl } from '@/lib/subdomain'
+import { PageHeader } from '@/components/PageHeader'
 import { Websites } from '@/stories/pages/Websites/Websites'
+import { LoadingState } from '@/components/LoadingState'
+import { ErrorState } from '@/components/ErrorState'
+import { FormField } from '@/components/FormField'
 
 export default function WebsitesPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
@@ -72,9 +72,7 @@ export default function WebsitesPage() {
   if (isLoading) {
     return (
       <ContentContainer>
-        <div className="flex items-center justify-center h-64">
-          <LoadingSpinner />
-        </div>
+        <LoadingState />
       </ContentContainer>
     )
   }
@@ -82,7 +80,7 @@ export default function WebsitesPage() {
   if (error) {
     return (
       <ContentContainer>
-        <ErrorMessage
+        <ErrorState
           title="Failed to load websites"
           message="There was an error loading your websites. Please try again."
         />
@@ -92,83 +90,75 @@ export default function WebsitesPage() {
 
   return (
     <ContentContainer>
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Websites</h1>
-          <p className="text-muted-foreground">
-            Manage your restaurant websites and build pages with prebuilt sections.
-          </p>
-        </div>
-
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Website
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Website</DialogTitle>
-              <DialogDescription>Create a new website for your restaurant with a custom subdomain.</DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Website Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="My Restaurant Website"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="subdomain">Subdomain</Label>
-                <div className="flex items-center">
+      <PageHeader
+        title="Websites"
+        description="Manage your restaurant websites and build pages with prebuilt sections."
+        action={
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            <DialogTrigger asChild>
+              <Button variant="default">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Website
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Create New Website</DialogTitle>
+                <DialogDescription>Create a new website for your restaurant with a custom subdomain.</DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+                <FormField label="Website Name" htmlFor="name" required>
                   <Input
-                    id="subdomain"
-                    value={formData.subdomain}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setFormData(prev => ({ ...prev, subdomain: e.target.value }))
-                    }
-                    placeholder="myrestaurant"
-                    className="rounded-r-none"
+                    id="name"
+                    value={formData.name}
+                    onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="My Restaurant Website"
                     required
                   />
-                  <div className="bg-muted px-3 py-2 text-sm text-muted-foreground border border-l-0 rounded-r-md">
-                    .kumiko.no
+                </FormField>
+
+                <FormField label="Subdomain" htmlFor="subdomain" required>
+                  <div className="flex items-stretch">
+                    <Input
+                      id="subdomain"
+                      value={formData.subdomain}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setFormData(prev => ({ ...prev, subdomain: e.target.value }))
+                      }
+                      placeholder="myrestaurant"
+                      className="flex-1 rounded-r-none"
+                      required
+                    />
+                    <div className="bg-muted px-4 flex items-center text-sm text-muted-foreground border border-l-0 rounded-r-md">
+                      .kumiko.no
+                    </div>
                   </div>
+                </FormField>
+
+                <FormField label="Description (optional)" htmlFor="description">
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="A brief description of your website"
+                  />
+                </FormField>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button type="button" variant="secondary" onClick={() => setIsCreateOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" variant="default" disabled={createWebsite.isPending}>
+                    {createWebsite.isPending ? 'Creating...' : 'Create Website'}
+                  </Button>
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Description (optional)</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="A brief description of your website"
-                />
-              </div>
-
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={createWebsite.isPending}>
-                  {createWebsite.isPending ? <LoadingSpinner size="sm" /> : 'Create Website'}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        }
+      />
 
       <Websites />
-
-
     </ContentContainer>
   )
 }

@@ -6,84 +6,78 @@ import { ArrowRight, ArrowLeft, X } from 'lucide-react'
 import { Dropzone } from '../Dropzone/Dropzone'
 
 interface UploadStepProps {
-    onImageSelect: (file: File, preview: string) => void
-    onBack: () => void
-    isSimple?: boolean
+  onImageSelect: (file: File, preview: string) => void
+  onBack: () => void
+  isSimple?: boolean
 }
 
 export function UploadStep({ onImageSelect, onBack, isSimple = false }: UploadStepProps) {
-    const [selectedFile, setSelectedFile] = useState<File | null>(null)
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
-    const handleFileSelect = (file: File) => {
-        if (!file?.type.startsWith('image/')) return
+  const handleFileSelect = (file: File) => {
+    if (!file?.type.startsWith('image/')) return
 
-        setSelectedFile(file)
-        const url = URL.createObjectURL(file)
-        setPreviewUrl(url)
+    setSelectedFile(file)
+    const url = URL.createObjectURL(file)
+    setPreviewUrl(url)
+  }
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null)
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(null)
     }
+  }
 
-    const handleRemoveFile = () => {
-        setSelectedFile(null)
-        if (previewUrl) {
-            URL.revokeObjectURL(previewUrl)
-            setPreviewUrl(null)
-        }
-    }
+  const handleContinue = () => selectedFile && previewUrl && onImageSelect(selectedFile, previewUrl)
 
-    const handleContinue = () => (selectedFile && previewUrl) && onImageSelect(selectedFile, previewUrl)
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold mb-2">Upload Menu Image</h2>
+        <p className="text-muted-foreground">Upload a clear photo of your menu to automatically extract menu items</p>
+      </div>
 
-    return (
-        <div className="space-y-6">
-            <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2">Upload Menu Image</h2>
-                <p className="text-muted-foreground">Upload a clear photo of your menu to automatically extract menu items</p>
-            </div>
+      {!selectedFile && <Dropzone onFileSelect={handleFileSelect} />}
+      {selectedFile && <SelectedFile file={selectedFile} previewUrl={previewUrl!} onRemoveFile={handleRemoveFile} />}
 
-            {!selectedFile && <Dropzone onFileSelect={handleFileSelect} />}
-            {selectedFile && <SelectedFile file={selectedFile} previewUrl={previewUrl!} onRemoveFile={handleRemoveFile} />}
-
-            <div className="flex items-center justify-between pt-6">
-                <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
-                    <ArrowLeft className="w-4 h-4" />
-                    Back
-                </Button>
-                <Button
-                    onClick={handleContinue}
-                    disabled={!selectedFile}
-                    size="lg"
-                    className="flex items-center gap-2"
-                >
-                    Continue
-                    <ArrowRight className="w-4 h-4" />
-                </Button>
-            </div>
-        </div>
-    )
+      <div className="flex items-center justify-between pt-6">
+        <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </Button>
+        <Button onClick={handleContinue} disabled={!selectedFile} size="lg" className="flex items-center gap-2">
+          Continue
+          <ArrowRight className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  )
 }
 
-
 interface SelectedFileProps {
-    file: File
-    previewUrl: string
-    onRemoveFile: () => void
+  file: File
+  previewUrl: string
+  onRemoveFile: () => void
 }
 
 const SelectedFile = ({ file, previewUrl, onRemoveFile }: SelectedFileProps) => {
-    const handleRemoveFile = () => {
-        onRemoveFile()
-        if (previewUrl) {
-            URL.revokeObjectURL(previewUrl)
-        }
+  const handleRemoveFile = () => {
+    onRemoveFile()
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
     }
-    return (
-        <div className="space-y-6">
-            <div className="relative">
-                <img src={previewUrl!} alt="Menu preview" className="w-full h-64 object-cover rounded-lg border" />
-                <Button onClick={handleRemoveFile} size="sm" variant="destructive" className="absolute top-2 right-2">
-                    <X className="w-4 h-4" />
-                </Button>
-            </div>
-        </div>
-    )
+  }
+  return (
+    <div className="space-y-6">
+      <div className="relative">
+        <img src={previewUrl!} alt="Menu preview" className="w-full h-64 object-cover rounded-lg border" />
+        <Button onClick={handleRemoveFile} size="sm" variant="destructive" className="absolute top-2 right-2">
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  )
 }

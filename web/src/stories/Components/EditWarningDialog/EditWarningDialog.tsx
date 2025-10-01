@@ -28,10 +28,7 @@ export function EditWarningDialog({ isOpen, onOpenChange, onConfirmEdit, content
             <AlertTriangle className="w-5 h-5 text-amber-500" />
             Edit Warning
           </AlertDialogTitle>
-          <AlertDialogDescription>
-            {content}
-
-          </AlertDialogDescription>
+          <AlertDialogDescription>{content}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>

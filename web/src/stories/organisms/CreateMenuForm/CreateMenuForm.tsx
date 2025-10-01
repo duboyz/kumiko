@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { ChefHat, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useCreateRestaurantMenu } from '@shared'
 import { useLocationSelection } from '@shared'
 import { NoLocation } from '@/stories/Components/NoLocation/NoLocation'
@@ -27,7 +27,6 @@ export function CreateMenuForm({ restaurantName, isLoading, router }: CreateMenu
 
   const notRestaurant = selectedLocation?.type !== 'Restaurant'
 
-
   const { mutate: createMenu } = useCreateRestaurantMenu()
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -35,66 +34,53 @@ export function CreateMenuForm({ restaurantName, isLoading, router }: CreateMenu
     if (!menuName.trim()) return
     if (!selectedLocation?.id) return
 
-    createMenu({
-      name: menuName,
-      description: menuDescription,
-      restaurantId: selectedLocation.id,
-    }, {
-      onSuccess: (menu) => {
-        if (menu) router.push(`/menus/${menu.id}`)
+    createMenu(
+      {
+        name: menuName,
+        description: menuDescription,
+        restaurantId: selectedLocation.id,
+      },
+      {
+        onSuccess: menu => {
+          if (menu) router.push(`/menus/${menu.id}`)
+        },
       }
-    })
+    )
   }
 
   if (hasNoLocations) return <NoLocation />
   if (notRestaurant) return <RestaurantRequired />
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="menuName">Menu Name</Label>
+        <Input
+          id="menuName"
+          value={menuName}
+          onChange={e => setMenuName(e.target.value)}
+          placeholder="e.g., Main Menu, Dinner Menu, Lunch Specials"
+          required
+        />
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            htmlFor="menuName"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Menu Name
-          </label>
-          <Input
-            id="menuName"
-            value={menuName}
-            onChange={e => setMenuName(e.target.value)}
-            placeholder="e.g., Main Menu, Dinner Menu, Lunch Specials"
-            className="mt-2"
-            required
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="menuDescription">Description</Label>
+        <Textarea
+          id="menuDescription"
+          value={menuDescription}
+          onChange={e => setMenuDescription(e.target.value)}
+          placeholder="A brief description of your menu..."
+          rows={3}
+        />
+      </div>
 
-        <div>
-          <label
-            htmlFor="menuDescription"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Description
-          </label>
-          <Textarea
-            id="menuDescription"
-            value={menuDescription}
-            onChange={e => setMenuDescription(e.target.value)}
-            placeholder="A brief description of your menu..."
-            className="mt-2"
-            rows={3}
-          />
-        </div>
-
-        <div className="flex gap-3 pt-4">
-          <Button type="submit" className="flex-1" disabled={isLoading || !menuName.trim()}>
-            <Plus className="w-4 h-4 mr-2" />
-            {isLoading ? 'Creating Menu...' : 'Create Menu'}
-          </Button>
-        </div>
-      </form>
-
-    </div>
+      <div className="flex justify-end gap-2 pt-2">
+        <Button type="submit" disabled={isLoading || !menuName.trim()}>
+          <Plus />
+          {isLoading ? 'Creating...' : 'Create Menu'}
+        </Button>
+      </div>
+    </form>
   )
 }

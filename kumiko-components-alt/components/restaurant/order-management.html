@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management - Kumiko Components</title>
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+    <div class="container" style="padding: 3rem 0;">
+        <h1>Order Management</h1>
+        <p class="text-muted" style="margin-bottom: 2rem;">Components for managing restaurant orders</p>
+
+        <!-- Order Status Badges -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Order Status</h2>
+            <div class="flex gap-4" style="flex-wrap: wrap;">
+                <div class="order-status order-status-pending">
+                    <span class="order-status-indicator"></span>
+                    Pending
+                </div>
+                <div class="order-status order-status-preparing">
+                    <span class="order-status-indicator"></span>
+                    Preparing
+                </div>
+                <div class="order-status order-status-ready">
+                    <span class="order-status-indicator"></span>
+                    Ready
+                </div>
+                <div class="order-status order-status-completed">
+                    <span class="order-status-indicator"></span>
+                    Completed
+                </div>
+            </div>
+        </section>
+
+        <!-- Order Cards -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Order Cards</h2>
+            <div class="grid grid-cols-2 gap-6">
+                <!-- Active Order -->
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div>
+                            <div class="order-number">#1234</div>
+                            <div class="order-time">Placed 5 minutes ago</div>
+                        </div>
+                        <div class="order-status order-status-preparing">
+                            <span class="order-status-indicator"></span>
+                            Preparing
+                        </div>
+                    </div>
+                    <div class="order-items">
+                        <div class="order-item">
+                            <div>
+                                <span class="order-item-quantity">2x</span>
+                                <span class="order-item-name">Spicy Ramen</span>
+                            </div>
+                            <span>¥2,400</span>
+                        </div>
+                        <div class="order-item">
+                            <div>
+                                <span class="order-item-quantity">1x</span>
+                                <span class="order-item-name">Salmon Sushi Set</span>
+                            </div>
+                            <span>¥2,400</span>
+                        </div>
+                        <div class="order-item">
+                            <div>
+                                <span class="order-item-quantity">3x</span>
+                                <span class="order-item-name">Green Tea</span>
+                            </div>
+                            <span>¥900</span>
+                        </div>
+                    </div>
+                    <div class="order-total">
+                        <span>Total</span>
+                        <span>¥5,700</span>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <button class="btn btn-outline btn-sm flex-1">View Details</button>
+                        <button class="btn btn-success btn-sm flex-1">Mark Ready</button>
+                    </div>
+                </div>
+
+                <!-- Pending Order -->
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div>
+                            <div class="order-number">#1235</div>
+                            <div class="order-time">Just now</div>
+                        </div>
+                        <div class="order-status order-status-pending">
+                            <span class="order-status-indicator"></span>
+                            Pending
+                        </div>
+                    </div>
+                    <div class="order-items">
+                        <div class="order-item">
+                            <div>
+                                <span class="order-item-quantity">1x</span>
+                                <span class="order-item-name">Tempura Platter</span>
+                            </div>
+                            <span>¥1,800</span>
+                        </div>
+                        <div class="order-item">
+                            <div>
+                                <span class="order-item-quantity">2x</span>
+                                <span class="order-item-name">Miso Soup</span>
+                            </div>
+                            <span>¥600</span>
+                        </div>
+                    </div>
+                    <div class="order-total">
+                        <span>Total</span>
+                        <span>¥2,400</span>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <button class="btn btn-destructive btn-sm">Reject</button>
+                        <button class="btn btn-primary btn-sm flex-1">Accept Order</button>
+                    </div>
+                </div>
+
+                <!-- Ready Order -->
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div>
+                            <div class="order-number">#1233</div>
+                            <div class="order-time">15 minutes ago</div>
+                        </div>
+                        <div class="order-status order-status-ready">
+                            <span class="order-status-indicator"></span>
+                            Ready for Pickup
+                        </div>
+                    </div>
+                    <div class="order-items">
+                        <div class="order-item">
+                            <div>
+                                <span class="order-item-quantity">1x</span>
+                                <span class="order-item-name">Chicken Teriyaki</span>
+                            </div>
+                            <span>¥1,400</span>
+                        </div>
+                        <div class="order-item">
+                            <div>
+                                <span class="order-item-quantity">1x</span>
+                                <span class="order-item-name">Edamame</span>
+                            </div>
+                            <span>¥400</span>
+                        </div>
+                    </div>
+                    <div class="order-total">
+                        <span>Total</span>
+                        <span>¥1,800</span>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-primary btn-sm w-full">Complete Order</button>
+                    </div>
+                </div>
+
+                <!-- Completed Order -->
+                <div class="order-card" style="opacity: 0.8;">
+                    <div class="order-card-header">
+                        <div>
+                            <div class="order-number">#1232</div>
+                            <div class="order-time">1 hour ago</div>
+                        </div>
+                        <div class="order-status order-status-completed">
+                            <span class="order-status-indicator"></span>
+                            Completed
+                        </div>
+                    </div>
+                    <div class="order-items">
+                        <div class="order-item">
+                            <div>
+                                <span class="order-item-quantity">1x</span>
+                                <span class="order-item-name">Wagyu Beef Bowl</span>
+                            </div>
+                            <span>¥3,200</span>
+                        </div>
+                    </div>
+                    <div class="order-total">
+                        <span>Total</span>
+                        <span>¥3,200</span>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-outline btn-sm w-full">View Receipt</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Order List View -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Order List View</h2>
+            <div class="card">
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Time</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="font-semibold">#1235</span></td>
+                                <td><span class="text-sm">Just now</span></td>
+                                <td><span class="text-sm">3 items</span></td>
+                                <td><span class="font-semibold">¥2,400</span></td>
+                                <td>
+                                    <span class="badge badge-warning">Pending</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm">Accept</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="font-semibold">#1234</span></td>
+                                <td><span class="text-sm">5 min ago</span></td>
+                                <td><span class="text-sm">3 items</span></td>
+                                <td><span class="font-semibold">¥5,700</span></td>
+                                <td>
+                                    <span class="badge badge-default">Preparing</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-success btn-sm">Ready</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="font-semibold">#1233</span></td>
+                                <td><span class="text-sm">15 min ago</span></td>
+                                <td><span class="text-sm">2 items</span></td>
+                                <td><span class="font-semibold">¥1,800</span></td>
+                                <td>
+                                    <span class="badge badge-success">Ready</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">Complete</button>
+                                </td>
+                            </tr>
+                            <tr style="opacity: 0.6;">
+                                <td><span class="font-semibold">#1232</span></td>
+                                <td><span class="text-sm">1 hour ago</span></td>
+                                <td><span class="text-sm">1 item</span></td>
+                                <td><span class="font-semibold">¥3,200</span></td>
+                                <td>
+                                    <span class="badge badge-secondary">Completed</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-ghost btn-sm">View</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage -->
+        <section style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid hsl(var(--border));">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Usage</h2>
+            <pre style="background-color: hsl(var(--muted)); padding: 1rem; border-radius: var(--radius-md); overflow-x: auto; font-size: 0.875rem;"><code>&lt;!-- Order Status --&gt;
+&lt;div class="order-status order-status-pending"&gt;
+    &lt;span class="order-status-indicator"&gt;&lt;/span&gt;
+    Pending
+&lt;/div&gt;
+
+&lt;!-- Order Card --&gt;
+&lt;div class="order-card"&gt;
+    &lt;div class="order-card-header"&gt;
+        &lt;div&gt;
+            &lt;div class="order-number"&gt;#1234&lt;/div&gt;
+            &lt;div class="order-time"&gt;5 min ago&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="order-status order-status-preparing"&gt;
+            &lt;span class="order-status-indicator"&gt;&lt;/span&gt;
+            Preparing
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="order-items"&gt;
+        &lt;div class="order-item"&gt;
+            &lt;div&gt;
+                &lt;span class="order-item-quantity"&gt;2x&lt;/span&gt;
+                &lt;span class="order-item-name"&gt;Ramen&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;span&gt;$24&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="order-total"&gt;
+        &lt;span&gt;Total&lt;/span&gt;
+        &lt;span&gt;$24&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+        </section>
+    </div>
+</body>
+</html>
