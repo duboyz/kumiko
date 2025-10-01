@@ -13,13 +13,13 @@ export const WebsitePageCard = ({ websitePage }: WebsitePageCardProps) => {
     const sectionCount = websitePage.sections?.length || 0
 
     return (
-        <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20">
-            <CardHeader className="pb-3">
+        <Card className="group relative hover:shadow-sm transition-shadow duration-200">
+            <CardHeader>
                 <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                            <FileText className="w-5 h-5 text-primary flex-shrink-0" />
-                            <CardTitle className="text-xl truncate">{websitePage.title}</CardTitle>
+                        <div className="flex items-center gap-2 mb-1">
+                            <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                            <CardTitle className="text-lg truncate">{websitePage.title}</CardTitle>
                         </div>
                         <CardDescription className="flex items-center gap-1 text-sm">
                             <ExternalLink className="w-3 h-3" />
@@ -29,9 +29,9 @@ export const WebsitePageCard = ({ websitePage }: WebsitePageCardProps) => {
                 </div>
             </CardHeader>
 
-            <CardContent className="pb-4">
+            <CardContent>
                 <div className="flex flex-wrap gap-2 mb-3">
-                    <Badge variant="secondary" className="font-normal">
+                    <Badge variant="secondary" className="text-xs">
                         <Layout className="w-3 h-3 mr-1" />
                         {sectionCount} {sectionCount === 1 ? 'Section' : 'Sections'}
                     </Badge>
@@ -44,9 +44,9 @@ export const WebsitePageCard = ({ websitePage }: WebsitePageCardProps) => {
                 )}
             </CardContent>
 
-            <CardFooter className="pt-3 border-t bg-muted/30">
+            <CardFooter className="pt-3 border-t">
                 <Link href={`/websites/${websitePage.websiteId}/pages/${websitePage.id}`} className="w-full">
-                    <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <Button variant="outline" size="sm" className="w-full">
                         <Eye className="w-4 h-4 mr-2" />
                         Edit Page
                     </Button>

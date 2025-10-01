@@ -18,18 +18,18 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
   const subdomain = params.subdomain as string
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-background border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-14">
           {/* Website Name/Logo */}
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-gray-900 hover:text-gray-700">
+            <Link href="/" className="text-lg font-semibold text-foreground hover:text-foreground/80 transition-colors">
               {websiteName}
             </Link>
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-6">
             {pages.map(page => {
               const isActive =
                 currentPageSlug === page.slug ||
@@ -40,9 +40,8 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
                 <Link
                   key={page.id}
                   href={page.slug === 'home' ? '/' : `/${page.slug}`}
-                  className={`text-sm font-medium transition-colors duration-200 ${
-                    isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'
-                  }`}
+                  className={`text-sm font-medium transition-colors ${isActive ? 'text-primary border-b border-primary pb-1' : 'text-muted-foreground hover:text-foreground'
+                    }`}
                 >
                   {page.title}
                 </Link>
@@ -54,10 +53,10 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
           <div className="md:hidden">
             <button
               type="button"
-              className="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600"
+              className="text-muted-foreground hover:text-foreground focus:outline-none focus:text-foreground transition-colors"
               aria-label="Toggle menu"
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
@@ -65,7 +64,7 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden border-t border-gray-200">
+        <div className="md:hidden border-t border-border">
           <div className="py-2 space-y-1">
             {pages.map(page => {
               const isActive =
@@ -77,9 +76,8 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
                 <Link
                   key={page.id}
                   href={page.slug === 'home' ? '/' : `/${page.slug}`}
-                  className={`block px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-                    isActive ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
+                  className={`block px-3 py-2 text-sm font-medium transition-colors ${isActive ? 'text-primary bg-muted' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    }`}
                 >
                   {page.title}
                 </Link>

@@ -11,6 +11,7 @@ import {
 import { useCreatePage } from '@shared'
 import { useState } from 'react'
 import { FormField } from '@/components/FormField'
+import { Plus } from 'lucide-react'
 
 interface CreateWebPageModalProps {
     websiteId: string
@@ -49,7 +50,10 @@ export const CreateWebPageModal = ({ websiteId }: CreateWebPageModalProps) => {
     return (
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-                <Button>Add Page</Button>
+                <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Page
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>

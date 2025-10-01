@@ -39,13 +39,13 @@ export const RestaurantMenuCard = ({ menu, router }: { menu: RestaurantMenuDto; 
 
     return (
         <>
-            <Card className="group relative overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer" onClick={() => router.push(`/menus/${menu.id}`)}>
+            <Card className="group relative hover:shadow-sm transition-shadow duration-200 cursor-pointer" onClick={() => router.push(`/menus/${menu.id}`)}>
                 <CardHeader>
                     <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                                <MenuSquare className="text-primary flex-shrink-0" />
-                                <CardTitle className="text-xl truncate">{menu.name}</CardTitle>
+                                <MenuSquare className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                                <CardTitle className="text-lg truncate">{menu.name}</CardTitle>
                             </div>
                             {menu.description && (
                                 <CardDescription className="line-clamp-2">{menu.description}</CardDescription>
@@ -86,10 +86,10 @@ export const RestaurantMenuCard = ({ menu, router }: { menu: RestaurantMenuDto; 
 
                 <CardContent>
                     <div className="flex flex-wrap gap-2 mb-3">
-                        <Badge variant="secondary" className="font-normal">
+                        <Badge variant="secondary" className="text-xs">
                             {categoryCount} {categoryCount === 1 ? 'Category' : 'Categories'}
                         </Badge>
-                        <Badge variant="outline" className="font-normal">
+                        <Badge variant="outline" className="text-xs">
                             {itemCount} {itemCount === 1 ? 'Item' : 'Items'}
                         </Badge>
                     </div>
