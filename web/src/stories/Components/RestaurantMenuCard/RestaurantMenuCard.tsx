@@ -39,38 +39,36 @@ export const RestaurantMenuCard = ({ menu, router }: { menu: RestaurantMenuDto; 
 
     return (
         <>
-            <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/60 via-primary to-primary/60" />
-
-                <CardHeader className="pb-3">
+            <Card className="group relative overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer" onClick={() => router.push(`/menus/${menu.id}`)}>
+                <CardHeader>
                     <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2">
-                                <MenuSquare className="w-5 h-5 text-primary flex-shrink-0" />
+                            <div className="flex items-center gap-2 mb-1">
+                                <MenuSquare className="text-primary flex-shrink-0" />
                                 <CardTitle className="text-xl truncate">{menu.name}</CardTitle>
                             </div>
                             {menu.description && (
-                                <CardDescription className="line-clamp-2 text-sm">{menu.description}</CardDescription>
+                                <CardDescription className="line-clamp-2">{menu.description}</CardDescription>
                             )}
                         </div>
 
                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="flex-shrink-0 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="flex-shrink-0 -mt-1 -mr-2"
                                 >
-                                    <MoreVertical className="h-4 w-4" />
+                                    <MoreVertical />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => router.push(`/menus/${menu.id}`)}>
-                                    <Edit className="mr-2 h-4 w-4" />
+                                    <Edit />
                                     Edit Menu
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setShowPreview(true)}>
-                                    <Eye className="mr-2 h-4 w-4" />
+                                    <Eye />
                                     Preview
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
@@ -78,7 +76,7 @@ export const RestaurantMenuCard = ({ menu, router }: { menu: RestaurantMenuDto; 
                                     className="text-destructive focus:text-destructive"
                                     onClick={() => setShowDeleteDialog(true)}
                                 >
-                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    <Trash2 />
                                     Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -86,7 +84,7 @@ export const RestaurantMenuCard = ({ menu, router }: { menu: RestaurantMenuDto; 
                     </div>
                 </CardHeader>
 
-                <CardContent className="pb-4">
+                <CardContent>
                     <div className="flex flex-wrap gap-2 mb-3">
                         <Badge variant="secondary" className="font-normal">
                             {categoryCount} {categoryCount === 1 ? 'Category' : 'Categories'}
@@ -101,19 +99,6 @@ export const RestaurantMenuCard = ({ menu, router }: { menu: RestaurantMenuDto; 
                         <span>Updated {new Date(menu.updatedAt).toLocaleDateString()}</span>
                     </div>
                 </CardContent>
-
-                <CardFooter className="pt-3 border-t bg-muted/30">
-                    <div className="flex gap-2 w-full">
-                        <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowPreview(true)}>
-                            <Eye className="w-4 h-4 mr-2" />
-                            Preview
-                        </Button>
-                        <Button size="sm" className="flex-1" onClick={() => router.push(`/menus/${menu.id}`)}>
-                            <Edit className="w-4 h-4 mr-2" />
-                            Edit
-                        </Button>
-                    </div>
-                </CardFooter>
             </Card>
 
             {/* Preview Dialog */}

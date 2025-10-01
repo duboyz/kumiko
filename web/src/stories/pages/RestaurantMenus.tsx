@@ -2,7 +2,7 @@
 import { useLocationSelection } from '@shared/hooks/locationSelection.hooks'
 import { useRestaurantMenus } from '@shared/hooks/menu.hooks'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
-import { MenuSquare, Plus, Search, SlidersHorizontal } from 'lucide-react'
+import { FileUp, MenuSquare, Plus, Search, SlidersHorizontal } from 'lucide-react'
 import { LoadingState } from '@/components/LoadingState'
 import { ErrorState } from '@/components/ErrorState'
 import { EmptyState } from '@/components/EmptyState'
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
 import { RestaurantMenuCard } from '../components/RestaurantMenuCard/RestaurantMenuCard'
+import { CreateMenuDialog } from '../organisms/CreateMenuDialog/CreateMenuDialog'
 
 interface RestaurantMenusProps {
     router: AppRouterInstance
@@ -66,10 +67,18 @@ export const RestaurantMenus = ({ router }: RestaurantMenusProps) => {
                         {menusData.menus.length} {menusData.menus.length === 1 ? 'menu' : 'menus'} available
                     </p>
                 </div>
-                <Button onClick={() => router.push('/menus/create')} size="lg">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Menu
-                </Button>
+                <div className="flex gap-2">
+                    <CreateMenuDialog
+                        restaurantName={selectedLocation?.name || ''}
+                        router={router}
+                        triggerText="Create Menu"
+                        triggerVariant="default"
+                    />
+                    <Button onClick={() => router.push('/menus/import')} size="lg">
+                        <FileUp className="w-4 h-4 mr-2" />
+                        Import Menu
+                    </Button>
+                </div>
             </div>
 
             {/* Search and Filters */}

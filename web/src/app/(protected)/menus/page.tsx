@@ -25,25 +25,7 @@ export default function MenusPage() {
 
   return (
     <ContentContainer>
-      <PageHeader
-        title={t('title')}
-        description="Create and manage menus for your restaurant. Import from existing menus or create from scratch."
-        action={
-          <>
-            <Button variant="secondary" onClick={() => router.push('/menus/import')}>
-              <FileUp />
-              {t('importMenu')}
-            </Button>
 
-            <CreateMenuDialog
-              restaurantName={selectedLocation.name}
-              router={router}
-              triggerText={t('createMenu')}
-              triggerVariant="default"
-            />
-          </>
-        }
-      />
       <RestaurantMenus router={router} />
     </ContentContainer>
   )

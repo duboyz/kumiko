@@ -2,7 +2,8 @@ namespace BackendApi.Models;
 
 
 
-public enum ApiResponseStatusCode {
+public enum ApiResponseStatusCode
+{
     Success = 200,
     Created = 201,
     NoContent = 204,
