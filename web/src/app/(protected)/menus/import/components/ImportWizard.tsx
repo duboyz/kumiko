@@ -10,8 +10,8 @@ import { AnnotationStep } from '@/stories/organisms/MenuImport/AnnotationStep/An
 import { ProcessStep } from './ProcessStep'
 import { useImportFlow } from '../hooks/useImportFlow'
 import { StructureReviewStep } from './StructureReviewStep'
-import { NoLocation } from '@/stories/Components/NoLocation/NoLocation'
-import { RestaurantRequired } from '@/stories/Components/RestaurantRequired/RestaurantRequired'
+import { NoLocation } from '@/stories/components/NoLocation/NoLocation'
+import { RestaurantRequired } from '@/stories/components/RestaurantRequired/RestaurantRequired'
 import { ProgressBar } from './ProgressBar'
 
 export enum ImportStep {

@@ -8,8 +8,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Plus } from 'lucide-react'
 import { useCreateRestaurantMenu } from '@shared'
 import { useLocationSelection } from '@shared'
-import { NoLocation } from '@/stories/Components/NoLocation/NoLocation'
-import { RestaurantRequired } from '@/stories/Components/RestaurantRequired/RestaurantRequired'
+import { NoLocation } from '@/stories/components/NoLocation/NoLocation'
+import { RestaurantRequired } from '@/stories/components/RestaurantRequired/RestaurantRequired'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 
 interface CreateMenuFormProps {

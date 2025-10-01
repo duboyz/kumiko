@@ -1,104 +1,110 @@
 'use client'
 import { useLocationSelection } from '@shared/hooks/locationSelection.hooks'
-import { useRestaurantMenus, useDeleteRestaurantMenu } from '@shared/hooks/menu.hooks'
-import { RestaurantMenuDto } from '@shared/types/menu.types'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useRestaurantMenus } from '@shared/hooks/menu.hooks'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
-import { MenuSquare, Trash2 } from 'lucide-react'
+import { MenuSquare, Plus, Search, SlidersHorizontal } from 'lucide-react'
 import { LoadingState } from '@/components/LoadingState'
 import { ErrorState } from '@/components/ErrorState'
 import { EmptyState } from '@/components/EmptyState'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useState } from 'react'
+import { RestaurantMenuCard } from '../components/RestaurantMenuCard/RestaurantMenuCard'
 
 interface RestaurantMenusProps {
-  router: AppRouterInstance
+    router: AppRouterInstance
 }
 
 export const RestaurantMenus = ({ router }: RestaurantMenusProps) => {
-  const { selectedLocation } = useLocationSelection()
-  const { data: menusData, isLoading, error } = useRestaurantMenus(selectedLocation?.id || '')
+    const { selectedLocation } = useLocationSelection()
+    const { data: menusData, isLoading, error } = useRestaurantMenus(selectedLocation?.id || '')
+    const [searchQuery, setSearchQuery] = useState('')
 
-  if (isLoading) {
-    return <LoadingState />
-  }
+    if (isLoading) return <LoadingState />
+    if (error) return <ErrorState title="Failed to load menus" message="There was an error loading your menus. Please try again." />
 
-  if (error) {
-    return (
-      <ErrorState title="Failed to load menus" message="There was an error loading your menus. Please try again." />
-    )
-  }
+    const filteredMenus = menusData?.menus?.filter(menu =>
+        menu.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        menu.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || []
 
-  if (!menusData?.menus || menusData.menus.length === 0) {
-    return (
-      <EmptyState
-        icon={MenuSquare}
-        title="No menus yet"
-        description="Create your first menu to start managing your restaurant offerings."
-      />
-    )
-  }
+    if (!menusData?.menus || menusData.menus.length === 0) {
+        return (
+            <div className="space-y-6">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">Menus</h1>
+                        <p className="text-muted-foreground mt-1">Manage your restaurant menus and offerings</p>
+                    </div>
+                    <Button onClick={() => router.push('/menus/create')} size="lg">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Menu
+                    </Button>
+                </div>
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {menusData.menus.map(menu => (
-        <RestaurantMenuCard key={menu.id} menu={menu} router={router} />
-      ))}
-    </div>
-  )
-}
-
-export const RestaurantMenuCard = ({ menu, router }: { menu: RestaurantMenuDto; router: AppRouterInstance }) => {
-  const { mutate: deleteMenu } = useDeleteRestaurantMenu()
-
-  const handleDelete = () => {
-    if (confirm(`Are you sure you want to delete "${menu.name}"? This action cannot be undone.`)) {
-      deleteMenu(menu.id)
+                <EmptyState
+                    icon={MenuSquare}
+                    title="No menus yet"
+                    description="Create your first menu to start managing your restaurant offerings."
+                    action={{
+                        label: 'Create Your First Menu',
+                        onClick: () => router.push('/menus/create'),
+                    }}
+                />
+            </div>
+        )
     }
-  }
 
-  const categoryCount = menu.categories?.length || 0
-  const itemCount = menu.categories?.reduce((total, cat) => total + (cat.menuCategoryItems?.length || 0), 0) || 0
+    return (
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Menus</h1>
+                    <p className="text-muted-foreground mt-1">
+                        {menusData.menus.length} {menusData.menus.length === 1 ? 'menu' : 'menus'} available
+                    </p>
+                </div>
+                <Button onClick={() => router.push('/menus/create')} size="lg">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Menu
+                </Button>
+            </div>
 
-  return (
-    <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push(`/menus/${menu.id}`)}>
-      <CardHeader>
-        <MenuSquare className="w-5 h-5 text-muted-foreground mb-2" />
-        <CardTitle className="text-xl">{menu.name}</CardTitle>
-        {menu.description && <CardDescription className="line-clamp-2">{menu.description}</CardDescription>}
-      </CardHeader>
-      <CardContent>
-        <div className="flex gap-4 text-xs text-muted-foreground">
-          <span>
-            {categoryCount} {categoryCount === 1 ? 'category' : 'categories'}
-          </span>
-          <span>•</span>
-          <span>
-            {itemCount} {itemCount === 1 ? 'item' : 'items'}
-          </span>
+            {/* Search and Filters */}
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Search menus by name or description..."
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
+                <Button variant="outline" size="default">
+                    <SlidersHorizontal className="w-4 h-4 mr-2" />
+                    Filters
+                </Button>
+            </div>
+
+            {/* Menu Grid */}
+            {filteredMenus.length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                    <Search className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium mb-2">No menus found</h3>
+                    <p className="text-muted-foreground">
+                        Try adjusting your search query or create a new menu.
+                    </p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredMenus.map(menu => (
+                        <RestaurantMenuCard key={menu.id} menu={menu} router={router} />
+                    ))}
+                </div>
+            )}
         </div>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={e => {
-            e.stopPropagation()
-            router.push(`/menus/${menu.id}`)
-          }}
-        >
-          Edit Menu
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={e => {
-            e.stopPropagation()
-            handleDelete()
-          }}
-        >
-          <Trash2 className="w-4 h-4" />
-        </Button>
-      </CardFooter>
-    </Card>
-  )
+    )
 }

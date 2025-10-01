@@ -4,32 +4,32 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 
 // Mock router for Storybook
 const mockRouter: AppRouterInstance = {
-  push: (href: string) => {
-    console.log('Navigate to:', href)
-  },
-  replace: (href: string) => {
-    console.log('Replace with:', href)
-  },
-  refresh: () => {
-    console.log('Refresh page')
-  },
-  back: () => {
-    console.log('Go back')
-  },
-  forward: () => {
-    console.log('Go forward')
-  },
-  prefetch: (href: string) => {
-    console.log('Prefetch:', href)
-  },
+    push: (href: string) => {
+        console.log('Navigate to:', href)
+    },
+    replace: (href: string) => {
+        console.log('Replace with:', href)
+    },
+    refresh: () => {
+        console.log('Refresh page')
+    },
+    back: () => {
+        console.log('Go back')
+    },
+    forward: () => {
+        console.log('Go forward')
+    },
+    prefetch: (href: string) => {
+        console.log('Prefetch:', href)
+    },
 } as AppRouterInstance
 
 const meta = {
-  component: RestaurantMenus,
-  parameters: {
-    layout: 'padded',
-  },
-  tags: ['autodocs'],
+    component: RestaurantMenus,
+    parameters: {
+        layout: 'padded',
+    },
+    tags: ['autodocs'],
 }
 
 export default meta
@@ -37,7 +37,29 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: {
-    router: mockRouter,
-  },
+    args: {
+        router: mockRouter,
+    },
+}
+
+export const Loading: Story = {
+    parameters: {
+        mockData: {
+            isLoading: true,
+        },
+    },
+    args: {
+        router: mockRouter,
+    },
+}
+
+export const EmptyState: Story = {
+    parameters: {
+        mockData: {
+            menus: [],
+        },
+    },
+    args: {
+        router: mockRouter,
+    },
 }

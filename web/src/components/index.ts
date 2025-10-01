@@ -1,12 +1,12 @@
 // Re-export components from their new stories locations
-export { LoadingSpinner } from '../stories/Components/LoadingSpinner/LoadingSpinner'
-export { LoadingMessage } from '../stories/Components/LoadingMessage/LoadingMessage'
-export { ErrorMessage } from '../stories/Components/ErrorMessage/ErrorMessage'
-export { PublicWebsiteHeader } from '../stories/Components/PublicWebsiteHeader/PublicWebsiteHeader'
-export { LocationTypeCard } from '../stories/Components/LocationTypeCard/LocationTypeCard'
+export { LoadingSpinner } from '../stories/components/LoadingSpinner/LoadingSpinner'
+export { LoadingMessage } from '../stories/components/LoadingMessage/LoadingMessage'
+export { ErrorMessage } from '../stories/components/ErrorMessage/ErrorMessage'
+export { PublicWebsiteHeader } from '../stories/components/PublicWebsiteHeader/PublicWebsiteHeader'
+export { LocationTypeCard } from '../stories/components/LocationTypeCard/LocationTypeCard'
 
-export { DeleteConfirmDialog } from '../stories/Components/DeleteConfirmDialog/DeleteConfirmDialog'
-export { EditWarningDialog } from '../stories/Components/EditWarningDialog/EditWarningDialog'
+export { DeleteConfirmDialog } from '../stories/components/DeleteConfirmDialog/DeleteConfirmDialog'
+export { EditWarningDialog } from '../stories/components/EditWarningDialog/EditWarningDialog'
 export { CreateMenuForm } from '../stories/organisms/CreateMenuForm/CreateMenuForm'
 
 // Layout components

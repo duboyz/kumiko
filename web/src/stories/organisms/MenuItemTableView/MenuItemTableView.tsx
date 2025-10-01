@@ -38,7 +38,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
 import { MenuItemDto, RestaurantMenuDto, useBulkDeleteMenuItems } from '@shared'
-import { DeleteConfirmDialog } from '../../Components/DeleteConfirmDialog/DeleteConfirmDialog'
+import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog/DeleteConfirmDialog'
 
 interface MenuItemTableViewProps {
   menuItems: MenuItemDto[]

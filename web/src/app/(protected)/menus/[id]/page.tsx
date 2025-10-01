@@ -3,8 +3,8 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useRestaurantMenus, useLocationSelection } from '@shared'
 import { LoadingSpinner } from '@/components'
-import { ContentLoadingError } from '@/stories/Components/ContentLoadingError/ContentLoadingError'
-import { ContentNotFound } from '@/stories/Components/ContentNotFound/ContentNotFound'
+import { ContentLoadingError } from '@/stories/components/ContentLoadingError/ContentLoadingError'
+import { ContentNotFound } from '@/stories/components/ContentNotFound/ContentNotFound'
 import { ContentContainer } from '@/components/ContentContainer'
 import { RestaurantMenu } from '@/stories/organisms/EditableRestaurantMenu/RestaurantMenu/RestaurantMenu'
 
