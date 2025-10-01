@@ -1,9 +1,8 @@
 'use client'
-
-import { HeroSection } from '../../organisms/HeroSection'
-import { TextSection } from '../../organisms/TextSection/TextSection'
-import { RestaurantMenuSection } from '../../organisms/RestaurantMenuSection/RestaurantMenuSection'
 import { LoadingState, ErrorState, EmptyState } from '@/components'
+import { HeroSection } from '@/stories/organisms/HeroSection/HeroSection'
+import { RestaurantMenuSection } from '@/stories/organisms/RestaurantMenuSection/RestaurantMenuSection'
+import { TextSection } from '@/stories/organisms/TextSection/TextSection'
 import type { WebsitePageDto, RestaurantMenuDto } from '@shared'
 import { useMenuById } from '@shared'
 import { FileX } from 'lucide-react'
@@ -37,11 +36,7 @@ function MenuSectionWithFetch({
     return (
       <section className="relative py-20 px-10 bg-white">
         <div className="max-w-[1000px] mx-auto">
-          <ErrorState
-            title="Menu Not Found"
-            message="The selected menu could not be loaded."
-            variant="inline"
-          />
+          <ErrorState title="Menu Not Found" message="The selected menu could not be loaded." variant="inline" />
         </div>
       </section>
     )
@@ -57,7 +52,7 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
     <div className={`min-h-screen ${className}`}>
       {sortedSections.map(section => {
         if (section.heroSection) {
-          return <HeroSection key={section.id} section={section.heroSection} />
+          return <HeroSection />
         }
 
         if (section.textSection) {
@@ -120,11 +115,7 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
 
       {sortedSections.length === 0 && (
         <div className="min-h-screen flex items-center justify-center bg-muted/30">
-          <EmptyState
-            icon={FileX}
-            title="No content yet"
-            description="Add sections to start building your page"
-          />
+          <EmptyState icon={FileX} title="No content yet" description="Add sections to start building your page" />
         </div>
       )}
     </div>
