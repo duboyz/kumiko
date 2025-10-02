@@ -36,3 +36,16 @@ export const usePages = (websiteId: string) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
+
+export const useDeletePage = (websiteId: string) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (pageId: string) => pageApi.deletePage(pageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['pages', websiteId],
+      })
+    },
+  })
+}

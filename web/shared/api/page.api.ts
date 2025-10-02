@@ -4,6 +4,7 @@ import type {
   CreatePageFromTemplateCommand,
   CreatePageFromTemplateResult,
   GetWebsitePagesResult,
+  DeleteWebsitePageResult,
   ApiResponse,
   ResponseData,
 } from '../types'
@@ -30,6 +31,12 @@ export const pageApi = {
   getPages: async (websiteId: string): Promise<ResponseData<GetWebsitePagesResult>> => {
     const { data } = await apiClient.get<ApiResponse<GetWebsitePagesResult>>(`/api/page/list?websiteId=${websiteId}`)
     if (!data.success) throw new Error(data.message || 'Failed to get pages')
+    return data.data
+  },
+
+  deletePage: async (pageId: string): Promise<ResponseData<DeleteWebsitePageResult>> => {
+    const { data } = await apiClient.delete<ApiResponse<DeleteWebsitePageResult>>(`/api/page/${pageId}`)
+    if (!data.success) throw new Error(data.message || 'Failed to delete page')
     return data.data
   },
 }

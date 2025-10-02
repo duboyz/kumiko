@@ -7,8 +7,9 @@ import { CreateWebPageModal } from '@/stories/websites/CreateWebPageModal'
 interface WebsitePagesProps {
   websitePages: WebsitePageDto[]
   websiteId: string
+  onDeletePage?: (pageId: string) => void
 }
-export function WebsitePages({ websitePages, websiteId }: WebsitePagesProps) {
+export function WebsitePages({ websitePages, websiteId, onDeletePage }: WebsitePagesProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -33,7 +34,7 @@ export function WebsitePages({ websitePages, websiteId }: WebsitePagesProps) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {websitePages.map(websitePage => (
-            <WebsitePageCard key={websitePage.id} websitePage={websitePage} />
+            <WebsitePageCard key={websitePage.id} websitePage={websitePage} onDelete={onDeletePage} />
           ))}
         </div>
       )}

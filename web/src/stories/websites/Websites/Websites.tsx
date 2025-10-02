@@ -1,4 +1,4 @@
-import { useLocationSelection, usePages, useRestaurantWebsites, useUpdateWebsite } from '@shared'
+import { useLocationSelection, usePages, useRestaurantWebsites, useUpdateWebsite, useDeletePage } from '@shared'
 import { useState, useEffect } from 'react'
 import { WebsitePages } from '@/stories/websites/WebsitePages'
 import { Globe, ExternalLink, Power, PowerOff } from 'lucide-react'
@@ -7,12 +7,22 @@ import { SelectWebsite } from '@/stories/websites/SelectWebsite'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 export function Websites() {
   const { selectedLocation } = useLocationSelection()
   const { data: websites } = useRestaurantWebsites(selectedLocation?.id, selectedLocation?.type || 'Restaurant')
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('')
+  const [deletePageId, setDeletePageId] = useState<string | null>(null)
   const updateWebsite = useUpdateWebsite()
+  const deletePage = useDeletePage(selectedWebsiteId || '')
 
   const { data: websitePages } = usePages(selectedWebsiteId || '')
 
@@ -39,6 +49,19 @@ export function Websites() {
 
   const getWebsiteUrl = (subdomain: string) => {
     return `https://${subdomain}.kumiko.no`
+  }
+
+  const handleDeletePage = async () => {
+    if (!deletePageId) return
+
+    try {
+      await deletePage.mutateAsync(deletePageId)
+      setDeletePageId(null)
+      toast.success('Page deleted successfully')
+    } catch (error) {
+      console.error('Failed to delete page:', error)
+      toast.error('Failed to delete page')
+    }
   }
 
   if (websites && websites.length === 0) {
@@ -131,7 +154,34 @@ export function Websites() {
         </Card>
       )}
 
-      {selectedWebsiteId && <WebsitePages websitePages={websitePages?.pages || []} websiteId={selectedWebsiteId} />}
+      {selectedWebsiteId && (
+        <WebsitePages
+          websitePages={websitePages?.pages || []}
+          websiteId={selectedWebsiteId}
+          onDeletePage={setDeletePageId}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deletePageId} onOpenChange={() => setDeletePageId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Page</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this page? This action cannot be undone and will remove all sections
+              from this page.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button variant="outline" onClick={() => setDeletePageId(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeletePage} disabled={deletePage.isPending}>
+              {deletePage.isPending ? 'Deleting...' : 'Delete Page'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

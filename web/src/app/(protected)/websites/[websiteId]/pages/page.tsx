@@ -15,8 +15,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, FileText, ArrowLeft, Edit } from 'lucide-react'
-import { usePages, useCreatePage } from '@shared'
+import { Plus, FileText, ArrowLeft, Edit, Trash2 } from 'lucide-react'
+import { usePages, useCreatePage, useDeletePage } from '@shared'
+import { toast } from 'sonner'
 import { ContentContainer } from '@/components'
 import { LoadingState } from '@/components'
 import { ErrorState } from '@/components'
@@ -29,6 +30,7 @@ export default function WebsitePagesPage() {
   const websiteId = params.websiteId as string
 
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [deletePageId, setDeletePageId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     slug: '',
     title: '',
@@ -39,6 +41,7 @@ export default function WebsitePagesPage() {
 
   const { data: pagesData, isLoading, error } = usePages(websiteId)
   const createPage = useCreatePage()
+  const deletePage = useDeletePage(websiteId)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -55,8 +58,23 @@ export default function WebsitePagesPage() {
 
       setIsCreateOpen(false)
       setFormData({ slug: '', title: '', seoTitle: '', seoDescription: '', seoKeywords: '' })
+      toast.success('Page created successfully')
     } catch (error) {
       console.error('Failed to create page:', error)
+      toast.error('Failed to create page')
+    }
+  }
+
+  const handleDeletePage = async () => {
+    if (!deletePageId) return
+
+    try {
+      await deletePage.mutateAsync(deletePageId)
+      setDeletePageId(null)
+      toast.success('Page deleted successfully')
+    } catch (error) {
+      console.error('Failed to delete page:', error)
+      toast.error('Failed to delete page')
     }
   }
 
@@ -181,6 +199,27 @@ export default function WebsitePagesPage() {
           </Dialog>
         </div>
 
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={!!deletePageId} onOpenChange={() => setDeletePageId(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Page</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this page? This action cannot be undone and will remove all sections
+                from this page.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button variant="outline" onClick={() => setDeletePageId(null)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleDeletePage} disabled={deletePage.isPending}>
+                {deletePage.isPending ? 'Deleting...' : 'Delete Page'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {pages.map(page => (
             <Card key={page.id}>
@@ -211,6 +250,13 @@ export default function WebsitePagesPage() {
                     >
                       <Edit className="h-4 w-4 mr-1" />
                       Edit Content
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setDeletePageId(page.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>

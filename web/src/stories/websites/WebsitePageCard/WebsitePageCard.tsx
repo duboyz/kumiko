@@ -1,15 +1,16 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
 import { WebsitePageDto } from '@shared'
 import Link from 'next/link'
-import { FileText, ExternalLink, Layout, Eye } from 'lucide-react'
+import { FileText, ExternalLink, Layout, Eye, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 interface WebsitePageCardProps {
   websitePage: WebsitePageDto
+  onDelete?: (pageId: string) => void
 }
 
-export const WebsitePageCard = ({ websitePage }: WebsitePageCardProps) => {
+export const WebsitePageCard = ({ websitePage, onDelete }: WebsitePageCardProps) => {
   const sectionCount = websitePage.sections?.length || 0
 
   return (
@@ -43,12 +44,26 @@ export const WebsitePageCard = ({ websitePage }: WebsitePageCardProps) => {
       </CardContent>
 
       <CardFooter className="pt-3 border-t">
-        <Link href={`/websites/${websitePage.websiteId}/pages/${websitePage.id}`} className="w-full">
-          <Button variant="outline" size="sm" className="w-full">
-            <Eye className="w-4 h-4 mr-2" />
-            Edit Page
-          </Button>
-        </Link>
+        <div className="flex gap-2 w-full">
+          <Link href={`/websites/${websitePage.websiteId}/pages/${websitePage.id}`} className="flex-1">
+            <Button variant="outline" size="sm" className="w-full">
+              <Eye className="w-4 h-4 mr-2" />
+              Edit Page
+            </Button>
+          </Link>
+          {onDelete && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.preventDefault()
+                onDelete(websitePage.id)
+              }}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
       </CardFooter>
     </Card>
   )

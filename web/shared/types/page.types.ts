@@ -21,3 +21,11 @@ export interface GetWebsitePagesQuery {
 export interface GetWebsitePagesResult {
   pages: WebsitePageDto[]
 }
+
+export interface DeleteWebsitePageCommand {
+  pageId: string
+}
+
+export interface DeleteWebsitePageResult {
+  success: boolean
+}
