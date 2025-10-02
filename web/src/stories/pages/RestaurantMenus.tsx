@@ -1,7 +1,6 @@
 'use client'
 import { useLocationSelection } from '@shared/hooks/locationSelection.hooks'
 import { useRestaurantMenus } from '@shared/hooks/menu.hooks'
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { FileUp, MenuSquare, Plus, Search, SlidersHorizontal } from 'lucide-react'
 import { LoadingState } from '@/components/LoadingState'
 import { ErrorState } from '@/components/ErrorState'
@@ -9,14 +8,12 @@ import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
-import { RestaurantMenuCard } from '../components/RestaurantMenuCard/RestaurantMenuCard'
+import { useRouter } from 'next/navigation'
+import { RestaurantMenuCard } from '../Components/RestaurantMenuCard/RestaurantMenuCard'
 import { CreateMenuDialog } from '../organisms/CreateMenuDialog/CreateMenuDialog'
 
-interface RestaurantMenusProps {
-  router: AppRouterInstance
-}
-
-export const RestaurantMenus = ({ router }: RestaurantMenusProps) => {
+export const RestaurantMenus = () => {
+  const router = useRouter()
   const { selectedLocation } = useLocationSelection()
   const { data: menusData, isLoading, error } = useRestaurantMenus(selectedLocation?.id || '')
   const [searchQuery, setSearchQuery] = useState('')

@@ -31,6 +31,14 @@ const preview: Preview = {
     a11y: {
       test: 'todo',
     },
+
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: '/',
+        query: {},
+      },
+    },
   },
   tags: ['autodocs'],
   globalTypes: {
