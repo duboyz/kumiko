@@ -8,6 +8,14 @@ export interface CreateWebsitePageCommand {
   seoDescription?: string
   seoKeywords?: string
   websiteId: string
+  templateId?: string
+  sections?: CreatePageSectionCommand[]
+}
+
+export interface CreatePageSectionCommand {
+  type: string
+  order: number
+  config: Record<string, any>
 }
 
 export interface CreateWebsitePageResult {

@@ -1,14 +1,57 @@
-import { WebsitePageDto } from '@shared'
+import { WebsitePageDto, useCreatePage } from '@shared'
 import { FileText } from 'lucide-react'
 import { EmptyState } from '@/stories/shared/EmptyState/EmptyState'
 import { WebsitePageCard } from '@/stories/shared/WebsitePageCard/WebsitePageCard'
 import { CreateWebPageModal } from '@/stories/shared/CreateWebPageModal/CreateWebPageModal'
+import { toast } from 'sonner'
 
 interface WebsitePagesProps {
   websitePages: WebsitePageDto[]
   websiteId: string
+  restaurantName?: string
 }
-export function WebsitePages({ websitePages, websiteId }: WebsitePagesProps) {
+
+export function WebsitePages({ websitePages, websiteId, restaurantName }: WebsitePagesProps) {
+  const createPage = useCreatePage()
+
+  const handlePageCreate = async (pageData: {
+    slug: string
+    title: string
+    seoTitle: string
+    seoDescription: string
+    seoKeywords?: string
+    templateId?: string
+    sections?: any[]
+  }) => {
+    try {
+      await createPage.mutateAsync({
+        slug: pageData.slug,
+        title: pageData.title,
+        seoTitle: pageData.seoTitle,
+        seoDescription: pageData.seoDescription,
+        seoKeywords: pageData.seoKeywords,
+        websiteId,
+        templateId: pageData.templateId,
+        sections: pageData.sections,
+      })
+
+      toast.success(`Page "${pageData.title}" created successfully!`)
+    } catch (error) {
+      console.error('Failed to create page:', error)
+
+      // Handle specific error cases
+      if (error instanceof Error) {
+        if (error.message.includes('slug already exists')) {
+          toast.error('A page with this URL already exists. Please choose a different slug.')
+        } else {
+          toast.error(`Failed to create page: ${error.message}`)
+        }
+      } else {
+        toast.error('Failed to create page. Please try again.')
+      }
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -20,7 +63,13 @@ export function WebsitePages({ websitePages, websiteId }: WebsitePagesProps) {
               : `${websitePages.length} ${websitePages.length === 1 ? 'page' : 'pages'} created`}
           </p>
         </div>
-        <CreateWebPageModal websiteId={websiteId} />
+        <CreateWebPageModal
+          websiteId={websiteId}
+          restaurantName={restaurantName}
+          existingSlugs={websitePages.map(page => page.slug)}
+          onPageCreate={handlePageCreate}
+          isLoading={createPage.isPending}
+        />
       </div>
 
       {websitePages.length === 0 ? (

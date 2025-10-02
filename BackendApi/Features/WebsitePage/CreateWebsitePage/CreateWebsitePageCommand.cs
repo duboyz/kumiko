@@ -8,8 +8,16 @@ public record CreateWebsitePageCommand(
     string? SeoTitle,
     string? SeoDescription,
     string? SeoKeywords,
-    Guid WebsiteId
+    Guid WebsiteId,
+    string? TemplateId,
+    List<CreatePageSectionCommand>? Sections
 ) : ICommand<CreateWebsitePageResult>;
+
+public record CreatePageSectionCommand(
+    string Type,
+    int Order,
+    Dictionary<string, object> Config
+);
 
 public record CreateWebsitePageResult(
     Guid PageId

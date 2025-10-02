@@ -1,0 +1,29 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+## General Rules
+- Use pnpm
+- Use Shadcn
+- Make the solutions short and concise
+- Suggest making a new type or ask for file path if unsure instead of using :any or as any
+- Never duplicate code.
+
+## Backend Architecture (Vertical Slice)
+- Each endpoint gets its own folder in Features/
+- Each folder contains: Controller, Handler, and Command/Query
+- Follow vertical slice architecture pattern
+
+## Frontend Architecture
+### API Implementation Pattern
+When implementing backend endpoints:
+1. Create types for response (and command/request) in `web/shared/types/`
+2. Create the API function in `web/shared/api/`
+3. Create a hook using TanStack Query in `web/shared/hooks/`
+
+### Component Organization
+- All components go into `stories/`
+- Each component gets a corresponding story file
+- Follow Storybook component structure

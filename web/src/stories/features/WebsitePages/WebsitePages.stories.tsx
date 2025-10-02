@@ -6,6 +6,7 @@ const meta = {
   args: {
     websiteId: '1',
     websitePages: [],
+    restaurantName: 'Demo Restaurant',
   },
 } satisfies Meta<typeof WebsitePages>
 
