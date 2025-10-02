@@ -157,3 +157,26 @@ export interface UpdateWebsiteResult {
   websiteId: string
   isPublished: boolean
 }
+
+// Page Template types
+export enum PageTemplate {
+  FrontPage = 'FrontPage',
+  MenuPage = 'MenuPage',
+  AboutPage = 'AboutPage',
+  ContactPage = 'ContactPage',
+  Blank = 'Blank',
+}
+
+export interface CreatePageFromTemplateCommand {
+  websiteId: string
+  template: PageTemplate
+  customTitle?: string
+  customSlug?: string
+  restaurantMenuId?: string // For MenuPage template
+}
+
+export interface CreatePageFromTemplateResult {
+  pageId: string
+  title: string
+  slug: string
+}
