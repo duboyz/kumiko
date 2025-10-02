@@ -1,20 +1,20 @@
 // Re-export components from their new stories locations
-export { LoadingSpinner } from '../stories/components/LoadingSpinner/LoadingSpinner'
-export { LoadingMessage } from '../stories/components/LoadingMessage/LoadingMessage'
-export { ErrorMessage } from '../stories/components/ErrorMessage/ErrorMessage'
-export { PublicWebsiteHeader } from '../stories/components/PublicWebsiteHeader/PublicWebsiteHeader'
-export { LocationTypeCard } from '../stories/components/LocationTypeCard/LocationTypeCard'
+export { LoadingSpinner } from '../stories/shared/LoadingSpinner/LoadingSpinner'
+export { LoadingMessage } from '../stories/shared/LoadingMessage/LoadingMessage'
+export { ErrorMessage } from '../stories/shared/ErrorMessage/ErrorMessage'
+export { PublicWebsiteHeader } from '../stories/shared/PublicWebsiteHeader/PublicWebsiteHeader'
+export { LocationTypeCard } from '../stories/shared/LocationTypeCard/LocationTypeCard'
 
-export { DeleteConfirmDialog } from '../stories/components/DeleteConfirmDialog/DeleteConfirmDialog'
-export { EditWarningDialog } from '../stories/components/EditWarningDialog/EditWarningDialog'
-export { CreateMenuForm } from '../stories/organisms/CreateMenuForm/CreateMenuForm'
+export { DeleteConfirmDialog } from '../stories/shared/DeleteConfirmDialog/DeleteConfirmDialog'
+export { EditWarningDialog } from '../stories/shared/EditWarningDialog/EditWarningDialog'
+export { CreateMenuForm } from '../stories/features/CreateMenuForm/CreateMenuForm'
 
-// Layout components
-export { ContentContainer } from './ContentContainer'
-export { PageHeader } from './PageHeader'
+// Shared components
+export { ContentContainer } from '../stories/shared/ContentContainer/ContentContainer'
+export { PageHeader } from '../stories/shared/PageHeader/PageHeader'
 
-// New reusable components
-export { EmptyState } from './EmptyState'
-export { LoadingState } from './LoadingState'
-export { ErrorState } from './ErrorState'
-export { FormField } from './FormField'
+// States
+export { EmptyState } from '../stories/shared/EmptyState/EmptyState'
+export { LoadingState } from '../stories/shared/LoadingState/LoadingState'
+export { ErrorState } from '../stories/shared/ErrorState/ErrorState'
+export { FormField } from '../stories/shared/FormField/FormField'

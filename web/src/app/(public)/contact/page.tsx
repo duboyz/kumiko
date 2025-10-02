@@ -1,4 +1,4 @@
-import { ContentContainer } from '@/components/ContentContainer'
+import { ContentContainer } from '@/stories/shared/ContentContainer/ContentContainer'
 
 export default function ContactPage() {
   return (

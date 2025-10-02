@@ -2,17 +2,7 @@ import type { Preview } from '@storybook/nextjs-vite'
 import React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '../src/app/globals.css'
-
 import '@fontsource/noto-sans-jp/latin.css'
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000,
-      retry: false,
-    },
-  },
-})
 
 const preview: Preview = {
   parameters: {
@@ -21,15 +11,32 @@ const preview: Preview = {
         color: /(background|color)$/i,
         date: /Date$/i,
       },
+      expanded: true,
     },
     layout: 'centered',
-
     backgrounds: {
       disable: true,
     },
-
     a11y: {
-      test: 'todo',
+      config: {
+        rules: [
+          {
+            id: 'color-contrast',
+            enabled: true,
+          },
+        ],
+      },
+    },
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        push: (...args: unknown[]) => console.log('Navigate to:', ...args),
+        replace: (...args: unknown[]) => console.log('Replace with:', ...args),
+        refresh: () => console.log('Refresh page'),
+        back: () => console.log('Go back'),
+        forward: () => console.log('Go forward'),
+        prefetch: (...args: unknown[]) => console.log('Prefetch:', ...args),
+      },
     },
   },
   tags: ['autodocs'],
@@ -48,18 +55,40 @@ const preview: Preview = {
       },
     },
   },
-
   decorators: [
     (Story, context) => {
       const theme = context.globals.theme || 'light'
 
+      // Apply theme to document
       if (typeof document !== 'undefined') {
         document.documentElement.className = theme
         document.documentElement.style.backgroundColor = 'var(--background)'
         document.documentElement.style.color = 'var(--foreground)'
-        // Ensure font is applied
         document.documentElement.style.setProperty('--font-noto-sans-jp', 'Noto Sans JP')
       }
+
+      // Create a NEW QueryClient for each story to prevent cache pollution
+      const [queryClient] = React.useState(
+        () =>
+          new QueryClient({
+            defaultOptions: {
+              queries: {
+                staleTime: Infinity, // Don't refetch in Storybook
+                retry: false, // Don't retry failed queries
+                gcTime: 0, // Don't cache query results
+              },
+              mutations: {
+                retry: false,
+              },
+            },
+            // Disable all network activity in Storybook
+            logger: {
+              log: () => {},
+              warn: () => {},
+              error: () => {},
+            },
+          })
+      )
 
       return (
         <QueryClientProvider client={queryClient}>

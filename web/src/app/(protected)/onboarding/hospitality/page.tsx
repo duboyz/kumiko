@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import SearchBusiness from '@/components/SearchBusiness'
+import SearchBusiness from '@/stories/shared/SearchBusiness/SearchBusiness'
 import { useCreateHospitality } from '@shared'
 import type { ResponseBusinessDetails } from '@shared'
 import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components'
-import { ContentContainer } from '@/components/ContentContainer'
+import { ContentContainer } from '@/stories/shared/ContentContainer/ContentContainer'
 
 export default function HospitalityOnboardingPage() {
   const [selectedBusiness, setSelectedBusiness] = useState<ResponseBusinessDetails | null>(null)

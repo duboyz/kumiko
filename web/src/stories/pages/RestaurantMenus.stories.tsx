@@ -1,65 +1,50 @@
 import { StoryObj } from '@storybook/nextjs-vite'
 import { RestaurantMenus } from './RestaurantMenus'
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
-
-// Mock router for Storybook
-const mockRouter: AppRouterInstance = {
-    push: (href: string) => {
-        console.log('Navigate to:', href)
-    },
-    replace: (href: string) => {
-        console.log('Replace with:', href)
-    },
-    refresh: () => {
-        console.log('Refresh page')
-    },
-    back: () => {
-        console.log('Go back')
-    },
-    forward: () => {
-        console.log('Go forward')
-    },
-    prefetch: (href: string) => {
-        console.log('Prefetch:', href)
-    },
-} as AppRouterInstance
+import { mockMenus, singleMenu, emptyMenus } from '@/stories/__mocks__'
 
 const meta = {
-    component: RestaurantMenus,
-    parameters: {
-        layout: 'padded',
-    },
-    tags: ['autodocs'],
+  component: RestaurantMenus,
+  parameters: {
+    layout: 'padded',
+  },
+  tags: ['autodocs'],
 }
 
 export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
-    args: {
-        router: mockRouter,
-    },
+export const MultipleMenus: Story = {
+  args: {
+    menus: mockMenus,
+    locationName: 'Bella Vista Restaurant',
+  },
+}
+
+export const SingleMenu: Story = {
+  args: {
+    menus: singleMenu,
+    locationName: 'Bella Vista Restaurant',
+  },
+}
+
+export const NoMenus: Story = {
+  args: {
+    menus: emptyMenus,
+    locationName: 'New Restaurant',
+  },
 }
 
 export const Loading: Story = {
-    parameters: {
-        mockData: {
-            isLoading: true,
-        },
-    },
-    args: {
-        router: mockRouter,
-    },
+  args: {
+    isLoading: true,
+    locationName: 'Bella Vista Restaurant',
+  },
 }
 
-export const EmptyState: Story = {
-    parameters: {
-        mockData: {
-            menus: [],
-        },
-    },
-    args: {
-        router: mockRouter,
-    },
+export const ErrorState: Story = {
+  args: {
+    error: new Error('Failed to load menus'),
+    locationName: 'Bella Vista Restaurant',
+  },
 }

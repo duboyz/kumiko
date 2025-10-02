@@ -1,6 +1,6 @@
 'use client'
 
-import { AppSidebar } from '@/components/app-sidebar'
+import { AppSidebar } from '@/stories/shared/AppSidebar/AppSidebar'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
 import {

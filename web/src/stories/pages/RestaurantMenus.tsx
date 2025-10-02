@@ -1,25 +1,46 @@
 'use client'
 import { useLocationSelection } from '@shared/hooks/locationSelection.hooks'
 import { useRestaurantMenus } from '@shared/hooks/menu.hooks'
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { FileUp, MenuSquare, Plus, Search, SlidersHorizontal } from 'lucide-react'
-import { LoadingState } from '@/components/LoadingState'
-import { ErrorState } from '@/components/ErrorState'
-import { EmptyState } from '@/components/EmptyState'
+import { LoadingState } from '@/stories/shared/LoadingState/LoadingState'
+import { ErrorState } from '@/stories/shared/ErrorState/ErrorState'
+import { EmptyState } from '@/stories/shared/EmptyState/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
-import { RestaurantMenuCard } from '../components/RestaurantMenuCard/RestaurantMenuCard'
-import { CreateMenuDialog } from '../organisms/CreateMenuDialog/CreateMenuDialog'
+import { RestaurantMenuCard } from '../shared/RestaurantMenuCard/RestaurantMenuCard'
+import { CreateMenuDialog } from '../features/CreateMenuDialog/CreateMenuDialog'
+import { useRouter } from 'next/navigation'
+import type { RestaurantMenuDto } from '@shared/types'
 
 interface RestaurantMenusProps {
-  router: AppRouterInstance
+  menus?: RestaurantMenuDto[]
+  isLoading?: boolean
+  error?: Error | null
+  locationName?: string
 }
 
-export const RestaurantMenus = ({ router }: RestaurantMenusProps) => {
+export const RestaurantMenus = ({
+  menus: menusProp,
+  isLoading: isLoadingProp,
+  error: errorProp,
+  locationName,
+}: RestaurantMenusProps = {}) => {
+  // Use hooks only if props are not provided (for production use)
   const { selectedLocation } = useLocationSelection()
-  const { data: menusData, isLoading, error } = useRestaurantMenus(selectedLocation?.id || '')
+  const {
+    data: menusData,
+    isLoading: isLoadingHook,
+    error: errorHook,
+  } = useRestaurantMenus(!menusProp ? selectedLocation?.id || '' : '')
   const [searchQuery, setSearchQuery] = useState('')
+  const router = useRouter()
+
+  // Use props if provided, otherwise use hook data
+  const menus = menusProp ?? menusData?.menus
+  const isLoading = isLoadingProp ?? isLoadingHook
+  const error = errorProp ?? errorHook
+  const location = locationName ?? selectedLocation?.name
 
   if (isLoading) return <LoadingState />
   if (error)
@@ -28,13 +49,13 @@ export const RestaurantMenus = ({ router }: RestaurantMenusProps) => {
     )
 
   const filteredMenus =
-    menusData?.menus?.filter(
+    menus?.filter(
       menu =>
         menu.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         menu.description?.toLowerCase().includes(searchQuery.toLowerCase())
     ) || []
 
-  if (!menusData?.menus || menusData.menus.length === 0) {
+  if (!menus || menus.length === 0) {
     return (
       <div className="space-y-6">
         {/* Header */}
@@ -64,21 +85,15 @@ export const RestaurantMenus = ({ router }: RestaurantMenusProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Menus</h1>
           <p className="text-muted-foreground mt-1">
-            {menusData.menus.length} {menusData.menus.length === 1 ? 'menu' : 'menus'} available
+            {menus.length} {menus.length === 1 ? 'menu' : 'menus'} available
           </p>
         </div>
         <div className="flex gap-2">
-          <CreateMenuDialog
-            restaurantName={selectedLocation?.name || ''}
-            router={router}
-            triggerText="Create Menu"
-            triggerVariant="default"
-          />
+          <CreateMenuDialog restaurantName={location || ''} triggerText="Create Menu" triggerVariant="default" />
           <Button onClick={() => router.push('/menus/import')} size="lg">
             <FileUp className="w-4 h-4 mr-2" />
             Import Menu
@@ -113,7 +128,7 @@ export const RestaurantMenus = ({ router }: RestaurantMenusProps) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMenus.map(menu => (
-            <RestaurantMenuCard key={menu.id} menu={menu} router={router} />
+            <RestaurantMenuCard key={menu.id} menu={menu} />
           ))}
         </div>
       )}

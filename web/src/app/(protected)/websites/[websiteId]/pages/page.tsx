@@ -17,11 +17,11 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Plus, FileText, ArrowLeft, Edit } from 'lucide-react'
 import { usePages, useCreatePage } from '@shared'
-import { ContentContainer } from '@/components/ContentContainer'
-import { LoadingState } from '@/components/LoadingState'
-import { ErrorState } from '@/components/ErrorState'
-import { EmptyState } from '@/components/EmptyState'
-import { FormField } from '@/components/FormField'
+import { ContentContainer } from '@/stories/shared/ContentContainer/ContentContainer'
+import { LoadingState } from '@/stories/shared/LoadingState/LoadingState'
+import { ErrorState } from '@/stories/shared/ErrorState/ErrorState'
+import { EmptyState } from '@/stories/shared/EmptyState/EmptyState'
+import { FormField } from '@/stories/shared/FormField/FormField'
 
 export default function WebsitePagesPage() {
   const params = useParams()

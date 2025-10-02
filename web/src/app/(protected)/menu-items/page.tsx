@@ -1,8 +1,9 @@
 'use client'
 
-import { ContentContainer } from '@/components/ContentContainer'
-import { DeleteConfirmDialog, LoadingSpinner } from '@/components'
-import MenuItemTableView from '@/stories/organisms/MenuItemTableView/MenuItemTableView'
+import { ContentContainer } from '@/stories/shared/ContentContainer/ContentContainer'
+import { DeleteConfirmDialog } from '@/stories/shared/DeleteConfirmDialog/DeleteConfirmDialog'
+import { LoadingSpinner } from '@/stories/shared/LoadingSpinner/LoadingSpinner'
+import MenuItemTableView from '@/stories/features/MenuItemTableView/MenuItemTableView'
 import {
   useAllRestaurantMenuItems,
   useCreateMenuItem,
@@ -22,10 +23,10 @@ import { useState, useEffect, Suspense } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
 import { MenuItemDto, CreateMenuItemCommand, UpdateMenuItemCommand } from '@shared'
-import { NoLocation } from '@/stories/components/NoLocation/NoLocation'
-import { RestaurantRequired } from '@/stories/components/RestaurantRequired/RestaurantRequired'
-import { LoadingState } from '@/components/LoadingState'
-import { EmptyState } from '@/components/EmptyState'
+import { NoLocation } from '@/stories/shared/NoLocation/NoLocation'
+import { RestaurantRequired } from '@/stories/shared/RestaurantRequired/RestaurantRequired'
+import { LoadingState } from '@/stories/shared/LoadingState/LoadingState'
+import { EmptyState } from '@/stories/shared/EmptyState/EmptyState'
 
 function MenuItemsPageContent() {
   const { selectedLocation, isLoading, hasNoLocations } = useLocationSelection()

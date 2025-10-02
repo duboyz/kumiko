@@ -1,12 +1,12 @@
 'use client'
 
-import { LoadingSpinner } from '@/components'
+import { LoadingSpinner } from '@/stories/shared/LoadingSpinner/LoadingSpinner'
 import { useLocationSelection } from '@shared'
-import { ContentContainer } from '@/components/ContentContainer'
+import { ContentContainer } from '@/stories/shared/ContentContainer/ContentContainer'
 import { RestaurantMenus } from '@/stories/pages/RestaurantMenus'
 import { useRouter } from 'next/navigation'
-import { NoLocation } from '@/stories/components/NoLocation/NoLocation'
-import { RestaurantRequired } from '@/stories/components/RestaurantRequired/RestaurantRequired'
+import { NoLocation } from '@/stories/shared/NoLocation/NoLocation'
+import { RestaurantRequired } from '@/stories/shared/RestaurantRequired/RestaurantRequired'
 
 export default function MenusPage() {
   const { selectedLocation, isLoading, hasNoLocations } = useLocationSelection()
@@ -19,7 +19,7 @@ export default function MenusPage() {
 
   return (
     <ContentContainer>
-      <RestaurantMenus router={router} />
+      <RestaurantMenus />
     </ContentContainer>
   )
 }

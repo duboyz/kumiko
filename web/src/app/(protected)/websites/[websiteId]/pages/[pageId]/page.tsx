@@ -17,9 +17,9 @@ import {
   TextAlignment,
 } from '@shared'
 import { LoadingState, ErrorState, EmptyState } from '@/components'
-import { ContentContainer } from '@/components/ContentContainer'
+import { ContentContainer } from '@/stories/shared/ContentContainer/ContentContainer'
 import { WebsitePage, HeroSection, TextSection, SectionSelectionModal } from '@/components/sections'
-import { RestaurantMenuSection } from '@/stories/organisms/RestaurantMenuSection/RestaurantMenuSection'
+import { RestaurantMenuSection } from '@/stories/features/RestaurantMenuSection/RestaurantMenuSection'
 import type { WebsiteSectionDto, HeroSectionDto, TextSectionDto, RestaurantMenuSectionDto } from '@shared'
 import { FileText } from 'lucide-react'
 
