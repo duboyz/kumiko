@@ -13,6 +13,8 @@ import type {
   UpdateRestaurantMenuSectionResult,
   DeleteSectionCommand,
   DeleteSectionResult,
+  ReorderSectionsCommand,
+  ReorderSectionsResult,
   ApiResponse,
   ResponseData,
 } from '../types'
@@ -81,6 +83,15 @@ export const sectionApi = {
   deleteSection: async (sectionId: string): Promise<ResponseData<DeleteSectionResult>> => {
     const { data } = await apiClient.delete<ApiResponse<DeleteSectionResult>>(`/api/website-sections/${sectionId}`)
     if (!data.success) throw new Error(data.message || 'Failed to delete section')
+    return data.data
+  },
+
+  reorderSections: async (command: ReorderSectionsCommand): Promise<ResponseData<ReorderSectionsResult>> => {
+    const { data } = await apiClient.post<ApiResponse<ReorderSectionsResult>>(
+      '/api/website-sections/reorder',
+      command
+    )
+    if (!data.success) throw new Error(data.message || 'Failed to reorder sections')
     return data.data
   },
 }

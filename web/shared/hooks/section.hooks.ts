@@ -7,6 +7,7 @@ import type {
   UpdateTextSectionCommand,
   CreateRestaurantMenuSectionCommand,
   UpdateRestaurantMenuSectionCommand,
+  ReorderSectionsCommand,
 } from '../types'
 import { HeroSectionType } from '../types/website.types'
 import { TextAlignment } from '../types'
@@ -189,6 +190,55 @@ export const useDeleteSection = (websiteId: string, onSuccess?: () => void) => {
     },
     onError: error => {
       console.error('Failed to delete section:', error)
+    },
+  })
+}
+
+// Reorder Sections hook with optimistic updates
+export const useReorderSections = (websiteId: string) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (command: ReorderSectionsCommand) => sectionApi.reorderSections(command),
+    onMutate: async (command) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['pages', websiteId] })
+
+      // Snapshot previous value
+      const previousPages = queryClient.getQueryData(['pages', websiteId])
+
+      // Optimistically update
+      queryClient.setQueryData(['pages', websiteId], (old: any) => {
+        if (!old?.pages) return old
+
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => {
+            // Update sections with new sort orders
+            const updatedSections = page.sections.map((section: any) => {
+              const newOrder = command.sectionOrders.find((so) => so.sectionId === section.id)
+              return newOrder ? { ...section, sortOrder: newOrder.sortOrder } : section
+            })
+
+            return { ...page, sections: updatedSections }
+          })
+        }
+      })
+
+      return { previousPages }
+    },
+    onError: (error, variables, context) => {
+      // Rollback on error
+      if (context?.previousPages) {
+        queryClient.setQueryData(['pages', websiteId], context.previousPages)
+      }
+      console.error('Failed to reorder sections:', error)
+    },
+    onSettled: () => {
+      // Refetch to ensure consistency
+      queryClient.invalidateQueries({
+        queryKey: ['pages', websiteId],
+      })
     },
   })
 }

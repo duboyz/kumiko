@@ -12,6 +12,7 @@ interface EmptyStateProps {
     onClick: () => void
     variant?: 'default' | 'secondary' | 'outline' | 'destructive' | 'ghost' | 'link'
   }
+  actionComponent?: React.ReactNode
   variant?: 'default' | 'compact'
   className?: string
 }
@@ -21,6 +22,7 @@ export function EmptyState({
   title,
   description,
   action,
+  actionComponent,
   variant = 'default',
   className,
 }: EmptyStateProps) {
@@ -30,12 +32,14 @@ export function EmptyState({
         <Icon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
         <h2 className="text-xl font-semibold mb-2">{title}</h2>
         <p className="text-muted-foreground mb-6">{description}</p>
-        {action && (
+        {actionComponent ? (
+          actionComponent
+        ) : action ? (
           // TODO: This should be a link so that we can use SSR
           <Button variant={action.variant || 'default'} onClick={action.onClick}>
             {action.label}
           </Button>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   )

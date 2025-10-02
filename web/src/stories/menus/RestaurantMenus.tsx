@@ -40,20 +40,26 @@ export const RestaurantMenus = () => {
             <h1 className="text-3xl font-bold tracking-tight">Menus</h1>
             <p className="text-muted-foreground mt-1">Manage your restaurant menus and offerings</p>
           </div>
-          <Button onClick={() => router.push('/menus/create')} size="lg">
-            <Plus className="w-4 h-4 mr-2" />
-            Create Menu
-          </Button>
+          <CreateMenuDialog
+            restaurantName={selectedLocation?.name || ''}
+            router={router}
+            triggerText="Create Menu"
+            triggerVariant="default"
+          />
         </div>
 
         <EmptyState
           icon={MenuSquare}
           title="No menus yet"
           description="Create your first menu to start managing your restaurant offerings."
-          action={{
-            label: 'Create Your First Menu',
-            onClick: () => router.push('/menus/create'),
-          }}
+          actionComponent={
+            <CreateMenuDialog
+              restaurantName={selectedLocation?.name || ''}
+              router={router}
+              triggerText="Create Your First Menu"
+              triggerVariant="default"
+            />
+          }
         />
       </div>
     )

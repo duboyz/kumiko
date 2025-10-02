@@ -19,6 +19,7 @@ import { useLocationSelection } from '@shared'
 import { NoLocation } from '@/stories/restaurants/NoLocation/NoLocation'
 import { RestaurantRequired } from '@/stories/restaurants/RestaurantRequired/RestaurantRequired'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+import { toast } from 'sonner'
 
 interface CreateMenuDialogProps {
   restaurantName: string
@@ -57,8 +58,15 @@ export function CreateMenuDialog({
         onSuccess: menu => {
           if (menu) {
             setIsOpen(false)
+            setMenuName('Main Menu')
+            setMenuDescription('Our carefully crafted selection of dishes')
+            toast.success('Menu created successfully')
             router.push(`/menus/${menu.id}`)
           }
+        },
+        onError: error => {
+          toast.error('Failed to create menu')
+          console.error('Error creating menu:', error)
         },
       }
     )

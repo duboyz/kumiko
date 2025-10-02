@@ -107,3 +107,18 @@ export interface DeleteSectionCommand {
 export interface DeleteSectionResult {
   success: boolean
 }
+
+// Reorder Sections types
+export interface SectionOrder {
+  sectionId: string
+  sortOrder: number
+}
+
+export interface ReorderSectionsCommand {
+  websiteId: string
+  sectionOrders: SectionOrder[]
+}
+
+export interface ReorderSectionsResult {
+  success: boolean
+}

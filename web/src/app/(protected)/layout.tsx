@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/breadcrumb'
 import { usePathname } from 'next/navigation'
 import { Fragment } from 'react'
+import { Toaster } from 'sonner'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -52,6 +53,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
         </header>
         <div className="flex flex-1 flex-col">{children}</div>
       </SidebarInset>
+      <Toaster richColors position="top-right" />
     </SidebarProvider>
   )
 }

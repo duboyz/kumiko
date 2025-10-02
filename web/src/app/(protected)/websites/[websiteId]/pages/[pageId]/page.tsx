@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Plus, Eye, Edit, Save, Trash2 } from 'lucide-react'
+import { ArrowLeft, Plus, Eye, Edit, Save, Trash2, GripVertical } from 'lucide-react'
 import {
   usePages,
   useAddSectionWithDefaults,
@@ -13,6 +13,7 @@ import {
   useDeleteSection,
   useRestaurantMenus,
   useLocationSelection,
+  useReorderSections,
   HeroSectionType,
   TextAlignment,
 } from '@shared'
@@ -22,6 +23,145 @@ import { WebsitePage, HeroSection, TextSection, SectionSelectionModal } from '@/
 import { RestaurantMenuSection } from '@/stories/menus/RestaurantMenuSection/RestaurantMenuSection'
 import type { WebsiteSectionDto, HeroSectionDto, TextSectionDto, RestaurantMenuSectionDto } from '@shared'
 import { FileText } from 'lucide-react'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+} from '@dnd-kit/core'
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { toast } from 'sonner'
+import { useEffect } from 'react'
+
+// Sortable Section Component
+interface SortableSectionProps {
+  section: WebsiteSectionDto
+  isEditing: boolean
+  sectionUpdates: Record<string, Partial<HeroSectionDto> | Partial<TextSectionDto> | Partial<RestaurantMenuSectionDto>>
+  menusData: any
+  onEdit: (sectionId: string) => void
+  onUpdate: (sectionId: string, field: string, value: string | boolean) => void
+  onTypeChange: (sectionId: string, newType: HeroSectionType) => void
+}
+
+function SortableSection({ section, isEditing, sectionUpdates, menusData, onEdit, onUpdate, onTypeChange }: SortableSectionProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group relative border-2 overflow-hidden bg-white transition-all duration-200 ${
+        isEditing
+          ? 'border-primary shadow-lg ring-2 ring-primary/20'
+          : 'border-transparent hover:border-gray-200 shadow-sm hover:shadow-md'
+      }`}
+    >
+      {/* Drag Handle */}
+      {!isEditing && (
+        <div
+          {...attributes}
+          {...listeners}
+          className="absolute left-3 top-3 z-20 cursor-grab active:cursor-grabbing bg-white/95 backdrop-blur-sm border-2 border-gray-300 rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-all hover:border-primary hover:bg-primary/5 shadow-md"
+          title="Drag to reorder"
+        >
+          <GripVertical className="w-4 h-4 text-gray-600" />
+        </div>
+      )}
+
+      {/* Edit overlay */}
+      {!isEditing && (
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/5 transition-all cursor-pointer z-10 flex items-center justify-center opacity-0 group-hover:opacity-100"
+          onClick={() => onEdit(section.id)}
+        >
+          <div className="bg-white shadow-xl p-4 border-2 border-primary rounded-lg transform scale-95 group-hover:scale-100 transition-transform">
+            <div className="flex items-center gap-2">
+              <Edit className="w-5 h-5 text-primary" />
+              <span className="text-sm font-medium text-primary">Click to edit</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Editing indicator */}
+      {isEditing && (
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/80 to-primary animate-pulse" />
+      )}
+
+      {/* Section content */}
+      {section.heroSection && (
+        <HeroSection
+          section={{
+            ...section.heroSection,
+            ...(sectionUpdates[section.id] as Partial<HeroSectionDto>),
+          }}
+          isEditing={isEditing}
+          onUpdate={(field, value) => onUpdate(section.id, field, value)}
+          onTypeChange={newType => onTypeChange(section.id, newType)}
+        />
+      )}
+
+      {section.textSection && (
+        <TextSection
+          title={(sectionUpdates[section.id] as Partial<TextSectionDto>)?.title ?? section.textSection.title}
+          text={(sectionUpdates[section.id] as Partial<TextSectionDto>)?.text ?? section.textSection.text}
+          alignText={
+            ((sectionUpdates[section.id] as Partial<TextSectionDto>)?.alignText as TextAlignment) ??
+            section.textSection.alignText
+          }
+          textColor={(sectionUpdates[section.id] as Partial<TextSectionDto>)?.textColor ?? section.textSection.textColor}
+          isEditing={isEditing}
+          onUpdate={(field, value) => onUpdate(section.id, field, value)}
+        />
+      )}
+
+      {section.restaurantMenuSection &&
+        (() => {
+          const menuSection = section.restaurantMenuSection
+          const menuUpdates = sectionUpdates[section.id] as Partial<RestaurantMenuSectionDto>
+
+          const currentMenuId = menuUpdates?.restaurantMenuId ?? menuSection.restaurantMenuId
+          const currentAllowOrdering = menuUpdates?.allowOrdering ?? menuSection.allowOrdering
+
+          const menu = menusData?.menus?.find((m: any) => m.id === currentMenuId)
+
+          if (!menu) {
+            return (
+              <div className="py-12 px-4 text-center text-gray-500">
+                <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
+                <p>The selected menu (ID: {currentMenuId}) could not be loaded.</p>
+                {isEditing && <p className="mt-2 text-sm">Please select a different menu in the section settings.</p>}
+              </div>
+            )
+          }
+
+          return (
+            <RestaurantMenuSection
+              restaurantMenu={menu}
+              allowOrdering={currentAllowOrdering}
+              currentMenuId={currentMenuId}
+              isEditing={isEditing}
+              availableMenus={menusData?.menus || []}
+              onUpdate={(field, value) => onUpdate(section.id, field, value)}
+            />
+          )
+        })()}
+    </div>
+  )
+}
 
 export default function PageEditorPage() {
   const params = useParams()
@@ -32,6 +172,7 @@ export default function PageEditorPage() {
   const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit')
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null)
+  const [activeDragId, setActiveDragId] = useState<string | null>(null)
   const [sectionUpdates, setSectionUpdates] = useState<
     Record<string, Partial<HeroSectionDto> | Partial<TextSectionDto> | Partial<RestaurantMenuSectionDto>>
   >({})
@@ -87,6 +228,87 @@ export default function PageEditorPage() {
   })
 
   const deleteSection = useDeleteSection(websiteId)
+  const reorderSections = useReorderSections(websiteId)
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px of movement before drag starts
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragId(event.active.id as string)
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    setActiveDragId(null)
+
+    if (!over || active.id === over.id || !page) {
+      return
+    }
+
+    const oldIndex = page.sections.findIndex(s => s.id === active.id)
+    const newIndex = page.sections.findIndex(s => s.id === over.id)
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const reorderedSections = arrayMove([...page.sections].sort((a, b) => a.sortOrder - b.sortOrder), oldIndex, newIndex)
+
+      // Update sort orders
+      const sectionOrders = reorderedSections.map((section, index) => ({
+        sectionId: section.id,
+        sortOrder: index,
+      }))
+
+      reorderSections.mutate(
+        {
+          websiteId,
+          sectionOrders,
+        },
+        {
+          onSuccess: () => {
+            toast.success('Section reordered')
+          },
+          onError: () => {
+            toast.error('Failed to reorder section')
+          },
+        }
+      )
+    }
+  }
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + S to save
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        if (editingSectionId) {
+          handleSaveSection(editingSectionId)
+          toast.success('Section saved')
+        }
+      }
+
+      // Escape to cancel editing
+      if (e.key === 'Escape' && editingSectionId) {
+        setEditingSectionId(null)
+        setSectionUpdates(prev => {
+          const { [editingSectionId]: _, ...rest } = prev
+          return rest
+        })
+        toast.info('Editing cancelled')
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [editingSectionId])
 
   const handleAddSection = (sectionType: string) => {
     if (page) {
@@ -196,7 +418,19 @@ export default function PageEditorPage() {
 
   const handleDeleteSection = (sectionId: string) => {
     if (confirm('Are you sure you want to delete this section? This action cannot be undone.')) {
-      deleteSection.mutate(sectionId)
+      deleteSection.mutate(sectionId, {
+        onSuccess: () => {
+          toast.success('Section deleted')
+          setEditingSectionId(null)
+          setSectionUpdates(prev => {
+            const { [sectionId]: _, ...rest } = prev
+            return rest
+          })
+        },
+        onError: () => {
+          toast.error('Failed to delete section')
+        },
+      })
     }
   }
 
@@ -221,6 +455,10 @@ export default function PageEditorPage() {
         <div className="flex items-center gap-3">
           {editingSectionId && (
             <>
+              <div className="text-xs text-muted-foreground mr-2 hidden md:block">
+                <kbd className="px-2 py-1 bg-muted rounded border text-xs">Ctrl+S</kbd> to save,{' '}
+                <kbd className="px-2 py-1 bg-muted rounded border text-xs">Esc</kbd> to cancel
+              </div>
               <Button
                 onClick={() => handleDeleteSection(editingSectionId)}
                 disabled={deleteSection.isPending}
@@ -288,91 +526,61 @@ export default function PageEditorPage() {
                 />
               </div>
             ) : (
-              page.sections
-                .sort((a, b) => a.sortOrder - b.sortOrder)
-                .map(section => (
-                  <div
-                    key={section.id}
-                    className="group relative border overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow"
-                    onClick={() => handleSectionEdit(section.id)}
-                  >
-                    {/* Edit overlay */}
-                    {editingSectionId !== section.id && (
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all cursor-pointer z-10 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <div className="bg-white shadow-lg p-4 border">
-                          <Edit className="w-5 h-5 text-muted-foreground" />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Section content */}
-                    {section.heroSection && (
-                      <HeroSection
-                        section={{
-                          ...section.heroSection,
-                          ...(sectionUpdates[section.id] as Partial<HeroSectionDto>),
-                        }}
-                        isEditing={editingSectionId === section.id}
-                        onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
-                        onTypeChange={newType => handleTypeChange(section.id, newType)}
-                      />
-                    )}
-
-                    {section.textSection && (
-                      <TextSection
-                        title={
-                          (sectionUpdates[section.id] as Partial<TextSectionDto>)?.title ?? section.textSection.title
-                        }
-                        text={(sectionUpdates[section.id] as Partial<TextSectionDto>)?.text ?? section.textSection.text}
-                        alignText={
-                          ((sectionUpdates[section.id] as Partial<TextSectionDto>)?.alignText as TextAlignment) ??
-                          section.textSection.alignText
-                        }
-                        textColor={
-                          (sectionUpdates[section.id] as Partial<TextSectionDto>)?.textColor ??
-                          section.textSection.textColor
-                        }
-                        isEditing={editingSectionId === section.id}
-                        onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
-                      />
-                    )}
-
-                    {section.restaurantMenuSection &&
-                      (() => {
-                        const menuSection = section.restaurantMenuSection
-                        const menuUpdates = sectionUpdates[section.id] as Partial<RestaurantMenuSectionDto>
-
-                        // Use updated values if they exist, otherwise use original values
-                        const currentMenuId = menuUpdates?.restaurantMenuId ?? menuSection.restaurantMenuId
-                        const currentAllowOrdering = menuUpdates?.allowOrdering ?? menuSection.allowOrdering
-
-                        const menu = menusData?.menus?.find(m => m.id === currentMenuId)
-
-                        if (!menu) {
-                          return (
-                            <div className="py-12 px-4 text-center text-gray-500">
-                              <h3 className="text-lg font-semibold mb-2">Menu Not Found</h3>
-                              <p>The selected menu (ID: {currentMenuId}) could not be loaded.</p>
-                              {editingSectionId === section.id && (
-                                <p className="mt-2 text-sm">Please select a different menu in the section settings.</p>
-                              )}
-                            </div>
-                          )
-                        }
-
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={page.sections.map(s => s.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-6">
+                    {page.sections
+                      .sort((a, b) => a.sortOrder - b.sortOrder)
+                      .map(section => (
+                        <SortableSection
+                          key={section.id}
+                          section={section}
+                          isEditing={editingSectionId === section.id}
+                          sectionUpdates={sectionUpdates}
+                          menusData={menusData}
+                          onEdit={handleSectionEdit}
+                          onUpdate={handleSectionUpdate}
+                          onTypeChange={handleTypeChange}
+                        />
+                      ))}
+                  </div>
+                </SortableContext>
+                <DragOverlay>
+                  {activeDragId ? (
+                    <div className="opacity-80 rotate-2 scale-105 transition-transform">
+                      {(() => {
+                        const section = page.sections.find(s => s.id === activeDragId)
+                        if (!section) return null
                         return (
-                          <RestaurantMenuSection
-                            restaurantMenu={menu}
-                            allowOrdering={currentAllowOrdering}
-                            currentMenuId={currentMenuId}
-                            isEditing={editingSectionId === section.id}
-                            availableMenus={menusData?.menus || []}
-                            onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
-                          />
+                          <div className="border-2 border-primary bg-white shadow-2xl overflow-hidden rounded-lg">
+                            <div className="p-4 bg-primary/10 border-b border-primary/20">
+                              <div className="flex items-center gap-2">
+                                <GripVertical className="w-4 h-4 text-primary" />
+                                <span className="text-sm font-medium text-primary">
+                                  {section.heroSection && 'Hero Section'}
+                                  {section.textSection && 'Text Section'}
+                                  {section.restaurantMenuSection && 'Menu Section'}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="p-4 text-sm text-muted-foreground">
+                              Drag to reorder this section
+                            </div>
+                          </div>
                         )
                       })()}
-                  </div>
-                ))
+                    </div>
+                  ) : null}
+                </DragOverlay>
+              </DndContext>
             )}
           </div>
         )}
