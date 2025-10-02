@@ -1,8 +1,6 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { HeroSectionType } from '@shared'
 import { HeroSettingsPopover } from './HeroSettingsPopover'
 
@@ -86,17 +84,19 @@ export function HeroBackgroundImage({
         {isEditing && onUpdate ? (
           <>
             {/* Content Editing */}
-            <Input
+            <textarea
               value={title}
               onChange={e => onUpdate('title', e.target.value)}
               placeholder="Enter title..."
-              className="text-6xl font-light leading-tight mb-6 min-h-[4rem] resize-none border-2 border-dashed border-white/50 bg-white/10 placeholder:text-white/70 text-center"
+              className="w-full text-6xl font-light leading-tight mb-6 min-h-[4rem] resize-none border-2 border-dashed border-white/50 bg-white/10 placeholder:text-white/70 text-center outline-none focus:border-white/70 transition-colors px-4 py-2"
+              style={{ color: textColor || '#ffffff' }}
             />
-            <Textarea
+            <textarea
               value={description}
               onChange={e => onUpdate('description', e.target.value)}
               placeholder="Enter description..."
-              className="text-lg text-muted-foreground leading-relaxed mb-10 min-h-[6rem] resize-none border-2 border-dashed border-white/50 bg-white/10 placeholder:text-white/70 text-center"
+              className="w-full text-lg leading-relaxed mb-10 min-h-[6rem] resize-none border-2 border-dashed border-white/50 bg-white/10 placeholder:text-white/70 text-center outline-none focus:border-white/70 transition-colors px-4 py-2 opacity-60"
+              style={{ color: textColor || '#ffffff' }}
             />
             <div className="inline-flex gap-4">
               <Button
@@ -115,8 +115,12 @@ export function HeroBackgroundImage({
           </>
         ) : (
           <>
-            <h1 className="text-6xl font-light leading-tight mb-6">{title}</h1>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-10">{description}</p>
+            <h1 className="text-6xl font-light leading-tight mb-6" style={{ color: textColor || '#ffffff' }}>
+              {title}
+            </h1>
+            <p className="text-lg leading-relaxed mb-10 opacity-60" style={{ color: textColor || '#ffffff' }}>
+              {description}
+            </p>
             {buttonText && (
               <div className="inline-flex gap-4">
                 <Button variant="default" className="px-10 py-5 text-sm" style={buttonStyle} asChild={!!buttonUrl}>

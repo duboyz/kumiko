@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Slider } from '@/components/ui/slider'
 import { Settings, Upload } from 'lucide-react'
 import { HeroSectionType } from '@shared'
+import { useState, useEffect } from 'react'
 
 interface HeroSettingsPopoverProps {
   type: HeroSectionType
@@ -22,6 +24,34 @@ interface HeroSettingsPopoverProps {
   onTypeChange?: (type: HeroSectionType) => void
 }
 
+// Helper function to parse rgba color
+function parseRgba(color?: string): { hex: string; opacity: number } {
+  if (!color) return { hex: '#000000', opacity: 0.5 }
+
+  // Check if it's rgba format
+  const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/)
+  if (rgbaMatch) {
+    const [, r, g, b, a] = rgbaMatch
+    const hex = '#' + [r, g, b].map(x => parseInt(x).toString(16).padStart(2, '0')).join('')
+    return { hex, opacity: a ? parseFloat(a) : 1 }
+  }
+
+  // If it's hex format
+  if (color.startsWith('#')) {
+    return { hex: color, opacity: 1 }
+  }
+
+  return { hex: '#000000', opacity: 0.5 }
+}
+
+// Helper function to create rgba string
+function createRgba(hex: string, opacity: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`
+}
+
 export function HeroSettingsPopover({
   type,
   imageUrl,
@@ -36,6 +66,30 @@ export function HeroSettingsPopover({
   onUpdate,
   onTypeChange,
 }: HeroSettingsPopoverProps) {
+  // Parse overlay color and opacity
+  const { hex: overlayHex, opacity: overlayOpacity } = parseRgba(backgroundOverlayColor)
+  const [localOverlayHex, setLocalOverlayHex] = useState(overlayHex)
+  const [localOverlayOpacity, setLocalOverlayOpacity] = useState(overlayOpacity)
+
+  // Update local state when prop changes
+  useEffect(() => {
+    const { hex, opacity } = parseRgba(backgroundOverlayColor)
+    setLocalOverlayHex(hex)
+    setLocalOverlayOpacity(opacity)
+  }, [backgroundOverlayColor])
+
+  // Handle overlay color change
+  const handleOverlayColorChange = (hex: string) => {
+    setLocalOverlayHex(hex)
+    onUpdate('backgroundOverlayColor', createRgba(hex, localOverlayOpacity))
+  }
+
+  // Handle overlay opacity change
+  const handleOverlayOpacityChange = (opacity: number) => {
+    setLocalOverlayOpacity(opacity)
+    onUpdate('backgroundOverlayColor', createRgba(localOverlayHex, opacity))
+  }
+
   return (
     <div className="absolute top-0 right-0 z-10">
       <Popover>
@@ -119,38 +173,53 @@ export function HeroSettingsPopover({
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <Input
-                      type="color"
-                      value={backgroundColor || '#1f2937'}
-                      onChange={e => onUpdate('backgroundColor', e.target.value)}
-                      className="w-full h-8 p-1 rounded border"
-                      title="Background"
-                    />
-                    <span className="text-xs text-gray-500 mt-1 block">Background</span>
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Input
+                        type="color"
+                        value={backgroundColor || '#1f2937'}
+                        onChange={e => onUpdate('backgroundColor', e.target.value)}
+                        className="w-full h-8 p-1 rounded border"
+                        title="Background"
+                      />
+                      <span className="text-xs text-gray-500 mt-1 block">Background</span>
+                    </div>
+                    <div>
+                      <Input
+                        type="color"
+                        value={textColor || '#ffffff'}
+                        onChange={e => onUpdate('textColor', e.target.value)}
+                        className="w-full h-8 p-1 rounded border"
+                        title="Text"
+                      />
+                      <span className="text-xs text-gray-500 mt-1 block">Text</span>
+                    </div>
                   </div>
-                  <div>
-                    <Input
-                      type="color"
-                      value={textColor || '#ffffff'}
-                      onChange={e => onUpdate('textColor', e.target.value)}
-                      className="w-full h-8 p-1 rounded border"
-                      title="Text"
-                    />
-                    <span className="text-xs text-gray-500 mt-1 block">Text</span>
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-500">Overlay</span>
+                      <span className="text-xs text-gray-500">{Math.round(localOverlayOpacity * 100)}%</span>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="color"
+                        value={localOverlayHex}
+                        onChange={e => handleOverlayColorChange(e.target.value)}
+                        className="w-12 h-8 p-1 rounded border flex-shrink-0"
+                        title="Overlay Color"
+                      />
+                      <Slider
+                        value={[localOverlayOpacity]}
+                        onValueChange={(values: number[]) => handleOverlayOpacityChange(values[0])}
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        className="flex-1"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Input
-                      type="color"
-                      value={backgroundOverlayColor || 'rgba(0, 0, 0, 0.5)'}
-                      onChange={e => onUpdate('backgroundOverlayColor', e.target.value)}
-                      className="w-full h-8 p-1 rounded border"
-                      title="Overlay"
-                    />
-                    <span className="text-xs text-gray-500 mt-1 block">Overlay</span>
-                  </div>
-                </div>
+                </>
               )}
             </div>
 

@@ -308,7 +308,10 @@ export default function PageEditorPage() {
                     {/* Section content */}
                     {section.heroSection && (
                       <HeroSection
-                        section={section.heroSection}
+                        section={{
+                          ...section.heroSection,
+                          ...(sectionUpdates[section.id] as Partial<HeroSectionDto>),
+                        }}
                         isEditing={editingSectionId === section.id}
                         onUpdate={(field, value) => handleSectionUpdate(section.id, field, value)}
                         onTypeChange={newType => handleTypeChange(section.id, newType)}
