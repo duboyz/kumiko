@@ -7,6 +7,7 @@ export const useRestaurantWebsites = (entityId?: string, entityType?: string) =>
     queryKey: ['restaurant-websites', entityId, entityType],
     queryFn: () => websiteApi.getRestaurantWebsites(entityId, entityType),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!entityId, // Only run query when entityId exists
   })
 }
 
