@@ -1,7 +1,7 @@
-import { ContentContainer } from '@/components/ContentContainer'
-import { PageHeader } from '@/components/PageHeader'
+import { ContentContainer } from '@/components'
+import { PageHeader } from '@/components'
 import { useTranslations } from 'next-intl'
-import { LanguageSelector } from '@/components/LanguageSelector'
+import { LanguageSelector } from '@/components'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
 export default function DashboardPage() {

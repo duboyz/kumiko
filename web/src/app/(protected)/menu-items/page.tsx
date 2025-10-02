@@ -1,8 +1,8 @@
 'use client'
 
-import { ContentContainer } from '@/components/ContentContainer'
+import { ContentContainer } from '@/components'
 import { DeleteConfirmDialog, LoadingSpinner } from '@/components'
-import MenuItemTableView from '@/stories/organisms/MenuItemTableView/MenuItemTableView'
+import MenuItemTableView from '@/stories/menus/MenuItemTableView/MenuItemTableView'
 import {
   useAllRestaurantMenuItems,
   useCreateMenuItem,
@@ -22,10 +22,10 @@ import { useState, useEffect, Suspense } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
 import { MenuItemDto, CreateMenuItemCommand, UpdateMenuItemCommand } from '@shared'
-import { NoLocation } from '@/stories/components/NoLocation/NoLocation'
-import { RestaurantRequired } from '@/stories/components/RestaurantRequired/RestaurantRequired'
-import { LoadingState } from '@/components/LoadingState'
-import { EmptyState } from '@/components/EmptyState'
+import { NoLocation } from '@/stories/restaurants/NoLocation/NoLocation'
+import { RestaurantRequired } from '@/stories/restaurants/RestaurantRequired/RestaurantRequired'
+import { LoadingState } from '@/components'
+import { EmptyState } from '@/components'
 
 function MenuItemsPageContent() {
   const { selectedLocation, isLoading, hasNoLocations } = useLocationSelection()

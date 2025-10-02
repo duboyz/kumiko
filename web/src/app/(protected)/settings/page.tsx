@@ -1,6 +1,6 @@
 'use client'
 
-import { ContentContainer } from '@/components/ContentContainer'
+import { ContentContainer } from '@/components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'

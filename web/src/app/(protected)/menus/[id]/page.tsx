@@ -3,10 +3,10 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useRestaurantMenus, useLocationSelection } from '@shared'
 import { LoadingSpinner } from '@/components'
-import { ContentLoadingError } from '@/stories/components/ContentLoadingError/ContentLoadingError'
-import { ContentNotFound } from '@/stories/components/ContentNotFound/ContentNotFound'
-import { ContentContainer } from '@/components/ContentContainer'
-import { RestaurantMenu } from '@/stories/organisms/EditableRestaurantMenu/RestaurantMenu/RestaurantMenu'
+import { ContentLoadingError } from '@/stories/shared/ContentLoadingError/ContentLoadingError'
+import { ContentNotFound } from '@/stories/shared/ContentNotFound/ContentNotFound'
+import { ContentContainer } from '@/components'
+import { RestaurantMenu } from '@/stories/menus/EditableRestaurantMenu/RestaurantMenu/RestaurantMenu'
 
 export default function MenuEditPage() {
   const params = useParams()

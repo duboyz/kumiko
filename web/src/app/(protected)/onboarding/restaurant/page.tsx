@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft, CheckCircle } from 'lucide-react'
-import SearchBusiness from '@/components/SearchBusiness'
-import { ContentContainer } from '@/components/ContentContainer'
+import { SearchBusiness } from '@/components'
+import { ContentContainer } from '@/components'
 import { useCreateRestaurant, ResponseBusinessDetails, CreateRestaurantCommand } from '@shared'
 
 export default function RestaurantOnboardingPage() {

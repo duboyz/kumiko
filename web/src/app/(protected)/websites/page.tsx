@@ -15,12 +15,12 @@ import { Textarea } from '@/components/ui/textarea'
 import { Plus } from 'lucide-react'
 import { useRestaurantWebsites, useCreateWebsite, useUpdateWebsite, useLocationSelection } from '@shared'
 import { LoadingSpinner } from '@/components'
-import { ContentContainer } from '@/components/ContentContainer'
-import { PageHeader } from '@/components/PageHeader'
-import { Websites } from '@/stories/pages/Websites/Websites'
-import { LoadingState } from '@/components/LoadingState'
-import { ErrorState } from '@/components/ErrorState'
-import { FormField } from '@/components/FormField'
+import { ContentContainer } from '@/components'
+import { PageHeader } from '@/components'
+import { Websites } from '@/stories/websites'
+import { LoadingState } from '@/components'
+import { ErrorState } from '@/components'
+import { FormField } from '@/components'
 
 export default function WebsitesPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)

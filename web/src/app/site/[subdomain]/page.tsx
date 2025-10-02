@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 import { useWebsiteBySubdomain } from '@shared'
 import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components'
-import { WebsitePage } from '@/components/sections'
+import { WebsitePage } from '@/stories/websites'
 import { PublicWebsiteHeader } from '@/components'
 
 export default function PublicWebsitePage() {

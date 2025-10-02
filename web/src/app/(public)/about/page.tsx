@@ -1,4 +1,4 @@
-import { ContentContainer } from '@/components/ContentContainer'
+import { ContentContainer } from '@/components'
 
 export default function AboutPage() {
   return (

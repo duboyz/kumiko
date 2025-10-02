@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Building2, Scissors, Hotel } from 'lucide-react'
-import { ContentContainer } from '@/components/ContentContainer'
+import { ContentContainer } from '@/components'
 import { LocationTypeCard } from '@/components'
 
 type LocationType = 'restaurant' | 'salon' | 'hotel'
