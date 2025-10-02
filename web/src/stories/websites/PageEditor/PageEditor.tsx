@@ -9,6 +9,7 @@ import {
   useUpdateHeroSection,
   useUpdateTextSection,
   useUpdateRestaurantMenuSection,
+  useUpdateTextAndImageSection,
   useDeleteSection,
   useRestaurantMenus,
   useReorderSections,
@@ -17,9 +18,9 @@ import {
 } from '@shared'
 import { LoadingState, ErrorState, EmptyState } from '@/components'
 import { ContentContainer } from '@/components'
-import { WebsitePage, HeroSection, TextSection, SectionSelectionModal } from '@/stories/websites'
+import { WebsitePage, HeroSection, TextSection, TextAndImageSection, SectionSelectionModal } from '@/stories/websites'
 import { RestaurantMenuSection } from '@/stories/menus/RestaurantMenuSection/RestaurantMenuSection'
-import type { WebsiteSectionDto, HeroSectionDto, TextSectionDto, RestaurantMenuSectionDto } from '@shared'
+import type { WebsiteSectionDto, HeroSectionDto, TextSectionDto, RestaurantMenuSectionDto, TextAndImageSectionDto } from '@shared'
 import { FileText } from 'lucide-react'
 import {
   DndContext,
@@ -40,7 +41,7 @@ import { toast } from 'sonner'
 interface SortableSectionProps {
   section: WebsiteSectionDto
   isEditing: boolean
-  sectionUpdates: Record<string, Partial<HeroSectionDto> | Partial<TextSectionDto> | Partial<RestaurantMenuSectionDto>>
+  sectionUpdates: Record<string, Partial<HeroSectionDto> | Partial<TextSectionDto> | Partial<TextAndImageSectionDto> | Partial<RestaurantMenuSectionDto>>
   menusData: any
   onEdit: (sectionId: string) => void
   onUpdate: (sectionId: string, field: string, value: string | boolean) => void
@@ -125,6 +126,30 @@ function SortableSection({ section, isEditing, sectionUpdates, menusData, onEdit
         />
       )}
 
+      {section.textAndImageSection && (
+        <TextAndImageSection
+          title={(sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.title ?? section.textAndImageSection.title}
+          content={(sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.content ?? section.textAndImageSection.content}
+          buttonText={(sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.buttonText ?? section.textAndImageSection.buttonText}
+          buttonUrl={(sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.buttonUrl ?? section.textAndImageSection.buttonUrl}
+          imageUrl={(sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.imageUrl ?? section.textAndImageSection.imageUrl}
+          imageAlt={(sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.imageAlt ?? section.textAndImageSection.imageAlt}
+          textColor={(sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.textColor ?? section.textAndImageSection.textColor}
+          buttonColor={(sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.buttonColor ?? section.textAndImageSection.buttonColor}
+          buttonTextColor={(sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.buttonTextColor ?? section.textAndImageSection.buttonTextColor}
+          alignment={
+            ((sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.alignment as TextAlignment) ??
+            section.textAndImageSection.alignment
+          }
+          imageOnLeft={
+            (sectionUpdates[section.id] as Partial<TextAndImageSectionDto>)?.imageOnLeft ??
+            section.textAndImageSection.imageOnLeft
+          }
+          isEditing={isEditing}
+          onUpdate={(field, value) => onUpdate(section.id, field, value)}
+        />
+      )}
+
       {section.restaurantMenuSection &&
         (() => {
           const menuSection = section.restaurantMenuSection
@@ -173,7 +198,7 @@ export function PageEditor({ websiteId, pageId, restaurantId, onBack }: PageEdit
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
   const [sectionUpdates, setSectionUpdates] = useState<
-    Record<string, Partial<HeroSectionDto> | Partial<TextSectionDto> | Partial<RestaurantMenuSectionDto>>
+    Record<string, Partial<HeroSectionDto> | Partial<TextSectionDto> | Partial<TextAndImageSectionDto> | Partial<RestaurantMenuSectionDto>>
   >({})
 
   const { data: pagesData, isLoading, error } = usePages(websiteId)
@@ -187,6 +212,7 @@ export function PageEditor({ websiteId, pageId, restaurantId, onBack }: PageEdit
     addHeroSection,
     addTextSection,
     addRestaurantMenuSection,
+    addTextAndImageSection,
     isLoading: isAddingSection,
   } = useAddSectionWithDefaults(websiteId, pageId, firstMenuId)
 
@@ -211,6 +237,16 @@ export function PageEditor({ websiteId, pageId, restaurantId, onBack }: PageEdit
   })
 
   const updateRestaurantMenuSection = useUpdateRestaurantMenuSection(websiteId, () => {
+    if (editingSectionId) {
+      setEditingSectionId(null)
+      setSectionUpdates(prev => {
+        const { [editingSectionId]: _, ...rest } = prev
+        return rest
+      })
+    }
+  })
+
+  const updateTextAndImageSection = useUpdateTextAndImageSection(websiteId, () => {
     if (editingSectionId) {
       setEditingSectionId(null)
       setSectionUpdates(prev => {
@@ -307,6 +343,8 @@ export function PageEditor({ websiteId, pageId, restaurantId, onBack }: PageEdit
         addHeroSection(nextSortOrder)
       } else if (sectionType === 'text') {
         addTextSection(nextSortOrder)
+      } else if (sectionType === 'text-and-image') {
+        addTextAndImageSection(nextSortOrder)
       } else if (sectionType === 'restaurant-menu') {
         if (!firstMenuId) {
           alert('No menus available. Please create a menu first before adding a menu section.')
@@ -384,6 +422,26 @@ export function PageEditor({ websiteId, pageId, restaurantId, onBack }: PageEdit
 
       updateTextSection.mutate({
         textSectionId: section.textSection.id,
+        updates: updateCommand,
+      })
+    } else if (section.textAndImageSection) {
+      const textAndImageUpdates = updates as Partial<TextAndImageSectionDto>
+      const updateCommand = {
+        title: textAndImageUpdates.title ?? section.textAndImageSection.title,
+        content: textAndImageUpdates.content ?? section.textAndImageSection.content,
+        buttonText: textAndImageUpdates.buttonText ?? section.textAndImageSection.buttonText,
+        buttonUrl: textAndImageUpdates.buttonUrl ?? section.textAndImageSection.buttonUrl,
+        imageUrl: textAndImageUpdates.imageUrl ?? section.textAndImageSection.imageUrl,
+        imageAlt: textAndImageUpdates.imageAlt ?? section.textAndImageSection.imageAlt,
+        textColor: textAndImageUpdates.textColor ?? section.textAndImageSection.textColor,
+        buttonColor: textAndImageUpdates.buttonColor ?? section.textAndImageSection.buttonColor,
+        buttonTextColor: textAndImageUpdates.buttonTextColor ?? section.textAndImageSection.buttonTextColor,
+        alignment: (textAndImageUpdates.alignment as string) ?? section.textAndImageSection.alignment,
+        imageOnLeft: textAndImageUpdates.imageOnLeft ?? section.textAndImageSection.imageOnLeft,
+      }
+
+      updateTextAndImageSection.mutate({
+        textAndImageSectionId: section.textAndImageSection.id,
         updates: updateCommand,
       })
     } else if (section.restaurantMenuSection) {
@@ -554,6 +612,7 @@ export function PageEditor({ websiteId, pageId, restaurantId, onBack }: PageEdit
                                 <span className="text-sm font-medium text-primary">
                                   {section.heroSection && 'Hero Section'}
                                   {section.textSection && 'Text Section'}
+                                  {section.textAndImageSection && 'Text & Image Section'}
                                   {section.restaurantMenuSection && 'Menu Section'}
                                 </span>
                               </div>

@@ -24,6 +24,7 @@ public record WebsitePageSectionDto(
     Guid WebsitePageId,
     WebsitePageHeroSectionDto? HeroSection,
     WebsitePageTextSectionDto? TextSection,
+    WebsitePageTextAndImageSectionDto? TextAndImageSection,
     WebsitePageRestaurantMenuSectionDto? RestaurantMenuSection
 );
 
@@ -50,6 +51,21 @@ public record WebsitePageTextSectionDto(
     string? Text,
     BackendApi.Entities.TextAlignment AlignText,
     string? TextColor
+);
+
+public record WebsitePageTextAndImageSectionDto(
+    Guid Id,
+    string? Title,
+    string? Content,
+    string? ButtonText,
+    string? ButtonUrl,
+    string? ImageUrl,
+    string? ImageAlt,
+    string? TextColor,
+    string? ButtonColor,
+    string? ButtonTextColor,
+    BackendApi.Entities.TextAlignment Alignment,
+    bool ImageOnLeft
 );
 
 public record WebsitePageRestaurantMenuSectionDto(

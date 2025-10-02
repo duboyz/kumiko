@@ -7,6 +7,8 @@ import type {
   UpdateTextSectionCommand,
   CreateRestaurantMenuSectionCommand,
   UpdateRestaurantMenuSectionCommand,
+  CreateTextAndImageSectionCommand,
+  UpdateTextAndImageSectionCommand,
   ReorderSectionsCommand,
 } from '../types'
 import { HeroSectionType } from '../types/website.types'
@@ -112,10 +114,48 @@ export const useUpdateRestaurantMenuSection = (websiteId: string, onSuccess?: ()
   })
 }
 
+// Text and Image Section hooks
+export const useCreateTextAndImageSection = (websiteId: string) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (command: CreateTextAndImageSectionCommand) => sectionApi.createTextAndImageSection(command),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['pages', websiteId],
+      })
+    },
+  })
+}
+
+export const useUpdateTextAndImageSection = (websiteId: string, onSuccess?: () => void) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      textAndImageSectionId,
+      updates,
+    }: {
+      textAndImageSectionId: string
+      updates: UpdateTextAndImageSectionCommand
+    }) => sectionApi.updateTextAndImageSection(textAndImageSectionId, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['pages', websiteId],
+      })
+      onSuccess?.()
+    },
+    onError: error => {
+      console.error('Failed to save text and image section:', error)
+    },
+  })
+}
+
 export const useAddSectionWithDefaults = (websiteId: string, pageId: string, defaultMenuId?: string) => {
   const createHeroSection = useCreateHeroSection(websiteId)
   const createTextSection = useCreateTextSection(websiteId)
   const createRestaurantMenuSection = useCreateRestaurantMenuSection(websiteId)
+  const createTextAndImageSection = useCreateTextAndImageSection(websiteId)
 
   const addHeroSection = (sortOrder: number) => {
     const defaultHeroSection: CreateHeroSectionCommand = {
@@ -168,11 +208,32 @@ export const useAddSectionWithDefaults = (websiteId: string, pageId: string, def
     createRestaurantMenuSection.mutate(defaultRestaurantMenuSection)
   }
 
+  const addTextAndImageSection = (sortOrder: number) => {
+    const defaultTextAndImageSection: CreateTextAndImageSectionCommand = {
+      websitePageId: pageId,
+      sortOrder,
+      title: 'Your Section Title',
+      content: 'Add compelling content that describes your product or service. This section allows you to combine text with a beautiful image.',
+      buttonText: 'Learn More',
+      buttonUrl: '#',
+      imageUrl: 'https://images.pexels.com/photos/2014773/pexels-photo-2014773.jpeg',
+      imageAlt: 'Section image',
+      textColor: '#1f2937',
+      buttonColor: '#3b82f6',
+      buttonTextColor: '#ffffff',
+      alignment: TextAlignment.Left,
+      imageOnLeft: false,
+    }
+
+    createTextAndImageSection.mutate(defaultTextAndImageSection)
+  }
+
   return {
     addHeroSection,
     addTextSection,
     addRestaurantMenuSection,
-    isLoading: createHeroSection.isPending || createTextSection.isPending || createRestaurantMenuSection.isPending,
+    addTextAndImageSection,
+    isLoading: createHeroSection.isPending || createTextSection.isPending || createRestaurantMenuSection.isPending || createTextAndImageSection.isPending,
   }
 }
 

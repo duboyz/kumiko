@@ -56,6 +56,22 @@ export interface TextSectionDto {
   textColor?: string
 }
 
+// Text and Image Section types
+export interface TextAndImageSectionDto {
+  id: string
+  title?: string
+  content?: string
+  buttonText?: string
+  buttonUrl?: string
+  imageUrl?: string
+  imageAlt?: string
+  textColor?: string
+  buttonColor?: string
+  buttonTextColor?: string
+  alignment: TextAlignment
+  imageOnLeft: boolean
+}
+
 // Website Page types
 export interface WebsitePageDto {
   id: string
@@ -76,6 +92,7 @@ export interface WebsiteSectionDto {
   websitePageId: string
   heroSection?: HeroSectionDto
   textSection?: TextSectionDto
+  textAndImageSection?: TextAndImageSectionDto
   restaurantMenuSection?: RestaurantMenuSectionDto
 }
 

@@ -61,6 +61,22 @@ export function SectionSelectionModal({
       available: true,
     },
     {
+      id: 'text-and-image',
+      name: 'Text & Image Section',
+      description: 'Combine text content with an image in a flexible layout',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h14a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3z"
+          />
+        </svg>
+      ),
+      available: true,
+    },
+    {
       id: 'restaurant-menu',
       name: 'Menu Section',
       description: isLoadingMenus

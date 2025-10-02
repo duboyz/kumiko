@@ -30,6 +30,7 @@ public static class DependencyInjectionConfiguration
         services.AddScoped<IHeroSectionRepository, HeroSectionRepository>();
         services.AddScoped<ITextSectionRepository, TextSectionRepository>();
         services.AddScoped<IRestaurantMenuSectionRepository, RestaurantMenuSectionRepository>();
+        services.AddScoped<ITextAndImageSectionRepository, TextAndImageSectionRepository>();
         services.AddScoped<IHospitalityRepository, HospitalityRepository>();
         services.AddScoped<IUserHospitalityRepository, UserHospitalityRepository>();
 

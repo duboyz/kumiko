@@ -1,6 +1,7 @@
 export { WebsitePage } from './WebsitePage'
 export { HeroSection } from './HeroSection'
 export { TextSection } from './TextSection'
+export { TextAndImageSection } from './TextAndImageSection'
 export { SectionSelectionModal } from './SectionSelectionModal'
 export { PublicWebsiteHeader } from './PublicWebsiteHeader'
 export { WebsitePageCard } from './WebsitePageCard'

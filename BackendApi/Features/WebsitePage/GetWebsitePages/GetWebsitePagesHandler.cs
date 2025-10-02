@@ -80,6 +80,20 @@ public class GetWebsitePagesHandler(
                     s.TextSection.AlignText,
                     s.TextSection.TextColor
                 ) : null,
+                s.TextAndImageSection != null ? new WebsitePageTextAndImageSectionDto(
+                    s.TextAndImageSection.Id,
+                    s.TextAndImageSection.Title,
+                    s.TextAndImageSection.Content,
+                    s.TextAndImageSection.ButtonText,
+                    s.TextAndImageSection.ButtonUrl,
+                    s.TextAndImageSection.ImageUrl,
+                    s.TextAndImageSection.ImageAlt,
+                    s.TextAndImageSection.TextColor,
+                    s.TextAndImageSection.ButtonColor,
+                    s.TextAndImageSection.ButtonTextColor,
+                    s.TextAndImageSection.Alignment,
+                    s.TextAndImageSection.ImageOnLeft
+                ) : null,
                 s.RestaurantMenuSection != null ? new WebsitePageRestaurantMenuSectionDto(
                     s.RestaurantMenuSection.Id,
                     s.RestaurantMenuSection.RestaurantMenuId,

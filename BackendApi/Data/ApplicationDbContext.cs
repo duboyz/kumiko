@@ -34,6 +34,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<HeroSection> HeroSections { get; set; }
     public DbSet<TextSection> TextSections { get; set; }
     public DbSet<RestaurantMenuSection> RestaurantMenuSections { get; set; }
+    public DbSet<TextAndImageSection> TextAndImageSections { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

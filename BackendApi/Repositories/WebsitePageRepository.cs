@@ -15,6 +15,8 @@ public class WebsitePageRepository(ApplicationDbContext context) : Repository<We
             .Include(p => p.Sections)
                 .ThenInclude(s => s.TextSection)
             .Include(p => p.Sections)
+                .ThenInclude(s => s.TextAndImageSection)
+            .Include(p => p.Sections)
                 .ThenInclude(s => s.RestaurantMenuSection)
             .Where(predicate)
             .OrderBy(p => p.CreatedAt)

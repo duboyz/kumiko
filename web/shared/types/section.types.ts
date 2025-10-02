@@ -108,6 +108,47 @@ export interface DeleteSectionResult {
   success: boolean
 }
 
+// Text and Image Section types
+export interface CreateTextAndImageSectionCommand {
+  websitePageId: string
+  sortOrder: number
+  title?: string
+  content?: string
+  buttonText?: string
+  buttonUrl?: string
+  imageUrl?: string
+  imageAlt?: string
+  textColor?: string
+  buttonColor?: string
+  buttonTextColor?: string
+  alignment: TextAlignment
+  imageOnLeft: boolean
+}
+
+export interface CreateTextAndImageSectionResult {
+  sectionId: string
+  textAndImageSectionId: string
+}
+
+// Update Text and Image Section types
+export interface UpdateTextAndImageSectionCommand {
+  title?: string
+  content?: string
+  buttonText?: string
+  buttonUrl?: string
+  imageUrl?: string
+  imageAlt?: string
+  textColor?: string
+  buttonColor?: string
+  buttonTextColor?: string
+  alignment: string
+  imageOnLeft: boolean
+}
+
+export interface UpdateTextAndImageSectionResult {
+  textAndImageSectionId: string
+}
+
 // Reorder Sections types
 export interface SectionOrder {
   sectionId: string

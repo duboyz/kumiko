@@ -11,6 +11,10 @@ import type {
   CreateRestaurantMenuSectionResult,
   UpdateRestaurantMenuSectionCommand,
   UpdateRestaurantMenuSectionResult,
+  CreateTextAndImageSectionCommand,
+  CreateTextAndImageSectionResult,
+  UpdateTextAndImageSectionCommand,
+  UpdateTextAndImageSectionResult,
   DeleteSectionCommand,
   DeleteSectionResult,
   ReorderSectionsCommand,
@@ -77,6 +81,29 @@ export const sectionApi = {
       command
     )
     if (!data.success) throw new Error(data.message || 'Failed to update restaurant menu section')
+    return data.data
+  },
+
+  createTextAndImageSection: async (
+    command: CreateTextAndImageSectionCommand
+  ): Promise<ResponseData<CreateTextAndImageSectionResult>> => {
+    const { data } = await apiClient.post<ApiResponse<CreateTextAndImageSectionResult>>(
+      '/api/section/text-and-image',
+      command
+    )
+    if (!data.success) throw new Error(data.message || 'Failed to create text and image section')
+    return data.data
+  },
+
+  updateTextAndImageSection: async (
+    textAndImageSectionId: string,
+    command: UpdateTextAndImageSectionCommand
+  ): Promise<ResponseData<UpdateTextAndImageSectionResult>> => {
+    const { data } = await apiClient.put<ApiResponse<UpdateTextAndImageSectionResult>>(
+      `/api/section/text-and-image/${textAndImageSectionId}`,
+      command
+    )
+    if (!data.success) throw new Error(data.message || 'Failed to update text and image section')
     return data.data
   },
 

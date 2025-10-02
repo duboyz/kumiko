@@ -644,6 +644,68 @@ namespace BackendApi.Migrations
                     b.ToTable("RestaurantMenuSections");
                 });
 
+            modelBuilder.Entity("BackendApi.Entities.TextAndImageSection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Alignment")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ButtonColor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ButtonText")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ButtonTextColor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ButtonUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ImageAlt")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("ImageOnLeft")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TextColor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("WebsiteSectionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WebsiteSectionId")
+                        .IsUnique();
+
+                    b.ToTable("TextAndImageSections");
+                });
+
             modelBuilder.Entity("BackendApi.Entities.TextSection", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1116,6 +1178,17 @@ namespace BackendApi.Migrations
                     b.Navigation("WebsiteSection");
                 });
 
+            modelBuilder.Entity("BackendApi.Entities.TextAndImageSection", b =>
+                {
+                    b.HasOne("BackendApi.Entities.WebsiteSection", "WebsiteSection")
+                        .WithOne("TextAndImageSection")
+                        .HasForeignKey("BackendApi.Entities.TextAndImageSection", "WebsiteSectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WebsiteSection");
+                });
+
             modelBuilder.Entity("BackendApi.Entities.TextSection", b =>
                 {
                     b.HasOne("BackendApi.Entities.WebsiteSection", "WebsiteSection")
@@ -1255,6 +1328,8 @@ namespace BackendApi.Migrations
                     b.Navigation("HeroSection");
 
                     b.Navigation("RestaurantMenuSection");
+
+                    b.Navigation("TextAndImageSection");
 
                     b.Navigation("TextSection");
                 });
