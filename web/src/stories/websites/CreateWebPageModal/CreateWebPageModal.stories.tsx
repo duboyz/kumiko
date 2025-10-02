@@ -3,11 +3,11 @@ import { CreateWebPageModal } from './CreateWebPageModal'
 
 const meta = {
   title: 'Websites/CreateWebPageModal',
-    component: CreateWebPageModal,
-    parameters: {
-        layout: 'centered',
-    },
-    tags: ['autodocs'],
+  component: CreateWebPageModal,
+  parameters: {
+    layout: 'centered',
+  },
+  tags: ['autodocs'],
 }
 
 export default meta
@@ -15,7 +15,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-    args: {
-        websiteId: 'website-123',
-    },
+  args: {
+    websiteId: 'website-123',
+  },
 }

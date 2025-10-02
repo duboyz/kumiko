@@ -104,9 +104,7 @@ export const NonEditable = ({ menuItem, setIsEditable }: NonEditableProps) => {
           <h4 className="text-lg font-medium">{menuItem.name}</h4>
           <span className="text-base text-muted-foreground">${menuItem.price.toFixed(2)}</span>
         </div>
-        {menuItem.description && (
-          <p className="text-sm text-muted-foreground">{menuItem.description}</p>
-        )}
+        {menuItem.description && <p className="text-sm text-muted-foreground">{menuItem.description}</p>}
       </div>
       <div className="flex items-center gap-3 pt-1">
         <Edit

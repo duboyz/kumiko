@@ -76,7 +76,13 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
 
         <div className="flex flex-col gap-4">
           <FormField label="Item Name" htmlFor="newItemName">
-            <Input id="newItemName" placeholder="Enter item name" type="text" value={name} onChange={e => setName(e.target.value)} />
+            <Input
+              id="newItemName"
+              placeholder="Enter item name"
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
           </FormField>
           <FormField label="Item Description" htmlFor="newItemDescription">
             <Input
@@ -88,7 +94,13 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
             />
           </FormField>
           <FormField label="Price" htmlFor="newItemPrice">
-            <Input id="newItemPrice" placeholder="0.00" type="number" value={price} onChange={e => setPrice(e.target.value)} />
+            <Input
+              id="newItemPrice"
+              placeholder="0.00"
+              type="number"
+              value={price}
+              onChange={e => setPrice(e.target.value)}
+            />
           </FormField>
         </div>
 

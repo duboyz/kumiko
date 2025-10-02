@@ -1,1 +1,1 @@
-export { default } from "./MenuItemTableView"
+export { default } from './MenuItemTableView'

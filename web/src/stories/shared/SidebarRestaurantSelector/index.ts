@@ -1,1 +1,1 @@
-export { SidebarRestaurantSelector } from "./SidebarRestaurantSelector"
+export { SidebarRestaurantSelector } from './SidebarRestaurantSelector'

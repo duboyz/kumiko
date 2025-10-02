@@ -1,1 +1,1 @@
-export { SectionSelectionModal } from "./SectionSelectionModal"
+export { SectionSelectionModal } from './SectionSelectionModal'

@@ -1,1 +1,1 @@
-export { NoLocation } from "./NoLocation"
+export { NoLocation } from './NoLocation'

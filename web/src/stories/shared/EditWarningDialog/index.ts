@@ -1,1 +1,1 @@
-export { EditWarningDialog } from "./EditWarningDialog"
+export { EditWarningDialog } from './EditWarningDialog'

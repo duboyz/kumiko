@@ -102,9 +102,7 @@ export function RestaurantMenuSection({
                 {/* Category Header */}
                 <div className="mb-10 pb-4 border-b">
                   <h3 className="text-2xl font-semibold uppercase">{category.name}</h3>
-                  {category.description && (
-                    <p className="text-sm text-muted-foreground mt-2">{category.description}</p>
-                  )}
+                  {category.description && <p className="text-sm text-muted-foreground mt-2">{category.description}</p>}
                 </div>
 
                 {/* Menu Items */}

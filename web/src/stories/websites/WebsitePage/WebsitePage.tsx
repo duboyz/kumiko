@@ -37,11 +37,7 @@ function MenuSectionWithFetch({
     return (
       <section className="relative py-20 px-10 bg-white">
         <div className="max-w-[1000px] mx-auto">
-          <ErrorState
-            title="Menu Not Found"
-            message="The selected menu could not be loaded."
-            variant="inline"
-          />
+          <ErrorState title="Menu Not Found" message="The selected menu could not be loaded." variant="inline" />
         </div>
       </section>
     )
@@ -120,11 +116,7 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
 
       {sortedSections.length === 0 && (
         <div className="min-h-screen flex items-center justify-center bg-muted/30">
-          <EmptyState
-            icon={FileX}
-            title="No content yet"
-            description="Add sections to start building your page"
-          />
+          <EmptyState icon={FileX} title="No content yet" description="Add sections to start building your page" />
         </div>
       )}
     </div>

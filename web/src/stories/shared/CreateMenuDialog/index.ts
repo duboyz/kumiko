@@ -1,1 +1,1 @@
-export { CreateMenuDialog } from "./CreateMenuDialog"
+export { CreateMenuDialog } from './CreateMenuDialog'

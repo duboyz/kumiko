@@ -18,8 +18,7 @@ export const RestaurantMenu = ({ menu }: RestaurantMenuProps) => {
 
   const { mutate: updateMenu } = useUpdateRestaurantMenu()
 
-  if (!menu)
-    return <div className="text-center py-20 text-muted-foreground">No menu found, create a new menu</div>
+  if (!menu) return <div className="text-center py-20 text-muted-foreground">No menu found, create a new menu</div>
 
   const handleCancelNewCategory = () => setShowNewCategoryForm(false)
 
@@ -38,7 +37,13 @@ export const RestaurantMenu = ({ menu }: RestaurantMenuProps) => {
         {isEditable ? (
           <div className="flex-1 flex flex-col gap-4">
             <FormField label="Menu Name" htmlFor="menuName">
-              <Input id="menuName" placeholder="Menu Name" type="text" value={menuName} onChange={e => setMenuName(e.target.value)} />
+              <Input
+                id="menuName"
+                placeholder="Menu Name"
+                type="text"
+                value={menuName}
+                onChange={e => setMenuName(e.target.value)}
+              />
             </FormField>
             <FormField label="Menu Description" htmlFor="menuDescription">
               <Input

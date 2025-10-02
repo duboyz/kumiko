@@ -70,7 +70,11 @@ export function CreateMenuDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant={triggerVariant} size="lg"> <Plus />{triggerText}</Button>
+        <Button variant={triggerVariant} size="lg">
+          {' '}
+          <Plus />
+          {triggerText}
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

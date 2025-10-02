@@ -1,1 +1,1 @@
-export { TextSection } from "./TextSection"
+export { TextSection } from './TextSection'

@@ -1,1 +1,1 @@
-export { LoadingMessage } from "./LoadingMessage"
+export { LoadingMessage } from './LoadingMessage'

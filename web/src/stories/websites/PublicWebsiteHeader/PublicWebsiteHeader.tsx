@@ -40,8 +40,11 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
                 <Link
                   key={page.id}
                   href={page.slug === 'home' ? '/' : `/${page.slug}`}
-                  className={`text-sm font-medium transition-colors ${isActive ? 'text-primary border-b border-primary pb-1' : 'text-muted-foreground hover:text-foreground'
-                    }`}
+                  className={`text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-primary border-b border-primary pb-1'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
                 >
                   {page.title}
                 </Link>
@@ -76,8 +79,9 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
                 <Link
                   key={page.id}
                   href={page.slug === 'home' ? '/' : `/${page.slug}`}
-                  className={`block px-3 py-2 text-sm font-medium transition-colors ${isActive ? 'text-primary bg-muted' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                    }`}
+                  className={`block px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive ? 'text-primary bg-muted' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }`}
                 >
                   {page.title}
                 </Link>

@@ -1,1 +1,1 @@
-export { LocationTypeCard } from "./LocationTypeCard"
+export { LocationTypeCard } from './LocationTypeCard'

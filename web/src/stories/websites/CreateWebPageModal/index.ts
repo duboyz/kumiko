@@ -1,1 +1,1 @@
-export { CreateWebPageModal } from "./CreateWebPageModal"
+export { CreateWebPageModal } from './CreateWebPageModal'

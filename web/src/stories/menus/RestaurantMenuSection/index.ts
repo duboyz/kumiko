@@ -1,1 +1,1 @@
-export { RestaurantMenuSection } from "./RestaurantMenuSection"
+export { RestaurantMenuSection } from './RestaurantMenuSection'

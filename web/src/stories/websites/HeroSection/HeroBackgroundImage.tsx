@@ -119,12 +119,7 @@ export function HeroBackgroundImage({
             <p className="text-lg text-muted-foreground leading-relaxed mb-10">{description}</p>
             {buttonText && (
               <div className="inline-flex gap-4">
-                <Button
-                  variant="default"
-                  className="px-10 py-5 text-sm"
-                  style={buttonStyle}
-                  asChild={!!buttonUrl}
-                >
+                <Button variant="default" className="px-10 py-5 text-sm" style={buttonStyle} asChild={!!buttonUrl}>
                   {buttonUrl ? <a href={buttonUrl}>{buttonText}</a> : <span>{buttonText}</span>}
                 </Button>
               </div>

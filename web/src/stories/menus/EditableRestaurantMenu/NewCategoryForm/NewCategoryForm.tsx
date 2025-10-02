@@ -52,7 +52,13 @@ export const NewCategoryForm = ({ onCancel, menu, isVisible, setIsVisible }: New
 
         <div className="flex flex-col gap-4">
           <FormField label="Category Name" htmlFor="newCategoryName">
-            <Input id="newCategoryName" placeholder="Enter category name" type="text" value={name} onChange={e => setName(e.target.value)} />
+            <Input
+              id="newCategoryName"
+              placeholder="Enter category name"
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
           </FormField>
           <FormField label="Category Description" htmlFor="newCategoryDescription">
             <Input

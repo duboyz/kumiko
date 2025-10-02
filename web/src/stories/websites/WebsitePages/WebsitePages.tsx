@@ -16,9 +16,8 @@ export function WebsitePages({ websitePages, websiteId }: WebsitePagesProps) {
           <h3 className="text-lg font-semibold">Website Pages</h3>
           <p className="text-sm text-muted-foreground">
             {websitePages.length === 0
-              ? "No pages created yet"
-              : `${websitePages.length} ${websitePages.length === 1 ? 'page' : 'pages'} created`
-            }
+              ? 'No pages created yet'
+              : `${websitePages.length} ${websitePages.length === 1 ? 'page' : 'pages'} created`}
           </p>
         </div>
         <CreateWebPageModal websiteId={websiteId} />
@@ -41,4 +40,3 @@ export function WebsitePages({ websitePages, websiteId }: WebsitePagesProps) {
     </div>
   )
 }
-
