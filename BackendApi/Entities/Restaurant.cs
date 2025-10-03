@@ -19,4 +19,5 @@ public class Restaurant : BaseEntity
 
     public ICollection<UserRestaurant> Staff { get; set; } = [];
     public ICollection<RestaurantMenu> Menus { get; set; } = [];
+    public ICollection<Order> Orders { get; set; } = [];
 }

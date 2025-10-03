@@ -18,4 +18,5 @@ public class User : BaseEntity
     public DateTime? RefreshTokenExpiresAt { get; set; }
 
     public ICollection<UserRestaurant> Restaurants { get; set; } = [];
+    public ICollection<Order> Orders { get; set; } = [];
 }

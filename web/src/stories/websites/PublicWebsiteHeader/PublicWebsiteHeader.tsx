@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { CartSheet } from '@/components/cart'
 
 interface PublicWebsiteHeaderProps {
   websiteName: string
@@ -29,7 +30,7 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex space-x-6">
+          <nav className="hidden md:flex space-x-6 items-center">
             {pages.map(page => {
               const isActive =
                 currentPageSlug === page.slug ||
@@ -50,10 +51,12 @@ export function PublicWebsiteHeader({ websiteName, pages, currentPageSlug }: Pub
                 </Link>
               )
             })}
+            <CartSheet />
           </nav>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          {/* Mobile Menu and Cart */}
+          <div className="md:hidden flex items-center gap-2">
+            <CartSheet />
             <button
               type="button"
               className="text-muted-foreground hover:text-foreground focus:outline-none focus:text-foreground transition-colors"

@@ -69,6 +69,8 @@ public class GetWebsiteBySubdomainHandler(IWebsiteRepository websiteRepository) 
             website.Description,
             website.IsPublished,
             website.Type.ToString(),
+            website.RestaurantId,
+            website.Restaurant?.Name,
             pages
         );
     }

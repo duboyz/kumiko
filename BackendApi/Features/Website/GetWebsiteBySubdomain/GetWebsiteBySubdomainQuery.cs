@@ -13,6 +13,8 @@ public record GetWebsiteBySubdomainResult(
     string? Description,
     bool IsPublished,
     string Type,
+    Guid? RestaurantId,
+    string? RestaurantName,
     IEnumerable<WebsitePageDto> Pages
 );
 

@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Settings, ShoppingCart } from 'lucide-react'
 import { RestaurantMenuDto, GetMenuByIdResult } from '@shared/types'
+import { useCart } from '@/contexts/CartContext'
+import { toast } from 'sonner'
 
 interface RestaurantMenuSectionProps {
   restaurantMenu: RestaurantMenuDto | GetMenuByIdResult
@@ -15,6 +17,8 @@ interface RestaurantMenuSectionProps {
   isEditing?: boolean
   availableMenus?: RestaurantMenuDto[]
   currentMenuId?: string
+  restaurantId?: string
+  restaurantName?: string
   onUpdate?: (field: string, value: string | boolean) => void
 }
 
@@ -25,10 +29,34 @@ export function RestaurantMenuSection({
   isEditing = false,
   availableMenus = [],
   currentMenuId,
+  restaurantId,
+  restaurantName,
   onUpdate,
 }: RestaurantMenuSectionProps) {
-  const handleAddToCart = (_itemId: string, itemName: string) => {
-    alert(`Not implemented yet: Adding "${itemName}" to cart`)
+  const { addItem } = useCart()
+
+  const handleAddToCart = (
+    menuItemId: string,
+    itemName: string,
+    itemDescription: string,
+    itemPrice: number
+  ) => {
+    if (!restaurantId || !restaurantName) {
+      toast.error('Restaurant information missing')
+      return
+    }
+
+    addItem(
+      {
+        menuItemId,
+        name: itemName,
+        description: itemDescription,
+        price: itemPrice,
+      },
+      restaurantId,
+      restaurantName
+    )
+    toast.success(`${itemName} added to cart`)
   }
 
   return (
@@ -134,7 +162,12 @@ export function RestaurantMenuSection({
                               size="sm"
                               className="mt-3 px-4 py-2"
                               onClick={() =>
-                                handleAddToCart(categoryItem.menuItem?.id || '', categoryItem.menuItem?.name || '')
+                                handleAddToCart(
+                                  categoryItem.menuItem?.id || '',
+                                  categoryItem.menuItem?.name || '',
+                                  categoryItem.menuItem?.description || '',
+                                  categoryItem.menuItem?.price || 0
+                                )
                               }
                             >
                               <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />

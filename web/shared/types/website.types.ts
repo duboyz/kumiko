@@ -114,6 +114,8 @@ export interface GetWebsiteBySubdomainResult {
   description?: string
   isPublished: boolean
   type: string
+  restaurantId?: string
+  restaurantName?: string
   pages: PublicWebsitePageDto[]
 }
 

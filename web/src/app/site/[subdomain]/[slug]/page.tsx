@@ -108,7 +108,12 @@ export default function PublicWebsitePageWithSlug() {
         pages={websiteData.pages.map(p => ({ id: p.id, title: p.title, slug: p.slug }))}
         currentPageSlug={slug}
       />
-      <WebsitePage page={adaptedPage} availableMenus={[]} />
+      <WebsitePage
+        page={adaptedPage}
+        availableMenus={[]}
+        restaurantId={websiteData.restaurantId}
+        restaurantName={websiteData.restaurantName}
+      />
     </div>
   )
 }

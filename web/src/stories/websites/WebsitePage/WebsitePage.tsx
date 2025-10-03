@@ -12,14 +12,20 @@ interface WebsitePageProps {
   page: WebsitePageDto
   className?: string
   availableMenus?: RestaurantMenuDto[]
+  restaurantId?: string
+  restaurantName?: string
 }
 
 function MenuSectionWithFetch({
   restaurantMenuId,
   allowOrdering,
+  restaurantId,
+  restaurantName,
 }: {
   restaurantMenuId: string
   allowOrdering: boolean
+  restaurantId?: string
+  restaurantName?: string
 }) {
   const { data: menuData, isLoading, error } = useMenuById(restaurantMenuId)
 
@@ -43,10 +49,18 @@ function MenuSectionWithFetch({
     )
   }
 
-  return <RestaurantMenuSection restaurantMenu={menuData} allowOrdering={allowOrdering} isEditing={false} />
+  return (
+    <RestaurantMenuSection
+      restaurantMenu={menuData}
+      allowOrdering={allowOrdering}
+      isEditing={false}
+      restaurantId={restaurantId}
+      restaurantName={restaurantName}
+    />
+  )
 }
 
-export function WebsitePage({ page, className = '', availableMenus = [] }: WebsitePageProps) {
+export function WebsitePage({ page, className = '', availableMenus = [], restaurantId, restaurantName }: WebsitePageProps) {
   const sortedSections = page.sections.sort((a, b) => a.sortOrder - b.sortOrder)
 
   return (
@@ -75,6 +89,8 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
                 key={section.id}
                 restaurantMenuId={section.restaurantMenuSection.restaurantMenuId}
                 allowOrdering={section.restaurantMenuSection.allowOrdering}
+                restaurantId={restaurantId}
+                restaurantName={restaurantName}
               />
             )
           }
@@ -101,6 +117,8 @@ export function WebsitePage({ page, className = '', availableMenus = [] }: Websi
               restaurantMenu={menu}
               allowOrdering={section.restaurantMenuSection.allowOrdering}
               isEditing={false}
+              restaurantId={restaurantId}
+              restaurantName={restaurantName}
             />
           )
         }
