@@ -302,7 +302,10 @@ export const ScrollTriggerSection = () => {
   ]
 
   return (
-    <section ref={sectionRef} className="py-24 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+    <section
+      ref={sectionRef}
+      className="h-screen bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden flex flex-col justify-center"
+    >
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-full">
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full opacity-20 blur-3xl" />
@@ -310,9 +313,9 @@ export const ScrollTriggerSection = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-green-200 rounded-full opacity-15 blur-3xl" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-8 relative z-10 flex-1 flex flex-col justify-center">
         {/* Section Header */}
-        <div className="text-center mb-20">
+        <div className="text-center mb-16">
           <h2
             ref={titleRef}
             className="text-5xl font-bold text-gray-800 mb-6"
@@ -344,7 +347,7 @@ export const ScrollTriggerSection = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-16">
+        <div className="text-center mt-12">
           <div className="inline-flex items-center space-x-6 bg-white rounded-xl px-8 py-4 shadow-lg border border-gray-100">
             <div className="text-left">
               <h3 className="text-base font-semibold text-gray-800">Ready to get started?</h3>
