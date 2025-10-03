@@ -26,81 +26,97 @@ const FeatureCard = ({ icon, title, description, features, color, delay }: Featu
   useEffect(() => {
     if (!cardRef.current || !iconRef.current || !titleRef.current || !descRef.current || !featuresRef.current) return
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: cardRef.current,
-        start: 'top 80%',
-        end: 'bottom 20%',
-        toggleActions: 'play none none reverse',
-      },
-    })
-
-    // Initial state
+    // Initial state with more dramatic positioning
     gsap.set([iconRef.current, titleRef.current, descRef.current, featuresRef.current], {
       opacity: 0,
-      y: 50,
+      y: 80,
+      rotationX: 15,
     })
 
     gsap.set(cardRef.current, {
-      scale: 0.9,
+      scale: 0.8,
       opacity: 0,
+      rotationY: 10,
+      transformOrigin: 'center center',
     })
 
-    // Animation sequence
+    // Create timeline that will be controlled by scroll
+    const tl = gsap.timeline({ paused: true })
+
+    // More sophisticated animation sequence
     tl.to(cardRef.current, {
       scale: 1,
       opacity: 1,
-      duration: 0.6,
-      ease: 'back.out(1.7)',
-      delay: delay * 0.2,
+      rotationY: 0,
+      duration: 1.2,
+      ease: 'power3.out',
     })
       .to(
         iconRef.current,
         {
           opacity: 1,
           y: 0,
-          duration: 0.5,
+          rotationX: 0,
+          duration: 0.8,
           ease: 'power2.out',
         },
-        '-=0.4'
+        '-=0.8'
       )
       .to(
         titleRef.current,
         {
           opacity: 1,
           y: 0,
-          duration: 0.5,
+          rotationX: 0,
+          duration: 0.8,
           ease: 'power2.out',
         },
-        '-=0.3'
+        '-=0.6'
       )
       .to(
         descRef.current,
         {
           opacity: 1,
           y: 0,
-          duration: 0.5,
+          rotationX: 0,
+          duration: 0.8,
           ease: 'power2.out',
         },
-        '-=0.2'
+        '-=0.4'
       )
       .to(
         featuresRef.current,
         {
           opacity: 1,
           y: 0,
-          duration: 0.5,
+          rotationX: 0,
+          duration: 0.8,
           ease: 'power2.out',
         },
-        '-=0.1'
+        '-=0.2'
       )
 
-    // Hover animation
+    // ScrollTrigger that controls the timeline based on scroll position
+    ScrollTrigger.create({
+      trigger: cardRef.current,
+      start: 'top 80%',
+      end: 'bottom 20%',
+      scrub: 1, // This makes it tied to scroll position
+      animation: tl,
+      onUpdate: self => {
+        // Add a slight delay based on the card's delay prop
+        const progress = Math.max(0, self.progress - delay * 0.1)
+        tl.progress(progress)
+      },
+    })
+
+    // Enhanced hover animation
     const handleMouseEnter = () => {
       gsap.to(cardRef.current, {
-        y: -10,
-        scale: 1.02,
-        duration: 0.3,
+        y: -8,
+        scale: 1.03,
+        rotationY: 2,
+        duration: 0.4,
         ease: 'power2.out',
       })
     }
@@ -109,7 +125,8 @@ const FeatureCard = ({ icon, title, description, features, color, delay }: Featu
       gsap.to(cardRef.current, {
         y: 0,
         scale: 1,
-        duration: 0.3,
+        rotationY: 0,
+        duration: 0.4,
         ease: 'power2.out',
       })
     }
@@ -120,31 +137,38 @@ const FeatureCard = ({ icon, title, description, features, color, delay }: Featu
     return () => {
       cardRef.current?.removeEventListener('mouseenter', handleMouseEnter)
       cardRef.current?.removeEventListener('mouseleave', handleMouseLeave)
+      // Clean up ScrollTrigger instances
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.trigger === cardRef.current) {
+          trigger.kill()
+        }
+      })
     }
   }, [delay])
 
   return (
     <div
       ref={cardRef}
-      className="group relative bg-white rounded-3xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 cursor-pointer"
+      className="group relative bg-white rounded-2xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-500 cursor-pointer overflow-hidden"
       style={{
-        background: `linear-gradient(135deg, ${color}10, ${color}05)`,
-        borderColor: `${color}20`,
+        background: `linear-gradient(135deg, ${color}08, ${color}03)`,
+        borderColor: `${color}15`,
+        transformStyle: 'preserve-3d',
       }}
     >
-      {/* Background decoration */}
+      {/* Subtle background gradient */}
       <div
-        className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10"
-        style={{ background: `radial-gradient(circle, ${color}, transparent)` }}
+        className="absolute inset-0 opacity-5"
+        style={{ background: `radial-gradient(circle at 30% 20%, ${color}, transparent 50%)` }}
       />
 
       {/* Icon */}
       <div
         ref={iconRef}
-        className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-6"
+        className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl mb-6 relative z-10"
         style={{
-          background: `linear-gradient(135deg, ${color}, ${color}CC)`,
-          boxShadow: `0 10px 30px ${color}30`,
+          background: `linear-gradient(135deg, ${color}, ${color}DD)`,
+          boxShadow: `0 8px 25px ${color}25`,
         }}
       >
         {icon}
@@ -153,32 +177,32 @@ const FeatureCard = ({ icon, title, description, features, color, delay }: Featu
       {/* Title */}
       <h3
         ref={titleRef}
-        className="text-2xl font-bold text-gray-800 mb-4"
+        className="text-xl font-bold text-gray-800 mb-3 relative z-10"
         style={{ fontFamily: "'Montserrat', sans-serif" }}
       >
         {title}
       </h3>
 
       {/* Description */}
-      <p ref={descRef} className="text-gray-600 mb-6 leading-relaxed">
+      <p ref={descRef} className="text-gray-600 mb-6 leading-relaxed text-sm relative z-10">
         {description}
       </p>
 
       {/* Features list */}
-      <ul ref={featuresRef} className="space-y-2">
+      <ul ref={featuresRef} className="space-y-3 relative z-10">
         {features.map((feature, index) => (
-          <li key={index} className="flex items-center text-sm text-gray-700">
-            <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: color }} />
+          <li key={index} className="flex items-center text-xs text-gray-700 font-medium">
+            <div className="w-1.5 h-1.5 rounded-full mr-3" style={{ backgroundColor: color }} />
             {feature}
           </li>
         ))}
       </ul>
 
-      {/* Hover effect overlay */}
+      {/* Elegant hover effect */}
       <div
-        className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500"
         style={{
-          background: `linear-gradient(135deg, ${color}08, transparent)`,
+          background: `linear-gradient(135deg, ${color}06, transparent)`,
         }}
       />
     </div>
@@ -193,88 +217,85 @@ export const ScrollTriggerSection = () => {
   useEffect(() => {
     if (!sectionRef.current || !titleRef.current || !subtitleRef.current) return
 
-    // Title animation
-    gsap.fromTo(
-      titleRef.current,
-      {
-        opacity: 0,
-        y: 100,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: titleRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none reverse',
-        },
-      }
-    )
+    // Set initial states with more sophisticated positioning
+    gsap.set(titleRef.current, {
+      opacity: 0,
+      y: 120,
+      scale: 0.8,
+      rotationX: 20,
+    })
 
-    // Subtitle animation
-    gsap.fromTo(
-      subtitleRef.current,
-      {
-        opacity: 0,
-        y: 50,
-      },
-      {
+    gsap.set(subtitleRef.current, {
+      opacity: 0,
+      y: 60,
+      scale: 0.9,
+    })
+
+    // Create scroll-controlled timeline for header
+    const headerTl = gsap.timeline({ paused: true })
+
+    headerTl
+      .to(titleRef.current, {
         opacity: 1,
         y: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-        delay: 0.2,
-        scrollTrigger: {
-          trigger: subtitleRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none reverse',
+        scale: 1,
+        rotationX: 0,
+        duration: 1.4,
+        ease: 'power3.out',
+      })
+      .to(
+        subtitleRef.current,
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 1,
+          ease: 'power2.out',
         },
-      }
-    )
+        '-=0.8'
+      )
+
+    // ScrollTrigger for header animations
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: 'top 80%',
+      end: 'top 20%',
+      scrub: 1,
+      animation: headerTl,
+    })
+
+    return () => {
+      // Clean up ScrollTrigger instances
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.trigger === sectionRef.current) {
+          trigger.kill()
+        }
+      })
+    }
   }, [])
 
   const features = [
     {
       icon: '🍽️',
-      title: 'Restaurant Management',
-      description: 'Complete restaurant management system with menu creation, order tracking, and customer insights.',
-      features: [
-        'Digital menu creation & management',
-        'Real-time order tracking',
-        'Customer analytics & insights',
-        'Multi-location support',
-        'QR code ordering system',
-      ],
+      title: 'Restaurant',
+      description: 'Complete management system for modern dining.',
+      features: ['Menu Management', 'Order Tracking', 'Analytics'],
       color: '#3B82F6',
       delay: 0,
     },
     {
       icon: '🏨',
-      title: 'Hospitality Solutions',
-      description: 'Comprehensive hospitality management for hotels, resorts, and accommodation providers.',
-      features: [
-        'Room & booking management',
-        'Guest experience optimization',
-        'Revenue management tools',
-        'Staff coordination systems',
-        'Guest communication platform',
-      ],
+      title: 'Hospitality',
+      description: 'Streamlined solutions for accommodation providers.',
+      features: ['Booking Management', 'Guest Experience', 'Revenue Tools'],
       color: '#10B981',
       delay: 1,
     },
     {
       icon: '🌐',
-      title: 'Website Builder',
-      description: 'Create stunning, responsive websites for your business with our intuitive drag-and-drop builder.',
-      features: [
-        'Drag-and-drop website builder',
-        'Mobile-responsive templates',
-        'SEO optimization tools',
-        'Custom domain integration',
-        'Analytics & performance tracking',
-      ],
+      title: 'Websites',
+      description: 'Beautiful, responsive websites made simple.',
+      features: ['Drag & Drop Builder', 'Mobile Ready', 'SEO Optimized'],
       color: '#8B5CF6',
       delay: 2,
     },
@@ -294,17 +315,16 @@ export const ScrollTriggerSection = () => {
         <div className="text-center mb-20">
           <h2
             ref={titleRef}
-            className="text-6xl font-bold text-gray-800 mb-6"
+            className="text-5xl font-bold text-gray-800 mb-6"
             style={{
               fontFamily: "'Montserrat', sans-serif",
               fontWeight: 700,
             }}
           >
-            Everything You Need
+            Built for Business
           </h2>
-          <p ref={subtitleRef} className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Kumiko provides a complete suite of tools to manage your restaurant, hospitality business, and online
-            presence. From menu management to website creation, we've got you covered.
+          <p ref={subtitleRef} className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Everything you need to manage, grow, and showcase your business.
           </p>
         </div>
 
@@ -324,17 +344,14 @@ export const ScrollTriggerSection = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-20">
-          <div className="inline-flex items-center space-x-4 bg-white rounded-2xl px-8 py-6 shadow-lg border border-gray-100">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-xl">
-              🚀
-            </div>
+        <div className="text-center mt-16">
+          <div className="inline-flex items-center space-x-6 bg-white rounded-xl px-8 py-4 shadow-lg border border-gray-100">
             <div className="text-left">
-              <h3 className="text-lg font-semibold text-gray-800">Ready to get started?</h3>
-              <p className="text-sm text-gray-600">Join thousands of businesses already using Kumiko</p>
+              <h3 className="text-base font-semibold text-gray-800">Ready to get started?</h3>
+              <p className="text-xs text-gray-600">Join businesses using Kumiko</p>
             </div>
-            <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105">
-              Start Free Trial
+            <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm">
+              Get Started
             </button>
           </div>
         </div>
