@@ -1,5 +1,5 @@
-import { HeroSection } from './HeroSection'
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
+import { HeroSection } from './HeroSection'
 
 const meta = {
   component: HeroSection,
