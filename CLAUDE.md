@@ -84,14 +84,85 @@ Features/
 
 ### Frontend - Next.js with TypeScript
 
-The frontend follows a structured pattern for API integration:
+The frontend follows a **strict three-layer pattern** for API integration. Every backend feature MUST have corresponding files in all three layers:
 
-1. **Type Definition** (`web/shared/types/`) - Define command/result types matching backend
-2. **API Client** (`web/shared/api/`) - Axios-based API calls
-3. **React Query Hooks** (`web/shared/hooks/`) - Data fetching hooks using Tanstack Query
+#### Three-Layer Architecture (MANDATORY):
+
+1. **Type Layer** (`web/shared/types/`)
+   - Define TypeScript types matching backend Commands, Queries, and Results **exactly**
+   - **IMPORTANT**: TypeScript types MUST use the same naming convention as backend C# types
+   - Naming convention: `{Feature}Command`, `{Feature}Query`, `{Feature}Result`
+   - Example: `CreateRestaurantCommand`, `UpdateRestaurantCommand`, `GetUserRestaurantsResult`
+   - Each domain should have its own types file (e.g., `auth.types.ts`, `restaurant.types.ts`)
+
+2. **API Layer** (`web/shared/api/`)
+   - One file per backend feature domain (e.g., `auth.api.ts`, `restaurant.api.ts`)
+   - Export an object containing all API functions for that domain
+   - Each function handles one endpoint, wraps it in proper error handling
+   - Uses the shared `apiClient` from `client.ts` (Axios with interceptors)
+   - Pattern: `export const {domain}Api = { functionName: async (params) => { ... } }`
+
+3. **Hook Layer** (`web/shared/hooks/`)
+   - One file per backend feature domain (e.g., `auth.hooks.ts`, `restaurant.hooks.ts`)
+   - Uses Tanstack Query (`useQuery` for reads, `useMutation` for writes)
+   - Each hook wraps one API function
+   - Handles query invalidation, optimistic updates, and error states
+   - Pattern: `export const use{Feature} = () => { ... }`
+
+#### Example Implementation Flow:
+
+**Backend**: `Features/Restaurant/CreateRestaurant/`
+- `CreateRestaurantCommand.cs` → `CreateRestaurantHandler.cs` → `CreateRestaurantController.cs`
+
+**Frontend**:
+1. **Types** (`web/shared/types/restaurant.types.ts`):
+   ```typescript
+   // MUST match backend CreateRestaurantCommand.cs
+   export interface CreateRestaurantCommand {
+     name: string
+     address: string
+     city: string
+     // ... other fields
+   }
+
+   // MUST match backend CreateRestaurantResult.cs
+   export interface CreateRestaurantResult {
+     id: string
+     name: string
+     // ... other fields
+   }
+   ```
+
+2. **API** (`web/shared/api/restaurant.api.ts`):
+   ```typescript
+   export const restaurantApi = {
+     createRestaurant: async (data: CreateRestaurantCommand): Promise<ResponseData<CreateRestaurantResult>> => {
+       const { data: response } = await apiClient.post<ApiResponse<CreateRestaurantResult>>('/api/restaurants', data)
+       if (!response.success) throw new Error(response.message || 'Failed to create restaurant')
+       return response.data
+     },
+   }
+   ```
+
+3. **Hook** (`web/shared/hooks/restaurant.hooks.ts`):
+   ```typescript
+   export const useCreateRestaurant = () => {
+     const queryClient = useQueryClient()
+
+     return useMutation({
+       mutationFn: (data: CreateRestaurantCommand) => restaurantApi.createRestaurant(data),
+       onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: ['restaurants'] })
+       },
+     })
+   }
+   ```
 
 #### Key Directories:
-- `web/shared/` - Shared utilities, types, API clients, and hooks
+- `web/shared/types/` - TypeScript type definitions (Commands, Queries, Results)
+- `web/shared/api/` - Axios-based API client functions
+- `web/shared/hooks/` - Tanstack Query hooks
+- `web/shared/stores/` - Zustand state management (for UI state, not server state)
 - `web/src/app/` - Next.js app router pages
 - `web/src/components/` - React components (using Shadcn UI)
 
@@ -102,11 +173,18 @@ The frontend follows a structured pattern for API integration:
 - All backend commands/results must have corresponding TypeScript types in `web/shared/types/`
 
 ### Backend Development Flow
-1. Create feature in `BackendApi/Features/`
+1. Create feature in `BackendApi/Features/{Domain}/{Feature}/`
+   - `{Feature}Command.cs` (or `{Feature}Query.cs`)
+   - `{Feature}Handler.cs`
+   - `{Feature}Controller.cs`
 2. Run `dotnet build` and fix all errors before proceeding
-3. Create TypeScript types in `web/shared/types/`
-4. Create API client in `web/shared/api/`
-5. Create React Query hook in `web/shared/hooks/`
+3. Create matching TypeScript types in `web/shared/types/{domain}.types.ts`
+   - Type names MUST exactly match backend Command/Query/Result names
+4. Create API client function in `web/shared/api/{domain}.api.ts`
+   - Add function to existing `{domain}Api` object
+5. Create React Query hook in `web/shared/hooks/{domain}.hooks.ts`
+   - Use `useMutation` for commands (POST/PUT/DELETE)
+   - Use `useQuery` for queries (GET)
 
 ### Frontend Development
 - Use **pnpm** for package management

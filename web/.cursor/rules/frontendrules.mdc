@@ -1,29 +1,157 @@
 ---
-description:
-globs:
+description: Frontend architecture and development rules
+globs: ["**/*.ts", "**/*.tsx", "**/*.jsx"]
 alwaysApply: true
 ---
 
 ## General Rules
-- Use pnpm
-- Use Shadcn
-- Make the solutions short and concise
-- Suggest making a new type or ask for file path if unsure instead of using :any or as any
-- Never duplicate code.
+- Use **pnpm** for package management (NOT npm or yarn)
+- Use **Shadcn UI** components
+- Make solutions short and concise
+- **NO `any` or `unknown` types** - Create proper types or ask for file paths
+- Never duplicate code
+- Always prefer editing existing files over creating new ones
 
-## Backend Architecture (Vertical Slice)
-- Each endpoint gets its own folder in Features/
-- Each folder contains: Controller, Handler, and Command/Query
-- Follow vertical slice architecture pattern
+## Frontend Three-Layer Architecture (MANDATORY)
 
-## Frontend Architecture
-### API Implementation Pattern
-When implementing backend endpoints:
-1. Create types for response (and command/request) in `web/shared/types/`
-2. Create the API function in `web/shared/api/`
-3. Create a hook using TanStack Query in `web/shared/hooks/`
+**CRITICAL**: Every backend feature MUST have files in ALL three layers:
 
-### Component Organization
-- All components go into `stories/`
-- Each component gets a corresponding story file
-- Follow Storybook component structure
+### 1. Type Layer (`shared/types/`)
+- **Type names MUST exactly match backend C# names**
+- Convention: `{Feature}Command`, `{Feature}Query`, `{Feature}Result`
+- One file per domain: `{domain}.types.ts`
+
+Example:
+```typescript
+// shared/types/restaurant.types.ts
+
+// MUST match CreateRestaurantCommand.cs from backend
+export interface CreateRestaurantCommand {
+  name: string
+  address: string
+  city: string
+  // ... all fields matching backend
+}
+
+// MUST match CreateRestaurantResult.cs from backend
+export interface CreateRestaurantResult {
+  id: string
+  name: string
+  // ... all fields matching backend
+}
+```
+
+### 2. API Layer (`shared/api/`)
+- One file per domain: `{domain}.api.ts`
+- Export object pattern: `export const {domain}Api = { ... }`
+- Use shared `apiClient` from `client.ts`
+
+Example:
+```typescript
+// shared/api/restaurant.api.ts
+import { CreateRestaurantCommand, CreateRestaurantResult, ApiResponse, ResponseData } from '../types'
+import apiClient from './client'
+
+export const restaurantApi = {
+  createRestaurant: async (data: CreateRestaurantCommand): Promise<ResponseData<CreateRestaurantResult>> => {
+    const { data: response } = await apiClient.post<ApiResponse<CreateRestaurantResult>>('/api/restaurants', data)
+    if (!response.success) throw new Error(response.message || 'Failed to create restaurant')
+    return response.data
+  },
+}
+```
+
+### 3. Hook Layer (`shared/hooks/`)
+- One file per domain: `{domain}.hooks.ts`
+- Use Tanstack Query:
+  - `useMutation` for commands (POST/PUT/DELETE)
+  - `useQuery` for queries (GET)
+- Always handle query invalidation in `onSuccess`
+
+Example:
+```typescript
+// shared/hooks/restaurant.hooks.ts
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { restaurantApi } from '../api'
+import { CreateRestaurantCommand } from '../types'
+
+export const useCreateRestaurant = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateRestaurantCommand) => restaurantApi.createRestaurant(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['restaurants'] })
+    },
+  })
+}
+```
+
+## Complete Frontend Implementation Flow
+
+When backend adds a new feature:
+
+1. **Types** (`shared/types/{domain}.types.ts`)
+   - Add interfaces matching backend Command/Query/Result
+   - Use exact same names as backend C# types
+
+2. **API** (`shared/api/{domain}.api.ts`)
+   - Add function to existing `{domain}Api` object
+   - Handle errors and unwrap response
+
+3. **Hook** (`shared/hooks/{domain}.hooks.ts`)
+   - Create hook wrapping API function
+   - Use `useMutation` or `useQuery`
+   - Handle cache invalidation
+
+4. **Type Check**
+   ```bash
+   npx tsc --noEmit
+   ```
+
+## State Management
+
+- **Server state**: Use Tanstack Query (in hooks)
+- **UI state**: Use Zustand stores (`shared/stores/`)
+- Never mix server and UI state
+
+## File Organization
+
+```
+web/
+├── shared/
+│   ├── types/       # TypeScript types matching backend
+│   ├── api/         # Axios API client functions
+│   ├── hooks/       # Tanstack Query hooks
+│   ├── stores/      # Zustand stores (UI state only)
+│   └── utils/       # Utility functions
+├── src/
+│   ├── app/         # Next.js pages (App Router)
+│   └── components/  # React components
+```
+
+## Component Guidelines
+
+- Use functional components only
+- Use Shadcn UI components from `src/components/ui/`
+- Each component can have a story file for Storybook
+- Keep components focused and reusable
+
+## Commands
+
+```bash
+pnpm install          # Install dependencies
+pnpm dev              # Run dev server
+pnpm build            # Build for production
+pnpm lint             # Run linting
+pnpm lint:fix         # Fix linting issues
+pnpm format           # Format code
+npx tsc --noEmit      # Type check (run after changes)
+```
+
+## Naming Conventions
+
+- **Types**: Match backend exactly (e.g., `CreateRestaurantCommand`, `UpdateRestaurantCommand`)
+- **API functions**: camelCase (e.g., `createRestaurant`, `getUserRestaurants`)
+- **Hooks**: `use{Feature}` (e.g., `useCreateRestaurant`, `useUserRestaurants`)
+- **Components**: PascalCase (e.g., `RestaurantCard`, `UserProfile`)

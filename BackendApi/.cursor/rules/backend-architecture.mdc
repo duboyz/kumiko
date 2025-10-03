@@ -1,0 +1,236 @@
+---
+description: Backend Vertical Slice Architecture with CQRS
+globs: ["**/*.cs"]
+alwaysApply: true
+---
+
+## Backend Architecture: Vertical Slice + CQRS
+
+Each feature is organized in `Features/{Domain}/{Feature}/` with:
+- `{Feature}Command.cs` or `{Feature}Query.cs` - Request and Result types
+- `{Feature}Handler.cs` - Business logic (implements `IRequestHandler`)
+- `{Feature}Controller.cs` - HTTP endpoint
+
+**Pattern**: Command/Query → Handler → Controller → Result
+
+## Feature Structure Example
+
+```
+Features/
+├── Restaurant/
+│   ├── CreateRestaurant/
+│   │   ├── CreateRestaurantCommand.cs      # Command + Result types
+│   │   ├── CreateRestaurantHandler.cs      # Business logic
+│   │   └── CreateRestaurantController.cs   # HTTP endpoint
+│   ├── UpdateRestaurant/
+│   │   ├── UpdateRestaurantCommand.cs
+│   │   ├── UpdateRestaurantHandler.cs
+│   │   └── UpdateRestaurantController.cs
+│   └── GetUserRestaurants/
+│       ├── GetUserRestaurantsQuery.cs
+│       ├── GetUserRestaurantsHandler.cs
+│       └── GetUserRestaurantsController.cs
+```
+
+## Command/Query Files
+
+Define request and result types in the same file:
+
+```csharp
+// CreateRestaurantCommand.cs
+public record CreateRestaurantCommand : IRequest<Result<CreateRestaurantResult>>
+{
+    public required string Name { get; init; }
+    public required string Address { get; init; }
+    // ... other properties
+}
+
+public record CreateRestaurantResult
+{
+    public required Guid Id { get; init; }
+    public required string Name { get; init; }
+    // ... other properties
+}
+```
+
+**Naming**:
+- Commands: `{Feature}Command` (e.g., `CreateRestaurantCommand`)
+- Queries: `{Feature}Query` (e.g., `GetUserRestaurantsQuery`)
+- Results: `{Feature}Result` (e.g., `CreateRestaurantResult`)
+
+## Handler Files
+
+Implement business logic using MediatR:
+
+```csharp
+// CreateRestaurantHandler.cs
+public class CreateRestaurantHandler : IRequestHandler<CreateRestaurantCommand, Result<CreateRestaurantResult>>
+{
+    private readonly ApplicationDbContext _context;
+
+    public CreateRestaurantHandler(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<Result<CreateRestaurantResult>> Handle(
+        CreateRestaurantCommand request,
+        CancellationToken cancellationToken)
+    {
+        // Business logic here
+        var restaurant = new Restaurant
+        {
+            Name = request.Name,
+            Address = request.Address,
+            // ...
+        };
+
+        _context.Restaurants.Add(restaurant);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Result<CreateRestaurantResult>.Success(new CreateRestaurantResult
+        {
+            Id = restaurant.Id,
+            Name = restaurant.Name,
+            // ...
+        });
+    }
+}
+```
+
+## Controller Files
+
+Handle HTTP requests and return standardized responses:
+
+```csharp
+// CreateRestaurantController.cs
+[ApiController]
+[Route("api/restaurants")]
+public class CreateRestaurantController : BaseController
+{
+    [HttpPost]
+    public async Task<ActionResult<ApiResponse<CreateRestaurantResult>>> CreateRestaurant(
+        [FromBody] CreateRestaurantCommand command)
+    {
+        var result = await Mediator.Send(command);
+        return CreateResponse(result, ApiResponseStatusCode.Created, "Restaurant created successfully");
+    }
+}
+```
+
+**Key Points**:
+- Inherit from `BaseController` (provides `Mediator` and `CreateResponse()`)
+- Use `[Route]` and HTTP method attributes
+- Use `CreateResponse()` for standardized API responses
+- Return `ApiResponse<T>` wrapper
+
+## Result Pattern
+
+All operations return `Result<T>`:
+
+```csharp
+// Success
+return Result<CreateRestaurantResult>.Success(data);
+
+// Failure
+return Result<CreateRestaurantResult>.Failure("Error message");
+return Result<CreateRestaurantResult>.Failure(ErrorCode.NotFound, "Not found");
+```
+
+## BaseController
+
+Controllers inherit from `BaseController`:
+
+```csharp
+public abstract class BaseController : ControllerBase
+{
+    private ISender? _mediator;
+    protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
+
+    protected ActionResult<ApiResponse<T>> CreateResponse<T>(
+        Result<T> result,
+        ApiResponseStatusCode successCode = ApiResponseStatusCode.Success,
+        string? successMessage = null)
+    {
+        // ... implementation
+    }
+}
+```
+
+## Complete Feature Implementation
+
+When adding a new feature:
+
+1. **Create folder**: `Features/{Domain}/{Feature}/`
+
+2. **Command/Query** (`{Feature}Command.cs`):
+   - Define request type implementing `IRequest<Result<TResult>>`
+   - Define result type
+   - Add validation attributes if needed
+
+3. **Handler** (`{Feature}Handler.cs`):
+   - Implement `IRequestHandler<TRequest, Result<TResult>>`
+   - Add business logic
+   - Return `Result<T>` (Success or Failure)
+
+4. **Controller** (`{Feature}Controller.cs`):
+   - Inherit from `BaseController`
+   - Define route and HTTP method
+   - Call `Mediator.Send()` and `CreateResponse()`
+
+5. **Build and test**:
+   ```bash
+   dotnet build
+   dotnet run
+   ```
+
+6. **Frontend integration**:
+   - Create matching TypeScript types in `web/shared/types/`
+   - Create API client in `web/shared/api/`
+   - Create React Query hook in `web/shared/hooks/`
+
+## Database
+
+- Use Entity Framework Core
+- Define entities in `Common/Models/`
+- Create migrations:
+  ```bash
+  dotnet ef migrations add <MigrationName>
+  dotnet ef database update
+  ```
+
+## Dependency Injection
+
+- Register services in `Program.cs`
+- Use constructor injection in handlers
+- Follow SOLID principles
+
+## Commands Reference
+
+```bash
+dotnet build                              # Build project
+dotnet run                                # Run application
+dotnet ef database update                 # Apply migrations
+dotnet ef migrations add <MigrationName>  # Create migration
+docker-compose up -d                      # Start PostgreSQL
+```
+
+## Authentication
+
+- JWT tokens stored in httpOnly cookies
+- Use `[Authorize]` attribute for protected endpoints
+- Access current user via `HttpContext.User`
+
+## API Response Format
+
+All endpoints return:
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Success message",
+  "data": { /* result object */ }
+}
+```
+
+Handled by `CreateResponse()` method.
