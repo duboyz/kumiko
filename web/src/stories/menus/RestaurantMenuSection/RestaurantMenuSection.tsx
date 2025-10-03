@@ -115,7 +115,9 @@ export function RestaurantMenuSection({
                           <div className="flex justify-between items-baseline mb-2">
                             <h4 className="text-lg font-medium">{categoryItem.menuItem?.name}</h4>
                             <span className="text-base text-muted-foreground whitespace-nowrap ml-4">
-                              ${categoryItem.menuItem?.price.toFixed(2)}
+                              {categoryItem.menuItem?.price !== null && categoryItem.menuItem?.price !== undefined
+                                ? `$${categoryItem.menuItem.price.toFixed(2)}`
+                                : 'Variable price'}
                             </span>
                           </div>
                           {categoryItem.menuItem?.description && (

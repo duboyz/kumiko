@@ -23,6 +23,7 @@ public class GetRestaurantMenusHandler(ApplicationDbContext context) : IQueryHan
             .Include(m => m.Categories.OrderBy(c => c.OrderIndex))
             .ThenInclude(c => c.MenuCategoryItems.OrderBy(ci => ci.OrderIndex))
             .ThenInclude(ci => ci.MenuItem)
+            .ThenInclude(mi => mi!.Options.OrderBy(o => o.OrderIndex))
             .ToListAsync(cancellationToken);
 
         var menuDtos = menus.Select(menu => new RestaurantMenuDto(
@@ -46,8 +47,17 @@ public class GetRestaurantMenusHandler(ApplicationDbContext context) : IQueryHan
                         categoryItem.MenuItem.Name,
                         categoryItem.MenuItem.Description,
                         categoryItem.MenuItem.Price,
+                        categoryItem.MenuItem.HasOptions,
                         categoryItem.MenuItem.IsAvailable,
                         categoryItem.MenuItem.RestaurantMenuId,
+                        categoryItem.MenuItem.Options.Select(o => new MenuItemOptionDto(
+                            o.Id,
+                            o.Name,
+                            o.Description,
+                            o.Price,
+                            o.OrderIndex,
+                            o.MenuItemId
+                        )).ToList(),
                         categoryItem.MenuItem.CreatedAt,
                         categoryItem.MenuItem.UpdatedAt ?? DateTime.UtcNow
                     ) : null,

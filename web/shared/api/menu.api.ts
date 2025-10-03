@@ -289,6 +289,7 @@ export const menuApi = {
               name: item.name,
               description: item.description || '',
               price: item.price || 0,
+              hasOptions: false,
               isAvailable: true,
               restaurantMenuId: createdMenu.id,
             })

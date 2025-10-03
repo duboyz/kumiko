@@ -274,6 +274,7 @@ export default function MenuItemTableView({
       name: '',
       description: '',
       price: 0,
+      hasOptions: false,
       isAvailable: true,
       restaurantMenuId: menus[0]?.id || '',
       menuCategoryItems: [],
@@ -755,7 +756,7 @@ export default function MenuItemTableView({
                         <Input
                           type="number"
                           step="0.01"
-                          value={editingItem.price}
+                          value={editingItem.price || ''}
                           onChange={e => updateEditingItem(item.id, 'price', parseFloat(e.target.value) || 0)}
                           onKeyDown={e => handleFieldKeyDown(e, 'price', item.id)}
                           onFocus={() => {
@@ -768,7 +769,9 @@ export default function MenuItemTableView({
                           data-item-id={item.id}
                         />
                       ) : (
-                        <span className="font-medium">${item.price.toFixed(2)}</span>
+                        <span className="font-medium">
+                          {item.price !== null ? `$${item.price.toFixed(2)}` : 'Variable'}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -910,7 +913,7 @@ export default function MenuItemTableView({
                         <Input
                           type="number"
                           step="0.01"
-                          value={item.price}
+                          value={item.price || ''}
                           onChange={e => updateEditingItem(item.id, 'price', parseFloat(e.target.value) || 0)}
                           onKeyDown={e => handleFieldKeyDown(e, 'price', item.id)}
                           onFocus={() => {

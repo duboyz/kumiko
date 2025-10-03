@@ -278,7 +278,9 @@ function MenuItemCard({
               <div className={`w-2 h-2 rounded-full ${item.isAvailable ? 'bg-green-500' : 'bg-gray-400'}`} />
             </div>
             <p className="text-sm text-muted-foreground truncate">{item.description || 'No description'}</p>
-            <p className="text-lg font-semibold text-green-600 mt-1">${item.price.toFixed(2)}</p>
+            <p className="text-lg font-semibold text-green-600 mt-1">
+              {item.price !== null ? `$${item.price.toFixed(2)}` : 'Variable price'}
+            </p>
           </div>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button variant="ghost" size="sm" onClick={() => onEdit(item)}>

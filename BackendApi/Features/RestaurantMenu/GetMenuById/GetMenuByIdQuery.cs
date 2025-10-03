@@ -31,6 +31,16 @@ public record MenuByIdItemDto(
     Guid Id,
     string Name,
     string? Description,
-    decimal Price,
+    decimal? Price,
+    bool HasOptions,
+    IEnumerable<MenuByIdItemOptionDto> Options,
     bool IsAvailable
+);
+
+public record MenuByIdItemOptionDto(
+    Guid Id,
+    string Name,
+    string? Description,
+    decimal Price,
+    int OrderIndex
 );

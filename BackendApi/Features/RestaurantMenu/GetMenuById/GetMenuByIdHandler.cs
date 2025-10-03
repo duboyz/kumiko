@@ -12,6 +12,7 @@ public class GetMenuByIdHandler(ApplicationDbContext context) : IQueryHandler<Ge
             .Include(m => m.Categories)
                 .ThenInclude(c => c.MenuCategoryItems)
                     .ThenInclude(mci => mci.MenuItem)
+                        .ThenInclude(mi => mi!.Options.OrderBy(o => o.OrderIndex))
             .FirstOrDefaultAsync(m => m.Id == request.MenuId, cancellationToken);
 
         if (menu == null)
@@ -36,6 +37,14 @@ public class GetMenuByIdHandler(ApplicationDbContext context) : IQueryHandler<Ge
                             categoryItem.MenuItem.Name,
                             categoryItem.MenuItem.Description,
                             categoryItem.MenuItem.Price,
+                            categoryItem.MenuItem.HasOptions,
+                            categoryItem.MenuItem.Options.Select(o => new MenuByIdItemOptionDto(
+                                o.Id,
+                                o.Name,
+                                o.Description,
+                                o.Price,
+                                o.OrderIndex
+                            )),
                             categoryItem.MenuItem.IsAvailable
                         ) : null
                     ))

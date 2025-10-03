@@ -4,11 +4,22 @@ public record MenuItemDto(
     Guid Id,
     string Name,
     string Description,
-    decimal Price,
+    decimal? Price,
+    bool HasOptions,
     bool IsAvailable,
     Guid RestaurantMenuId,
+    List<MenuItemOptionDto> Options,
     DateTime CreatedAt,
     DateTime UpdatedAt
+);
+
+public record MenuItemOptionDto(
+    Guid Id,
+    string Name,
+    string Description,
+    decimal Price,
+    int OrderIndex,
+    Guid MenuItemId
 );
 
 public record MenuCategoryDto(

@@ -24,7 +24,8 @@ export interface MenuItemDto {
   id: string
   name: string
   description: string
-  price: number
+  price: number | null
+  hasOptions: boolean
   isAvailable: boolean
   restaurantMenuId: string
   menuCategoryItems: MenuCategoryItemDto[]
@@ -49,10 +50,9 @@ export interface MenuItemOptionDto {
   id: string
   name: string
   description: string
-  priceModifier: number
+  price: number
+  orderIndex: number
   menuItemId: string
-  createdAt: string
-  updatedAt: string
 }
 
 export interface AllergenDto {
@@ -79,9 +79,18 @@ export interface CreateMenuCategoryCommand {
 export interface CreateMenuItemCommand {
   name: string
   description: string
-  price: number
+  price: number | null
+  hasOptions: boolean
+  options?: CreateMenuItemOptionDto[]
   isAvailable: boolean
   restaurantMenuId: string
+}
+
+export interface CreateMenuItemOptionDto {
+  name: string
+  description: string
+  price: number
+  orderIndex: number
 }
 
 export interface AddMenuItemToCategoryCommand {
@@ -124,8 +133,18 @@ export interface UpdateMenuItemCommand {
   id: string
   name: string
   description: string
-  price: number
+  price: number | null
+  hasOptions: boolean
+  options?: UpdateMenuItemOptionDto[]
   isAvailable: boolean
+}
+
+export interface UpdateMenuItemOptionDto {
+  id?: string
+  name: string
+  description: string
+  price: number
+  orderIndex: number
 }
 
 export interface UpdateMenuCategoryItemCommand {
@@ -163,8 +182,18 @@ export interface PublicMenuItemDto {
   id: string
   name: string
   description?: string
-  price: number
+  price: number | null
+  hasOptions: boolean
+  options: PublicMenuItemOptionDto[]
   isAvailable: boolean
+}
+
+export interface PublicMenuItemOptionDto {
+  id: string
+  name: string
+  description?: string
+  price: number
+  orderIndex: number
 }
 
 export interface SimpleGenerateMenuFromImageResult {

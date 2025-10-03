@@ -68,6 +68,7 @@ public class CreateMenuStructureHandler(ApplicationDbContext context) : ICommand
                         Name = itemCommand.Name,
                         Description = itemCommand.Description,
                         Price = itemCommand.Price,
+                        HasOptions = false, // Default to no options for menu structure creation
                         IsAvailable = itemCommand.IsAvailable,
                         RestaurantMenuId = restaurantMenu.Id,
                         CreatedAt = DateTime.UtcNow,
@@ -94,7 +95,7 @@ public class CreateMenuStructureHandler(ApplicationDbContext context) : ICommand
                         ItemId = menuItem.Id,
                         Name = menuItem.Name,
                         Description = menuItem.Description,
-                        Price = menuItem.Price,
+                        Price = menuItem.Price ?? 0, // Use default 0 if null
                         OrderIndex = itemCommand.OrderIndex,
                         IsAvailable = menuItem.IsAvailable
                     });

@@ -385,6 +385,9 @@ namespace BackendApi.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
+                    b.Property<bool>("HasOptions")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("boolean");
 
@@ -396,7 +399,7 @@ namespace BackendApi.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
 
@@ -474,6 +477,12 @@ namespace BackendApi.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
 
                     b.Property<decimal>("PriceModifier")
                         .HasPrecision(10, 2)

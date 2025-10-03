@@ -1,4 +1,5 @@
 using BackendApi.Data;
+using BackendApi.Entities;
 using BackendApi.Shared.Contracts;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ public class UpdateMenuItemHandler(ApplicationDbContext context) : ICommandHandl
     public async Task<UpdateMenuItemResult> Handle(UpdateMenuItemCommand request, CancellationToken cancellationToken)
     {
         var menuItem = await context.MenuItems
+            .Include(i => i.Options)
             .FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
 
         if (menuItem == null)
@@ -16,11 +18,82 @@ public class UpdateMenuItemHandler(ApplicationDbContext context) : ICommandHandl
             throw new ArgumentException("Menu item not found");
         }
 
+        // Validate options logic
+        if (request.HasOptions)
+        {
+            if (request.Options == null || request.Options.Count < 2)
+            {
+                throw new ArgumentException("Items with options must have at least 2 options");
+            }
+            if (request.Price != null)
+            {
+                throw new ArgumentException("Items with options should not have a base price");
+            }
+        }
+        else
+        {
+            if (request.Price == null || request.Price <= 0)
+            {
+                throw new ArgumentException("Items without options must have a valid price");
+            }
+        }
+
         menuItem.Name = request.Name;
         menuItem.Description = request.Description;
         menuItem.Price = request.Price;
+        menuItem.HasOptions = request.HasOptions;
         menuItem.IsAvailable = request.IsAvailable;
         menuItem.UpdatedAt = DateTime.UtcNow;
+
+        // Handle options update if item has options
+        if (request.HasOptions && request.Options != null)
+        {
+            // Remove existing options that aren't in the update
+            var optionsToRemove = menuItem.Options
+                .Where(o => !request.Options.Any(ro => ro.Id == o.Id))
+                .ToList();
+
+            foreach (var option in optionsToRemove)
+            {
+                context.MenuItemOptions.Remove(option);
+            }
+
+            // Update or add options
+            foreach (var optionDto in request.Options)
+            {
+                if (optionDto.Id.HasValue)
+                {
+                    // Update existing option
+                    var existingOption = menuItem.Options.FirstOrDefault(o => o.Id == optionDto.Id.Value);
+                    if (existingOption != null)
+                    {
+                        existingOption.Name = optionDto.Name;
+                        existingOption.Description = optionDto.Description;
+                        existingOption.Price = optionDto.Price;
+                        existingOption.OrderIndex = optionDto.OrderIndex;
+                        existingOption.UpdatedAt = DateTime.UtcNow;
+                    }
+                }
+                else
+                {
+                    // Add new option
+                    var newOption = new MenuItemOption
+                    {
+                        Name = optionDto.Name,
+                        Description = optionDto.Description,
+                        Price = optionDto.Price,
+                        OrderIndex = optionDto.OrderIndex,
+                        MenuItemId = menuItem.Id
+                    };
+                    menuItem.Options.Add(newOption);
+                }
+            }
+        }
+        else if (!request.HasOptions)
+        {
+            // Remove all options if item no longer has options
+            context.MenuItemOptions.RemoveRange(menuItem.Options);
+        }
 
         await context.SaveChangesAsync(cancellationToken);
 
@@ -29,6 +102,7 @@ public class UpdateMenuItemHandler(ApplicationDbContext context) : ICommandHandl
             menuItem.Name,
             menuItem.Description,
             menuItem.Price,
+            menuItem.HasOptions,
             menuItem.IsAvailable,
             menuItem.RestaurantMenuId
         );
