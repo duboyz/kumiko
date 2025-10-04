@@ -3,6 +3,13 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { SplitText } from 'gsap/SplitText'
+import { Bebas_Neue } from 'next/font/google'
+
+const bebasNeue = Bebas_Neue({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 // Register the SplitText plugin
 gsap.registerPlugin(SplitText)
@@ -56,7 +63,7 @@ export function HeroSection({}: HeroSectionProps) {
       kumikoIn: { duration: 0.5, stagger: 0.1 },
       kumikoHold: { duration: 0.3 },
       kumikoOut: { duration: 0.4, stagger: 0.05 },
-      lineDelay: 0.15, // Delay between each line (reduced from 0.3)
+      lineDelay: 0.05, // Delay between each line (reduced from 0.3)
       lineDuration: 0.4, // Faster line animation (reduced from 0.6)
       descriptionDelay: 0.1, // Faster description (reduced from 0.2)
       buttonDelay: 0.1, // Faster button (reduced from 0.2)
@@ -192,15 +199,13 @@ export function HeroSection({}: HeroSectionProps) {
   return (
     <div
       ref={heroRef}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 relative overflow-hidden"
+      className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 relative overflow-hidden ${bebasNeue.className}`}
     >
       {/* Title Section */}
       <h1
         ref={titleRef}
         className="absolute text-7xl font-bold text-gray-800 text-center uppercase z-10"
         style={{
-          fontFamily: "'Montserrat', sans-serif",
-          fontWeight: 400,
           fontSize: '9rem',
           lineHeight: '10rem',
           clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)',
@@ -217,13 +222,7 @@ export function HeroSection({}: HeroSectionProps) {
       >
         {/* Hero Text */}
         <div ref={heroTextRef} className="flex-1 pr-12" style={{ transformStyle: 'preserve-3d' }}>
-          <h2
-            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-800 mb-8 leading-tight max-w-4xl"
-            style={{
-              fontFamily: "'Montserrat', sans-serif",
-              fontWeight: 700,
-            }}
-          >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-800 mb-8 leading-tight max-w-4xl">
             <span ref={line1Ref} className="inline">
               DIGITIZE YOUR
             </span>{' '}
