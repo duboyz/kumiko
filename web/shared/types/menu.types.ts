@@ -168,6 +168,7 @@ export interface GetMenuByIdResult {
   id: string
   name: string
   description?: string
+  restaurantId: string
   categories: PublicMenuCategoryDto[]
 }
 
@@ -192,6 +193,7 @@ export interface PublicMenuItemDto {
   price: number | null
   hasOptions: boolean
   options: PublicMenuItemOptionDto[]
+  allergens: AllergenDto[]
   isAvailable: boolean
 }
 
