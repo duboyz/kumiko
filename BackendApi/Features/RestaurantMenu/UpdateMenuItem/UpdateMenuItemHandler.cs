@@ -11,6 +11,7 @@ public class UpdateMenuItemHandler(ApplicationDbContext context) : ICommandHandl
     {
         var menuItem = await context.MenuItems
             .Include(i => i.Options)
+            .Include(i => i.Allergens)
             .FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
 
         if (menuItem == null)
@@ -93,6 +94,42 @@ public class UpdateMenuItemHandler(ApplicationDbContext context) : ICommandHandl
         {
             // Remove all options if item no longer has options
             context.MenuItemOptions.RemoveRange(menuItem.Options);
+        }
+
+        // Handle allergens update
+        if (request.AllergenIds != null)
+        {
+            // Remove existing allergens that aren't in the update
+            var allergensToRemove = menuItem.Allergens
+                .Where(a => !request.AllergenIds.Contains(a.AllergenId))
+                .ToList();
+
+            foreach (var allergen in allergensToRemove)
+            {
+                context.MenuItemAllergens.Remove(allergen);
+            }
+
+            // Add new allergens
+            var existingAllergenIds = menuItem.Allergens.Select(a => a.AllergenId).ToList();
+            var allergensToAdd = request.AllergenIds
+                .Where(id => !existingAllergenIds.Contains(id))
+                .ToList();
+
+            foreach (var allergenId in allergensToAdd)
+            {
+                var allergen = await context.Allergens.FindAsync([allergenId], cancellationToken);
+                if (allergen != null)
+                {
+                    var menuItemAllergen = new MenuItemAllergen
+                    {
+                        Id = Guid.NewGuid(),
+                        MenuItemId = menuItem.Id,
+                        AllergenId = allergenId,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    context.MenuItemAllergens.Add(menuItemAllergen);
+                }
+            }
         }
 
         await context.SaveChangesAsync(cancellationToken);

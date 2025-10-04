@@ -9,7 +9,8 @@ public record CreateMenuItemCommand(
     bool HasOptions,
     List<CreateMenuItemOptionDto>? Options,
     bool IsAvailable,
-    Guid RestaurantMenuId
+    Guid RestaurantMenuId,
+    List<Guid>? AllergenIds
 ) : ICommand<CreateMenuItemResult>;
 
 public record CreateMenuItemOptionDto(

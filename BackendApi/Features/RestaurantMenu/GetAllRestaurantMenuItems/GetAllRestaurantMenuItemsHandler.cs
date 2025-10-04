@@ -21,6 +21,8 @@ public class GetAllRestaurantMenuItemsHandler(ApplicationDbContext context) : IQ
         // Get all menu items for ALL menus of this restaurant
         var menuItems = await context.MenuItems
             .Include(i => i.Options.OrderBy(o => o.OrderIndex))
+            .Include(i => i.Allergens)
+                .ThenInclude(ma => ma.Allergen)
             .Where(i => context.RestaurantMenus
                 .Where(m => m.RestaurantId == request.RestaurantId)
                 .Select(m => m.Id)
@@ -43,6 +45,11 @@ public class GetAllRestaurantMenuItemsHandler(ApplicationDbContext context) : IQ
                 o.Price,
                 o.OrderIndex,
                 o.MenuItemId
+            )).ToList(),
+            item.Allergens.Select(ma => new AllergenDto(
+                ma.Allergen.Id,
+                ma.Allergen.Name,
+                ma.Allergen.Description
             )).ToList(),
             item.CreatedAt,
             item.UpdatedAt ?? DateTime.UtcNow

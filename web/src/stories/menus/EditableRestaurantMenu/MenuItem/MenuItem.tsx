@@ -1,11 +1,13 @@
 import { MenuItemDto, useDeleteMenuItem, useUpdateMenuItem, UpdateMenuItemOptionDto } from '@shared'
-import { Edit, Save, Trash, Plus, Trash2 } from 'lucide-react'
+import { Edit, Save, Trash, Plus, Trash2, AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import { FormField } from '@/components'
+import { AllergenSelector } from '@/components/menus'
 
 export const MenuItem = ({ item }: { item: MenuItemDto }) => {
   const [isEditable, setIsEditable] = useState(false)
@@ -33,6 +35,9 @@ const Editable = ({ menuItem, setIsEditable }: EditableProps) => {
           { name: '', description: '', price: 0, orderIndex: 0 },
           { name: '', description: '', price: 0, orderIndex: 1 }
         ]
+  )
+  const [selectedAllergenIds, setSelectedAllergenIds] = useState<string[]>(
+    menuItem.allergens?.map(a => a.id) || []
   )
 
   const handleChange = (property: keyof MenuItemDto, value: MenuItemDto[keyof MenuItemDto]) => {
@@ -82,6 +87,7 @@ const Editable = ({ menuItem, setIsEditable }: EditableProps) => {
             .map((o, idx) => ({ ...o, orderIndex: idx }))
         : undefined,
       isAvailable: editableMenuItem.isAvailable,
+      allergenIds: selectedAllergenIds.length > 0 ? selectedAllergenIds : undefined,
     })
     setIsEditable(false)
   }
@@ -180,6 +186,13 @@ const Editable = ({ menuItem, setIsEditable }: EditableProps) => {
             ))}
           </div>
         )}
+
+        <FormField label="Allergens" htmlFor="allergens">
+          <AllergenSelector
+            selectedAllergenIds={selectedAllergenIds}
+            onChange={setSelectedAllergenIds}
+          />
+        </FormField>
       </div>
 
       <div className="flex gap-3">
@@ -229,6 +242,17 @@ export const NonEditable = ({ menuItem, setIsEditable }: NonEditableProps) => {
                   <span className="text-muted-foreground">${option.price.toFixed(2)}</span>
                 </div>
               ))}
+          </div>
+        )}
+
+        {menuItem.allergens && menuItem.allergens.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            <AlertCircle className="w-3.5 h-3.5 text-orange-500 mt-0.5" />
+            {menuItem.allergens.map(allergen => (
+              <Badge key={allergen.id} variant="secondary" className="text-xs">
+                {allergen.name}
+              </Badge>
+            ))}
           </div>
         )}
       </div>

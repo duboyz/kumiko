@@ -14,10 +14,11 @@ import {
 import { useLocationSelection } from '@shared'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 
 import Link from 'next/link'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
-import { Plus, Edit, Trash2, Package, Upload, CheckCircle } from 'lucide-react'
+import { Plus, Edit, Trash2, Package, Upload, CheckCircle, AlertCircle } from 'lucide-react'
 import { useState, useEffect, Suspense } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
@@ -281,6 +282,21 @@ function MenuItemCard({
             <p className="text-lg font-semibold text-green-600 mt-1">
               {item.price !== null ? `$${item.price.toFixed(2)}` : 'Variable price'}
             </p>
+            {item.allergens && item.allergens.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1 items-center">
+                <AlertCircle className="w-3 h-3 text-orange-500" />
+                {item.allergens.slice(0, 3).map(allergen => (
+                  <Badge key={allergen.id} variant="secondary" className="text-xs">
+                    {allergen.name}
+                  </Badge>
+                ))}
+                {item.allergens.length > 3 && (
+                  <Badge variant="secondary" className="text-xs">
+                    +{item.allergens.length - 3}
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button variant="ghost" size="sm" onClick={() => onEdit(item)}>

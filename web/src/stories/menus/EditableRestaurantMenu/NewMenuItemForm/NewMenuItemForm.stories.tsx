@@ -27,6 +27,7 @@ const mockCategory: MenuCategoryDto = {
         name: 'Spring Rolls',
         description: 'Fresh vegetables wrapped in crispy spring roll wrapper',
         price: 12.99,
+  hasOptions: false,
         isAvailable: true,
         restaurantMenuId: 'dafadd2c-83e1-408e-9204-56ccb358bb89',
         menuCategoryItems: [],

@@ -84,6 +84,7 @@ export interface CreateMenuItemCommand {
   options?: CreateMenuItemOptionDto[]
   isAvailable: boolean
   restaurantMenuId: string
+  allergenIds?: string[]
 }
 
 export interface CreateMenuItemOptionDto {
@@ -137,6 +138,7 @@ export interface UpdateMenuItemCommand {
   hasOptions: boolean
   options?: UpdateMenuItemOptionDto[]
   isAvailable: boolean
+  allergenIds?: string[]
 }
 
 export interface UpdateMenuItemOptionDto {
@@ -154,6 +156,11 @@ export interface UpdateMenuCategoryItemCommand {
 
 export interface DeleteRestaurantMenuCommand {
   id: string
+}
+
+// Allergen types
+export interface GetAllergensResult {
+  allergens: AllergenDto[]
 }
 
 // Public menu types

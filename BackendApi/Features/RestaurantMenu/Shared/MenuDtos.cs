@@ -9,6 +9,7 @@ public record MenuItemDto(
     bool IsAvailable,
     Guid RestaurantMenuId,
     List<MenuItemOptionDto> Options,
+    List<AllergenDto> Allergens,
     DateTime CreatedAt,
     DateTime UpdatedAt
 );
@@ -51,4 +52,10 @@ public record RestaurantMenuDto(
     List<MenuCategoryDto> Categories,
     DateTime CreatedAt,
     DateTime UpdatedAt
+);
+
+public record AllergenDto(
+    Guid Id,
+    string Name,
+    string Description
 );

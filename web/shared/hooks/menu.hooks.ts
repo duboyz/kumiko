@@ -305,3 +305,12 @@ export const useGenerateMenuFromImage = () => {
     },
   })
 }
+
+// Get all allergens
+export const useAllergens = () => {
+  return useQuery({
+    queryKey: ['allergens'],
+    queryFn: () => menuApi.getAllergens(),
+    staleTime: 60 * 60 * 1000, // 1 hour - allergens rarely change
+  })
+}
