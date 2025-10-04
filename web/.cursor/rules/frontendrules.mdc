@@ -127,15 +127,31 @@ web/
 │   └── utils/       # Utility functions
 ├── src/
 │   ├── app/         # Next.js pages (App Router)
-│   └── components/  # React components
+│   ├── components/  # Shadcn UI components ONLY (ui/ directory)
+│   └── stories/     # ALL custom components go here
 ```
 
 ## Component Guidelines
 
+- **CRITICAL**: ALL custom components MUST go in `src/stories/`, NOT in `src/components/`
+- `src/components/` is ONLY for Shadcn UI components (in the `ui/` subdirectory)
+- Structure: `src/stories/{domain}/{ComponentName}/{ComponentName}.tsx`
+- Always include an `index.ts` file that exports the component
 - Use functional components only
-- Use Shadcn UI components from `src/components/ui/`
-- Each component can have a story file for Storybook
+- Each component can have a `.stories.tsx` file for Storybook
 - Keep components focused and reusable
+
+### Component Location Examples:
+```
+✅ CORRECT:
+src/stories/menus/AllergenSelector/AllergenSelector.tsx
+src/stories/menus/AllergenSelector/index.ts
+src/stories/restaurants/RestaurantCard/RestaurantCard.tsx
+
+❌ WRONG:
+src/components/menus/AllergenSelector.tsx
+src/components/AllergenSelector.tsx
+```
 
 ## Commands
 

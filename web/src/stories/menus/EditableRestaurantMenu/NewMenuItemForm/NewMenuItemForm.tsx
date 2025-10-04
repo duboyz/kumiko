@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { MenuCategoryDto, useCreateMenuItem, useAddMenuItemToCategory, CreateMenuItemOptionDto } from '@shared'
 import { useState } from 'react'
 import { FormField } from '@/components'
-import { AllergenSelector } from '@/components/menus'
+import { AllergenSelector } from '@/stories/menus/AllergenSelector'
 import { Plus, Trash2 } from 'lucide-react'
 
 interface NewMenuItemFormProps {

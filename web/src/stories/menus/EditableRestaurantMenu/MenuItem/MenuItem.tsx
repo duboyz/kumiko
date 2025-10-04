@@ -7,7 +7,7 @@ import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { FormField } from '@/components'
-import { AllergenSelector } from '@/components/menus'
+import { AllergenSelector } from '@/stories/menus/AllergenSelector'
 
 export const MenuItem = ({ item }: { item: MenuItemDto }) => {
   const [isEditable, setIsEditable] = useState(false)
