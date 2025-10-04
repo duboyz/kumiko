@@ -10,6 +10,7 @@ public record GetMenuByIdResult(
     Guid Id,
     string Name,
     string? Description,
+    Guid RestaurantId,
     IEnumerable<MenuByIdCategoryDto> Categories
 );
 
@@ -34,7 +35,14 @@ public record MenuByIdItemDto(
     decimal? Price,
     bool HasOptions,
     IEnumerable<MenuByIdItemOptionDto> Options,
+    IEnumerable<MenuByIdAllergenDto> Allergens,
     bool IsAvailable
+);
+
+public record MenuByIdAllergenDto(
+    Guid Id,
+    string Name,
+    string Description
 );
 
 public record MenuByIdItemOptionDto(

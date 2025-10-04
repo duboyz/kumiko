@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Settings, ShoppingCart } from 'lucide-react'
 import { RestaurantMenuDto, GetMenuByIdResult } from '@shared/types'
+import { OrderForm } from '@/stories/orders/OrderForm'
 
 interface RestaurantMenuSectionProps {
   restaurantMenu: RestaurantMenuDto | GetMenuByIdResult
@@ -15,6 +16,7 @@ interface RestaurantMenuSectionProps {
   isEditing?: boolean
   availableMenus?: RestaurantMenuDto[]
   currentMenuId?: string
+  restaurantId?: string
   onUpdate?: (field: string, value: string | boolean) => void
 }
 
@@ -25,10 +27,28 @@ export function RestaurantMenuSection({
   isEditing = false,
   availableMenus = [],
   currentMenuId,
+  restaurantId,
   onUpdate,
 }: RestaurantMenuSectionProps) {
   const handleAddToCart = (_itemId: string, itemName: string) => {
     alert(`Not implemented yet: Adding "${itemName}" to cart`)
+  }
+
+  // Check if we can use the full OrderForm
+  const canUseOrderForm = 
+    allowOrdering && 
+    !isEditing && 
+    restaurantId && 
+    'categories' in restaurantMenu &&
+    restaurantMenu.categories.length > 0
+
+  // If ordering is enabled and we have all the data, use the full OrderForm
+  if (canUseOrderForm) {
+    return (
+      <section className={`relative py-20 px-10 bg-white ${className}`}>
+        <OrderForm menu={restaurantMenu as GetMenuByIdResult} restaurantId={restaurantId!} />
+      </section>
+    )
   }
 
   return (

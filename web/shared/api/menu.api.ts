@@ -18,6 +18,8 @@ import {
   UpdateMenuCategoryItemCommand,
   GetMenuByIdResult,
   SimpleGenerateMenuFromImageResult,
+  GetAllergensResult,
+  AllergenDto,
 } from '../types/menu.types'
 import { ApiResponse, ResponseData } from '../types/apiResponse.types'
 
@@ -315,5 +317,11 @@ export const menuApi = {
       description: createdMenu.description,
       restaurantId: createdMenu.restaurantId,
     }
+  },
+
+  getAllergens: async (): Promise<ResponseData<AllergenDto[]>> => {
+    const { data: response } = await client.get<ApiResponse<GetAllergensResult>>('/api/allergens')
+    if (!response.success || !response.data) throw new Error(response.message || 'Failed to get allergens')
+    return response.data.allergens
   },
 }

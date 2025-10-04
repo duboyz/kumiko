@@ -36,6 +36,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<RestaurantMenuSection> RestaurantMenuSections { get; set; }
     public DbSet<TextAndImageSection> TextAndImageSections { get; set; }
 
+    // Order-related DbSets
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -46,5 +50,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ConfigureMenu();
         modelBuilder.ConfigureWebsite();
         modelBuilder.ConfigureHospitality();
+        modelBuilder.ConfigureOrder();
     }
 }

@@ -72,6 +72,27 @@ public class CreateMenuItemHandler(ApplicationDbContext context) : ICommandHandl
         }
 
         context.MenuItems.Add(menuItem);
+
+        // Add allergens if provided
+        if (request.AllergenIds != null && request.AllergenIds.Count > 0)
+        {
+            foreach (var allergenId in request.AllergenIds)
+            {
+                var allergen = await context.Allergens.FindAsync([allergenId], cancellationToken);
+                if (allergen != null)
+                {
+                    var menuItemAllergen = new MenuItemAllergen
+                    {
+                        Id = Guid.NewGuid(),
+                        MenuItemId = menuItem.Id,
+                        AllergenId = allergenId,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    context.MenuItemAllergens.Add(menuItemAllergen);
+                }
+            }
+        }
+
         await context.SaveChangesAsync(cancellationToken);
 
         return new CreateMenuItemResult(

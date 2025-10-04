@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import { MenuCategoryDto, useCreateMenuItem, useAddMenuItemToCategory, CreateMenuItemOptionDto } from '@shared'
 import { useState } from 'react'
 import { FormField } from '@/components'
+import { AllergenSelector } from '@/stories/menus/AllergenSelector'
 import { Plus, Trash2 } from 'lucide-react'
 
 interface NewMenuItemFormProps {
@@ -23,6 +24,7 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
     { name: '', description: '', price: 0, orderIndex: 0 },
     { name: '', description: '', price: 0, orderIndex: 1 }
   ])
+  const [selectedAllergenIds, setSelectedAllergenIds] = useState<string[]>([])
 
   const { mutate: createMenuItem } = useCreateMenuItem()
   const { mutate: addItemToCategory } = useAddMenuItemToCategory()
@@ -50,6 +52,7 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
         : undefined,
       isAvailable: true,
       restaurantMenuId: category.restaurantMenuId,
+      allergenIds: selectedAllergenIds.length > 0 ? selectedAllergenIds : undefined,
     }
 
     createMenuItem(itemData, {
@@ -190,6 +193,13 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
               ))}
             </div>
           )}
+
+          <FormField label="Allergens" htmlFor="allergens">
+            <AllergenSelector
+              selectedAllergenIds={selectedAllergenIds}
+              onChange={setSelectedAllergenIds}
+            />
+          </FormField>
         </div>
 
         <div className="flex gap-3">

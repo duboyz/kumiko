@@ -20,6 +20,8 @@ public class GetRestaurantMenuItemsHandler(ApplicationDbContext context) : IQuer
 
         var menuItems = await context.MenuItems
             .Include(i => i.Options.OrderBy(o => o.OrderIndex))
+            .Include(i => i.Allergens)
+                .ThenInclude(ma => ma.Allergen)
             .Where(i => i.RestaurantMenuId == request.RestaurantMenuId)
             .OrderBy(i => i.Name)
             .ToListAsync(cancellationToken);
@@ -39,6 +41,11 @@ public class GetRestaurantMenuItemsHandler(ApplicationDbContext context) : IQuer
                 o.Price,
                 o.OrderIndex,
                 o.MenuItemId
+            )).ToList(),
+            item.Allergens.Select(ma => new AllergenDto(
+                ma.Allergen.Id,
+                ma.Allergen.Name,
+                ma.Allergen.Description
             )).ToList(),
             item.CreatedAt,
             item.UpdatedAt ?? DateTime.UtcNow

@@ -43,7 +43,7 @@ function MenuSectionWithFetch({
     )
   }
 
-  return <RestaurantMenuSection restaurantMenu={menuData} allowOrdering={allowOrdering} isEditing={false} />
+  return <RestaurantMenuSection restaurantMenu={menuData} allowOrdering={allowOrdering} isEditing={false} restaurantId={menuData.restaurantId} />
 }
 
 export function WebsitePage({ page, className = '', availableMenus = [] }: WebsitePageProps) {
