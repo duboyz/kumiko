@@ -6,7 +6,8 @@ import { MenuCategoryDto, useCreateMenuItem, useAddMenuItemToCategory, CreateMen
 import { useState } from 'react'
 import { FormField } from '@/components'
 import { AllergenSelector } from '@/stories/menus/AllergenSelector'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, X } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface NewMenuItemFormProps {
   onCancel: () => void
@@ -26,18 +27,39 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
   ])
   const [selectedAllergenIds, setSelectedAllergenIds] = useState<string[]>([])
 
-  const { mutate: createMenuItem } = useCreateMenuItem()
+  const { mutate: createMenuItem, isPending } = useCreateMenuItem()
   const { mutate: addItemToCategory } = useAddMenuItemToCategory()
+
+  const resetForm = () => {
+    setName('')
+    setDescription('')
+    setPrice('')
+    setHasOptions(false)
+    setOptions([
+      { name: '', description: '', price: 0, orderIndex: 0 },
+      { name: '', description: '', price: 0, orderIndex: 1 }
+    ])
+    setSelectedAllergenIds([])
+  }
 
   const handleCreateMenuItem = () => {
     const parsedPrice = hasOptions ? null : parseFloat(price)
 
     // Validation
-    if (!name.trim()) return
-    if (!hasOptions && (!parsedPrice || parsedPrice <= 0)) return
+    if (!name.trim()) {
+      toast.error('Please enter a name for the menu item')
+      return
+    }
+    if (!hasOptions && (!parsedPrice || parsedPrice <= 0)) {
+      toast.error('Please enter a valid price')
+      return
+    }
     if (hasOptions) {
       const validOptions = options.filter(o => o.name.trim() && o.price > 0)
-      if (validOptions.length < 2) return
+      if (validOptions.length < 2) {
+        toast.error('Please add at least 2 valid options')
+        return
+      }
     }
 
     const itemData = {
@@ -66,11 +88,20 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
           },
           {
             onSuccess: () => {
+              toast.success('Menu item added successfully')
+              resetForm()
+              setIsVisible(false)
               onCancel()
             },
+            onError: () => {
+              toast.error('Failed to add menu item to category')
+            }
           }
         )
       },
+      onError: () => {
+        toast.error('Failed to create menu item')
+      }
     })
   }
 
@@ -89,49 +120,47 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
     setOptions(newOptions)
   }
 
-  if (!isVisible)
+  const handleCancel = () => {
+    resetForm()
+    setIsVisible(false)
+    onCancel()
+  }
+
+  if (!isVisible) {
     return (
-      <Button onClick={() => setIsVisible(true)} variant="secondary">
-        Add New Item
+      <Button variant="outline" size="sm" onClick={() => setIsVisible(true)}>
+        <Plus className="w-4 h-4 mr-2" />
+        Add Menu Item
       </Button>
     )
+  }
 
   return (
-    <div className="pb-6 mb-6 border-b">
-      <div className="flex flex-col gap-6">
-        <h4 className="text-sm font-semibold uppercase text-muted-foreground">New Menu Item</h4>
+    <div className="py-4 px-4 bg-muted/30 rounded-lg border-2 border-dashed border-primary/20">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-sm font-semibold text-muted-foreground">NEW MENU ITEM</h4>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleCancel}
+            disabled={isPending}
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField label="Item Name" htmlFor="newItemName">
             <Input
               id="newItemName"
               placeholder="Enter item name"
-              type="text"
               value={name}
               onChange={e => setName(e.target.value)}
             />
           </FormField>
 
-          <FormField label="Item Description" htmlFor="newItemDescription">
-            <Input
-              id="newItemDescription"
-              placeholder="Enter item description"
-              type="text"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-            />
-          </FormField>
-
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="hasOptions"
-              checked={hasOptions}
-              onCheckedChange={setHasOptions}
-            />
-            <Label htmlFor="hasOptions">Has size/option variants</Label>
-          </div>
-
-          {!hasOptions ? (
+          {!hasOptions && (
             <FormField label="Price" htmlFor="newItemPrice">
               <Input
                 id="newItemPrice"
@@ -142,23 +171,40 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
                 onChange={e => setPrice(e.target.value)}
               />
             </FormField>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label>Options (minimum 2 required)</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addOption}
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Add Option
-                </Button>
-              </div>
+          )}
+        </div>
 
+        <FormField label="Description" htmlFor="newItemDescription">
+          <Input
+            id="newItemDescription"
+            placeholder="Enter item description"
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+          />
+        </FormField>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="hasOptions"
+            checked={hasOptions}
+            onCheckedChange={setHasOptions}
+          />
+          <Label htmlFor="hasOptions">Has size/option variants</Label>
+        </div>
+
+        {hasOptions && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Options (minimum 2 required)</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addOption}>
+                <Plus className="w-4 h-4 mr-1" />
+                Add Option
+              </Button>
+            </div>
+
+            <div className="space-y-2">
               {options.map((option, index) => (
-                <div key={index} className="flex gap-2 p-3 border rounded-lg">
+                <div key={index} className="flex gap-2 p-2 border rounded-md bg-background">
                   <div className="flex-1 space-y-2">
                     <Input
                       placeholder="Option name (e.g., Small, Large)"
@@ -166,12 +212,12 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
                       onChange={e => updateOption(index, 'name', e.target.value)}
                     />
                     <Input
-                      placeholder="Option description (optional)"
+                      placeholder="Description (optional)"
                       value={option.description}
                       onChange={e => updateOption(index, 'description', e.target.value)}
                     />
                   </div>
-                  <div className="w-32">
+                  <div className="w-24">
                     <Input
                       placeholder="Price"
                       type="number"
@@ -192,22 +238,22 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
                 </div>
               ))}
             </div>
-          )}
+          </div>
+        )}
 
-          <FormField label="Allergens" htmlFor="allergens">
-            <AllergenSelector
-              selectedAllergenIds={selectedAllergenIds}
-              onChange={setSelectedAllergenIds}
-            />
-          </FormField>
-        </div>
+        <FormField label="Allergens" htmlFor="allergens">
+          <AllergenSelector
+            selectedAllergenIds={selectedAllergenIds}
+            onChange={setSelectedAllergenIds}
+          />
+        </FormField>
 
-        <div className="flex gap-3">
-          <Button onClick={onCancel} variant="secondary">
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="outline" onClick={handleCancel} disabled={isPending}>
             Cancel
           </Button>
-          <Button onClick={handleCreateMenuItem} variant="default">
-            Save
+          <Button onClick={handleCreateMenuItem} disabled={isPending}>
+            {isPending ? 'Adding...' : 'Add Item'}
           </Button>
         </div>
       </div>

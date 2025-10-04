@@ -3,6 +3,8 @@ import { Input } from '@/components/ui/input'
 import { RestaurantMenuDto, useCreateMenuCategory } from '@shared'
 import { useState } from 'react'
 import { FormField } from '@/components'
+import { Plus, X } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface NewCategoryFormProps {
   onCancel: () => void
@@ -15,47 +17,75 @@ export const NewCategoryForm = ({ onCancel, menu, isVisible, setIsVisible }: New
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
 
-  const { mutate: createCategory } = useCreateMenuCategory()
+  const { mutate: createCategory, isPending } = useCreateMenuCategory()
 
-  const handleCreateCategory = (categoryData: { name: string; description: string }) => {
-    createCategory(
-      {
-        name: categoryData.name,
-        description: categoryData.description,
-        orderIndex: menu.categories.length,
-        restaurantMenuId: menu.id,
-      },
-      { onSuccess: () => onCancel() }
-    )
+  const resetForm = () => {
+    setName('')
+    setDescription('')
   }
 
   const handleSubmit = () => {
-    if (name.trim()) {
-      handleCreateCategory({ name: name.trim(), description: description.trim() })
-
-      setName('')
-      setDescription('')
+    if (!name.trim()) {
+      toast.error('Please enter a category name')
+      return
     }
+
+    createCategory(
+      {
+        name: name.trim(),
+        description: description.trim(),
+        orderIndex: menu.categories.length,
+        restaurantMenuId: menu.id,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Category added successfully')
+          resetForm()
+          setIsVisible(false)
+          onCancel()
+        },
+        onError: () => {
+          toast.error('Failed to create category')
+        }
+      }
+    )
   }
 
-  if (!isVisible)
+  const handleCancel = () => {
+    resetForm()
+    setIsVisible(false)
+    onCancel()
+  }
+
+  if (!isVisible) {
     return (
-      <Button onClick={() => setIsVisible(true)} variant="secondary">
-        Add New Category
+      <Button variant="outline" onClick={() => setIsVisible(true)}>
+        <Plus className="w-4 h-4 mr-2" />
+        Add Category
       </Button>
     )
+  }
 
   return (
-    <div className="pb-8 mb-8 border-b">
-      <div className="flex flex-col gap-6">
-        <h4 className="text-sm font-semibold uppercase text-muted-foreground">New Category</h4>
+    <div className="py-4 px-4 bg-muted/30 rounded-lg border-2 border-dashed border-primary/20">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-sm font-semibold text-muted-foreground">NEW CATEGORY</h4>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleCancel}
+            disabled={isPending}
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField label="Category Name" htmlFor="newCategoryName">
             <Input
               id="newCategoryName"
-              placeholder="Enter category name"
-              type="text"
+              placeholder="e.g., Appetizers, Main Courses, Desserts"
               value={name}
               onChange={e => setName(e.target.value)}
             />
@@ -63,20 +93,19 @@ export const NewCategoryForm = ({ onCancel, menu, isVisible, setIsVisible }: New
           <FormField label="Category Description" htmlFor="newCategoryDescription">
             <Input
               id="newCategoryDescription"
-              placeholder="Enter category description"
-              type="text"
+              placeholder="Optional description"
               value={description}
               onChange={e => setDescription(e.target.value)}
             />
           </FormField>
         </div>
 
-        <div className="flex gap-3">
-          <Button onClick={onCancel} variant="secondary">
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="outline" onClick={handleCancel} disabled={isPending}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} variant="default">
-            Save
+          <Button onClick={handleSubmit} disabled={isPending}>
+            {isPending ? 'Adding...' : 'Add Category'}
           </Button>
         </div>
       </div>

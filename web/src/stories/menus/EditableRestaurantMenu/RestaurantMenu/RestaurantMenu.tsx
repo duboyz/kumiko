@@ -4,7 +4,8 @@ import { MenuCategory } from '../MenuCategory'
 import { NewCategoryForm } from '../NewCategoryForm'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { FormField } from '@/components'
+import { Edit, X, Check } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface RestaurantMenuProps {
   menu?: RestaurantMenuDto
@@ -12,77 +13,107 @@ interface RestaurantMenuProps {
 
 export const RestaurantMenu = ({ menu }: RestaurantMenuProps) => {
   const [showNewCategoryForm, setShowNewCategoryForm] = useState(false)
-  const [isEditable, setIsEditable] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [menuName, setMenuName] = useState(menu?.name || '')
   const [menuDescription, setMenuDescription] = useState(menu?.description || '')
 
-  const { mutate: updateMenu } = useUpdateRestaurantMenu()
+  const { mutate: updateMenu, isPending: isUpdating } = useUpdateRestaurantMenu()
 
   if (!menu) return <div className="text-center py-20 text-muted-foreground">No menu found, create a new menu</div>
 
   const handleCancelNewCategory = () => setShowNewCategoryForm(false)
 
   const handleSave = () => {
-    updateMenu({
-      id: menu.id,
-      name: menuName,
-      description: menuDescription,
-    })
-    setIsEditable(false)
+    if (!menuName.trim()) {
+      toast.error('Please enter a menu name')
+      return
+    }
+
+    updateMenu(
+      {
+        id: menu.id,
+        name: menuName,
+        description: menuDescription,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Menu updated successfully')
+          setIsEditing(false)
+        },
+        onError: () => {
+          toast.error('Failed to update menu')
+        }
+      }
+    )
+  }
+
+  const handleStartEdit = () => {
+    setMenuName(menu.name || '')
+    setMenuDescription(menu.description || '')
+    setIsEditing(true)
+  }
+
+  const handleCancel = () => {
+    setIsEditing(false)
   }
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-row gap-6 justify-between items-start pb-6 border-b">
-        {isEditable ? (
-          <div className="flex-1 flex flex-col gap-4">
-            <FormField label="Menu Name" htmlFor="menuName">
+        {isEditing ? (
+          <div className="flex-1 flex items-center gap-4">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                id="menuName"
                 placeholder="Menu Name"
-                type="text"
                 value={menuName}
                 onChange={e => setMenuName(e.target.value)}
               />
-            </FormField>
-            <FormField label="Menu Description" htmlFor="menuDescription">
               <Input
-                id="menuDescription"
                 placeholder="Menu Description"
-                type="text"
                 value={menuDescription}
                 onChange={e => setMenuDescription(e.target.value)}
               />
-            </FormField>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCancel}
+                disabled={isUpdating}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={isUpdating}
+              >
+                <Check className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         ) : (
-          <div className="flex-1">
-            <h2 className="text-2xl font-semibold mb-2">{menuName}</h2>
-            <p className="text-sm text-muted-foreground">{menuDescription}</p>
-          </div>
-        )}
-
-        {isEditable ? (
-          <div className="flex gap-3">
-            <Button variant="secondary" onClick={() => setIsEditable(false)}>
-              Cancel
-            </Button>
-            <Button variant="default" onClick={handleSave}>
-              Save
-            </Button>
-          </div>
-        ) : (
-          <div>
-            <Button variant="secondary" onClick={() => setIsEditable(true)}>
+          <>
+            <div className="flex-1">
+              <h2 className="text-3xl font-bold mb-2">{menu.name}</h2>
+              {menu.description && (
+                <p className="text-base text-muted-foreground">{menu.description}</p>
+              )}
+            </div>
+            
+            <Button variant="outline" onClick={handleStartEdit}>
+              <Edit className="w-4 h-4 mr-2" />
               Edit
             </Button>
-          </div>
+          </>
         )}
       </div>
 
-      {menu.categories.map(category => (
-        <MenuCategory key={category.id} category={category} />
-      ))}
+      <div className="space-y-6">
+        {menu.categories.map(category => (
+          <MenuCategory key={category.id} category={category} />
+        ))}
+      </div>
 
       <NewCategoryForm
         onCancel={handleCancelNewCategory}
