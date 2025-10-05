@@ -1,12 +1,10 @@
 'use client'
-import { HeroSection } from '@/stories/pages/LandingPage/HeroSection'
-import { ScrollTriggerSection } from '@/stories/pages/LandingPage/ScrollTriggerSection'
+import { LandingPage } from '@/stories/pages/LandingPage/LandingPage'
 
 export default function Home() {
   return (
     <div>
-      <HeroSection />
-      <ScrollTriggerSection />
+      <LandingPage />
     </div>
   )
 }
