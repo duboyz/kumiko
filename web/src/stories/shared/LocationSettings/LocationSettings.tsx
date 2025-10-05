@@ -11,7 +11,7 @@ import { toast } from 'sonner'
 
 export function LocationSettings() {
     const t = useTranslations()
-    const { selectedLocation } = useLocationSelection()
+    const { selectedLocation, setSelectedLocation } = useLocationSelection()
     const updateRestaurantSettings = useUpdateRestaurantSettings()
     const updateHospitalitySettings = useUpdateHospitalitySettings()
 
@@ -59,6 +59,12 @@ export function LocationSettings() {
                 })
             }
             toast.success(t('settings.settingsUpdated'))
+
+            // Update the selectedLocation in the store with the new currency value
+            setSelectedLocation({
+                ...selectedLocation,
+                currency: currentLocationCurrency,
+            })
 
             // Reset local state to null so it uses the updated location data
             setLocationCurrency(null)
