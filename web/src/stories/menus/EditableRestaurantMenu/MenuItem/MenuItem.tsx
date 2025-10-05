@@ -1,4 +1,4 @@
-import { MenuItemDto, useDeleteMenuItem, useUpdateMenuItem, UpdateMenuItemOptionDto } from '@shared'
+import { MenuItemDto, useDeleteMenuItem, useUpdateMenuItem, UpdateMenuItemOptionDto, Currency, formatPrice, useLocationSelection } from '@shared'
 import { Edit, Trash, Plus, Trash2, AlertCircle, GripVertical, X, Check } from 'lucide-react'
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
@@ -21,6 +21,8 @@ import {
 import { toast } from 'sonner'
 
 export const MenuItem = ({ item }: { item: MenuItemDto }) => {
+  const { selectedLocation } = useLocationSelection()
+  const currency = selectedLocation?.currency ?? Currency.USD
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [editableMenuItem, setEditableMenuItem] = useState(item)
@@ -321,7 +323,7 @@ export const MenuItem = ({ item }: { item: MenuItemDto }) => {
               </div>
               {!item.hasOptions && item.price !== null && (
                 <span className="text-base font-medium text-muted-foreground whitespace-nowrap">
-                  ${item.price.toFixed(2)}
+                  {formatPrice(item.price, currency)}
                 </span>
               )}
             </div>
@@ -339,7 +341,7 @@ export const MenuItem = ({ item }: { item: MenuItemDto }) => {
                         )}
                       </span>
                       <span className="text-muted-foreground font-medium whitespace-nowrap ml-2">
-                        ${option.price.toFixed(2)}
+                        {formatPrice(option.price, currency)}
                       </span>
                     </div>
                   ))}

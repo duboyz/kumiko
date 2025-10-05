@@ -37,7 +37,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
-import { MenuItemDto, RestaurantMenuDto, useBulkDeleteMenuItems } from '@shared'
+import { MenuItemDto, RestaurantMenuDto, useBulkDeleteMenuItems, Currency, formatPrice, useLocationSelection } from '@shared'
 import { DeleteConfirmDialog } from '@/stories/shared/DeleteConfirmDialog/DeleteConfirmDialog'
 
 interface MenuItemTableViewProps {
@@ -68,6 +68,8 @@ export default function MenuItemTableView({
   onBulkDelete,
   onBulkUpdate,
 }: MenuItemTableViewProps) {
+  const { selectedLocation } = useLocationSelection()
+  const currency = selectedLocation?.currency ?? Currency.USD
   const bulkDeleteMenuItemsMutation = useBulkDeleteMenuItems()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedMenu, setSelectedMenu] = useState<string>('')
@@ -770,7 +772,7 @@ export default function MenuItemTableView({
                         />
                       ) : (
                         <span className="font-medium">
-                          {item.price !== null ? `$${item.price.toFixed(2)}` : 'Variable'}
+                          {item.price !== null ? formatPrice(item.price, currency) : 'Variable'}
                         </span>
                       )}
                     </TableCell>

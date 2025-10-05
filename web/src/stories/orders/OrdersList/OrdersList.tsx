@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Phone, Mail, Clock, Calendar, FileText, ChevronDown, ChevronUp } from 'lucide-react'
-import { OrderDto, ORDER_STATUS_COLORS, ORDER_STATUS_LABELS, useUpdateOrderStatus } from '@shared'
+import { OrderDto, ORDER_STATUS_COLORS, ORDER_STATUS_LABELS, useUpdateOrderStatus, Currency, formatPrice, useLocationSelection } from '@shared'
 import { toast } from 'sonner'
 
 interface OrdersListProps {
@@ -21,6 +21,8 @@ interface OrdersListProps {
 }
 
 export function OrdersList({ orders, isLoading }: OrdersListProps) {
+  const { selectedLocation } = useLocationSelection()
+  const currency = selectedLocation?.currency ?? Currency.USD
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set())
   const updateOrderStatus = useUpdateOrderStatus()
 
@@ -78,7 +80,7 @@ export function OrdersList({ orders, isLoading }: OrdersListProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Badge className={ORDER_STATUS_COLORS[order.status]}>{ORDER_STATUS_LABELS[order.status]}</Badge>
-                <span className="text-lg font-semibold">${order.totalAmount.toFixed(2)}</span>
+                <span className="text-lg font-semibold">{formatPrice(order.totalAmount, currency)}</span>
               </div>
             </div>
           </CardHeader>
@@ -155,10 +157,10 @@ export function OrdersList({ orders, isLoading }: OrdersListProps) {
                     </div>
                     <div className="text-right">
                       <div className="font-medium">
-                        {item.quantity} × ${item.priceAtOrder.toFixed(2)}
+                        {item.quantity} × {formatPrice(item.priceAtOrder, currency)}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        ${(item.quantity * item.priceAtOrder).toFixed(2)}
+                        {formatPrice(item.quantity * item.priceAtOrder, currency)}
                       </div>
                     </div>
                   </div>

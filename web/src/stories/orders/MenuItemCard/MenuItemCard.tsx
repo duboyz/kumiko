@@ -2,11 +2,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Plus, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react'
-import { GetMenuByIdResult } from '@shared'
+import { GetMenuByIdResult, Currency, formatPrice, useLocationSelection } from '@shared'
 import { useState } from 'react'
 
 interface MenuItemCardProps {
   item: NonNullable<GetMenuByIdResult['categories'][0]['menuCategoryItems'][0]['menuItem']>
+  currency?: Currency
   onAddToCart: (
     menuItemId: string,
     menuItemName: string,
@@ -16,7 +17,7 @@ interface MenuItemCardProps {
   ) => void
 }
 
-export function MenuItemCard({ item, onAddToCart }: MenuItemCardProps) {
+export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: MenuItemCardProps) {
   const [showOptions, setShowOptions] = useState(false)
 
   if (!item.isAvailable) return null
@@ -33,7 +34,7 @@ export function MenuItemCard({ item, onAddToCart }: MenuItemCardProps) {
             <div className="flex justify-between items-start gap-2 mb-1">
               <h4 className="text-base font-semibold leading-tight">{item.name}</h4>
               <span className="text-sm font-medium text-green-600 whitespace-nowrap">
-                kr {item.price?.toFixed(2)}
+                {item.price !== null && item.price !== undefined ? formatPrice(item.price, currency) : ''}
               </span>
             </div>
 
@@ -110,7 +111,7 @@ export function MenuItemCard({ item, onAddToCart }: MenuItemCardProps) {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-green-600">
-                          kr {option.price.toFixed(2)}
+                          {formatPrice(option.price, currency)}
                         </span>
                         <Button
                           size="sm"

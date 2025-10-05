@@ -180,7 +180,7 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
             </FormField>
           )}
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Switch
             id="hasOptions"

@@ -28,7 +28,7 @@ import {
   ParsedMenuItem,
   CreateMenuStructureRequest,
 } from '@shared/types/menu-structure.types'
-import { useCreateMenuStructure } from '@shared/hooks/menu.hooks'
+import { useCreateMenuStructure, Currency, formatPrice, useLocationSelection } from '@shared'
 
 interface StructureReviewStepProps {
   parsedStructure: ParsedMenuStructure
@@ -38,6 +38,8 @@ interface StructureReviewStepProps {
 }
 
 export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restaurantId }: StructureReviewStepProps) {
+  const { selectedLocation } = useLocationSelection()
+  const currency = selectedLocation?.currency ?? Currency.USD
   const [isCreating, setIsCreating] = useState(false)
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set([0])) // Expand first category by default
   const [editableStructure, setEditableStructure] = useState<ParsedMenuStructure>(parsedStructure)
@@ -369,7 +371,7 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
                           <div className="flex items-center gap-2">
                             {!isEditingItem && (
                               <div className="text-right">
-                                <div className="font-semibold text-lg">${item.price.toFixed(2)}</div>
+                                <div className="font-semibold text-lg">{formatPrice(item.price, currency)}</div>
                               </div>
                             )}
 

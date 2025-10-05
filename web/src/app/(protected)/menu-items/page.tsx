@@ -10,8 +10,10 @@ import {
   useDeleteMenuItem,
   useRestaurantMenus,
   useBulkAddMenuItemsToCategory,
+  useLocationSelection,
+  Currency,
+  formatPrice,
 } from '@shared'
-import { useLocationSelection } from '@shared'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -31,6 +33,7 @@ import { EmptyState } from '@/components'
 function MenuItemsPageContent() {
   const { selectedLocation, isLoading, hasNoLocations } = useLocationSelection()
   const restaurantId = selectedLocation?.type === 'Restaurant' ? selectedLocation.id : null
+  const currency = selectedLocation?.currency ?? Currency.USD
 
   const { data: menuItemsData, isLoading: menuItemsLoading, error } = useAllRestaurantMenuItems(restaurantId || '')
   const { data: menusData } = useRestaurantMenus(restaurantId || '')
@@ -208,6 +211,7 @@ function MenuItemsPageContent() {
                   <MenuItemCard
                     key={item.id}
                     item={item}
+                    currency={currency}
                     onEdit={item => {
                       setEditingItem(item)
                       setIsEditDialogOpen(true)
@@ -262,13 +266,17 @@ function MenuItemsPageContent() {
 
 function MenuItemCard({
   item,
+  currency,
   onEdit,
   onDelete,
 }: {
   item: MenuItemDto
+  currency: Currency
   onEdit: (item: MenuItemDto) => void
   onDelete: (id: string) => void
 }) {
+  const { selectedLocation } = useLocationSelection()
+  const c = selectedLocation?.currency ?? Currency.USD
   return (
     <Card className="group hover:shadow-sm transition-all">
       <CardContent className="p-4">
@@ -280,7 +288,7 @@ function MenuItemCard({
             </div>
             <p className="text-sm text-muted-foreground truncate">{item.description || 'No description'}</p>
             <p className="text-lg font-semibold text-green-600 mt-1">
-              {item.price !== null ? `$${item.price.toFixed(2)}` : 'Variable price'}
+              {item.price !== null ? formatPrice(item.price, currency) : 'Variable price'}
             </p>
             {item.allergens && item.allergens.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1 items-center">

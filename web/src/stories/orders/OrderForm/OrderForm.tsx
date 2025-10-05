@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { GetMenuByIdResult, useCreateOrder, CreateOrderItemDto } from '@shared'
+import { GetMenuByIdResult, useCreateOrder, CreateOrderItemDto, Currency } from '@shared'
 import { toast } from 'sonner'
 import { CartButton } from '../CartButton'
 import { CartDialog } from '../CartDialog'
@@ -13,10 +13,11 @@ import { CartItem, CustomerInfo } from '../shared/types'
 interface OrderFormProps {
   menu: GetMenuByIdResult
   restaurantId: string
+  currency?: Currency
   className?: string
 }
 
-export function OrderForm({ menu, restaurantId, className = '' }: OrderFormProps) {
+export function OrderForm({ menu, restaurantId, currency = Currency.USD, className = '' }: OrderFormProps) {
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
@@ -158,12 +159,13 @@ export function OrderForm({ menu, restaurantId, className = '' }: OrderFormProps
       {/* Floating Cart Button */}
       <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
         <DialogTrigger asChild>
-          <CartButton cart={cart} onClick={() => setIsCartOpen(true)} />
+          <CartButton cart={cart} currency={currency} onClick={() => setIsCartOpen(true)} />
         </DialogTrigger>
         <CartDialog
           open={isCartOpen}
           onOpenChange={setIsCartOpen}
           cart={cart}
+          currency={currency}
           onUpdateQuantity={updateQuantity}
           onRemoveItem={removeItem}
           onProceedToCheckout={() => setIsCheckoutOpen(true)}
@@ -175,6 +177,7 @@ export function OrderForm({ menu, restaurantId, className = '' }: OrderFormProps
         open={isCheckoutOpen}
         onOpenChange={setIsCheckoutOpen}
         cart={cart}
+        currency={currency}
         customerInfo={customerInfo}
         onCustomerInfoChange={handleCustomerInfoChange}
         onSubmitOrder={handleSubmitOrder}
@@ -182,7 +185,7 @@ export function OrderForm({ menu, restaurantId, className = '' }: OrderFormProps
       />
 
       {/* Menu Display */}
-      <MenuDisplay menu={menu} onAddToCart={addToCart} />
+      <MenuDisplay menu={menu} currency={currency} onAddToCart={addToCart} />
     </div>
   )
 }

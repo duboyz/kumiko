@@ -6,12 +6,14 @@ import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Settings, ShoppingCart } from 'lucide-react'
-import { RestaurantMenuDto, GetMenuByIdResult } from '@shared/types'
+import { RestaurantMenuDto, GetMenuByIdResult, Currency } from '@shared/types'
+import { formatPrice } from '@shared'
 import { OrderForm } from '@/stories/orders/OrderForm'
 
 interface RestaurantMenuSectionProps {
   restaurantMenu: RestaurantMenuDto | GetMenuByIdResult
   allowOrdering?: boolean
+  currency?: Currency
   className?: string
   isEditing?: boolean
   availableMenus?: RestaurantMenuDto[]
@@ -23,6 +25,7 @@ interface RestaurantMenuSectionProps {
 export function RestaurantMenuSection({
   restaurantMenu,
   allowOrdering = true,
+  currency = Currency.USD,
   className = '',
   isEditing = false,
   availableMenus = [],
@@ -46,7 +49,7 @@ export function RestaurantMenuSection({
   if (canUseOrderForm) {
     return (
       <section className={`relative py-20 px-10 bg-white ${className}`}>
-        <OrderForm menu={restaurantMenu as GetMenuByIdResult} restaurantId={restaurantId!} />
+        <OrderForm menu={restaurantMenu as GetMenuByIdResult} restaurantId={restaurantId!} currency={currency} />
       </section>
     )
   }
@@ -136,7 +139,7 @@ export function RestaurantMenuSection({
                             <h4 className="text-lg font-medium">{categoryItem.menuItem?.name}</h4>
                             <span className="text-base text-muted-foreground whitespace-nowrap ml-4">
                               {categoryItem.menuItem?.price !== null && categoryItem.menuItem?.price !== undefined
-                                ? `$${categoryItem.menuItem.price.toFixed(2)}`
+                                ? formatPrice(categoryItem.menuItem.price, currency)
                                 : 'Variable price'}
                             </span>
                           </div>

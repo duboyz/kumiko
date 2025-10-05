@@ -1,8 +1,9 @@
-import { GetMenuByIdResult } from '@shared'
+import { GetMenuByIdResult, Currency } from '@shared'
 import { MenuItemCard } from '../MenuItemCard'
 
 interface MenuDisplayProps {
   menu: GetMenuByIdResult
+  currency?: Currency
   onAddToCart: (
     menuItemId: string,
     menuItemName: string,
@@ -13,7 +14,7 @@ interface MenuDisplayProps {
   className?: string
 }
 
-export function MenuDisplay({ menu, onAddToCart, className = '' }: MenuDisplayProps) {
+export function MenuDisplay({ menu, currency = Currency.USD, onAddToCart, className = '' }: MenuDisplayProps) {
   return (
     <div className={`max-w-4xl mx-auto ${className}`}>
       <div className="text-center mb-12">
@@ -38,6 +39,7 @@ export function MenuDisplay({ menu, onAddToCart, className = '' }: MenuDisplayPr
                     <MenuItemCard
                       key={categoryItem.id}
                       item={item}
+                      currency={currency}
                       onAddToCart={onAddToCart}
                     />
                   )

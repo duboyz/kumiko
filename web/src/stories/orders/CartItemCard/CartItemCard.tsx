@@ -3,15 +3,17 @@ import { Plus, Minus, Trash2 } from 'lucide-react'
 import { CartItem } from '../shared/types'
 import { Input } from '@/components/ui/input'
 import { ChangeEvent } from 'react'
+import { Currency, formatPrice } from '@shared'
 
 interface CartItemCardProps {
   item: CartItem
   index: number
+  currency?: Currency
   onUpdateQuantity: (index: number, delta: number) => void
   onRemove: (index: number) => void
 }
 
-export function CartItemCard({ item, index, onUpdateQuantity, onRemove }: CartItemCardProps) {
+export function CartItemCard({ item, index, currency = Currency.USD, onUpdateQuantity, onRemove }: CartItemCardProps) {
   const handleMinus = () => {
     if (item.quantity > 0) onUpdateQuantity(index, -1)
   }
@@ -38,7 +40,7 @@ export function CartItemCard({ item, index, onUpdateQuantity, onRemove }: CartIt
           {item.menuItemOptionName && (
             <p className="text-sm text-muted-foreground">{item.menuItemOptionName}</p>
           )}
-          <p className="font-medium">kr {totalPrice.toFixed(2)}</p>
+          <p className="font-medium">{formatPrice(totalPrice, currency)}</p>
           {item.specialInstructions && (
             <p className="text-sm text-muted-foreground italic">
               Note: {item.specialInstructions}

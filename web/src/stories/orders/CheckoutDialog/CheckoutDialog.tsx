@@ -8,11 +8,13 @@ import {
 } from '@/components/ui/dialog'
 import { CustomerInfoForm } from '../CustomerInfoForm'
 import { CartItem, CustomerInfo } from '../shared/types'
+import { Currency, formatPrice } from '@shared'
 
 interface CheckoutDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   cart: CartItem[]
+  currency?: Currency
   customerInfo: CustomerInfo
   onCustomerInfoChange: (field: keyof CustomerInfo, value: string) => void
   onSubmitOrder: () => void
@@ -23,6 +25,7 @@ export function CheckoutDialog({
   open,
   onOpenChange,
   cart,
+  currency = Currency.USD,
   customerInfo,
   onCustomerInfoChange,
   onSubmitOrder,
@@ -47,7 +50,7 @@ export function CheckoutDialog({
           <div className="border-t pt-4">
             <div className="flex justify-between items-center text-lg font-bold mb-4">
               <span>Total:</span>
-              <span>${totalAmount.toFixed(2)}</span>
+              <span>{formatPrice(totalAmount, currency)}</span>
             </div>
             <Button
               onClick={onSubmitOrder}
