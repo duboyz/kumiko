@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { SplitText } from 'gsap/SplitText'
 import { bebasNeue } from '@shared'
-import router from 'next/router'
 
 // Register the SplitText plugin
 gsap.registerPlugin(SplitText)
@@ -232,8 +231,14 @@ export function HeroSection({}: HeroSectionProps) {
             style={{
               boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
             }}
+            onClick={() => {
+              // Simple navigation that works in both Next.js and Storybook
+              if (typeof window !== 'undefined') {
+                window.location.href = '/register'
+              }
+            }}
           >
-            <span className="relative z-10" onClick={() => router.push('/register')}>
+            <span className="relative z-10">
               Get Started
             </span>
             <div className="absolute inset-0 bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
