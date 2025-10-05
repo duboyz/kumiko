@@ -18,20 +18,20 @@ interface FlowSectionProps {}
 const steps = [
   {
     id: 1,
-    title: 'Find Your Business',
-    description: "Sign up and tell us about your restaurant. We'll help you get started in just a few minutes.",
+    title: 'Take picture of menu',
+    description: 'Just one image and we fix the rest!',
     image: searchImage,
   },
   {
     id: 2,
-    title: 'Take Picture of Menu',
-    description: 'Snap a photo of your menu with your phone. Our AI will instantly digitize and organize it for you.',
+    title: 'Create Website',
+    description: 'We create a beautiful website for your restaurant. With menu and orders integrated',
     image: picImage,
   },
   {
     id: 3,
-    title: 'Make It Live',
-    description: 'Your digital menu is now live! Customers can browse, order, and make reservations instantly.',
+    title: 'Get Orders',
+    description: 'Receive and manage your orders',
     image: globeImage,
   },
 ] as const
@@ -102,7 +102,7 @@ export function FlowSection({}: FlowSectionProps) {
     <div
       ref={sectionRef}
       className={`flex items-center px-8 !bg-black rounded-[4rem] ${bebasNeue.className}`}
-      style={{ backgroundColor: 'black', borderRadius: '4rem 4rem 0 0', paddingTop: '50px' }}
+      style={{ backgroundColor: 'black', borderRadius: '4rem ', paddingTop: '50px' }}
     >
       <div className="max-w-4xl mx-auto w-full">
         {/* Section Title */}
