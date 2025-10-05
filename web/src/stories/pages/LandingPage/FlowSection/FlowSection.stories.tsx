@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import { HeroSection } from './HeroSection'
+import { FlowSection } from './FlowSection'
 
 const meta = {
-  title: 'Pages/LandingPage/HeroSection',
-  component: HeroSection,
+  component: FlowSection,
   parameters: {
+    title: 'Pages/LandingPage/FlowSection',
     layout: 'fullscreen',
   },
   args: {},
-} satisfies Meta<typeof HeroSection>
+} satisfies Meta<typeof FlowSection>
 
 export default meta
 

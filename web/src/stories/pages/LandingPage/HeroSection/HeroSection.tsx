@@ -3,13 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { SplitText } from 'gsap/SplitText'
-import { Bebas_Neue } from 'next/font/google'
-
-const bebasNeue = Bebas_Neue({
-  weight: '400',
-  subsets: ['latin'],
-  display: 'swap',
-})
+import { bebasNeue } from '@shared'
 
 // Register the SplitText plugin
 gsap.registerPlugin(SplitText)
@@ -21,7 +15,6 @@ export function HeroSection({}: HeroSectionProps) {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const heroContentRef = useRef<HTMLDivElement>(null)
   const heroTextRef = useRef<HTMLDivElement>(null)
-  const heroImageRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   // Individual line refs for staggered animation
@@ -37,7 +30,6 @@ export function HeroSection({}: HeroSectionProps) {
       !titleRef.current ||
       !heroContentRef.current ||
       !heroTextRef.current ||
-      !heroImageRef.current ||
       !buttonRef.current ||
       !line1Ref.current ||
       !line2Ref.current ||
@@ -71,7 +63,6 @@ export function HeroSection({}: HeroSectionProps) {
 
     // Set initial states
     gsap.set(splitText.chars, { y: 115, opacity: 0 })
-    gsap.set(heroImageRef.current, { opacity: 0 })
 
     // Set initial states for hero text characters (coming from above)
     gsap.set(splitLine1.chars, { y: -50, opacity: 0 })
@@ -174,17 +165,6 @@ export function HeroSection({}: HeroSectionProps) {
       `+=${config.buttonDelay}`
     )
 
-    // Phase 7: Image slides in (can be adjusted to come in earlier/later)
-    tl.to(
-      heroImageRef.current,
-      {
-        opacity: 1,
-        duration: 0.8,
-        ease: 'power2.out',
-      },
-      '-=0.4'
-    )
-
     // Cleanup function
     return () => {
       tl.kill()
@@ -199,15 +179,15 @@ export function HeroSection({}: HeroSectionProps) {
   return (
     <div
       ref={heroRef}
-      className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 relative overflow-hidden ${bebasNeue.className}`}
+      className={`min-h-screen flex items-center justify-center from-blue-50 to-indigo-100 relative overflow-hidden ${bebasNeue.className}`}
     >
       {/* Title Section */}
       <h1
         ref={titleRef}
-        className="absolute text-7xl font-bold text-gray-800 text-center uppercase z-10"
+        className="absolute text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-gray-800 text-center uppercase z-10"
         style={{
-          fontSize: '9rem',
-          lineHeight: '10rem',
+          fontSize: 'clamp(4rem, 12vw, 9rem)',
+          lineHeight: 'clamp(4.5rem, 13vw, 10rem)',
           clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)',
         }}
       >
@@ -217,12 +197,12 @@ export function HeroSection({}: HeroSectionProps) {
       {/* Hero Content Section */}
       <div
         ref={heroContentRef}
-        className="flex items-center justify-between w-full max-w-7xl mx-auto px-8 z-20"
+        className="flex items-center justify-center w-full max-w-7xl mx-auto px-8 z-20"
         style={{ perspective: '1000px' }}
       >
-        {/* Hero Text */}
-        <div ref={heroTextRef} className="flex-1 pr-12" style={{ transformStyle: 'preserve-3d' }}>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-800 mb-8 leading-tight max-w-4xl">
+        {/* Hero Text - Centered */}
+        <div ref={heroTextRef} className="text-center px-4" style={{ transformStyle: 'preserve-3d' }}>
+          <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-gray-800 mb-6 sm:mb-8 leading-tight">
             <span ref={line1Ref} className="inline">
               DIGITIZE YOUR
             </span>{' '}
@@ -238,13 +218,16 @@ export function HeroSection({}: HeroSectionProps) {
               MINUTES
             </span>
           </h2>
-          <p ref={descriptionRef} className="text-xl text-gray-600 mb-10 leading-relaxed max-w-lg">
+          <p
+            ref={descriptionRef}
+            className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 sm:mb-10 leading-relaxed max-w-2xl mx-auto px-4"
+          >
             Transform your paper menu into a stunning digital experience. Create a professional website, enable online
             ordering, and start taking reservations—all without any technical skills required.
           </p>
           <button
             ref={buttonRef}
-            className="group relative bg-gray-800 text-white px-10 py-5 rounded-2xl text-lg font-semibold overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:bg-gray-700"
+            className="group relative bg-gray-800 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-lg font-semibold overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:bg-gray-700"
             style={{
               boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
             }}
@@ -252,23 +235,6 @@ export function HeroSection({}: HeroSectionProps) {
             <span className="relative z-10">Get Started</span>
             <div className="absolute inset-0 bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
-        </div>
-
-        {/* Hero Image */}
-        <div ref={heroImageRef} className="flex-1 pl-12" style={{ transformStyle: 'preserve-3d' }}>
-          <div
-            className="w-full h-[500px] bg-gradient-to-br from-gray-200 to-gray-300 rounded-3xl flex items-center justify-center relative overflow-hidden border border-gray-200"
-            style={{
-              boxShadow: '0 25px 50px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div className="text-center">
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mx-auto mb-6 flex items-center justify-center">
-                <span className="text-4xl">📱</span>
-              </div>
-              <span className="text-gray-500 text-lg font-medium">Hero Image Placeholder</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
