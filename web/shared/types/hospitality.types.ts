@@ -55,4 +55,6 @@ export interface LocationOption {
   city: string
   role: string
   currency: Currency
+  businessHours?: string | null
+  isOpenNow?: boolean | null
 }

@@ -20,7 +20,9 @@ public static class RestaurantMappers
             restaurant.Country ?? string.Empty,
             restaurant.Latitude ?? string.Empty,
             restaurant.Longitude ?? string.Empty,
-            restaurant.Currency
+            restaurant.Currency,
+            restaurant.BusinessHours,
+            restaurant.IsOpenNow
         );
     }
 }

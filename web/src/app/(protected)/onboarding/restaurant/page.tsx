@@ -31,6 +31,8 @@ export default function RestaurantOnboardingPage() {
       latitude: selectedBusiness.geometry.location.lat.toString(),
       longitude: selectedBusiness.geometry.location.lng.toString(),
       googlePlaceId: selectedBusiness.placeId,
+      businessHours: selectedBusiness.openingHours?.weekdayText ? JSON.stringify(selectedBusiness.openingHours.weekdayText) : null,
+      isOpenNow: selectedBusiness.openingHours?.openNow,
     }
 
     try {
@@ -100,6 +102,9 @@ export default function RestaurantOnboardingPage() {
                 </p>
               )}
             </div>
+            <pre>
+              {JSON.stringify(selectedBusiness, null, 2)}
+            </pre>
           </CardContent>
         </Card>
       )}

@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -16,39 +15,45 @@ interface SearchBusinessProps {
 
 export default function SearchBusiness({ onBusinessSelect, selectedBusiness }: SearchBusinessProps) {
   const [query, setQuery] = useState('')
-  const searchMutation = useSearchBusiness()
+  const { mutate: searchMutation, isPending, error, data } = useSearchBusiness()
 
-  const handleSearch = () => {
+  // Debounced search effect
+  useEffect(() => {
     if (!query.trim()) return
 
-    searchMutation.mutate({
-      query: query.trim(),
-      country: 'NO',
-      limit: 10,
-    })
-  }
+    const timeoutId = setTimeout(() => {
+      searchMutation({
+        query: query.trim(),
+        country: 'NO',
+        limit: 10,
+      })
+    }, 500) // 500ms debounce delay
 
-  const businesses = searchMutation.data?.businesses || []
+    return () => clearTimeout(timeoutId)
+  }, [query, searchMutation])
+
+  const businesses = data?.businesses || []
 
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <div className="flex gap-2">
+        <div className="relative">
           <Input
             type="text"
             placeholder="Search for your restaurant (e.g., 'Pizza Express Oslo')"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            className="flex-1"
+            className="w-full pr-10"
           />
-          <Button onClick={handleSearch} disabled={!query.trim() || searchMutation.isPending}>
-            {searchMutation.isPending ? <LoadingSpinner size="sm" /> : 'Search'}
-          </Button>
+          {isPending && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <LoadingSpinner size="sm" />
+            </div>
+          )}
         </div>
 
-        {searchMutation.error && (
-          <div className="text-red-600 text-sm">Error searching: {searchMutation.error.message}</div>
+        {error && (
+          <div className="text-red-600 text-sm">Error searching: {error.message}</div>
         )}
       </div>
 

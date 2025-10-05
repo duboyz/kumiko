@@ -14,6 +14,10 @@ public class Restaurant : BaseEntity
     public string Latitude { get; set; } = string.Empty;
     public string Longitude { get; set; } = string.Empty;
 
+    // Business hours from Google Places API
+    public string? BusinessHours { get; set; } // JSON string of weekday_text array
+    public bool? IsOpenNow { get; set; }
+
     // Localization settings
     public Currency Currency { get; set; } = Currency.USD;
 

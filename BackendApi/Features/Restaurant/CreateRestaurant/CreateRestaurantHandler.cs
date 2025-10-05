@@ -3,6 +3,7 @@ using BackendApi.Repositories;
 using BackendApi.Shared.Contracts;
 using BackendApi.Entities;
 using BackendApi.Extensions;
+using BackendApi.Services;
 
 namespace BackendApi.Features.Restaurant.CreateRestaurant;
 
@@ -16,6 +17,25 @@ public class CreateRestaurantHandler(
     {
         var userId = httpContextAccessor.GetCurrentUserId();
 
+        // Parse business hours if provided
+        string? parsedBusinessHours = null;
+        if (!string.IsNullOrEmpty(request.BusinessHours))
+        {
+            try
+            {
+                var weekdayText = System.Text.Json.JsonSerializer.Deserialize<List<string>>(request.BusinessHours);
+                if (weekdayText != null)
+                {
+                    parsedBusinessHours = BusinessHoursParser.ParseBusinessHours(weekdayText);
+                }
+            }
+            catch
+            {
+                // If parsing fails, store the original data
+                parsedBusinessHours = request.BusinessHours;
+            }
+        }
+
         var restaurant = await restaurantRepository.AddAsync(new Entities.Restaurant
         {
             Name = request.Name,
@@ -26,7 +46,9 @@ public class CreateRestaurantHandler(
             Country = request.Country,
             Latitude = request.Latitude,
             Longitude = request.Longitude,
-            GooglePlaceId = request.GooglePlaceId
+            GooglePlaceId = request.GooglePlaceId,
+            BusinessHours = parsedBusinessHours,
+            IsOpenNow = request.IsOpenNow
         });
 
         // Create UserRestaurant relationship with Owner role

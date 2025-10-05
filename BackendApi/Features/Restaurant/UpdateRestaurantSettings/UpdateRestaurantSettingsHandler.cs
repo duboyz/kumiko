@@ -13,6 +13,8 @@ public class UpdateRestaurantSettingsHandler(IRestaurantRepository restaurantRep
             throw new KeyNotFoundException("Restaurant not found");
         }
 
+        Console.WriteLine($"Restaurant updated {request.Currency}");
+
         restaurant.Currency = request.Currency;
         restaurant.UpdatedAt = DateTime.UtcNow;
         await restaurantRepository.UpdateAsync(restaurant);

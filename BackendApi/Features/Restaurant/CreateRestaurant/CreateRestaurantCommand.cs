@@ -12,5 +12,7 @@ public record CreateRestaurantCommand(
     string Country,
     string Latitude,
     string Longitude,
-    string GooglePlaceId
+    string GooglePlaceId,
+    string? BusinessHours = null,
+    bool? IsOpenNow = null
 ) : ICommand<RestaurantBaseDto>;

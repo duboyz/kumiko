@@ -13,5 +13,7 @@ public record RestaurantBaseDto(
     string Country,
     string Latitude,
     string Longitude,
-    Currency Currency
+    Currency Currency,
+    string? BusinessHours = null,
+    bool? IsOpenNow = null
 );

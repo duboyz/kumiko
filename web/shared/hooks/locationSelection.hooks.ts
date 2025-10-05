@@ -57,6 +57,8 @@ export const useLocationSelection = () => {
           city: restaurant.restaurant.city,
           role: restaurant.role,
           currency: convertCurrencyFromApi(restaurant.restaurant.currency),
+          businessHours: restaurant.restaurant.businessHours,
+          isOpenNow: restaurant.restaurant.isOpenNow,
         })
       })
     }

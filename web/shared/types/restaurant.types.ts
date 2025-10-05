@@ -8,6 +8,8 @@ export interface CreateRestaurantCommand {
   latitude: string
   longitude: string
   googlePlaceId: string
+  businessHours?: string | null
+  isOpenNow?: boolean | null
 }
 
 import { Currency } from './localization.types'
@@ -24,9 +26,11 @@ export interface RestaurantBaseDto {
   latitude: string
   longitude: string
   currency: Currency
+  businessHours?: string | null
+  isOpenNow?: boolean | null
 }
 
-export interface CreateRestaurantResult extends RestaurantBaseDto {}
+export interface CreateRestaurantResult extends RestaurantBaseDto { }
 
 export interface UserRestaurantDto {
   restaurant: RestaurantBaseDto

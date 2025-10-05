@@ -624,6 +624,9 @@ namespace BackendApi.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<string>("BusinessHours")
+                        .HasColumnType("text");
+
                     b.Property<string>("City")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -656,6 +659,9 @@ namespace BackendApi.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsOpenNow")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Latitude")

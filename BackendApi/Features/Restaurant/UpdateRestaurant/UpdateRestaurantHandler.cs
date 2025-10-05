@@ -41,6 +41,8 @@ public class UpdateRestaurantHandler(IRestaurantRepository restaurantRepository)
         restaurant.UpdatedAt = DateTime.UtcNow;
         await restaurantRepository.UpdateAsync(restaurant);
 
+        Console.WriteLine($"Restaurant updated");
+
         return restaurant.ToBaseDto();
     }
 }

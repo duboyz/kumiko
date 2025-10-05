@@ -21,7 +21,7 @@ export const useUpdateRestaurantSettings = () => {
       settingsApi.updateRestaurantSettings(restaurantId, command),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurants'] })
-      queryClient.invalidateQueries({ queryKey: ['userRestaurants'] })
+      queryClient.invalidateQueries({ queryKey: ['user-restaurants'] })
     },
   })
 }
@@ -34,7 +34,7 @@ export const useUpdateHospitalitySettings = () => {
       settingsApi.updateHospitalitySettings(hospitalityId, command),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hospitalities'] })
-      queryClient.invalidateQueries({ queryKey: ['userHospitalities'] })
+      queryClient.invalidateQueries({ queryKey: ['user-hospitalities'] })
     },
   })
 }

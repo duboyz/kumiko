@@ -313,16 +313,18 @@ export const MenuItem = ({ item }: { item: MenuItemDto }) => {
           
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-baseline gap-4 mb-1">
-              <h4 className="text-base font-medium">{item.name}</h4>
+              <div className="flex items-baseline gap-2 flex-1 min-w-0">
+                <h4 className="text-base font-medium">{item.name}</h4>
+                {item.description && (
+                  <span className="text-sm text-muted-foreground truncate">— {item.description}</span>
+                )}
+              </div>
               {!item.hasOptions && item.price !== null && (
                 <span className="text-base font-medium text-muted-foreground whitespace-nowrap">
                   ${item.price.toFixed(2)}
                 </span>
               )}
             </div>
-            {item.description && (
-              <p className="text-sm text-muted-foreground mb-2">{item.description}</p>
-            )}
 
             {item.hasOptions && item.options.length > 0 && (
               <div className="mt-2 space-y-1">

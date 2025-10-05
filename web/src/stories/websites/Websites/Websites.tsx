@@ -48,7 +48,11 @@ export function Websites() {
   }
 
   const getWebsiteUrl = (subdomain: string) => {
-    return `https://${subdomain}.kumiko.no`
+    const thisHost = window.location.hostname
+    const thisPort = window.location.port
+    const thisProtocol = window.location.protocol
+    const portSuffix = thisPort ? `:${thisPort}` : ''
+    return `${thisProtocol}//${subdomain}.${thisHost}${portSuffix}`
   }
 
   const handleDeletePage = async () => {
