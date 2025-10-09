@@ -8,11 +8,8 @@ public class UpdateUserSettingsHandler(IUserRepository userRepository) : IComman
     public async Task Handle(UpdateUserSettingsCommand request, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetByIdAsync(request.UserId);
-        if (user == null)
-        {
-            throw new KeyNotFoundException("User not found");
-        }
-
+        if (user == null) throw new KeyNotFoundException("User not found");
+        
         user.PreferredLanguage = request.PreferredLanguage;
         user.UpdatedAt = DateTime.UtcNow;
         await userRepository.UpdateAsync(user);
