@@ -46,54 +46,39 @@ public class UpdateMenuItemHandler(ApplicationDbContext context) : ICommandHandl
         menuItem.IsAvailable = request.IsAvailable;
         menuItem.UpdatedAt = DateTime.UtcNow;
 
-        // Handle options update if item has options
+        // Handle options update - clear and rebuild to avoid tracking issues
         if (request.HasOptions && request.Options != null)
         {
-            // Remove existing options that aren't in the update
-            var optionsToRemove = menuItem.Options
-                .Where(o => !request.Options.Any(ro => ro.Id == o.Id))
-                .ToList();
-
-            foreach (var option in optionsToRemove)
+            // Remove all existing options
+            if (menuItem.Options.Any())
             {
-                context.MenuItemOptions.Remove(option);
+                context.MenuItemOptions.RemoveRange(menuItem.Options.ToList());
+                await context.SaveChangesAsync(cancellationToken);
             }
 
-            // Update or add options
+            // Add all options from request
             foreach (var optionDto in request.Options)
             {
-                if (optionDto.Id.HasValue)
+                var newOption = new MenuItemOption
                 {
-                    // Update existing option
-                    var existingOption = menuItem.Options.FirstOrDefault(o => o.Id == optionDto.Id.Value);
-                    if (existingOption != null)
-                    {
-                        existingOption.Name = optionDto.Name;
-                        existingOption.Description = optionDto.Description;
-                        existingOption.Price = optionDto.Price;
-                        existingOption.OrderIndex = optionDto.OrderIndex;
-                        existingOption.UpdatedAt = DateTime.UtcNow;
-                    }
-                }
-                else
-                {
-                    // Add new option
-                    var newOption = new MenuItemOption
-                    {
-                        Name = optionDto.Name,
-                        Description = optionDto.Description,
-                        Price = optionDto.Price,
-                        OrderIndex = optionDto.OrderIndex,
-                        MenuItemId = menuItem.Id
-                    };
-                    menuItem.Options.Add(newOption);
-                }
+                    Name = optionDto.Name,
+                    Description = optionDto.Description,
+                    Price = optionDto.Price,
+                    OrderIndex = optionDto.OrderIndex,
+                    MenuItemId = menuItem.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                context.MenuItemOptions.Add(newOption);
             }
         }
         else if (!request.HasOptions)
         {
             // Remove all options if item no longer has options
-            context.MenuItemOptions.RemoveRange(menuItem.Options);
+            if (menuItem.Options.Any())
+            {
+                context.MenuItemOptions.RemoveRange(menuItem.Options.ToList());
+            }
         }
 
         // Handle allergens update
