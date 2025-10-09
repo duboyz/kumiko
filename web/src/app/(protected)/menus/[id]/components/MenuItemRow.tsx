@@ -7,7 +7,7 @@ import { ChevronDown, ChevronRight, Edit, GripVertical, Trash2, Save, X } from '
 import { useState, useEffect } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { MenuCategoryItemDto, useUpdateMenuItem, useAllergens } from '@shared'
+import { MenuCategoryItemDto, useUpdateMenuItem, useAllergens, formatPrice, useLocationSelection, Currency } from '@shared'
 import { toast } from 'sonner'
 import { MenuItemOptions } from './MenuItemOptions'
 import { MenuItemAllergens } from './MenuItemAllergens'
@@ -32,6 +32,8 @@ export const MenuItemRow = ({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
   const updateMutation = useUpdateMenuItem()
   const { data: allergensData } = useAllergens()
+  const { selectedLocation } = useLocationSelection()
+  const currency = selectedLocation?.currency ?? Currency.USD
 
   const [editedData, setEditedData] = useState({
     name: item.menuItem.name,
@@ -258,7 +260,7 @@ export const MenuItemRow = ({
                   return `${minPrice.toFixed(0)}-${maxPrice.toFixed(0)}`
                 })()
               ) : item.menuItem.price ? (
-                `$${item.menuItem.price.toFixed(2)}`
+                formatPrice(item.menuItem.price, currency)
               ) : (
                 '-'
               )}
@@ -282,23 +284,25 @@ export const MenuItemRow = ({
 
       {isExpanded && (
         <TableRow key={`${item.id}-details`}>
-          <TableCell colSpan={7} className="bg-gray-50">
-            <div className="p-4 space-y-4">
-              <MenuItemOptions
-                options={isEditing ? editedData.options : item.menuItem.options || []}
-                isEditing={isEditing}
-                onAddOption={addOption}
-                onRemoveOption={removeOption}
-                onUpdateOption={updateOption}
-              />
+          <TableCell colSpan={7} className="bg-gradient-to-br from-gray-50 to-gray-100/50">
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <MenuItemOptions
+                  options={isEditing ? editedData.options : item.menuItem.options || []}
+                  isEditing={isEditing}
+                  onAddOption={addOption}
+                  onRemoveOption={removeOption}
+                  onUpdateOption={updateOption}
+                />
 
-              <MenuItemAllergens
-                allergens={item.menuItem.allergens || []}
-                selectedAllergenIds={editedData.allergenIds}
-                isEditing={isEditing}
-                allAllergens={allergensData || undefined}
-                onToggleAllergen={toggleAllergen}
-              />
+                <MenuItemAllergens
+                  allergens={item.menuItem.allergens || []}
+                  selectedAllergenIds={editedData.allergenIds}
+                  isEditing={isEditing}
+                  allAllergens={allergensData || undefined}
+                  onToggleAllergen={toggleAllergen}
+                />
+              </div>
             </div>
           </TableCell>
         </TableRow>
