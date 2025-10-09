@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useRestaurantMenus, useLocationSelection, MenuCategoryDto, useReorderMenuItems, MenuCategoryItemDto, useUpdateMenuItem, useAllergens, useCreateMenuItem, useAddMenuItemToCategory, useCreateMenuCategory } from '@shared'
+import { useRestaurantMenus, useLocationSelection, MenuCategoryDto, useReorderMenuItems, MenuCategoryItemDto, useUpdateMenuItem, useAllergens, useCreateMenuItem, useAddMenuItemToCategory, useCreateMenuCategory, useReorderCategories } from '@shared'
 import { LoadingSpinner } from '@/components'
 import { ContentLoadingError } from '@/stories/shared/ContentLoadingError/ContentLoadingError'
 import { ContentNotFound } from '@/stories/shared/ContentNotFound/ContentNotFound'
@@ -37,6 +37,29 @@ export default function MenuEditPage() {
     description: '',
   })
   const createCategoryMutation = useCreateMenuCategory()
+  const reorderCategoriesMutation = useReorderCategories()
+
+  // Categories state for drag and drop
+  const [categories, setCategories] = useState(menu?.categories || [])
+
+  // Update categories when menu changes
+  useEffect(() => {
+    if (menu?.categories) {
+      setCategories(menu.categories)
+    }
+  }, [menu?.categories])
+
+  // Category drag and drop sensors (reuse from CategoryTable)
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   // Category handlers
   const handleAddCategory = () => {
@@ -81,6 +104,41 @@ export default function MenuEditPage() {
         onError: (error) => {
           console.error('Create category error:', error)
           toast.error('Failed to create category')
+        },
+      }
+    )
+  }
+
+  const handleCategoryDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) {
+      return
+    }
+
+    const oldIndex = categories.findIndex(cat => cat.id === active.id)
+    const newIndex = categories.findIndex(cat => cat.id === over.id)
+
+    if (oldIndex === -1 || newIndex === -1) {
+      return
+    }
+
+    // Update local state immediately for optimistic UI
+    const newCategories = arrayMove(categories, oldIndex, newIndex)
+    setCategories(newCategories)
+
+    // Call API to persist the new order
+    const categoryIds = newCategories.map(cat => cat.id)
+    reorderCategoriesMutation.mutate(
+      categoryIds,
+      {
+        onError: () => {
+          // Revert on error
+          setCategories(categories)
+          toast.error('Failed to reorder categories')
+        },
+        onSuccess: () => {
+          toast.success('Categories reordered successfully')
         },
       }
     )
@@ -172,11 +230,15 @@ export default function MenuEditPage() {
         )}
       </div>
 
-      <div className="space-y-6">
-        {menu.categories.map(category => (
-          <CategoryTable key={category.id} menuCategory={category} />
-        ))}
-      </div>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
+        <div className="space-y-6 min-h-[200px]">
+          <SortableContext items={categories.map(cat => cat.id)} strategy={verticalListSortingStrategy}>
+            {categories.map(category => (
+              <SortableCategory key={category.id} menuCategory={category} />
+            ))}
+          </SortableContext>
+        </div>
+      </DndContext>
 
 
 
@@ -190,7 +252,7 @@ interface CategoryTableProps {
   menuCategory: MenuCategoryDto
 }
 
-export const CategoryTable = ({ menuCategory }: CategoryTableProps) => {
+export const SortableCategory = ({ menuCategory }: CategoryTableProps) => {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
   const [showAddItemForm, setShowAddItemForm] = useState(false)
@@ -377,24 +439,251 @@ export const CategoryTable = ({ menuCategory }: CategoryTableProps) => {
   }
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
+    <SortableCategoryWrapper menuCategory={menuCategory} />
+  )
+}
+
+interface SortableCategoryWrapperProps {
+  menuCategory: MenuCategoryDto
+}
+
+const SortableCategoryWrapper = ({ menuCategory }: SortableCategoryWrapperProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: menuCategory.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 1000 : 'auto',
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`mb-8 ${isDragging ? 'pointer-events-none select-none' : ''}`}
+    >
+      <SortableCategoryHeader menuCategory={menuCategory} attributes={attributes} listeners={listeners} />
+      <SortableCategoryContent menuCategory={menuCategory} />
+    </div>
+  )
+}
+
+interface SortableCategoryHeaderProps {
+  menuCategory: MenuCategoryDto
+  attributes?: any
+  listeners?: any
+}
+
+const SortableCategoryHeader = ({ menuCategory, attributes, listeners }: SortableCategoryHeaderProps) => {
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center gap-3">
+        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-200 rounded transition-colors">
+          <GripVertical className="h-4 w-4 text-gray-400" />
+        </div>
         <div>
           <h2 className="text-2xl font-bold">{menuCategory.name}</h2>
           {menuCategory.description && (
             <p className="text-gray-600">{menuCategory.description}</p>
           )}
         </div>
-        <Button
-          onClick={handleAddMenuItem}
-          disabled={showAddItemForm}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Add Menu Item
-        </Button>
       </div>
+    </div>
+  )
+}
 
+interface SortableCategoryContentProps {
+  menuCategory: MenuCategoryDto
+}
+
+const SortableCategoryContent = ({ menuCategory }: SortableCategoryContentProps) => {
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+  const [editingItemId, setEditingItemId] = useState<string | null>(null)
+  const [showAddItemForm, setShowAddItemForm] = useState(false)
+  const [newItemData, setNewItemData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    isAvailable: true,
+    allergenIds: [] as string[],
+  })
+  const [items, setItems] = useState(menuCategory.menuCategoryItems)
+  const reorderMutation = useReorderMenuItems()
+  const createMenuItemMutation = useCreateMenuItem()
+  const addToCategoryMutation = useAddMenuItemToCategory()
+
+  // Update items when menuCategory changes
+  useEffect(() => {
+    setItems(menuCategory.menuCategoryItems)
+  }, [menuCategory.menuCategoryItems])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const toggleRow = (itemId: string) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId)
+      } else {
+        newSet.add(itemId)
+      }
+      return newSet
+    })
+  }
+
+  const startEditing = (itemId: string) => {
+    setEditingItemId(itemId)
+    // Auto-expand the row when editing
+    setExpandedRows(prev => {
+      const newSet = new Set(prev)
+      newSet.add(itemId)
+      return newSet
+    })
+  }
+
+  const stopEditing = () => {
+    setEditingItemId(null)
+  }
+
+  const handleAddMenuItem = () => {
+    setShowAddItemForm(true)
+    setNewItemData({
+      name: '',
+      description: '',
+      price: '',
+      isAvailable: true,
+      allergenIds: [],
+    })
+  }
+
+  const handleCancelAddItem = () => {
+    setShowAddItemForm(false)
+    setNewItemData({
+      name: '',
+      description: '',
+      price: '',
+      isAvailable: true,
+      allergenIds: [],
+    })
+  }
+
+  const handleCreateMenuItem = () => {
+    if (!newItemData.name.trim()) {
+      toast.error('Name is required')
+      return
+    }
+
+    if (!newItemData.price || parseFloat(newItemData.price) <= 0) {
+      toast.error('Valid price is required')
+      return
+    }
+
+    createMenuItemMutation.mutate(
+      {
+        name: newItemData.name,
+        description: newItemData.description,
+        price: parseFloat(newItemData.price),
+        hasOptions: false, // New items don't have options initially
+        isAvailable: newItemData.isAvailable,
+        restaurantMenuId: menuCategory.restaurantMenuId,
+        allergenIds: newItemData.allergenIds,
+      },
+      {
+        onSuccess: (result) => {
+          if (!result?.id) {
+            toast.error('Failed to create menu item - no ID returned')
+            return
+          }
+
+          // Now add the created menu item to this category
+          addToCategoryMutation.mutate(
+            {
+              menuItemId: result.id,
+              menuCategoryId: menuCategory.id,
+              orderIndex: items.length, // Add at the end
+            },
+            {
+              onSuccess: () => {
+                toast.success('Menu item created and added to category')
+                setShowAddItemForm(false)
+                setNewItemData({
+                  name: '',
+                  description: '',
+                  price: '',
+                  isAvailable: true,
+                  allergenIds: [],
+                })
+              },
+              onError: (error) => {
+                console.error('Add to category error:', error)
+                toast.error('Menu item created but failed to add to category')
+                setShowAddItemForm(false)
+                setNewItemData({
+                  name: '',
+                  description: '',
+                  price: '',
+                  isAvailable: true,
+                  allergenIds: [],
+                })
+              },
+            }
+          )
+        },
+        onError: (error) => {
+          console.error('Create menu item error:', error)
+          toast.error('Failed to create menu item')
+        },
+      }
+    )
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) {
+      return
+    }
+
+    const oldIndex = items.findIndex(item => item.id === active.id)
+    const newIndex = items.findIndex(item => item.id === over.id)
+
+    if (oldIndex === -1 || newIndex === -1) {
+      return
+    }
+
+    // Update local state immediately for optimistic UI
+    const newItems = arrayMove(items, oldIndex, newIndex)
+    setItems(newItems)
+
+    // Call API to persist the new order
+    const categoryItemIds = newItems.map(item => item.id)
+    reorderMutation.mutate(
+      { categoryId: menuCategory.id, categoryItemIds },
+      {
+        onError: () => {
+          // Revert on error
+          setItems(items)
+          toast.error('Failed to reorder items')
+        },
+        onSuccess: () => {
+          toast.success('Order updated successfully')
+        },
+      }
+    )
+  }
+
+  return (
+    <>
       {showAddItemForm && (
         <div className="mb-6 p-4 border rounded-lg bg-gray-50">
           <h3 className="text-lg font-semibold mb-4">Add New Menu Item</h3>
@@ -457,44 +746,52 @@ export const CategoryTable = ({ menuCategory }: CategoryTableProps) => {
         </div>
       )}
 
-      <div className="rounded-md border">
+      <div className="border rounded">
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]"></TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <SortableContext items={items.map(item => item.id)} strategy={verticalListSortingStrategy}>
-              <TableBody>
-                {items.map(item => {
-                  const isExpanded = expandedRows.has(item.id)
-                  const isEditing = editingItemId === item.id
+          <div className="rounded overflow-hidden">
+            <Table className="">
+              <TableHeader className="bg-gray-200">
+                <TableRow className="uppercase text-xs font-bold">
+                  <TableHead className="w-[50px] " ></TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <SortableContext items={items.map(item => item.id)} strategy={verticalListSortingStrategy}>
+                <TableBody className="bg-white">
+                  {items.map(item => {
+                    const isExpanded = expandedRows.has(item.id)
+                    const isEditing = editingItemId === item.id
 
-                  return (
-                    <SortableRow
-                      key={item.id}
-                      item={item}
-                      isExpanded={isExpanded}
-                      isEditing={isEditing}
-                      toggleRow={toggleRow}
-                      startEditing={startEditing}
-                      stopEditing={stopEditing}
-                    />
-                  )
-                })}
-              </TableBody>
-            </SortableContext>
-          </Table>
+                    return (
+                      <SortableRow
+                        key={item.id}
+                        item={item}
+                        isExpanded={isExpanded}
+                        isEditing={isEditing}
+                        toggleRow={toggleRow}
+                        startEditing={startEditing}
+                        stopEditing={stopEditing}
+                      />
+                    )
+                  })}
+                </TableBody>
+              </SortableContext>
+            </Table>
+          </div>
         </DndContext>
-      </div>
-    </div>
+        <div className="pt-2 mb-2 border-t">
+          <Button variant="ghost" onClick={handleAddMenuItem} className="w-full" disabled={showAddItemForm}>
+            <Plus className="w-4 h-4 mr-1" /> Add Item
+          </Button>
+        </div>
+
+      </div >
+    </>
   )
 }
 
@@ -882,3 +1179,4 @@ const SortableRow = ({ item, isExpanded, isEditing, toggleRow, startEditing, sto
     </>
   )
 }
+
