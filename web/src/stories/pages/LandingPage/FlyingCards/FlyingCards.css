@@ -1,0 +1,176 @@
+.flying-cards-container {
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  background-color: #000;
+  color: #fff;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+}
+
+.flying-cards-container * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.flying-cards-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flying-cards-main {
+  width: 100vw;
+  height: 150vh;
+  flex-direction: column;
+  background: linear-gradient(180deg, #000 0%, #1a1a1a 50%, #000 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.flying-card-row {
+  position: relative;
+  width: 100%;
+  margin: 1em 0;
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+}
+
+.flying-card {
+  position: relative;
+  width: 40%;
+  height: 360px;
+  border-radius: 0.75em;
+  overflow: hidden;
+  will-change: transform;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.flying-card:hover {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+}
+
+.flying-cards-content {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.flying-cards-logo {
+  width: 150px;
+  height: 150px;
+  border: 2px solid #fff;
+  border-radius: 100%;
+  overflow: hidden;
+  transform: scale(0);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.5s ease;
+}
+
+/* Fallback for when GSAP doesn't load */
+.flying-cards-logo.gsap-loaded {
+  transform: scale(1);
+}
+
+.flying-cards-copy {
+  margin: 2em 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.flying-cards-line {
+  position: relative;
+  margin: 0.5em 0;
+  width: max-content;
+  height: 28px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+.flying-cards-line p {
+  position: relative;
+  font-size: 24px;
+  font-weight: 500;
+  transform: translateY(30px);
+  color: #fff;
+}
+
+.flying-cards-button {
+  position: relative;
+  padding: 1em 2em;
+  font-size: 18px;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 8em;
+  background: none;
+  outline: none;
+  transform: translateY(30px);
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  pointer-events: auto;
+}
+
+.flying-cards-button:hover {
+  background: #fff;
+  color: #000;
+  transform: translateY(25px) scale(1.05);
+}
+
+.flying-cards-btn {
+  margin-top: 1em;
+}
+
+@media (max-width: 900px) {
+  .flying-card {
+    width: 50%;
+    height: 240px;
+  }
+
+  .flying-cards-line p {
+    font-size: 20px;
+  }
+
+  .flying-card-row {
+    gap: 1em;
+  }
+}
+
+@media (max-width: 600px) {
+  .flying-card-row {
+    flex-direction: column;
+    height: auto;
+    gap: 1em;
+    margin: 2em 0;
+  }
+
+  .flying-card {
+    width: 80%;
+    height: 200px;
+  }
+
+  .flying-cards-logo {
+    width: 100px;
+    height: 100px;
+  }
+
+  .flying-cards-line p {
+    font-size: 18px;
+  }
+}
