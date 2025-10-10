@@ -7,7 +7,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { MenuCategoryDto, useReorderMenuItems, useCreateMenuItem, useAddMenuItemToCategory } from '@shared'
 import { toast } from 'sonner'
 import { MenuItemRow } from './MenuItemRow'
-import { AddMenuItemForm } from './AddMenuItemForm'
+import { AddMenuItemRow } from './AddMenuItemRow'
 
 interface CategoryItemsTableProps {
   menuCategory: MenuCategoryDto
@@ -77,7 +77,6 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
     description: string
     price: string
     isAvailable: boolean
-    allergenIds: string[]
   }) => {
     if (!data.name.trim()) {
       toast.error('Name is required')
@@ -97,7 +96,7 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
         hasOptions: false,
         isAvailable: data.isAvailable,
         restaurantMenuId: menuCategory.restaurantMenuId,
-        allergenIds: data.allergenIds,
+        allergenIds: [],
       },
       {
         onSuccess: (result) => {
@@ -114,7 +113,7 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
             },
             {
               onSuccess: () => {
-                toast.success('Menu item created and added to category')
+                toast.success('Menu item created')
                 setShowAddItemForm(false)
               },
               onError: (error) => {
@@ -166,59 +165,56 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
   }
 
   return (
-    <>
-      {showAddItemForm && (
-        <AddMenuItemForm
-          onSubmit={handleCreateMenuItem}
-          onCancel={handleCancelAddItem}
-          isSubmitting={createMenuItemMutation.isPending || addToCategoryMutation.isPending}
-        />
-      )}
+    <div className="border rounded">
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <div className="rounded overflow-hidden">
+          <Table>
+            <TableHeader className="bg-gray-200">
+              <TableRow className="uppercase text-xs font-bold">
+                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-[50px]"></TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <SortableContext items={items.map(item => item.id)} strategy={verticalListSortingStrategy}>
+              <TableBody className="bg-white">
+                {items.map(item => {
+                  const isExpanded = expandedRows.has(item.id)
+                  const isEditing = editingItemId === item.id
 
-      <div className="border rounded">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <div className="rounded overflow-hidden">
-            <Table>
-              <TableHeader className="bg-gray-200">
-                <TableRow className="uppercase text-xs font-bold">
-                  <TableHead className="w-[50px]"></TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <SortableContext items={items.map(item => item.id)} strategy={verticalListSortingStrategy}>
-                <TableBody className="bg-white">
-                  {items.map(item => {
-                    const isExpanded = expandedRows.has(item.id)
-                    const isEditing = editingItemId === item.id
-
-                    return (
-                      <MenuItemRow
-                        key={item.id}
-                        item={item}
-                        isExpanded={isExpanded}
-                        isEditing={isEditing}
-                        toggleRow={toggleRow}
-                        startEditing={startEditing}
-                        stopEditing={stopEditing}
-                      />
-                    )
-                  })}
-                </TableBody>
-              </SortableContext>
-            </Table>
-          </div>
-        </DndContext>
-        <div className="pt-2 mb-2 border-t">
-          <Button variant="ghost" onClick={handleAddMenuItem} className="w-full" disabled={showAddItemForm}>
-            <Plus className="w-4 h-4 mr-1" /> Add Item
-          </Button>
+                  return (
+                    <MenuItemRow
+                      key={item.id}
+                      item={item}
+                      isExpanded={isExpanded}
+                      isEditing={isEditing}
+                      toggleRow={toggleRow}
+                      startEditing={startEditing}
+                      stopEditing={stopEditing}
+                    />
+                  )
+                })}
+                {showAddItemForm && (
+                  <AddMenuItemRow
+                    onSave={handleCreateMenuItem}
+                    onCancel={handleCancelAddItem}
+                    isSubmitting={createMenuItemMutation.isPending || addToCategoryMutation.isPending}
+                  />
+                )}
+              </TableBody>
+            </SortableContext>
+          </Table>
         </div>
+      </DndContext>
+      <div className="pt-2 mb-2 border-t">
+        <Button variant="ghost" onClick={handleAddMenuItem} className="w-full" disabled={showAddItemForm}>
+          <Plus className="w-4 h-4 mr-1" /> Add Item
+        </Button>
       </div>
-    </>
+    </div>
   )
 }

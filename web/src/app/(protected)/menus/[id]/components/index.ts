@@ -1,5 +1,6 @@
 export { AddCategoryForm } from './AddCategoryForm'
 export { AddMenuItemForm } from './AddMenuItemForm'
+export { AddMenuItemRow } from './AddMenuItemRow'
 export { CategoryItemsTable } from './CategoryItemsTable'
 export { MenuItemAllergens } from './MenuItemAllergens'
 export { MenuItemOptions } from './MenuItemOptions'
