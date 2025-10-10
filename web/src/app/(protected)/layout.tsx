@@ -22,11 +22,9 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   const websitePattern = /\/websites\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   const isWebsitePage = websitePattern.test(pathname)
 
-  if (isWebsitePage) {
-    return (
-      children
-    )
-  }
+  const isOnboardingPage = pathname.startsWith('/onboarding')
+
+  if (isWebsitePage || isOnboardingPage) return children
 
   return (
     <SidebarProvider>
