@@ -176,6 +176,7 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Price</TableHead>
+                <TableHead>Has Options</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>

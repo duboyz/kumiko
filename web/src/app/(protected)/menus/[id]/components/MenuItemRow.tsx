@@ -1,16 +1,15 @@
 import { TableCell, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { ChevronDown, ChevronRight, Edit, GripVertical, Trash2, Save, X } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
+import { ChevronDown, ChevronRight, Edit, GripVertical, Trash2, Save, X, CornerDownRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { MenuCategoryItemDto, useUpdateMenuItem, useAllergens, formatPrice, useLocationSelection, Currency } from '@shared'
 import { toast } from 'sonner'
-import { MenuItemOptions } from './MenuItemOptions'
-import { MenuItemAllergens } from './MenuItemAllergens'
+
+import { cn } from '@/lib/utils'
 
 interface MenuItemRowProps {
   item: MenuCategoryItemDto
@@ -44,6 +43,10 @@ export const MenuItemRow = ({
     allergenIds: item.menuItem.allergens?.map(a => a.id) || [],
   })
 
+  // Store options temporarily when converting to simple item
+  const [savedOptions, setSavedOptions] = useState<typeof editedData.options>([])
+
+
   // Reset edited data when item changes
   useEffect(() => {
     if (!isEditing) {
@@ -55,8 +58,16 @@ export const MenuItemRow = ({
         options: item.menuItem.options || [],
         allergenIds: item.menuItem.allergens?.map(a => a.id) || [],
       })
+      setSavedOptions([]) // Clear saved options when exiting edit mode
     }
   }, [item.menuItem, isEditing])
+
+  // Auto-expand when entering edit mode
+  useEffect(() => {
+    if (isEditing && !isExpanded) {
+      toggleRow(item.id)
+    }
+  }, [isEditing])
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -65,6 +76,7 @@ export const MenuItemRow = ({
   }
 
   const hasOptions = item.menuItem.options && item.menuItem.options.length > 0
+  const canExpand = hasOptions || isEditing
 
   const handleSave = () => {
     const hasOptions = editedData.options.length > 0
@@ -113,6 +125,7 @@ export const MenuItemRow = ({
     updateMutation.mutate(payload, {
       onSuccess: () => {
         toast.success('Menu item updated successfully')
+        setSavedOptions([]) // Clear saved options on successful save
         stopEditing()
       },
       onError: (error: any) => {
@@ -131,6 +144,7 @@ export const MenuItemRow = ({
       options: item.menuItem.options || [],
       allergenIds: item.menuItem.allergens?.map(a => a.id) || [],
     })
+    setSavedOptions([]) // Clear saved options on cancel
     stopEditing()
   }
 
@@ -176,26 +190,85 @@ export const MenuItemRow = ({
     }))
   }
 
+  const convertToOptions = () => {
+    // If we have saved options, restore them
+    if (savedOptions.length > 0) {
+      setEditedData(prev => ({
+        ...prev,
+        options: savedOptions,
+      }))
+    } else {
+      // Otherwise create default options
+      const basePrice = editedData.price || 0
+      setEditedData(prev => ({
+        ...prev,
+        options: [
+          {
+            id: `temp-${Date.now()}-1`,
+            name: '',
+            description: '',
+            price: basePrice,
+            orderIndex: 0,
+            menuItemId: item.menuItem.id,
+          },
+          {
+            id: `temp-${Date.now()}-2`,
+            name: '',
+            description: '',
+            price: basePrice,
+            orderIndex: 1,
+            menuItemId: item.menuItem.id,
+          },
+        ],
+      }))
+    }
+    // Expand the row to show the options
+    if (!isExpanded) {
+      toggleRow(item.id)
+    }
+  }
+
+  const convertToSimpleItem = () => {
+    // Save current options before removing them
+    if (editedData.options.length > 0) {
+      setSavedOptions(editedData.options)
+    }
+    // Use the first option's price or 0
+    const priceToUse = editedData.options.length > 0 ? editedData.options[0].price : 0
+    setEditedData(prev => ({
+      ...prev,
+      options: [],
+      price: priceToUse,
+    }))
+  }
+
+
   return (
     <>
-      <TableRow ref={setNodeRef} style={style} className="hover:bg-gray-50">
+      <TableRow ref={setNodeRef} style={style} className={cn(
+        "hover:bg-gray-50",
+        isExpanded && hasOptions && "bg-gray-100"
+      )} >
         <TableCell>
           <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-200 rounded transition-colors">
             <GripVertical className="h-4 w-4 text-gray-400" />
           </div>
         </TableCell>
         <TableCell>
-          <button
-            onClick={() => toggleRow(item.id)}
-            className="p-1 hover:bg-gray-200 rounded transition-colors"
-            disabled={isEditing}
-          >
-            {isExpanded ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </button>
+          {
+            canExpand && (
+              <button
+                onClick={() => toggleRow(item.id)}
+                className="p-1 hover:bg-gray-200 rounded transition-colors"
+              >
+                {isExpanded ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </button>
+            )
+          }
         </TableCell>
         {isEditing ? (
           <>
@@ -223,18 +296,24 @@ export const MenuItemRow = ({
                 disabled={editedData.options.length > 0}
                 placeholder={editedData.options.length > 0 ? "N/A" : "0.00"}
               />
-              {editedData.options.length > 0 && (
-                <p className="text-xs text-gray-500 mt-1">Price set by options</p>
-              )}
             </TableCell>
             <TableCell>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  checked={editedData.isAvailable}
-                  onCheckedChange={(checked) => setEditedData(prev => ({ ...prev, isAvailable: checked as boolean }))}
-                />
-                <span className="text-sm">Available</span>
-              </div>
+              <Switch
+                checked={editedData.options.length > 0}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    convertToOptions()
+                  } else {
+                    convertToSimpleItem()
+                  }
+                }}
+              />
+            </TableCell>
+            <TableCell>
+              <Switch
+                checked={editedData.isAvailable}
+                onCheckedChange={(checked) => setEditedData(prev => ({ ...prev, isAvailable: checked as boolean }))}
+              />
             </TableCell>
             <TableCell>
               <div className="flex gap-2">
@@ -266,9 +345,16 @@ export const MenuItemRow = ({
               )}
             </TableCell>
             <TableCell>
-              <Badge variant={item.menuItem.isAvailable ? 'default' : 'secondary'}>
-                {item.menuItem.isAvailable ? 'Available' : 'Unavailable'}
-              </Badge>
+              <Switch
+                checked={hasOptions}
+                disabled
+              />
+            </TableCell>
+            <TableCell>
+              <Switch
+                checked={item.menuItem.isAvailable}
+                disabled
+              />
             </TableCell>
             <TableCell>
               <div className="flex gap-2">
@@ -282,9 +368,94 @@ export const MenuItemRow = ({
         )}
       </TableRow>
 
-      {isExpanded && (
+      {
+        isExpanded && (
+          <>
+            {isEditing ? (
+              // Edit mode - show input fields
+              <>
+                {editedData.options.map((option, index) => (
+                  <TableRow key={option.id || `option-${index}`} className="pl-8">
+                    <TableCell className="bg-gray-50"></TableCell>
+                    <TableCell className="bg-gray-100"><CornerDownRight className="h-4 w-4" /></TableCell>
+                    <TableCell className="bg-gray-100">
+                      <Input
+                        value={option.name}
+                        onChange={(e) => updateOption(index, 'name', e.target.value)}
+                        placeholder="Option name"
+                        className="w-full"
+                      />
+                    </TableCell>
+                    <TableCell className="bg-gray-100">
+                      <Input
+                        value={option.description || ''}
+                        onChange={(e) => updateOption(index, 'description', e.target.value)}
+                        placeholder="Description (optional)"
+                        className="w-full"
+                      />
+                    </TableCell>
+                    <TableCell className="bg-gray-100">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={option.price || 0}
+                        onChange={(e) => updateOption(index, 'price', parseFloat(e.target.value) || 0)}
+                        placeholder="0.00"
+                        className="w-24"
+                      />
+                    </TableCell>
+                    <TableCell className="bg-gray-50"></TableCell>
+                    <TableCell className="bg-gray-50"></TableCell>
+                    <TableCell className="bg-gray-100">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeOption(index)}
+                        disabled={editedData.options.length <= 2}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                <TableRow key={`${item.id}-add-option`} className="pl-8">
+                  <TableCell colSpan={8} className="bg-gray-50">
+                    <Button onClick={addOption} className="w-full" variant="ghost">
+                      Add option
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </>
+            ) : (
+              // View mode - show read-only data
+              <>
+                {hasOptions && item.menuItem.options.map((option, index) => (
+                  <TableRow key={option.id || `option-${index}`} className="pl-8">
+                    <TableCell className="bg-gray-50"></TableCell>
+                    <TableCell className="bg-gray-50"><CornerDownRight className="ml-2 h-4 w-4 text-gray-600" /></TableCell>
+                    <TableCell className="bg-gray-50">
+                      <p className="font-medium">{option.name}</p>
+                    </TableCell>
+                    <TableCell className="bg-gray-50">
+                      <p className="text-gray-600">{option.description || '-'}</p>
+                    </TableCell>
+                    <TableCell className="bg-gray-50">
+                      <p>{formatPrice(option.price, currency)}</p>
+                    </TableCell>
+                    <TableCell className="bg-gray-50"></TableCell>
+                    <TableCell className="bg-gray-50"></TableCell>
+                    <TableCell className="bg-gray-50"></TableCell>
+                  </TableRow>
+                ))}
+              </>
+            )}
+          </>
+        )
+      }
+
+      {/* {isExpanded && (
         <TableRow key={`${item.id}-details`}>
-          <TableCell colSpan={7} className="bg-gradient-to-br from-gray-50 to-gray-100/50">
+            <TableCell colSpan={8} className="bg-gray-100">
             <div className="p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <MenuItemOptions
@@ -306,7 +477,7 @@ export const MenuItemRow = ({
             </div>
           </TableCell>
         </TableRow>
-      )}
+      )} */}
     </>
   )
 }
