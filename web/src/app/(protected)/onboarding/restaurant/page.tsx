@@ -4,35 +4,52 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, CheckCircle } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { SearchBusiness } from '@/components'
 import { ContentContainer } from '@/components'
 import { useCreateRestaurant, ResponseBusinessDetails, CreateRestaurantCommand } from '@shared'
+import { BusinessHoursEditor, BusinessHours, BusinessDetailsEditor, BusinessDetails } from '@/stories/onboarding'
 
 export default function RestaurantOnboardingPage() {
   const router = useRouter()
   const [selectedBusiness, setSelectedBusiness] = useState<ResponseBusinessDetails | null>(null)
+  const [businessDetails, setBusinessDetails] = useState<BusinessDetails | null>(null)
+  const [businessHours, setBusinessHours] = useState<BusinessHours | null>(null)
   const createRestaurantMutation = useCreateRestaurant()
 
   const handleBusinessSelect = (business: ResponseBusinessDetails) => {
     setSelectedBusiness(business)
   }
 
+  const handleBusinessDetailsChange = (details: BusinessDetails) => {
+    setBusinessDetails(details)
+  }
+
+  const handleBusinessHoursChange = (hours: BusinessHours) => {
+    setBusinessHours(hours)
+  }
+
   const handleCreateRestaurant = async () => {
-    if (!selectedBusiness) return
+    if (!businessDetails) return
+
+    // Convert business hours to JSON string format
+    let businessHoursJson: string | null = null
+    if (businessHours) {
+      businessHoursJson = JSON.stringify(businessHours)
+    }
 
     const command: CreateRestaurantCommand = {
-      name: selectedBusiness.name,
-      address: selectedBusiness.formattedAddress,
-      city: selectedBusiness.vicinity || '',
-      state: '',
-      zip: '',
-      country: 'NO',
-      latitude: selectedBusiness.geometry.location.lat.toString(),
-      longitude: selectedBusiness.geometry.location.lng.toString(),
-      googlePlaceId: selectedBusiness.placeId,
-      businessHours: selectedBusiness.openingHours?.weekdayText ? JSON.stringify(selectedBusiness.openingHours.weekdayText) : null,
-      isOpenNow: selectedBusiness.openingHours?.openNow,
+      name: businessDetails.name,
+      address: businessDetails.address,
+      city: businessDetails.city,
+      state: businessDetails.state,
+      zip: businessDetails.zip,
+      country: businessDetails.country,
+      latitude: businessDetails.latitude,
+      longitude: businessDetails.longitude,
+      googlePlaceId: businessDetails.googlePlaceId,
+      businessHours: businessHoursJson,
+      isOpenNow: selectedBusiness?.openingHours?.openNow,
     }
 
     try {
@@ -71,57 +88,29 @@ export default function RestaurantOnboardingPage() {
       </Card>
 
       {selectedBusiness && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              Selected Restaurant
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p>
-                <strong>Name:</strong> {selectedBusiness.name}
-              </p>
-              <p>
-                <strong>Address:</strong> {selectedBusiness.formattedAddress}
-              </p>
-              {selectedBusiness.formattedPhoneNumber && (
-                <p>
-                  <strong>Phone:</strong> {selectedBusiness.formattedPhoneNumber}
-                </p>
-              )}
-              {selectedBusiness.website && (
-                <p>
-                  <strong>Website:</strong> {selectedBusiness.website}
-                </p>
-              )}
-              {selectedBusiness.rating && (
-                <p>
-                  <strong>Rating:</strong> {selectedBusiness.rating} ⭐ ({selectedBusiness.userRatingsTotal} reviews)
-                </p>
-              )}
-            </div>
-            <pre>
-              {JSON.stringify(selectedBusiness, null, 2)}
-            </pre>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <BusinessDetailsEditor businessData={selectedBusiness} onChange={handleBusinessDetailsChange} />
+
+          <BusinessHoursEditor
+            weekdayText={selectedBusiness.openingHours?.weekdayText}
+            onChange={handleBusinessHoursChange}
+          />
+
+          <div className="text-center">
+            <Button
+              onClick={handleCreateRestaurant}
+              disabled={!businessDetails || !businessHours || createRestaurantMutation.isPending}
+              size="lg"
+            >
+              {createRestaurantMutation.isPending ? 'Creating Restaurant...' : 'Complete Setup'}
+            </Button>
+
+            {createRestaurantMutation.error && (
+              <p className="text-red-600 text-sm mt-2">Error: {createRestaurantMutation.error.message}</p>
+            )}
+          </div>
+        </div>
       )}
-
-      <div className="text-center">
-        <Button
-          onClick={handleCreateRestaurant}
-          disabled={!selectedBusiness || createRestaurantMutation.isPending}
-          size="lg"
-        >
-          {createRestaurantMutation.isPending ? 'Creating...' : 'Create Restaurant'}
-        </Button>
-
-        {createRestaurantMutation.error && (
-          <p className="text-red-600 text-sm mt-2">Error: {createRestaurantMutation.error.message}</p>
-        )}
-      </div>
     </ContentContainer>
   )
 }
