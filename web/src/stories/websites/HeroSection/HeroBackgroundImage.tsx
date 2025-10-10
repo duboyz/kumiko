@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button'
 import { HeroSectionType } from '@shared'
-import { HeroSettingsPopover } from './HeroSettingsPopover'
 
 interface HeroBackgroundImageProps {
   title: string
@@ -59,23 +58,6 @@ export function HeroBackgroundImage({
 
   return (
     <section className={`relative py-[160px] px-10 text-center ${className}`} style={sectionStyle}>
-      {/* Floating Edit Button */}
-      {isEditing && onUpdate && (
-        <HeroSettingsPopover
-          type={type}
-          backgroundImageUrl={backgroundImageUrl}
-          backgroundColor={backgroundColor}
-          textColor={textColor}
-          backgroundOverlayColor={backgroundOverlayColor}
-          buttonText={buttonText}
-          buttonUrl={buttonUrl}
-          buttonTextColor={buttonTextColor}
-          buttonBackgroundColor={buttonBackgroundColor}
-          onUpdate={onUpdate}
-          onTypeChange={onTypeChange}
-        />
-      )}
-
       {/* Overlay */}
       <div className="absolute inset-0" style={overlayStyle} />
 

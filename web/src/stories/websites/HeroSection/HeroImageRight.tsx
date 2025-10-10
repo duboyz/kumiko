@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button'
 import { HeroSectionType } from '@shared'
-import { HeroSettingsPopover } from './HeroSettingsPopover'
 
 interface HeroImageRightProps {
   title: string
@@ -54,22 +53,6 @@ export function HeroImageRight({
       className={`grid grid-cols-1 lg:grid-cols-2 min-h-[600px] items-center ${className}`}
       style={containerStyle}
     >
-      {/* Floating Edit Button */}
-      {isEditing && onUpdate && (
-        <HeroSettingsPopover
-          type={type}
-          imageUrl={imageUrl}
-          backgroundColor={backgroundColor}
-          textColor={textColor}
-          buttonText={buttonText}
-          buttonUrl={buttonUrl}
-          buttonTextColor={buttonTextColor}
-          buttonBackgroundColor={buttonBackgroundColor}
-          onUpdate={onUpdate}
-          onTypeChange={onTypeChange}
-        />
-      )}
-
       {/* Content */}
       <div className="p-20">
         {isEditing && onUpdate ? (

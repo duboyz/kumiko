@@ -1,11 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Settings, ShoppingCart } from 'lucide-react'
+import { ShoppingCart } from 'lucide-react'
 import { RestaurantMenuDto, GetMenuByIdResult, Currency } from '@shared/types'
 import { formatPrice } from '@shared'
 import { OrderForm } from '@/stories/orders/OrderForm'
@@ -38,10 +34,10 @@ export function RestaurantMenuSection({
   }
 
   // Check if we can use the full OrderForm
-  const canUseOrderForm = 
-    allowOrdering && 
-    !isEditing && 
-    restaurantId && 
+  const canUseOrderForm =
+    allowOrdering &&
+    !isEditing &&
+    restaurantId &&
     'categories' in restaurantMenu &&
     restaurantMenu.categories.length > 0
 
@@ -56,55 +52,6 @@ export function RestaurantMenuSection({
 
   return (
     <section className={`relative py-20 px-10 bg-white ${className}`}>
-      {/* Floating Edit Button */}
-      {isEditing && onUpdate && (
-        <div className="absolute top-4 right-4 z-10">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button size="sm" variant="outline" className="bg-white shadow-lg border-gray-300">
-                <Settings className="w-4 h-4" color="#000" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80" align="end">
-              <div className="space-y-4">
-                <h4 className="font-medium text-sm text-gray-900 mb-3">Menu Section Settings</h4>
-
-                {/* Menu Selection */}
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Select Menu</label>
-                  <Select
-                    value={currentMenuId || restaurantMenu.id}
-                    onValueChange={value => onUpdate?.('restaurantMenuId', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableMenus.map(menu => (
-                        <SelectItem key={menu.id} value={menu.id}>
-                          {menu.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Allow Ordering Toggle */}
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="allow-ordering"
-                    checked={allowOrdering}
-                    onCheckedChange={(checked: boolean) => onUpdate?.('allowOrdering', checked)}
-                  />
-                  <Label htmlFor="allow-ordering" className="text-sm font-medium text-gray-700">
-                    Allow ordering
-                  </Label>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-      )}
 
       {/* Content */}
       <div className="max-w-[1000px] mx-auto">

@@ -19,6 +19,15 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   const pathname = usePathname()
   const pathSegments = pathname.split('/').filter(Boolean)
 
+  const websitePattern = /\/websites\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+  const isWebsitePage = websitePattern.test(pathname)
+
+  if (isWebsitePage) {
+    return (
+      children
+    )
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />

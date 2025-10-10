@@ -20,6 +20,7 @@ import { LoadingState, ErrorState, EmptyState } from '@/components'
 import { ContentContainer } from '@/components'
 import { WebsitePage, HeroSection, TextSection, TextAndImageSection, SectionSelectionModal } from '@/stories/websites'
 import { RestaurantMenuSection } from '@/stories/menus/RestaurantMenuSection/RestaurantMenuSection'
+import { SectionSettingsSidebar } from './SectionSettingsSidebar'
 import type { WebsiteSectionDto, HeroSectionDto, TextSectionDto, RestaurantMenuSectionDto, TextAndImageSectionDto } from '@shared'
 import { FileText } from 'lucide-react'
 import {
@@ -61,11 +62,10 @@ function SortableSection({ section, isEditing, sectionUpdates, menusData, onEdit
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative border-2 overflow-hidden bg-white transition-all duration-200 ${
-        isEditing
-          ? 'border-primary shadow-lg ring-2 ring-primary/20'
-          : 'border-transparent hover:border-gray-200 shadow-sm hover:shadow-md'
-      }`}
+      className={`group relative border-2 overflow-hidden bg-white transition-all duration-200 ${isEditing
+        ? 'border-primary shadow-lg ring-2 ring-primary/20'
+        : 'border-transparent hover:border-gray-200 shadow-sm hover:shadow-md'
+        }`}
     >
       {/* Drag Handle */}
       {!isEditing && (
@@ -481,165 +481,189 @@ export function PageEditor({ websiteId, pageId, restaurantId, onBack }: PageEdit
   if (error) return <ErrorState message={error instanceof Error ? error.message : 'An error occurred'} />
   if (!page) return <ErrorState message="Page not found" />
 
+  const editingSection = editingSectionId ? page.sections.find(s => s.id === editingSectionId) : null
+
   return (
-    <ContentContainer className="bg-white">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-8 border-b">
-        <div className="flex items-center gap-6">
-          {onBack && (
-            <Button variant="ghost" size="sm" onClick={onBack}>
-              <ArrowLeft />
-              Back
-            </Button>
-          )}
-          <div>
-            <h1 className="text-3xl font-light">{page.title}</h1>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {editingSectionId && (
-            <>
-              <div className="text-xs text-muted-foreground mr-2 hidden md:block">
-                <kbd className="px-2 py-1 bg-muted rounded border text-xs">Ctrl+S</kbd> to save,{' '}
-                <kbd className="px-2 py-1 bg-muted rounded border text-xs">Esc</kbd> to cancel
+    <div className="flex h-screen overflow-hidden">
+      <div className="flex-1 overflow-y-auto">
+        <ContentContainer className="bg-white">
+          {/* Header */}
+          <div className="flex items-center justify-between pb-8 border-b">
+            <div className="flex items-center gap-6">
+              {onBack && (
+                <Button variant="ghost" size="sm" onClick={onBack}>
+                  <ArrowLeft />
+                  Back
+                </Button>
+              )}
+              <div>
+                <h1 className="text-3xl font-light">{page.title}</h1>
               </div>
-              <Button
-                onClick={() => handleDeleteSection(editingSectionId)}
-                disabled={deleteSection.isPending}
-                variant="destructive"
-                size="sm"
-              >
-                <Trash2 />
-                {deleteSection.isPending ? 'Deleting...' : 'Delete'}
-              </Button>
-              <Button
-                onClick={() => handleSaveSection(editingSectionId)}
-                disabled={
-                  updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending
-                }
-                variant="default"
-              >
-                <Save />
-                {updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending
-                  ? 'Saving...'
-                  : 'Save'}
-              </Button>
-            </>
-          )}
+            </div>
 
-          <div className="flex items-center border bg-white">
-            <Button variant={viewMode === 'edit' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('edit')}>
-              <Edit />
-              Edit
-            </Button>
-            <Button
-              variant={viewMode === 'preview' ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('preview')}
-            >
-              <Eye />
-              Preview
-            </Button>
+            <div className="flex items-center gap-3">
+              {editingSectionId && (
+                <>
+                  <div className="text-xs text-muted-foreground mr-2 hidden md:block">
+                    <kbd className="px-2 py-1 bg-muted rounded border text-xs">Ctrl+S</kbd> to save,{' '}
+                    <kbd className="px-2 py-1 bg-muted rounded border text-xs">Esc</kbd> to cancel
+                  </div>
+                  <Button
+                    onClick={() => handleDeleteSection(editingSectionId)}
+                    disabled={deleteSection.isPending}
+                    variant="destructive"
+                    size="sm"
+                  >
+                    <Trash2 />
+                    {deleteSection.isPending ? 'Deleting...' : 'Delete'}
+                  </Button>
+                  <Button
+                    onClick={() => handleSaveSection(editingSectionId)}
+                    disabled={
+                      updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending
+                    }
+                    variant="default"
+                  >
+                    <Save />
+                    {updateHeroSection.isPending || updateTextSection.isPending || updateRestaurantMenuSection.isPending
+                      ? 'Saving...'
+                      : 'Save'}
+                  </Button>
+                </>
+              )}
+
+              <div className="flex items-center border bg-white">
+                <Button variant={viewMode === 'edit' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('edit')}>
+                  <Edit />
+                  Edit
+                </Button>
+                <Button
+                  variant={viewMode === 'preview' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('preview')}
+                >
+                  <Eye />
+                  Preview
+                </Button>
+              </div>
+
+              <Button onClick={() => setIsAddSectionModalOpen(true)} disabled={isAddingSection} variant="default">
+                <Plus />
+                Add Section
+              </Button>
+            </div>
           </div>
 
-          <Button onClick={() => setIsAddSectionModalOpen(true)} disabled={isAddingSection} variant="default">
-            <Plus />
-            Add Section
-          </Button>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="space-y-8">
-        {viewMode === 'preview' ? (
-          <div className="border overflow-hidden bg-white shadow-sm">
-            <WebsitePage page={page} availableMenus={menusData?.menus || []} />
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {page.sections.length === 0 ? (
-              <div className="text-center py-20 bg-white border-2 border-dashed">
-                <EmptyState
-                  icon={FileText}
-                  title="No sections yet"
-                  description="Start building your page by adding sections with different types of content."
-                  action={{
-                    label: 'Add Your First Section',
-                    onClick: () => setIsAddSectionModalOpen(true),
-                  }}
-                />
+          {/* Content */}
+          <div className="space-y-8">
+            {viewMode === 'preview' ? (
+              <div className="border overflow-hidden bg-white shadow-sm">
+                <WebsitePage page={page} availableMenus={menusData?.menus || []} />
               </div>
             ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={page.sections.map(s => s.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-6">
-                    {page.sections
-                      .sort((a, b) => a.sortOrder - b.sortOrder)
-                      .map(section => (
-                        <SortableSection
-                          key={section.id}
-                          section={section}
-                          isEditing={editingSectionId === section.id}
-                          sectionUpdates={sectionUpdates}
-                          menusData={menusData}
-                          onEdit={handleSectionEdit}
-                          onUpdate={handleSectionUpdate}
-                          onTypeChange={handleTypeChange}
-                        />
-                      ))}
+              <div className="space-y-6">
+                {page.sections.length === 0 ? (
+                  <div className="text-center py-20 bg-white border-2 border-dashed">
+                    <EmptyState
+                      icon={FileText}
+                      title="No sections yet"
+                      description="Start building your page by adding sections with different types of content."
+                      action={{
+                        label: 'Add Your First Section',
+                        onClick: () => setIsAddSectionModalOpen(true),
+                      }}
+                    />
                   </div>
-                </SortableContext>
-                <DragOverlay>
-                  {activeDragId ? (
-                    <div className="opacity-80 rotate-2 scale-105 transition-transform">
-                      {(() => {
-                        const section = page.sections.find(s => s.id === activeDragId)
-                        if (!section) return null
-                        return (
-                          <div className="border-2 border-primary bg-white shadow-2xl overflow-hidden rounded-lg">
-                            <div className="p-4 bg-primary/10 border-b border-primary/20">
-                              <div className="flex items-center gap-2">
-                                <GripVertical className="w-4 h-4 text-primary" />
-                                <span className="text-sm font-medium text-primary">
-                                  {section.heroSection && 'Hero Section'}
-                                  {section.textSection && 'Text Section'}
-                                  {section.textAndImageSection && 'Text & Image Section'}
-                                  {section.restaurantMenuSection && 'Menu Section'}
-                                </span>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={page.sections.map(s => s.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-6">
+                        {page.sections
+                          .sort((a, b) => a.sortOrder - b.sortOrder)
+                          .map(section => (
+                            <SortableSection
+                              key={section.id}
+                              section={section}
+                              isEditing={editingSectionId === section.id}
+                              sectionUpdates={sectionUpdates}
+                              menusData={menusData}
+                              onEdit={handleSectionEdit}
+                              onUpdate={handleSectionUpdate}
+                              onTypeChange={handleTypeChange}
+                            />
+                          ))}
+                      </div>
+                    </SortableContext>
+                    <DragOverlay>
+                      {activeDragId ? (
+                        <div className="opacity-80 rotate-2 scale-105 transition-transform">
+                          {(() => {
+                            const section = page.sections.find(s => s.id === activeDragId)
+                            if (!section) return null
+                            return (
+                              <div className="border-2 border-primary bg-white shadow-2xl overflow-hidden rounded-lg">
+                                <div className="p-4 bg-primary/10 border-b border-primary/20">
+                                  <div className="flex items-center gap-2">
+                                    <GripVertical className="w-4 h-4 text-primary" />
+                                    <span className="text-sm font-medium text-primary">
+                                      {section.heroSection && 'Hero Section'}
+                                      {section.textSection && 'Text Section'}
+                                      {section.textAndImageSection && 'Text & Image Section'}
+                                      {section.restaurantMenuSection && 'Menu Section'}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="p-4 text-sm text-muted-foreground">
+                                  Drag to reorder this section
+                                </div>
                               </div>
-                            </div>
-                            <div className="p-4 text-sm text-muted-foreground">
-                              Drag to reorder this section
-                            </div>
-                          </div>
-                        )
-                      })()}
-                    </div>
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
+                            )
+                          })()}
+                        </div>
+                      ) : null}
+                    </DragOverlay>
+                  </DndContext>
+                )}
+              </div>
             )}
           </div>
-        )}
+
+          {/* Section Selection Modal */}
+          <SectionSelectionModal
+            open={isAddSectionModalOpen}
+            onOpenChange={setIsAddSectionModalOpen}
+            onSelectSection={handleAddSection}
+            hasMenusAvailable={!!firstMenuId}
+            isLoadingMenus={isLoadingMenus}
+          />
+        </ContentContainer>
       </div>
 
-      {/* Section Selection Modal */}
-      <SectionSelectionModal
-        open={isAddSectionModalOpen}
-        onOpenChange={setIsAddSectionModalOpen}
-        onSelectSection={handleAddSection}
-        hasMenusAvailable={!!firstMenuId}
-        isLoadingMenus={isLoadingMenus}
-      />
-    </ContentContainer>
+      {/* Section Settings Sidebar */}
+      {editingSection && (
+        <SectionSettingsSidebar
+          section={editingSection}
+          sectionUpdates={sectionUpdates}
+          onUpdate={handleSectionUpdate}
+          onTypeChange={handleTypeChange}
+          availableMenus={menusData?.menus || []}
+          onClose={() => {
+            setEditingSectionId(null)
+            setSectionUpdates(prev => {
+              const { [editingSection.id]: _, ...rest } = prev
+              return rest
+            })
+          }}
+        />
+      )}
+    </div>
   )
 }
