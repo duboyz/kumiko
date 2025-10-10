@@ -1,8 +1,6 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { TextAlignment } from '@shared'
 
 interface TextAndImageSectionProps {
@@ -64,11 +62,12 @@ export function TextAndImageSection({
     <div className={`flex flex-col ${getAlignmentClass()} justify-center p-12`}>
       {/* Title */}
       {isEditing && onUpdate ? (
-        <Input
+        <textarea
           value={title || ''}
           onChange={e => onUpdate('title', e.target.value)}
           placeholder="Enter section title..."
-          className="text-3xl font-bold leading-tight mb-4 min-h-[3rem] border-2 border-dashed border-blue-300 bg-blue-50/50"
+          className={`w-full text-3xl font-bold leading-tight mb-4 min-h-[3rem] resize-none bg-transparent placeholder:text-gray-400 outline-none border border-transparent hover:border-gray-300 focus:border-gray-400 rounded transition-colors px-2 py-1 ${alignment === TextAlignment.Left ? 'text-left' : alignment === TextAlignment.Center ? 'text-center' : 'text-right'}`}
+          style={{ color: textColor || '#1f2937' }}
         />
       ) : title ? (
         <h2 className="text-3xl font-bold leading-tight mb-4">{title}</h2>
@@ -76,11 +75,12 @@ export function TextAndImageSection({
 
       {/* Content */}
       {isEditing && onUpdate ? (
-        <Textarea
+        <textarea
           value={content || ''}
           onChange={e => onUpdate('content', e.target.value)}
           placeholder="Enter your content..."
-          className="text-base leading-relaxed mb-6 min-h-[8rem] resize-none border-2 border-dashed border-blue-300 bg-blue-50/50"
+          className={`w-full text-base leading-relaxed mb-6 min-h-[8rem] resize-none bg-transparent placeholder:text-gray-400 outline-none border border-transparent hover:border-gray-300 focus:border-gray-400 rounded transition-colors px-2 py-1 ${alignment === TextAlignment.Left ? 'text-left' : alignment === TextAlignment.Center ? 'text-center' : 'text-right'}`}
+          style={{ color: textColor || '#1f2937' }}
         />
       ) : content ? (
         <div className="text-base leading-relaxed mb-6 whitespace-pre-wrap">
@@ -96,19 +96,7 @@ export function TextAndImageSection({
       {(buttonText || isEditing) && (
         <div>
           {isEditing && onUpdate ? (
-            <div className="space-y-2">
-              <Input
-                value={buttonText || ''}
-                onChange={e => onUpdate('buttonText', e.target.value)}
-                placeholder="Button text..."
-                className="border-2 border-dashed border-blue-300 bg-blue-50/50"
-              />
-              <Input
-                value={buttonUrl || ''}
-                onChange={e => onUpdate('buttonUrl', e.target.value)}
-                placeholder="Button URL..."
-                className="border-2 border-dashed border-blue-300 bg-blue-50/50"
-              />
+            <div>
               <Button style={buttonStyle} className="px-8 py-3">
                 {buttonText || 'Button Preview'}
               </Button>

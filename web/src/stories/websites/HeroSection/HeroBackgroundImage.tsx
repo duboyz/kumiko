@@ -70,14 +70,14 @@ export function HeroBackgroundImage({
               value={title}
               onChange={e => onUpdate('title', e.target.value)}
               placeholder="Enter title..."
-              className="w-full text-6xl font-light leading-tight mb-6 min-h-[4rem] resize-none border-2 border-dashed border-white/50 bg-white/10 placeholder:text-white/70 text-center outline-none focus:border-white/70 transition-colors px-4 py-2"
+              className="w-full text-6xl font-light leading-tight mb-6 min-h-[4rem] resize-none bg-transparent placeholder:text-white/40 text-center outline-none border border-transparent hover:border-white/30 focus:border-white/50 rounded transition-colors px-2 py-1"
               style={{ color: textColor || '#ffffff' }}
             />
             <textarea
               value={description}
               onChange={e => onUpdate('description', e.target.value)}
               placeholder="Enter description..."
-              className="w-full text-lg leading-relaxed mb-10 min-h-[6rem] resize-none border-2 border-dashed border-white/50 bg-white/10 placeholder:text-white/70 text-center outline-none focus:border-white/70 transition-colors px-4 py-2 opacity-60"
+              className="w-full text-lg leading-relaxed mb-10 min-h-[6rem] resize-none bg-transparent placeholder:text-white/40 text-center outline-none opacity-60 border border-transparent hover:border-white/30 focus:border-white/50 rounded transition-colors px-2 py-1"
               style={{ color: textColor || '#ffffff' }}
             />
             <div className="inline-flex gap-4">

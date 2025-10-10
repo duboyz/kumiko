@@ -62,14 +62,14 @@ export function HeroImageRight({
               value={title}
               onChange={e => onUpdate('title', e.target.value)}
               placeholder="Enter title..."
-              className="w-full text-5xl font-light leading-tight mb-6 min-h-[3.5rem] resize-none border-2 border-dashed border-blue-300 bg-blue-50/50 text-left outline-none focus:border-blue-500 transition-colors px-4 py-2"
+              className="w-full text-5xl font-light leading-tight mb-6 min-h-[3.5rem] resize-none bg-transparent placeholder:text-gray-400 text-left outline-none border border-transparent hover:border-gray-300 focus:border-gray-400 rounded transition-colors px-2 py-1"
               style={{ color: textColor || 'inherit' }}
             />
             <textarea
               value={description}
               onChange={e => onUpdate('description', e.target.value)}
               placeholder="Enter description..."
-              className="w-full text-lg leading-relaxed mb-10 min-h-[5rem] resize-none border-2 border-dashed border-blue-300 bg-blue-50/50 text-left outline-none focus:border-blue-500 transition-colors px-4 py-2 opacity-70"
+              className="w-full text-lg leading-relaxed mb-10 min-h-[5rem] resize-none bg-transparent placeholder:text-gray-400 text-left outline-none opacity-70 border border-transparent hover:border-gray-300 focus:border-gray-400 rounded transition-colors px-2 py-1"
               style={{ color: textColor || 'inherit' }}
             />
             <div className="inline-flex gap-4">
