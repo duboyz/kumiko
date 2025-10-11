@@ -77,26 +77,51 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
     description: string
     price: string
     isAvailable: boolean
+    allergenIds: string[]
+    options: Array<{ name: string; description: string; price: number }>
   }) => {
     if (!data.name.trim()) {
       toast.error('Name is required')
       return
     }
 
-    if (!data.price || parseFloat(data.price) <= 0) {
-      toast.error('Valid price is required')
-      return
+    const hasOptions = data.options.length > 0
+
+    // Validation for items with options
+    if (hasOptions) {
+      if (data.options.length < 2) {
+        toast.error('Items with options must have at least 2 options')
+        return
+      }
+
+      const invalidOptions = data.options.filter(opt => !opt.name.trim())
+      if (invalidOptions.length > 0) {
+        toast.error('All options must have a name')
+        return
+      }
+    } else {
+      // Validation for simple items
+      if (!data.price || parseFloat(data.price) <= 0) {
+        toast.error('Items without options must have a valid price')
+        return
+      }
     }
 
     createMenuItemMutation.mutate(
       {
         name: data.name,
         description: data.description,
-        price: parseFloat(data.price),
-        hasOptions: false,
+        price: hasOptions ? null : parseFloat(data.price),
+        hasOptions: hasOptions,
         isAvailable: data.isAvailable,
         restaurantMenuId: menuCategory.restaurantMenuId,
-        allergenIds: [],
+        allergenIds: data.allergenIds,
+        options: hasOptions ? data.options.map((opt, idx) => ({
+          name: opt.name,
+          description: opt.description || '',
+          price: opt.price || 0,
+          orderIndex: idx,
+        })) : [],
       },
       {
         onSuccess: (result) => {
@@ -113,7 +138,7 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
             },
             {
               onSuccess: () => {
-                toast.success('Menu item created')
+                toast.success('Menu item created successfully')
                 setShowAddItemForm(false)
               },
               onError: (error) => {
@@ -176,7 +201,7 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Price</TableHead>
-                <TableHead>Has Options</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>

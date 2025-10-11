@@ -2,7 +2,17 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
-import { ChevronDown, ChevronRight, Edit, GripVertical, Trash2, Save, X, CornerDownRight } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { ChevronDown, ChevronRight, Edit, GripVertical, Trash2, Save, X, CornerDownRight, Plus } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -45,7 +55,8 @@ export const MenuItemRow = ({
 
   // Store options temporarily when converting to simple item
   const [savedOptions, setSavedOptions] = useState<typeof editedData.options>([])
-
+  const [showRemoveOptionDialog, setShowRemoveOptionDialog] = useState(false)
+  const [optionToRemove, setOptionToRemove] = useState<number | null>(null)
 
   // Reset edited data when item changes
   useEffect(() => {
@@ -149,27 +160,83 @@ export const MenuItemRow = ({
   }
 
   const addOption = () => {
-    setEditedData(prev => ({
-      ...prev,
-      options: [
-        ...prev.options,
-        {
-          id: `temp-${Date.now()}`,
-          name: '',
-          description: '',
-          price: 0,
-          orderIndex: prev.options.length,
-          menuItemId: item.menuItem.id,
-        },
-      ],
-    }))
+    setEditedData(prev => {
+      // If no options exist, add 2 (minimum required)
+      if (prev.options.length === 0) {
+        const basePrice = prev.price || 0
+        return {
+          ...prev,
+          options: [
+            {
+              id: `temp-${Date.now()}-1`,
+              name: '',
+              description: '',
+              price: basePrice,
+              orderIndex: 0,
+              menuItemId: item.menuItem.id,
+            },
+            {
+              id: `temp-${Date.now()}-2`,
+              name: '',
+              description: '',
+              price: basePrice,
+              orderIndex: 1,
+              menuItemId: item.menuItem.id,
+            },
+          ],
+        }
+      }
+
+      // Otherwise add 1 option
+      return {
+        ...prev,
+        options: [
+          ...prev.options,
+          {
+            id: `temp-${Date.now()}`,
+            name: '',
+            description: '',
+            price: 0,
+            orderIndex: prev.options.length,
+            menuItemId: item.menuItem.id,
+          },
+        ],
+      }
+    })
   }
 
   const removeOption = (index: number) => {
-    setEditedData(prev => ({
-      ...prev,
-      options: prev.options.filter((_, i) => i !== index),
-    }))
+    // If removing this option would leave us with only 1 option, show confirmation dialog
+    if (editedData.options.length === 2) {
+      setOptionToRemove(index)
+      setShowRemoveOptionDialog(true)
+    } else {
+      // Safe to remove, more than 2 options
+      setEditedData(prev => ({
+        ...prev,
+        options: prev.options.filter((_, i) => i !== index),
+      }))
+    }
+  }
+
+  const confirmRemoveOption = () => {
+    if (optionToRemove !== null) {
+      // Convert to simple item by removing all options
+      const priceToUse = editedData.options[optionToRemove === 0 ? 1 : 0].price
+      setEditedData(prev => ({
+        ...prev,
+        options: [],
+        price: priceToUse,
+      }))
+      setShowRemoveOptionDialog(false)
+      setOptionToRemove(null)
+      toast.info('Converted to simple menu item')
+    }
+  }
+
+  const cancelRemoveOption = () => {
+    setShowRemoveOptionDialog(false)
+    setOptionToRemove(null)
   }
 
   const updateOption = (index: number, field: string, value: string | number) => {
@@ -198,7 +265,7 @@ export const MenuItemRow = ({
         options: savedOptions,
       }))
     } else {
-      // Otherwise create default options
+      // Otherwise create 2 default options (minimum required)
       const basePrice = editedData.price || 0
       setEditedData(prev => ({
         ...prev,
@@ -298,16 +365,21 @@ export const MenuItemRow = ({
               />
             </TableCell>
             <TableCell>
-              <Switch
-                checked={editedData.options.length > 0}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    convertToOptions()
-                  } else {
-                    convertToSimpleItem()
-                  }
-                }}
-              />
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={editedData.options.length > 0}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      convertToOptions()
+                    } else {
+                      convertToSimpleItem()
+                    }
+                  }}
+                />
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  {editedData.options.length > 0 ? 'Options' : 'No options'}
+                </span>
+              </div>
             </TableCell>
             <TableCell>
               <Switch
@@ -345,10 +417,15 @@ export const MenuItemRow = ({
               )}
             </TableCell>
             <TableCell>
-              <Switch
-                checked={hasOptions}
-                disabled
-              />
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={hasOptions}
+                  disabled
+                />
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  {hasOptions ? 'Options' : 'No options'}
+                </span>
+              </div>
             </TableCell>
             <TableCell>
               <Switch
@@ -375,18 +452,20 @@ export const MenuItemRow = ({
               // Edit mode - show input fields
               <>
                 {editedData.options.map((option, index) => (
-                  <TableRow key={option.id || `option-${index}`} className="pl-8">
-                    <TableCell className="bg-gray-50"></TableCell>
-                    <TableCell className="bg-gray-100"><CornerDownRight className="h-4 w-4" /></TableCell>
-                    <TableCell className="bg-gray-100">
+                  <TableRow key={option.id || `option-${index}`} className="bg-gray-50">
+                    <TableCell></TableCell>
+                    <TableCell>
+                      <CornerDownRight className="h-4 w-4" />
+                    </TableCell>
+                    <TableCell>
                       <Input
                         value={option.name}
                         onChange={(e) => updateOption(index, 'name', e.target.value)}
-                        placeholder="Option name"
+                        placeholder="Option name, e.g. Small, Medium"
                         className="w-full"
                       />
                     </TableCell>
-                    <TableCell className="bg-gray-100">
+                    <TableCell>
                       <Input
                         value={option.description || ''}
                         onChange={(e) => updateOption(index, 'description', e.target.value)}
@@ -394,7 +473,7 @@ export const MenuItemRow = ({
                         className="w-full"
                       />
                     </TableCell>
-                    <TableCell className="bg-gray-100">
+                    <TableCell>
                       <Input
                         type="number"
                         step="0.01"
@@ -404,23 +483,23 @@ export const MenuItemRow = ({
                         className="w-24"
                       />
                     </TableCell>
-                    <TableCell className="bg-gray-50"></TableCell>
-                    <TableCell className="bg-gray-50"></TableCell>
-                    <TableCell className="bg-gray-100">
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => removeOption(index)}
-                        disabled={editedData.options.length <= 2}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
                 ))}
-                <TableRow key={`${item.id}-add-option`} className="pl-8">
-                  <TableCell colSpan={8} className="bg-gray-50">
-                    <Button onClick={addOption} className="w-full" variant="ghost">
+                <TableRow key={`${item.id}-add-option`} className="bg-gray-50">
+                  <TableCell colSpan={8} className="py-2">
+                    <Button onClick={addOption} className="w-full" variant="outline" size="sm">
+                      <Plus className="h-4 w-4 mr-1" />
                       Add option
                     </Button>
                   </TableCell>
@@ -478,6 +557,24 @@ export const MenuItemRow = ({
           </TableCell>
         </TableRow>
       )} */}
+
+      {/* Remove Option Confirmation Dialog */}
+      <AlertDialog open={showRemoveOptionDialog} onOpenChange={setShowRemoveOptionDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Option?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This menu item currently has only 2 options. Removing this option will convert the menu item to a simple item without any options. The remaining option's price will become the item's base price.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelRemoveOption}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemoveOption}>
+              Remove & Convert to Simple Item
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

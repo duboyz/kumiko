@@ -217,11 +217,10 @@ export const AddMenuItemForm = ({ onSubmit, onCancel, isSubmitting }: AddMenuIte
             {allergensData.map(allergen => (
               <div
                 key={allergen.id}
-                className={`flex items-center gap-2 p-2 rounded-md transition-colors ${
-                  data.allergenIds.includes(allergen.id)
+                className={`flex items-center gap-2 p-2 rounded-md transition-colors ${data.allergenIds.includes(allergen.id)
                     ? 'bg-orange-50 border border-orange-200'
                     : 'hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 <Checkbox
                   id={`new-allergen-${allergen.id}`}
