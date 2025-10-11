@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { authApi } from '../api'
 import { LoginRdto, RegisterRdto, AuthSdto, UserSdto, RefreshTokenResult } from '../types'
 import { useRouter } from 'next/navigation'
+import { useLocationStore } from '../stores/location-store'
 
 export const useLogin = () => {
   const queryClient = useQueryClient()
@@ -9,8 +10,12 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: (credentials: Omit<LoginRdto, 'clientType'>) => authApi.login(credentials),
-    onSuccess: data => {
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] })
+    onSuccess: async data => {
+      // First, invalidate and wait for user data
+      await queryClient.invalidateQueries({ queryKey: ['currentUser'] })
+
+      // Check if user has any locations, redirect to onboarding if not
+      // The check will happen in the protected layout
       router.push('/dashboard')
     },
   })
@@ -22,9 +27,10 @@ export const useRegister = () => {
 
   return useMutation({
     mutationFn: (credentials: Omit<RegisterRdto, 'clientType'>) => authApi.register(credentials),
-    onSuccess: data => {
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] })
-      router.push('/dashboard')
+    onSuccess: async data => {
+      // New users always need onboarding
+      await queryClient.invalidateQueries({ queryKey: ['currentUser'] })
+      router.push('/onboarding')
     },
   })
 }
@@ -32,11 +38,24 @@ export const useRegister = () => {
 export const useLogout = () => {
   const queryClient = useQueryClient()
   const router = useRouter()
+  const { clearSelectedLocation } = useLocationStore()
 
   return useMutation({
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
+      // Clear all React Query cache
       queryClient.clear()
+
+      // Clear all Zustand stores
+      clearSelectedLocation()
+
+      // Clear persisted storage manually
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('location-storage')
+        sessionStorage.clear()
+      }
+
+      // Redirect to login
       router.push('/login')
     },
   })
@@ -53,6 +72,7 @@ export const useCurrentUser = () => {
 
 export const useRefreshToken = () => {
   const queryClient = useQueryClient()
+  const { clearSelectedLocation } = useLocationStore()
 
   return useMutation({
     mutationFn: () => authApi.refresh(),
@@ -61,8 +81,16 @@ export const useRefreshToken = () => {
       queryClient.invalidateQueries({ queryKey: ['currentUser'] })
     },
     onError: () => {
-      // Token refresh failed, clear all queries and redirect to login
+      // Token refresh failed, clear everything
       queryClient.clear()
+      clearSelectedLocation()
+
+      // Clear persisted storage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('location-storage')
+        sessionStorage.clear()
+      }
+
       window.location.href = '/login'
     },
   })

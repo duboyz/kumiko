@@ -66,9 +66,15 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError as AxiosError)
 
-        // Only redirect to login if we're not already on the login page
-        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-          window.location.href = '/login'
+        // Clear all storage on auth failure
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('location-storage')
+          sessionStorage.clear()
+
+          // Only redirect to login if we're not already on the login page
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login'
+          }
         }
 
         return Promise.reject(refreshError)

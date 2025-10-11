@@ -11,13 +11,33 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import { usePathname } from 'next/navigation'
-import { Fragment } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { Fragment, useEffect } from 'react'
 import { Toaster } from 'sonner'
+import { useLocationSelection } from '@shared'
+import { LoadingSpinner } from '@/components'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const pathSegments = pathname.split('/').filter(Boolean)
+  const { userLocations, isLoading, hasNoLocations } = useLocationSelection()
+
+  // Redirect to onboarding if user has no locations (except if already on onboarding)
+  useEffect(() => {
+    if (!isLoading && hasNoLocations && !pathname.startsWith('/onboarding')) {
+      router.push('/onboarding')
+    }
+  }, [hasNoLocations, isLoading, pathname, router])
+
+  // Show loading while checking locations
+  if (isLoading && !pathname.startsWith('/onboarding')) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    )
+  }
 
   const websitePattern = /\/websites\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   const isWebsitePage = websitePattern.test(pathname)
