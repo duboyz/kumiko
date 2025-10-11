@@ -5,7 +5,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { bebasNeue } from '@shared'
 import Image from 'next/image'
-import searchImage from '../assets/search.png'
+import foodImage from '../assets/food.png'
 import picImage from '../assets/pic.png'
 import globeImage from '../assets/globe.png'
 
@@ -20,19 +20,19 @@ const steps = [
     id: 1,
     title: 'Take picture of menu',
     description: 'Just one image and we fix the rest!',
-    image: searchImage,
+    image: picImage,
   },
   {
     id: 2,
     title: 'Create Website',
     description: 'We create a beautiful website for your restaurant. With menu and orders integrated',
-    image: picImage,
+    image: globeImage,
   },
   {
     id: 3,
     title: 'Get Orders',
     description: 'Receive and manage your orders',
-    image: globeImage,
+    image: foodImage,
   },
 ] as const
 
