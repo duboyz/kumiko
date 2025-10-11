@@ -106,5 +106,8 @@
   "menus": {
     "importMenu": "Importer meny",
     "createMenu": "Opprett meny"
+  },
+  "dashboard": {
+    "title": "Dashbord"
   }
 }

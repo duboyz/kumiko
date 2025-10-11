@@ -102,5 +102,8 @@
     "SEK": "Svenska kronor",
     "DKK": "Danska kronor",
     "ISK": "Isländska kronor"
+  },
+  "dashboard": {
+    "title": "Dashboard"
   }
 }
