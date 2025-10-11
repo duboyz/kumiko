@@ -23,6 +23,7 @@ export interface BusinessHours {
 
 interface BusinessHoursEditorProps {
     weekdayText?: string[] // Google Places format
+    initialHours?: BusinessHours // Direct business hours object
     onChange: (businessHours: BusinessHours) => void
 }
 
@@ -89,8 +90,12 @@ function parseWeekdayText(weekdayText: string[]): BusinessHours {
     return hours
 }
 
-export function BusinessHoursEditor({ weekdayText, onChange }: BusinessHoursEditorProps) {
+export function BusinessHoursEditor({ weekdayText, initialHours, onChange }: BusinessHoursEditorProps) {
     const [hours, setHours] = useState<BusinessHours>(() => {
+        // Priority: initialHours > weekdayText > defaults
+        if (initialHours) {
+            return initialHours
+        }
         if (weekdayText && weekdayText.length > 0) {
             return parseWeekdayText(weekdayText)
         }

@@ -57,4 +57,6 @@ export interface LocationOption {
   currency: Currency
   businessHours?: string | null
   isOpenNow?: boolean | null
+  restaurant?: import('./restaurant.types').RestaurantBaseDto
+  hospitality?: HospitalityBaseDto
 }

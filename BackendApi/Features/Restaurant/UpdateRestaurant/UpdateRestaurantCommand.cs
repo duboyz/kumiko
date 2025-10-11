@@ -6,6 +6,7 @@ namespace BackendApi.Features.Restaurant.UpdateRestaurant;
 public record UpdateRestaurantCommand(
     Guid Id,
     string? Name,
+    string? Description,
     string? Address,
     string? City,
     string? State,
@@ -13,5 +14,7 @@ public record UpdateRestaurantCommand(
     string? Country,
     string? Latitude,
     string? Longitude,
-    string? GooglePlaceId
+    string? GooglePlaceId,
+    string? BusinessHours,
+    bool? IsOpenNow
 ) : ICommand<RestaurantBaseDto>;

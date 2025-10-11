@@ -14,6 +14,9 @@ public class UpdateRestaurantHandler(IRestaurantRepository restaurantRepository)
         if (!string.IsNullOrWhiteSpace(request.Name))
             restaurant.Name = request.Name;
 
+        if (request.Description != null)
+            restaurant.Description = request.Description;
+
         if (!string.IsNullOrWhiteSpace(request.Address))
             restaurant.Address = request.Address;
 
@@ -38,10 +41,16 @@ public class UpdateRestaurantHandler(IRestaurantRepository restaurantRepository)
         if (!string.IsNullOrWhiteSpace(request.GooglePlaceId))
             restaurant.GooglePlaceId = request.GooglePlaceId;
 
+        if (!string.IsNullOrWhiteSpace(request.BusinessHours))
+            restaurant.BusinessHours = request.BusinessHours;
+
+        if (request.IsOpenNow.HasValue)
+            restaurant.IsOpenNow = request.IsOpenNow;
+
         restaurant.UpdatedAt = DateTime.UtcNow;
         await restaurantRepository.UpdateAsync(restaurant);
 
-        Console.WriteLine($"Restaurant updated");
+        Console.WriteLine($"Restaurant updated with BusinessHours: {restaurant.BusinessHours}");
 
         return restaurant.ToBaseDto();
     }

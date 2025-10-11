@@ -22,7 +22,8 @@ public static class RestaurantMappers
             restaurant.Longitude ?? string.Empty,
             restaurant.Currency,
             restaurant.BusinessHours,
-            restaurant.IsOpenNow
+            restaurant.IsOpenNow,
+            restaurant.Description
         );
     }
 }

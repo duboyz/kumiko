@@ -59,6 +59,7 @@ export const useLocationSelection = () => {
           currency: convertCurrencyFromApi(restaurant.restaurant.currency),
           businessHours: restaurant.restaurant.businessHours,
           isOpenNow: restaurant.restaurant.isOpenNow,
+          restaurant: restaurant.restaurant,
         })
       })
     }
@@ -74,6 +75,7 @@ export const useLocationSelection = () => {
           city: hospitality.hospitality.city,
           role: hospitality.role,
           currency: convertCurrencyFromApi(hospitality.hospitality.currency),
+          hospitality: hospitality.hospitality,
         })
       })
     }
@@ -93,13 +95,17 @@ export const useLocationSelection = () => {
       return
     }
 
-    // If a location is selected but no longer exists in the user's locations, clear it
+    // If a location is selected, update it with fresh data if it exists
     if (selectedLocation) {
-      const locationStillExists = userLocations.some(
+      const updatedLocation = userLocations.find(
         location => location.id === selectedLocation.id && location.type === selectedLocation.type
       )
 
-      if (!locationStillExists) {
+      if (updatedLocation) {
+        // Update the selected location with fresh data from the server
+        setSelectedLocation(updatedLocation)
+      } else {
+        // Location no longer exists, clear it
         clearSelectedLocation()
 
         // Auto-select the first available location if there's exactly one

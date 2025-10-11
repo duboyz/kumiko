@@ -3,6 +3,7 @@ import { restaurantApi } from '../api'
 import {
   CreateRestaurantCommand,
   CreateRestaurantResult,
+  UpdateRestaurantCommand,
   GetUserRestaurantsResult,
   GetUserRestaurantsParams,
 } from '../types'
@@ -15,6 +16,19 @@ export const useCreateRestaurant = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurants'] })
       queryClient.invalidateQueries({ queryKey: ['user-restaurants'] })
+    },
+  })
+}
+
+export const useUpdateRestaurant = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: UpdateRestaurantCommand) => restaurantApi.updateRestaurant(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['restaurants'] })
+      queryClient.invalidateQueries({ queryKey: ['user-restaurants'] })
+      queryClient.invalidateQueries({ queryKey: ['selectedLocation'] })
     },
   })
 }

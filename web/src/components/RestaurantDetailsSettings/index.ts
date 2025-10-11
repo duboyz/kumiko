@@ -1,0 +1,1 @@
+export { RestaurantDetailsSettings } from './RestaurantDetailsSettings'

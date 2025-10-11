@@ -12,6 +12,22 @@ export interface CreateRestaurantCommand {
   isOpenNow?: boolean | null
 }
 
+export interface UpdateRestaurantCommand {
+  id: string
+  name?: string | null
+  description?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  zip?: string | null
+  country?: string | null
+  latitude?: string | null
+  longitude?: string | null
+  googlePlaceId?: string | null
+  businessHours?: string | null
+  isOpenNow?: boolean | null
+}
+
 import { Currency } from './localization.types'
 
 export interface RestaurantBaseDto {
@@ -28,6 +44,7 @@ export interface RestaurantBaseDto {
   currency: Currency
   businessHours?: string | null
   isOpenNow?: boolean | null
+  description?: string | null
 }
 
 export interface CreateRestaurantResult extends RestaurantBaseDto { }

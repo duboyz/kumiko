@@ -1,6 +1,8 @@
 import {
   CreateRestaurantCommand,
   CreateRestaurantResult,
+  UpdateRestaurantCommand,
+  RestaurantBaseDto,
   GetUserRestaurantsResult,
   GetUserRestaurantsParams,
   ApiResponse,
@@ -12,6 +14,11 @@ export const restaurantApi = {
   createRestaurant: async (data: CreateRestaurantCommand): Promise<ResponseData<CreateRestaurantResult>> => {
     const { data: response } = await apiClient.post<ApiResponse<CreateRestaurantResult>>('/api/restaurants', data)
     if (!response.success) throw new Error(response.message || 'Failed to create restaurant')
+    return response.data
+  },
+  updateRestaurant: async (data: UpdateRestaurantCommand): Promise<ResponseData<RestaurantBaseDto>> => {
+    const { data: response } = await apiClient.put<ApiResponse<RestaurantBaseDto>>(`/api/restaurants/${data.id}`, data)
+    if (!response.success) throw new Error(response.message || 'Failed to update restaurant')
     return response.data
   },
   getUserRestaurants: async (params?: GetUserRestaurantsParams): Promise<ResponseData<GetUserRestaurantsResult>> => {

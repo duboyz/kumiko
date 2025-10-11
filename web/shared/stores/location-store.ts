@@ -29,6 +29,9 @@ export const useLocationStore = create<LocationStore>()(
             city: restaurant.restaurant.city,
             role: restaurant.role,
             currency: restaurant.restaurant.currency,
+            businessHours: restaurant.restaurant.businessHours,
+            isOpenNow: restaurant.restaurant.isOpenNow,
+            restaurant: restaurant.restaurant,
           }
           set({ selectedLocation: location })
         } else {
@@ -46,6 +49,7 @@ export const useLocationStore = create<LocationStore>()(
             city: hospitality.hospitality.city,
             role: hospitality.role,
             currency: hospitality.hospitality.currency,
+            hospitality: hospitality.hospitality,
           }
           set({ selectedLocation: location })
         } else {
