@@ -125,8 +125,10 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
     }
 
     if (marquee2Ref.current) {
+      // Set initial position to start from the right
+      gsap.set(marquee2Ref.current, { x: '-50%' })
       gsap.to(marquee2Ref.current, {
-        x: '50%',
+        x: '0%',
         duration: 25,
         ease: 'none',
         repeat: -1,
@@ -140,10 +142,7 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
   }, [])
 
   return (
-    <div
-      ref={sectionRef}
-      className={`py-24 px-8 bg-gradient-to-b from-white to-blue-50 ${bebasNeue.className}`}
-    >
+    <div ref={sectionRef} className={`py-24 px-8 bg-gradient-to-b from-white to-blue-50 ${bebasNeue.className}`}>
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-20">
@@ -159,10 +158,7 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
         <div className="relative overflow-hidden">
           {/* First Marquee Row - Moving Left */}
           <div className="mb-8">
-            <div 
-              ref={marquee1Ref}
-              className="flex gap-6 w-[200%]"
-            >
+            <div ref={marquee1Ref} className="flex gap-6 w-[200%]">
               {marqueeTestimonials.map((testimonial, index) => (
                 <div key={`marquee1-${testimonial.id}-${index}`} className="flex-shrink-0 w-80">
                   <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-0 shadow-md bg-white/80 backdrop-blur-sm">
@@ -170,7 +166,9 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
                       {/* Rating Stars */}
                       <div className="flex mb-4">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <span key={i} className="text-yellow-400 text-lg">⭐</span>
+                          <span key={i} className="text-yellow-400 text-lg">
+                            ⭐
+                          </span>
                         ))}
                       </div>
 
@@ -191,9 +189,7 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
                           <div className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
                             {testimonial.restaurant}
                           </div>
-                          <div className="text-xs text-gray-500">
-                            {testimonial.location}
-                          </div>
+                          <div className="text-xs text-gray-500">{testimonial.location}</div>
                         </div>
                       </div>
                     </CardContent>
@@ -205,10 +201,7 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
 
           {/* Second Marquee Row - Moving Right */}
           <div>
-            <div 
-              ref={marquee2Ref}
-              className="flex gap-6 w-[200%]"
-            >
+            <div ref={marquee2Ref} className="flex gap-6 w-[200%]">
               {marqueeTestimonials.map((testimonial, index) => (
                 <div key={`marquee2-${testimonial.id}-${index}`} className="flex-shrink-0 w-80">
                   <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-0 shadow-md bg-white/80 backdrop-blur-sm">
@@ -216,7 +209,9 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
                       {/* Rating Stars */}
                       <div className="flex mb-4">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <span key={i} className="text-yellow-400 text-lg">⭐</span>
+                          <span key={i} className="text-yellow-400 text-lg">
+                            ⭐
+                          </span>
                         ))}
                       </div>
 
@@ -237,9 +232,7 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
                           <div className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
                             {testimonial.restaurant}
                           </div>
-                          <div className="text-xs text-gray-500">
-                            {testimonial.location}
-                          </div>
+                          <div className="text-xs text-gray-500">{testimonial.location}</div>
                         </div>
                       </div>
                     </CardContent>

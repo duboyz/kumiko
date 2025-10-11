@@ -227,7 +227,7 @@ export function HeroSection({}: HeroSectionProps) {
           </p>
           <button
             ref={buttonRef}
-            className="group relative bg-gray-800 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-lg font-semibold overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:bg-gray-700"
+            className="group relative bg-black text-white px-8 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-lg font-semibold overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:bg-gray-800"
             style={{
               boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
             }}
@@ -238,10 +238,8 @@ export function HeroSection({}: HeroSectionProps) {
               }
             }}
           >
-            <span className="relative z-10">
-              Get Started
-            </span>
-            <div className="absolute inset-0 bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <span className="relative z-10">Get Started</span>
+            <div className="absolute inset-0 bg-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
         </div>
       </div>
