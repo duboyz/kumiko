@@ -107,5 +107,8 @@
     "importMenu": "Import Menu",
     "createMenu": "Create Menu",
     "title": "Menus"
+  },
+  "dashboard": {
+    "title": "Dashboard"
   }
 }
