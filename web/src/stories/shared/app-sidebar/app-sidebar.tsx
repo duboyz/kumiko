@@ -26,35 +26,35 @@ const items = [
   {
     title: 'Dashboard',
     url: '/dashboard',
-    icon: Home,
+    icon: '🏠',
   },
   {
     title: 'Menus',
     url: '/menus',
-    icon: ChefHat,
+    icon: '🧑🏻‍🍳',
     restaurantOnly: true,
   },
-  {
-    title: 'Menu items',
-    url: '/menu-items',
-    icon: List,
-    restaurantOnly: true,
-  },
+  // {
+  //   title: 'Menu items',
+  //   url: '/menu-items',
+  //   icon: List,
+  //   restaurantOnly: true,
+  // },
   {
     title: 'Orders',
     url: '/orders',
-    icon: ClipboardList,
+    icon: '📋',
     restaurantOnly: true,
   },
   {
     title: 'Websites',
     url: '/websites',
-    icon: Globe,
+    icon: '🌐',
   },
   {
     title: 'Settings',
     url: '/settings',
-    icon: Settings2,
+    icon: '⚙️',
   },
 ]
 
@@ -84,13 +84,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="text-lg flex flex-col gap-4">
               {visibleItems.map(item => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={pathname === item.url}>
                     <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
+                      {/* <item.icon /> */}
+                      <span className="text-2xl">{item.icon}</span>
+                      <span className="text-lg">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -43,7 +43,7 @@ export default function SearchBusiness({ onBusinessSelect, selectedBusiness }: S
             placeholder="Search for your restaurant (e.g., 'Pizza Express Oslo')"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="w-full pr-10"
+            className="w-full pr-10 border-1 border-gray-300 text-center"
           />
           {isPending && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
