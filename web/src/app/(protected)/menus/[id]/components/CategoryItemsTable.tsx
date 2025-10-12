@@ -6,6 +6,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { MenuCategoryDto, useReorderMenuItems, useCreateMenuItem, useAddMenuItemToCategory } from '@shared'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 import { MenuItemRow } from './MenuItemRow'
 import { AddMenuItemRow } from './AddMenuItemRow'
 
@@ -14,6 +15,7 @@ interface CategoryItemsTableProps {
 }
 
 export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) => {
+  const t = useTranslations('menus')
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
   const [showAddItemForm, setShowAddItemForm] = useState(false)
@@ -81,7 +83,7 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
     options: Array<{ name: string; description: string; price: number }>
   }) => {
     if (!data.name.trim()) {
-      toast.error('Name is required')
+      toast.error(t('nameRequired'))
       return
     }
 
@@ -90,19 +92,19 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
     // Validation for items with options
     if (hasOptions) {
       if (data.options.length < 2) {
-        toast.error('Items with options must have at least 2 options')
+        toast.error(t('itemsWithOptionsNeed2'))
         return
       }
 
       const invalidOptions = data.options.filter(opt => !opt.name.trim())
       if (invalidOptions.length > 0) {
-        toast.error('All options must have a name')
+        toast.error(t('allOptionsMustHaveName'))
         return
       }
     } else {
       // Validation for simple items
       if (!data.price || parseFloat(data.price) <= 0) {
-        toast.error('Items without options must have a valid price')
+        toast.error(t('itemsWithoutOptionsNeedPrice'))
         return
       }
     }
@@ -138,12 +140,12 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
             },
             {
               onSuccess: () => {
-                toast.success('Menu item created successfully')
+                toast.success(t('menuItemCreated'))
                 setShowAddItemForm(false)
               },
               onError: (error) => {
                 console.error('Add to category error:', error)
-                toast.error('Menu item created but failed to add to category')
+                toast.error(t('failedToCreate'))
                 setShowAddItemForm(false)
               },
             }
@@ -151,7 +153,7 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
         },
         onError: (error) => {
           console.error('Create menu item error:', error)
-          toast.error('Failed to create menu item')
+          toast.error(t('failedToCreate'))
         },
       }
     )
@@ -180,10 +182,10 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
       {
         onError: () => {
           setItems(items)
-          toast.error('Failed to reorder items')
+          toast.error(t('failedToReorder'))
         },
         onSuccess: () => {
-          toast.success('Order updated successfully')
+          toast.success(t('orderUpdated'))
         },
       }
     )
@@ -238,7 +240,7 @@ export const CategoryItemsTable = ({ menuCategory }: CategoryItemsTableProps) =>
       </DndContext>
       <div className="pt-2 mb-2 border-t">
         <Button variant="ghost" onClick={handleAddMenuItem} className="w-full" disabled={showAddItemForm}>
-          <Plus className="w-4 h-4 mr-1" /> Add Item
+          <Plus className="w-4 h-4 mr-1" /> {t('addItem')}
         </Button>
       </div>
     </div>

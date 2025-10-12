@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Save } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 interface AddCategoryFormProps {
   onSubmit: (data: { name: string; description: string }) => void
@@ -10,6 +11,7 @@ interface AddCategoryFormProps {
 }
 
 export const AddCategoryForm = ({ onSubmit, onCancel, isSubmitting }: AddCategoryFormProps) => {
+  const t = useTranslations('menus')
   const [data, setData] = useState({
     name: '',
     description: '',
@@ -21,22 +23,22 @@ export const AddCategoryForm = ({ onSubmit, onCancel, isSubmitting }: AddCategor
 
   return (
     <div className="mb-6 p-4 border rounded-lg bg-gray-50">
-      <h3 className="text-lg font-semibold mb-4">Add New Category</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('addCategory')}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Name *</label>
+          <label className="block text-sm font-medium mb-1">{t('categoryName')} *</label>
           <Input
             value={data.name}
             onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="Category name"
+            placeholder={t('categoryNamePlaceholder')}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
+          <label className="block text-sm font-medium mb-1">{t('categoryDescription')}</label>
           <Input
             value={data.description}
             onChange={(e) => setData(prev => ({ ...prev, description: e.target.value }))}
-            placeholder="Description (optional)"
+            placeholder={t('categoryDescriptionPlaceholder')}
           />
         </div>
       </div>
@@ -48,14 +50,14 @@ export const AddCategoryForm = ({ onSubmit, onCancel, isSubmitting }: AddCategor
           className="flex items-center gap-2"
         >
           <Save className="h-4 w-4" />
-          {isSubmitting ? 'Creating...' : 'Create Category'}
+          {isSubmitting ? `${t('save')}...` : t('addCategory')}
         </Button>
         <Button
           variant="outline"
           onClick={onCancel}
           disabled={isSubmitting}
         >
-          Cancel
+          {t('cancel')}
         </Button>
       </div>
     </div>

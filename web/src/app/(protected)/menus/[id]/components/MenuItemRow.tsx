@@ -18,6 +18,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { MenuCategoryItemDto, useUpdateMenuItem, useAllergens, formatPrice, useLocationSelection, Currency } from '@shared'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 import { cn } from '@/lib/utils'
 
@@ -38,6 +39,7 @@ export const MenuItemRow = ({
   startEditing,
   stopEditing,
 }: MenuItemRowProps) => {
+  const t = useTranslations('menus')
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
   const updateMutation = useUpdateMenuItem()
   const { data: allergensData } = useAllergens()
@@ -135,12 +137,12 @@ export const MenuItemRow = ({
 
     updateMutation.mutate(payload, {
       onSuccess: () => {
-        toast.success('Menu item updated successfully')
+        toast.success(t('menuItemUpdated'))
         setSavedOptions([]) // Clear saved options on successful save
         stopEditing()
       },
       onError: (error: any) => {
-        const message = error?.response?.data?.message || 'Failed to update menu item'
+        const message = error?.response?.data?.message || t('failedToUpdate')
         toast.error(message)
       },
     })
@@ -230,7 +232,7 @@ export const MenuItemRow = ({
       }))
       setShowRemoveOptionDialog(false)
       setOptionToRemove(null)
-      toast.info('Converted to simple menu item')
+      toast.info(t('convertedToSimple'))
     }
   }
 
@@ -377,7 +379,7 @@ export const MenuItemRow = ({
                   }}
                 />
                 <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  {editedData.options.length > 0 ? 'Options' : 'No options'}
+                  {editedData.options.length > 0 ? t('options') : t('noOptions')}
                 </span>
               </div>
             </TableCell>
@@ -423,7 +425,7 @@ export const MenuItemRow = ({
                   disabled
                 />
                 <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  {hasOptions ? 'Options' : 'No options'}
+                  {hasOptions ? t('options') : t('noOptions')}
                 </span>
               </div>
             </TableCell>
@@ -461,7 +463,7 @@ export const MenuItemRow = ({
                       <Input
                         value={option.name}
                         onChange={(e) => updateOption(index, 'name', e.target.value)}
-                        placeholder="Option name, e.g. Small, Medium"
+                        placeholder={t('optionNamePlaceholder')}
                         className="w-full"
                       />
                     </TableCell>
@@ -469,7 +471,7 @@ export const MenuItemRow = ({
                       <Input
                         value={option.description || ''}
                         onChange={(e) => updateOption(index, 'description', e.target.value)}
-                        placeholder="Description (optional)"
+                        placeholder={t('optionDescriptionPlaceholder')}
                         className="w-full"
                       />
                     </TableCell>
@@ -479,7 +481,7 @@ export const MenuItemRow = ({
                         step="0.01"
                         value={option.price || 0}
                         onChange={(e) => updateOption(index, 'price', parseFloat(e.target.value) || 0)}
-                        placeholder="0.00"
+                        placeholder={t('pricePlaceholder')}
                         className="w-24"
                       />
                     </TableCell>
@@ -500,7 +502,7 @@ export const MenuItemRow = ({
                   <TableCell colSpan={8} className="py-2">
                     <Button onClick={addOption} className="w-full" variant="outline" size="sm">
                       <Plus className="h-4 w-4 mr-1" />
-                      Add option
+                      {t('addOption')}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -562,15 +564,17 @@ export const MenuItemRow = ({
       <AlertDialog open={showRemoveOptionDialog} onOpenChange={setShowRemoveOptionDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Option?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This menu item currently has only 2 options. Removing this option will convert the menu item to a simple item without any options. The remaining option's price will become the item's base price.
+            <AlertDialogTitle>{t('removeOptionTitle')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-lg">
+              <p>
+                {t('removeOptionDescription')}
+              </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelRemoveOption}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={cancelRemoveOption}>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmRemoveOption}>
-              Remove & Convert to Simple Item
+              {t('removeAndConvert')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

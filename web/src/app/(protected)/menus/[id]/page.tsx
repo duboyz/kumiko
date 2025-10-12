@@ -12,9 +12,11 @@ import { useState, useEffect } from 'react'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 import { AddCategoryForm, SortableCategory } from './components'
 
 export default function MenuEditPage() {
+  const t = useTranslations('menus')
   const params = useParams()
   const { selectedLocation } = useLocationSelection()
 
@@ -58,7 +60,7 @@ export default function MenuEditPage() {
 
   const handleCreateCategory = (data: { name: string; description: string }) => {
     if (!data.name.trim()) {
-      toast.error('Category name is required')
+      toast.error(t('nameRequired'))
       return
     }
 
@@ -71,12 +73,12 @@ export default function MenuEditPage() {
       },
       {
         onSuccess: () => {
-          toast.success('Category created successfully')
+          toast.success(t('categoryCreated'))
           setShowAddCategoryForm(false)
         },
         onError: (error) => {
           console.error('Create category error:', error)
-          toast.error('Failed to create category')
+          toast.error(t('failedToCreateCategory'))
         },
       }
     )

@@ -15,6 +15,7 @@ import {
 import { Save, X, CornerDownRight, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface MenuItemOption {
   id: string
@@ -37,6 +38,7 @@ interface AddMenuItemRowProps {
 }
 
 export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRowProps) => {
+  const t = useTranslations('menus')
   const [data, setData] = useState({
     name: '',
     description: '',
@@ -119,7 +121,7 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
       }))
       setShowRemoveOptionDialog(false)
       setOptionToRemove(null)
-      toast.info('Converted to simple menu item')
+      toast.info(t('convertedToSimple'))
     }
   }
 
@@ -178,7 +180,7 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
           <Input
             value={data.name}
             onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="Menu item name"
+            placeholder={t('menuItemNamePlaceholder')}
             className="w-full"
             autoFocus
           />
@@ -187,7 +189,7 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
           <Input
             value={data.description}
             onChange={(e) => setData(prev => ({ ...prev, description: e.target.value }))}
-            placeholder="Description (optional)"
+            placeholder={t('descriptionPlaceholder')}
             className="w-full"
           />
         </TableCell>
@@ -197,7 +199,7 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
             step="0.01"
             value={data.price}
             onChange={(e) => setData(prev => ({ ...prev, price: e.target.value }))}
-            placeholder={hasOptions ? "N/A" : "0.00"}
+            placeholder={hasOptions ? "N/A" : t('pricePlaceholder')}
             className="w-24"
             disabled={hasOptions}
           />
@@ -209,7 +211,7 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
               onCheckedChange={toggleHasOptions}
             />
             <span className="text-xs text-muted-foreground whitespace-nowrap">
-              {hasOptions ? 'Options' : 'No options'}
+              {hasOptions ? t('options') : t('noOptions')}
             </span>
           </div>
         </TableCell>
@@ -252,7 +254,7 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
             <Input
               value={option.name}
               onChange={(e) => updateOption(index, 'name', e.target.value)}
-              placeholder="Option name, e.g. Small, Medium"
+              placeholder={t('optionNamePlaceholder')}
               className="w-full"
             />
           </TableCell>
@@ -260,7 +262,7 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
             <Input
               value={option.description || ''}
               onChange={(e) => updateOption(index, 'description', e.target.value)}
-              placeholder="Description (optional)"
+              placeholder={t('optionDescriptionPlaceholder')}
               className="w-full"
             />
           </TableCell>
@@ -270,7 +272,7 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
               step="0.01"
               value={option.price || 0}
               onChange={(e) => updateOption(index, 'price', parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
+              placeholder={t('pricePlaceholder')}
               className="w-24"
             />
           </TableCell>
@@ -293,7 +295,7 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
         <TableCell colSpan={8} className="py-2">
           <Button onClick={addOption} className="w-full" variant="outline" size="sm">
             <Plus className="h-4 w-4 mr-1" />
-            Add option
+            {t('addOption')}
           </Button>
         </TableCell>
       </TableRow>
@@ -302,15 +304,15 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
       <AlertDialog open={showRemoveOptionDialog} onOpenChange={setShowRemoveOptionDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Option?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This menu item currently has only 2 options. Removing this option will convert the menu item to a simple item without any options. The remaining option's price will become the item's base price.
+            <AlertDialogTitle>{t('removeOptionTitle')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-lg">
+              {t('removeOptionDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelRemoveOption}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={cancelRemoveOption}>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmRemoveOption}>
-              Remove & Convert to Simple Item
+              {t('removeAndConvert')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
