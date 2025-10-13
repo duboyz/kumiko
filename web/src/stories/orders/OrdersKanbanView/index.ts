@@ -1,0 +1,2 @@
+export { OrdersKanbanView } from './OrdersKanbanView'
+
