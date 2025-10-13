@@ -142,7 +142,7 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
   }, [])
 
   return (
-    <div ref={sectionRef} className={`py-24 px-8 bg-gradient-to-b from-white to-blue-50 ${bebasNeue.className}`}>
+    <div ref={sectionRef} className={`py-24 px-8 bg-gradient-to-b from-white to-gray-50 ${bebasNeue.className}`}>
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-20">
@@ -183,7 +183,7 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
                           {testimonial.avatar}
                         </div>
                         <div>
-                          <div className="font-bold text-gray-800 group-hover:text-blue-600 transition-colors duration-300 text-sm">
+                          <div className="font-bold text-gray-800 group-hover:text-gray-900 transition-colors duration-300 text-sm">
                             {testimonial.name}
                           </div>
                           <div className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
@@ -226,7 +226,7 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
                           {testimonial.avatar}
                         </div>
                         <div>
-                          <div className="font-bold text-gray-800 group-hover:text-blue-600 transition-colors duration-300 text-sm">
+                          <div className="font-bold text-gray-800 group-hover:text-gray-900 transition-colors duration-300 text-sm">
                             {testimonial.name}
                           </div>
                           <div className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors duration-300">

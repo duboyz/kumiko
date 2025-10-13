@@ -179,7 +179,7 @@ export function HeroSection({}: HeroSectionProps) {
   return (
     <div
       ref={heroRef}
-      className={`min-h-screen flex items-center justify-center from-blue-50 to-indigo-100 relative overflow-hidden ${bebasNeue.className}`}
+      className={`min-h-screen flex items-center justify-center from-gray-50 to-gray-100 relative overflow-hidden ${bebasNeue.className}`}
     >
       {/* Title Section */}
       <h1
@@ -222,8 +222,8 @@ export function HeroSection({}: HeroSectionProps) {
             ref={descriptionRef}
             className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 sm:mb-10 leading-relaxed max-w-2xl mx-auto px-4"
           >
-            Transform your paper menu into a stunning digital experience. Create a professional website, enable online
-            ordering, and start taking reservations—all without any technical skills required.
+            Transform your paper menu into a stunning digital experience. Get a beautiful, fresh website that's
+            optimized for food ordering and ready to take orders immediately—all without any technical skills required.
           </p>
           <button
             ref={buttonRef}

@@ -304,11 +304,11 @@ export const ScrollTriggerSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="h-screen bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden flex flex-col justify-center"
+      className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden flex flex-col justify-center"
     >
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-full">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full opacity-20 blur-3xl" />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-gray-200 rounded-full opacity-20 blur-3xl" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-200 rounded-full opacity-20 blur-3xl" />
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-green-200 rounded-full opacity-15 blur-3xl" />
       </div>
@@ -353,7 +353,7 @@ export const ScrollTriggerSection = () => {
               <h3 className="text-base font-semibold text-gray-800">Ready to get started?</h3>
               <p className="text-xs text-gray-600">Join businesses using Kumiko</p>
             </div>
-            <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm">
+            <button className="bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm">
               Get Started
             </button>
           </div>

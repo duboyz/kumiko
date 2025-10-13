@@ -14,9 +14,9 @@ interface FeaturesSectionProps {}
 const features = [
   {
     id: 1,
-    title: 'Digital Menu Creation',
-    description: 'Transform your paper menu into a beautiful, interactive digital experience that customers love.',
-    icon: '📱',
+    title: 'Beautiful Website',
+    description: 'Get a fresh, simple website that looks professional and is optimized for food ordering right away.',
+    icon: '🌐',
   },
   {
     id: 2,
@@ -130,18 +130,16 @@ export function FeaturesSection({}: FeaturesSectionProps) {
   }, [])
 
   return (
-    <div
-      ref={sectionRef}
-      className={`py-24 px-8 bg-gradient-to-b from-gray-50 to-white ${bebasNeue.className}`}
-    >
+    <div ref={sectionRef} className={`py-24 px-8 bg-gradient-to-b from-gray-50 to-white ${bebasNeue.className}`}>
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-20">
           <h2 ref={titleRef} className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-            Everything You Need
+            Beautiful Website + Everything You Need
           </h2>
           <p ref={subtitleRef} className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Our all-in-one platform gives you everything needed to digitize your restaurant and grow your business.
+            Get a fresh, professional website that's ready to take orders immediately, plus all the tools you need to
+            grow your business.
           </p>
         </div>
 
@@ -158,7 +156,7 @@ export function FeaturesSection({}: FeaturesSectionProps) {
               <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
                 {feature.icon}
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-blue-600 transition-colors duration-300">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-gray-900 transition-colors duration-300">
                 {feature.title}
               </h3>
               <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
