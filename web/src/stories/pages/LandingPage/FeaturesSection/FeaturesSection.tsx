@@ -130,10 +130,7 @@ export function FeaturesSection({}: FeaturesSectionProps) {
   }, [])
 
   return (
-    <div
-      ref={sectionRef}
-      className={`py-24 px-8 bg-gradient-to-b from-gray-50 to-white ${bebasNeue.className}`}
-    >
+    <div ref={sectionRef} className={`py-24 px-8 bg-gradient-to-b from-gray-50 to-white ${bebasNeue.className}`}>
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-20">
@@ -158,7 +155,7 @@ export function FeaturesSection({}: FeaturesSectionProps) {
               <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
                 {feature.icon}
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-blue-600 transition-colors duration-300">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-gray-900 transition-colors duration-300">
                 {feature.title}
               </h3>
               <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">

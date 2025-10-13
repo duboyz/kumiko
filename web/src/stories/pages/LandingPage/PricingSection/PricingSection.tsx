@@ -146,7 +146,7 @@ export function PricingSection({}: PricingSectionProps) {
   }, [])
 
   return (
-    <div ref={sectionRef} className={`py-24 px-8 bg-gradient-to-b from-blue-50 to-white ${bebasNeue.className}`}>
+    <div ref={sectionRef} className={`py-24 px-8 bg-gradient-to-b from-gray-50 to-white ${bebasNeue.className}`}>
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-20">
