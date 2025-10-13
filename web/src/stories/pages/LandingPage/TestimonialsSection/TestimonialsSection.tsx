@@ -247,7 +247,7 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
         <div className="mt-20 text-center">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="group">
-              <div className="text-4xl font-bold text-blue-600 mb-2 group-hover:scale-110 transition-transform duration-300">
+              <div className="text-4xl font-bold  mb-2 group-hover:scale-110 transition-transform duration-300">
                 500+
               </div>
               <div className="text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
@@ -255,15 +255,13 @@ export function TestimonialsSection({}: TestimonialsSectionProps) {
               </div>
             </div>
             <div className="group">
-              <div className="text-4xl font-bold text-blue-600 mb-2 group-hover:scale-110 transition-transform duration-300">
-                40%
-              </div>
+              <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300">40%</div>
               <div className="text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
                 Average Order Increase
               </div>
             </div>
             <div className="group">
-              <div className="text-4xl font-bold text-blue-600 mb-2 group-hover:scale-110 transition-transform duration-300">
+              <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300">
                 30min
               </div>
               <div className="text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
