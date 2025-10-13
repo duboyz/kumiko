@@ -14,9 +14,9 @@ interface FeaturesSectionProps {}
 const features = [
   {
     id: 1,
-    title: 'Digital Menu Creation',
-    description: 'Transform your paper menu into a beautiful, interactive digital experience that customers love.',
-    icon: '📱',
+    title: 'Beautiful Website',
+    description: 'Get a fresh, simple website that looks professional and is optimized for food ordering right away.',
+    icon: '🌐',
   },
   {
     id: 2,
@@ -135,10 +135,11 @@ export function FeaturesSection({}: FeaturesSectionProps) {
         {/* Section Header */}
         <div className="text-center mb-20">
           <h2 ref={titleRef} className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-            Everything You Need
+            Beautiful Website + Everything You Need
           </h2>
           <p ref={subtitleRef} className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Our all-in-one platform gives you everything needed to digitize your restaurant and grow your business.
+            Get a fresh, professional website that's ready to take orders immediately, plus all the tools you need to
+            grow your business.
           </p>
         </div>
 

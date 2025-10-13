@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger)
 interface SavingsCalculatorProps {}
 
 export function SavingsCalculator({}: SavingsCalculatorProps) {
-  const [monthlyRevenue, setMonthlyRevenue] = useState(50000)
+  const [monthlyRevenue, setMonthlyRevenue] = useState(5000)
   const sectionRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
@@ -23,7 +23,7 @@ export function SavingsCalculator({}: SavingsCalculatorProps) {
 
   // Calculate costs
   const competitorFee = Math.round(monthlyRevenue * 0.3) // 30% cut
-  const kumikoFee = 500 // Fixed 500 NOK
+  const kumikoFee = 30 // Starting at $29.99 USD
   const savings = competitorFee - kumikoFee
   const savingsPercentage = Math.round((savings / competitorFee) * 100)
 
@@ -87,10 +87,10 @@ export function SavingsCalculator({}: SavingsCalculatorProps) {
         end: 'bottom 20%',
         scrub: 1,
         onUpdate: self => {
-          // Animate revenue from 50k to 200k as user scrolls
+          // Animate revenue from 5k to 20k as user scrolls
           const progress = self.progress
-          const minRevenue = 50000
-          const maxRevenue = 200000
+          const minRevenue = 5000
+          const maxRevenue = 20000
           const newRevenue = Math.round(minRevenue + (maxRevenue - minRevenue) * progress)
           setMonthlyRevenue(newRevenue)
         },
@@ -103,9 +103,9 @@ export function SavingsCalculator({}: SavingsCalculatorProps) {
   }, [])
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('nb-NO', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'NOK',
+      currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount)
@@ -142,14 +142,14 @@ export function SavingsCalculator({}: SavingsCalculatorProps) {
                   <Slider
                     value={[monthlyRevenue]}
                     onValueChange={value => setMonthlyRevenue(value[0])}
-                    min={10000}
-                    max={500000}
-                    step={5000}
+                    min={1000}
+                    max={50000}
+                    step={500}
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-gray-500 mt-2">
-                    <span>{formatCurrency(10000)}</span>
-                    <span>{formatCurrency(500000)}</span>
+                    <span>{formatCurrency(1000)}</span>
+                    <span>{formatCurrency(50000)}</span>
                   </div>
                 </div>
               </div>
@@ -186,7 +186,7 @@ export function SavingsCalculator({}: SavingsCalculatorProps) {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-xl font-bold text-white">Kumiko</CardTitle>
                       <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                        Fixed Fee
+                        Starting at $29.99
                       </Badge>
                     </div>
                   </CardHeader>
@@ -194,7 +194,7 @@ export function SavingsCalculator({}: SavingsCalculatorProps) {
                     <div className="space-y-4">
                       <div className="text-center">
                         <div className="text-3xl font-bold text-white mb-1">{formatCurrency(kumikoFee)}</div>
-                        <div className="text-sm text-gray-200">Monthly platform fee</div>
+                        <div className="text-sm text-gray-200">Starting monthly fee</div>
                       </div>
                       <div className="text-center text-sm text-gray-300">
                         That's {formatCurrency(kumikoFee * 12)} per year!
