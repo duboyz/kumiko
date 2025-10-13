@@ -10,14 +10,10 @@ import {
   LayoutDashboard,
   Globe,
   Settings,
-  Menu as MenuIcon,
-  ChevronDown,
-  Building2,
-  Hotel,
-  ForkKnifeCrossed
+  Menu as MenuIcon, Hotel,
+  ForkKnifeCrossed,
+  ShoppingCart
 } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Button } from '@/components/ui/button'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -34,11 +30,15 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     }]
 
     if (selectedLocationType === 'Restaurant') {
-      links.push({
+      links.push(...[{
         label: 'Menus',
         href: '/menus',
         icon: MenuIcon,
-      })
+      }, {
+        label: 'Orders',
+        href: '/orders',
+        icon: ShoppingCart,
+      }])
     }
 
     links.push(...[

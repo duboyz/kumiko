@@ -10,12 +10,20 @@ namespace BackendApi.Features.Restaurant.CreateRestaurant;
 public class CreateRestaurantHandler(
     IRestaurantRepository restaurantRepository,
     IUserRestaurantRepository userRestaurantRepository,
-    IHttpContextAccessor httpContextAccessor
+    IHttpContextAccessor httpContextAccessor,
+    ISubscriptionService subscriptionService
 ) : ICommandHandler<CreateRestaurantCommand, RestaurantBaseDto>
 {
     public async Task<RestaurantBaseDto> Handle(CreateRestaurantCommand request, CancellationToken cancellationToken)
     {
         var userId = httpContextAccessor.GetCurrentUserId();
+
+        // Check subscription limits
+        var canCreate = await subscriptionService.CanCreateRestaurantAsync(userId, cancellationToken);
+        if (!canCreate)
+        {
+            throw new Exception("You have reached the maximum number of locations for your subscription plan. Please upgrade to create more locations.");
+        }
 
         // Parse business hours if provided
         string? parsedBusinessHours = null;

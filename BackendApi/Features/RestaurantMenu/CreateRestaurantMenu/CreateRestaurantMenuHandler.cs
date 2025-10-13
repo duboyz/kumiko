@@ -1,11 +1,14 @@
 using BackendApi.Data;
 using BackendApi.Entities;
+using BackendApi.Services;
 using BackendApi.Shared.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendApi.Features.RestaurantMenu.CreateRestaurantMenu;
 
-public class CreateRestaurantMenuHandler(ApplicationDbContext context) : ICommandHandler<CreateRestaurantMenuCommand, CreateRestaurantMenuResult>
+public class CreateRestaurantMenuHandler(
+    ApplicationDbContext context,
+    ISubscriptionService subscriptionService) : ICommandHandler<CreateRestaurantMenuCommand, CreateRestaurantMenuResult>
 {
     public async Task<CreateRestaurantMenuResult> Handle(CreateRestaurantMenuCommand request, CancellationToken cancellationToken)
     {
@@ -16,6 +19,13 @@ public class CreateRestaurantMenuHandler(ApplicationDbContext context) : IComman
         if (restaurant == null)
         {
             throw new ArgumentException("Restaurant not found");
+        }
+
+        // Check subscription limits for menu creation
+        var canCreate = await subscriptionService.CanCreateMenuAsync(request.RestaurantId, cancellationToken);
+        if (!canCreate)
+        {
+            throw new Exception("You have reached the maximum number of menus for this location. Please upgrade your subscription plan to create more menus.");
         }
 
         var menu = new Entities.RestaurantMenu

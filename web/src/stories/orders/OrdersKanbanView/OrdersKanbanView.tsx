@@ -74,7 +74,16 @@ export function OrdersKanbanView({ orders }: OrdersKanbanViewProps) {
                                             <CardHeader className="pb-3">
                                                 <div className="flex items-start justify-between">
                                                     <div className="space-y-1 flex-1">
-                                                        <CardTitle className="text-base font-medium">{order.customerName}</CardTitle>
+                                                        <div className="flex items-center justify-between">
+                                                            <CardTitle className="text-base font-medium">{order.customerName}</CardTitle>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => setSelectedOrder(order)}
+                                                            >
+                                                                <Eye className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
                                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                             <Calendar className="h-3 w-3" />
                                                             {new Date(order.pickupDate).toLocaleDateString()}
@@ -127,14 +136,17 @@ export function OrdersKanbanView({ orders }: OrdersKanbanViewProps) {
                                                             ← Back
                                                         </Button>
                                                     )}
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => setSelectedOrder(order)}
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                    {statusIndex < STATUSES.length - 1 && (
+                                                    {order.status === 'Ready' ? (
+                                                        <Button
+                                                            variant="default"
+                                                            size="sm"
+                                                            className="flex-1"
+                                                            onClick={() => handleStatusChange(order.id, 'Completed')}
+                                                            disabled={updateOrderStatus.isPending}
+                                                        >
+                                                            Done
+                                                        </Button>
+                                                    ) : statusIndex < STATUSES.length - 1 && (
                                                         <Button
                                                             variant="default"
                                                             size="sm"

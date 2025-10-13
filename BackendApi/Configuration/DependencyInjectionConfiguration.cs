@@ -18,6 +18,7 @@ public static class DependencyInjectionConfiguration
         // Services
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IOpenAiService, OpenAiService>();
+        services.AddScoped<ISubscriptionService, SubscriptionService>();
 
 
         // Repositories
