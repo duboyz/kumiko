@@ -1,9 +1,5 @@
-import { ContentContainer } from '@/components'
+import { AboutPage } from '@/stories/pages/AboutPage'
 
-export default function AboutPage() {
-  return (
-    <ContentContainer>
-      <h1 className="text-3xl font-bold">About</h1>
-    </ContentContainer>
-  )
+export default function AboutPageRoute() {
+  return <AboutPage />
 }

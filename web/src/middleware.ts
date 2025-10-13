@@ -30,7 +30,19 @@ function detectLocale(request: NextRequest): string {
 }
 
 // Define public routes that don't require authentication
-const publicRoutes = ['/login', '/register', '/forgot-password', '/', '/about', '/contact', '/site']
+const publicRoutes = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/',
+  '/about',
+  '/contact',
+  '/site',
+  '/pricing',
+  '/privacy',
+  '/terms',
+  '/faq',
+]
 
 // Define the JWT secret (should match backend)
 const JWT_SECRET = new TextEncoder().encode(
