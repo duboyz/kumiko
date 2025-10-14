@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Upload, Camera, FileImage } from 'lucide-react'
 
 interface DropzoneProps {
-  onFileSelect: (file: File) => void
+  onFileSelect: (files: File[]) => void
   accept?: string
   multiple?: boolean
   className?: string
@@ -14,15 +14,15 @@ interface DropzoneProps {
 export function Dropzone({
   onFileSelect,
   accept = 'image/*,image/heic',
-  multiple = false,
+  multiple = true,
   className = '',
 }: DropzoneProps) {
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileSelect = (file: File) => {
-    if (!file) return
-    onFileSelect(file)
+  const handleFilesSelect = (files: File[]) => {
+    if (!files || files.length === 0) return
+    onFileSelect(files)
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -38,13 +38,13 @@ export function Dropzone({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
-    const file = e.dataTransfer.files?.[0]
-    if (file) handleFileSelect(file)
+    const files = Array.from(e.dataTransfer.files || [])
+    if (files.length > 0) handleFilesSelect(files)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) handleFileSelect(file)
+    const files = Array.from(e.target.files || [])
+    if (files.length > 0) handleFilesSelect(files)
   }
 
   return (

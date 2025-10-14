@@ -18,6 +18,9 @@ export function SetupTimeSection({}: SetupTimeSectionProps) {
   const subtitleRef = useRef<HTMLParagraphElement>(null)
   const statsRef = useRef<HTMLDivElement>(null)
   const testimonialsRef = useRef<HTMLDivElement>(null)
+  const ctaRef = useRef<HTMLDivElement>(null)
+  const statCardsRef = useRef<(HTMLDivElement | null)[]>([])
+  const testimonialCardsRef = useRef<(HTMLDivElement | null)[]>([])
 
   const stats = [
     { number: '15', unit: 'minutes', label: 'Average setup time', icon: '⚡' },
@@ -55,35 +58,105 @@ export function SetupTimeSection({}: SetupTimeSectionProps) {
     },
   ]
 
+  // Number counting animation
+  const animateNumber = (element: HTMLElement, targetNumber: number, duration: number = 1) => {
+    gsap.fromTo(
+      element,
+      { innerText: 0 },
+      {
+        innerText: targetNumber,
+        duration: duration,
+        ease: 'power2.out',
+        snap: { innerText: 1 },
+        onUpdate: function () {
+          element.innerText = Math.ceil(this.targets()[0].innerText).toString()
+        },
+      }
+    )
+  }
+
+  // Add hover animations for cards
+  const addHoverAnimations = () => {
+    statCardsRef.current.forEach(card => {
+      if (card) {
+        card.addEventListener('mouseenter', () => {
+          gsap.to(card, {
+            y: -8,
+            scale: 1.02,
+            duration: 0.3,
+            ease: 'power2.out',
+          })
+        })
+
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, {
+            y: 0,
+            scale: 1,
+            duration: 0.3,
+            ease: 'power2.out',
+          })
+        })
+      }
+    })
+
+    testimonialCardsRef.current.forEach(card => {
+      if (card) {
+        card.addEventListener('mouseenter', () => {
+          gsap.to(card, {
+            y: -5,
+            scale: 1.01,
+            duration: 0.3,
+            ease: 'power2.out',
+          })
+        })
+
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, {
+            y: 0,
+            scale: 1,
+            duration: 0.3,
+            ease: 'power2.out',
+          })
+        })
+      }
+    })
+  }
+
   useEffect(() => {
     if (
       !sectionRef.current ||
       !titleRef.current ||
       !subtitleRef.current ||
       !statsRef.current ||
-      !testimonialsRef.current
+      !testimonialsRef.current ||
+      !ctaRef.current
     )
       return
 
     // Set initial states
-    gsap.set([titleRef.current, subtitleRef.current], { y: 50, opacity: 0 })
-    gsap.set(statsRef.current, { y: 80, opacity: 0, scale: 0.95 })
-    gsap.set(testimonialsRef.current, { y: 60, opacity: 0 })
+    gsap.set([titleRef.current, subtitleRef.current], { y: 30, opacity: 0 })
+    gsap.set(statsRef.current, { y: 40, opacity: 0 })
+    gsap.set(testimonialsRef.current, { y: 30, opacity: 0 })
+    gsap.set(ctaRef.current, { y: 20, opacity: 0 })
 
-    // Create timeline
+    // Set initial states for individual cards
+    gsap.set(statCardsRef.current, { y: 20, opacity: 0, scale: 0.95 })
+    gsap.set(testimonialCardsRef.current, { y: 15, opacity: 0, scale: 0.98 })
+
+    // Create main timeline
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top 80%',
+        start: 'top 85%',
         toggleActions: 'play none none reverse',
       },
     })
 
-    // Animate elements
+    // Animate main elements
     tl.to(titleRef.current, {
       y: 0,
       opacity: 1,
-      duration: 0.8,
+      duration: 0.6,
       ease: 'power2.out',
     })
       .to(
@@ -91,32 +164,82 @@ export function SetupTimeSection({}: SetupTimeSectionProps) {
         {
           y: 0,
           opacity: 1,
-          duration: 0.8,
+          duration: 0.6,
           ease: 'power2.out',
         },
-        '-=0.4'
+        '-=0.3'
       )
       .to(
         statsRef.current,
         {
           y: 0,
           opacity: 1,
-          scale: 1,
-          duration: 0.8,
-          ease: 'back.out(1.7)',
+          duration: 0.6,
+          ease: 'power2.out',
         },
-        '-=0.4'
+        '-=0.2'
+      )
+      // Animate stat cards with stagger
+      .to(
+        statCardsRef.current,
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: 'back.out(1.4)',
+          stagger: 0.15,
+          onComplete: () => {
+            // Animate numbers after cards appear
+            const numberElements = document.querySelectorAll('[data-number]')
+            numberElements.forEach((el, index) => {
+              const targetNumber = parseInt(stats[index]?.number || '0')
+              if (targetNumber > 0) {
+                animateNumber(el as HTMLElement, targetNumber, 1.2)
+              }
+            })
+          },
+        },
+        '-=0.3'
       )
       .to(
         testimonialsRef.current,
         {
           y: 0,
           opacity: 1,
-          duration: 0.8,
+          duration: 0.6,
           ease: 'power2.out',
+        },
+        '-=0.1'
+      )
+      // Animate testimonial cards with stagger
+      .to(
+        testimonialCardsRef.current,
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: 'power2.out',
+          stagger: 0.1,
         },
         '-=0.2'
       )
+      .to(
+        ctaRef.current,
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power2.out',
+        },
+        '-=0.1'
+      )
+
+    // Add hover animations after initial animation
+    setTimeout(() => {
+      addHoverAnimations()
+    }, 2000)
 
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill())
@@ -140,11 +263,20 @@ export function SetupTimeSection({}: SetupTimeSectionProps) {
         {/* Stats */}
         <div ref={statsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
           {stats.map((stat, index) => (
-            <Card key={index} className="text-center border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+            <Card
+              key={index}
+              ref={el => {
+                statCardsRef.current[index] = el
+              }}
+              className="text-center border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+            >
               <CardContent className="p-8">
                 <div className="text-4xl mb-4">{stat.icon}</div>
                 <div className="text-4xl font-bold text-gray-800 mb-2">
-                  {stat.number} <span className="text-2xl text-gray-600">{stat.unit}</span>
+                  <span data-number className="inline-block">
+                    {stat.number}
+                  </span>{' '}
+                  <span className="text-2xl text-gray-600">{stat.unit}</span>
                 </div>
                 <div className="text-lg text-gray-600">{stat.label}</div>
               </CardContent>
@@ -161,7 +293,13 @@ export function SetupTimeSection({}: SetupTimeSectionProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <Card
+                key={index}
+                ref={el => {
+                  testimonialCardsRef.current[index] = el
+                }}
+                className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+              >
                 <CardContent className="p-6">
                   <div className="text-center mb-4">
                     <div className="text-4xl mb-3">{testimonial.avatar}</div>
@@ -179,7 +317,7 @@ export function SetupTimeSection({}: SetupTimeSectionProps) {
         </div>
 
         {/* Bottom CTA */}
-        <div className="mt-16 text-center">
+        <div ref={ctaRef} className="mt-16 text-center">
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 max-w-4xl mx-auto">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Ready to Get Online in Minutes?</h3>
             <p className="text-lg text-gray-600 mb-6">
