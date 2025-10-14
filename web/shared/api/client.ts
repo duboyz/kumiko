@@ -87,4 +87,13 @@ apiClient.interceptors.response.use(
   }
 )
 
+// Public API client for endpoints that don't require authentication
+export const publicApiClient: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: false, // Don't send credentials for public endpoints
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 export default apiClient
