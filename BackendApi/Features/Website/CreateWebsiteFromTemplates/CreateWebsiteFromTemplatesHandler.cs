@@ -42,7 +42,7 @@ public class CreateWebsiteFromTemplatesHandler(
             throw new InvalidOperationException("Subdomain is already taken");
         }
 
-        // Create the website
+        // Create the website (auto-publish for onboarding)
         var website = new Entities.Website
         {
             Name = request.WebsiteName,
@@ -50,7 +50,7 @@ public class CreateWebsiteFromTemplatesHandler(
             Description = request.Description,
             RestaurantId = request.RestaurantId,
             Type = WebsiteType.Restaurant,
-            IsPublished = false
+            IsPublished = true // Auto-publish websites created during onboarding
         };
 
         await websiteRepository.AddAsync(website);

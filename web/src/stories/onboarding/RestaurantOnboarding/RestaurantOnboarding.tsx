@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, ArrowRight, CheckCircle, Search, Upload, Globe } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle, Search, Upload, Globe, PartyPopper } from 'lucide-react'
 import { SearchBusiness } from '@/components'
 import {
   BusinessDetailsEditor,
@@ -11,8 +11,11 @@ import {
   BusinessHoursEditor,
   BusinessHours,
   WebsiteTemplateStep,
+  CelebrationStep,
 } from '@/stories/onboarding'
 import { MenuImportWizard } from '@/stories/onboarding/MenuImportWizard'
+import { gsap } from 'gsap'
+import { useRouter } from 'next/navigation'
 import {
   useCreateRestaurant,
   ResponseBusinessDetails,
@@ -29,9 +32,10 @@ interface RestaurantOnboardingProps {
   onComplete?: () => void
 }
 
-type Step = 'search' | 'details' | 'hours' | 'menu' | 'website'
+type Step = 'search' | 'details' | 'hours' | 'menu' | 'website' | 'celebration'
 
 export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardingProps) {
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState<Step>('search')
   const [selectedBusiness, setSelectedBusiness] = useState<ResponseBusinessDetails | null>(null)
   const [businessDetails, setBusinessDetails] = useState<BusinessDetails | null>(null)
@@ -39,6 +43,8 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
   const [menuId, setMenuId] = useState<string | null>(null)
   const [selectedTemplates, setSelectedTemplates] = useState<PageTemplate[]>([])
+  const [websiteData, setWebsiteData] = useState<{ subdomain: string; pagesCount: number } | null>(null)
+  const stepContentRef = useRef<HTMLDivElement>(null)
   const createRestaurant = useCreateRestaurant()
   const createWebsiteFromTemplates = useCreateWebsiteFromTemplates()
 
@@ -116,10 +122,11 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
     }
 
     try {
+      const subdomain = businessDetails.name.toLowerCase().replace(/\s+/g, '-') || 'restaurant'
       const result = await createWebsiteFromTemplates.mutateAsync({
         restaurantId,
         websiteName: `${businessDetails.name} Website`,
-        subdomain: businessDetails.name.toLowerCase().replace(/\s+/g, '-') || 'restaurant',
+        subdomain,
         description: `Website for ${businessDetails.name}`,
         pageTemplates: templates.map(template => ({
           templateType: template,
@@ -127,8 +134,14 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
         menuId: menuId || undefined,
       })
 
-      toast.success('Website created successfully!')
-      onComplete?.()
+      // Store website data for celebration step
+      setWebsiteData({
+        subdomain,
+        pagesCount: result.createdPages.length,
+      })
+
+      // Move to celebration step
+      setCurrentStep('celebration')
     } catch (error) {
       console.error('Failed to create website:', error)
       toast.error('Failed to create website')
@@ -137,6 +150,16 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
 
   const handleSkipWebsite = () => {
     onComplete?.()
+  }
+
+  const handleViewWebsite = () => {
+    if (websiteData) {
+      window.open(`/site/${websiteData.subdomain}`, '_blank')
+    }
+  }
+
+  const handleGoToDashboard = () => {
+    router.push('/websites')
   }
 
   const handleBack = () => {
@@ -152,6 +175,13 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
     // Don't call onBack for first step since we're directly on restaurant onboarding
   }
 
+  // GSAP step transitions
+  useEffect(() => {
+    if (!stepContentRef.current) return
+
+    gsap.fromTo(stepContentRef.current, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out' })
+  }, [currentStep])
+
   return (
     <div className="space-y-6">
       {/* Progress Indicator */}
@@ -162,10 +192,12 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
           { step: 'hours', label: 'Hours', icon: CheckCircle },
           { step: 'menu', label: 'Menu', icon: Upload },
           { step: 'website', label: 'Website', icon: Globe },
+          { step: 'celebration', label: 'Go Live', icon: PartyPopper },
         ].map(({ step, label, icon: Icon }, index) => {
           const stepIndex = index + 1
           const isCurrentStep = currentStep === step
-          const isCompleted = ['search', 'details', 'hours', 'menu', 'website'].indexOf(currentStep) > index
+          const isCompleted =
+            ['search', 'details', 'hours', 'menu', 'website', 'celebration'].indexOf(currentStep) > index
           const isActive = isCurrentStep || isCompleted
 
           return (
@@ -190,90 +222,105 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
                   {label}
                 </span>
               </div>
-              {index < 4 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
+              {index < 5 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
             </div>
           )
         })}
       </div>
 
       {/* Step Content */}
-      {currentStep === 'search' && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="w-5 h-5" />
-              Find Your Restaurant
-            </CardTitle>
-            <CardDescription>
-              Search for your restaurant using Google Places to automatically fill in the details
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <SearchBusiness onBusinessSelect={handleBusinessSelect} selectedBusiness={selectedBusiness} />
+      <div ref={stepContentRef}>
+        {currentStep === 'search' && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="w-5 h-5" />
+                Find Your Restaurant
+              </CardTitle>
+              <CardDescription>
+                Search for your restaurant using Google Places to automatically fill in the details
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <SearchBusiness onBusinessSelect={handleBusinessSelect} selectedBusiness={selectedBusiness} />
 
-            {selectedBusiness && (
-              <div className="flex gap-3 pt-4 border-t">
-                <Button onClick={() => setSelectedBusiness(null)} variant="outline" className="flex-1">
-                  Deselect
-                </Button>
-                <Button onClick={handleContinueToDetails} className="flex-1">
-                  Next: Business Details
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+              {selectedBusiness && (
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button onClick={() => setSelectedBusiness(null)} variant="outline" className="flex-1">
+                    Deselect
+                  </Button>
+                  <Button onClick={handleContinueToDetails} className="flex-1">
+                    Next: Business Details
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
-      {currentStep === 'details' && (
-        <BusinessDetailsEditor businessData={selectedBusiness!} onChange={setBusinessDetails} />
-      )}
+        {currentStep === 'details' && (
+          <BusinessDetailsEditor businessData={selectedBusiness!} onChange={setBusinessDetails} />
+        )}
 
-      {currentStep === 'hours' && (
-        <BusinessHoursEditor weekdayText={selectedBusiness?.openingHours?.weekdayText} onChange={setBusinessHours} />
-      )}
+        {currentStep === 'hours' && (
+          <BusinessHoursEditor weekdayText={selectedBusiness?.openingHours?.weekdayText} onChange={setBusinessHours} />
+        )}
 
-      {currentStep === 'menu' && restaurantId && (
-        <MenuImportWizard
-          restaurantId={restaurantId}
-          onMenuCreated={handleMenuCreated}
-          onSkip={handleSkipMenu}
-          onBack={() => setCurrentStep('hours')}
-        />
-      )}
+        {currentStep === 'menu' && restaurantId && (
+          <MenuImportWizard
+            restaurantId={restaurantId}
+            onMenuCreated={handleMenuCreated}
+            onSkip={handleSkipMenu}
+            onBack={() => setCurrentStep('hours')}
+          />
+        )}
 
-      {currentStep === 'website' && (
-        <WebsiteTemplateStep
-          onTemplatesSelected={handleTemplatesSelected}
-          onSkip={handleSkipWebsite}
-          selectedMenuId={menuId || undefined}
-        />
-      )}
+        {currentStep === 'website' && (
+          <WebsiteTemplateStep
+            onTemplatesSelected={handleTemplatesSelected}
+            onSkip={handleSkipWebsite}
+            selectedMenuId={menuId || undefined}
+          />
+        )}
+
+        {currentStep === 'celebration' && websiteData && businessDetails && (
+          <CelebrationStep
+            websiteName={`${businessDetails.name} Website`}
+            subdomain={websiteData.subdomain}
+            pagesCreated={websiteData.pagesCount}
+            onViewWebsite={handleViewWebsite}
+            onGoToDashboard={handleGoToDashboard}
+          />
+        )}
+      </div>
 
       {/* Navigation Buttons */}
-      {currentStep !== 'search' && currentStep !== 'menu' && currentStep !== 'website' && (
-        <div className="flex items-center justify-between pt-6">
-          <Button onClick={handleBack} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-
-          {currentStep === 'details' && (
-            <Button onClick={handleContinueToHours} disabled={!businessDetails}>
-              Next: Business Hours
-              <ArrowRight className="w-4 h-4 ml-2" />
+      {currentStep !== 'search' &&
+        currentStep !== 'menu' &&
+        currentStep !== 'celebration' &&
+        currentStep !== 'website' && (
+          <div className="flex items-center justify-between pt-6">
+            <Button onClick={handleBack} variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
             </Button>
-          )}
 
-          {currentStep === 'hours' && (
-            <Button onClick={handleContinueToMenu} disabled={!businessHours || createRestaurant.isPending}>
-              {createRestaurant.isPending ? 'Creating Restaurant...' : 'Next: Import Menu'}
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          )}
-        </div>
-      )}
+            {currentStep === 'details' && (
+              <Button onClick={handleContinueToHours} disabled={!businessDetails}>
+                Next: Business Hours
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            )}
+
+            {currentStep === 'hours' && (
+              <Button onClick={handleContinueToMenu} disabled={!businessHours || createRestaurant.isPending}>
+                {createRestaurant.isPending ? 'Creating Restaurant...' : 'Next: Import Menu'}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            )}
+          </div>
+        )}
 
       {createRestaurant.error && (
         <p className="text-red-600 text-sm text-center">Error: {createRestaurant.error.message}</p>

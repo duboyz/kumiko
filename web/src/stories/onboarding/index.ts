@@ -6,6 +6,7 @@ export { RestaurantOnboarding } from './RestaurantOnboarding'
 export { HospitalityOnboarding } from './HospitalityOnboarding'
 export { WebsiteTemplateStep } from './WebsiteTemplateStep'
 export { MenuImportWizard } from './MenuImportWizard'
+export { CelebrationStep } from './CelebrationStep'
 
 // Storybook stories
 export { default as WebsiteTemplateStepStories } from './WebsiteTemplateStep/WebsiteTemplateStep.stories'

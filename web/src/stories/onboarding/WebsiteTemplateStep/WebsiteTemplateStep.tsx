@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Globe, Layout, Menu, Check } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Globe, Layout, Menu, Check, Star } from 'lucide-react'
 import { PageTemplate } from '@shared'
 import { cn } from '@/lib/utils'
+import { gsap } from 'gsap'
 
 interface WebsiteTemplateStepProps {
   onTemplatesSelected: (templates: PageTemplate[]) => void
@@ -34,8 +36,27 @@ const WEBSITE_OPTIONS = {
 
 export function WebsiteTemplateStep({ onTemplatesSelected, onSkip, selectedMenuId }: WebsiteTemplateStepProps) {
   const [selectedOption, setSelectedOption] = useState<WebsiteOption | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const cardsRef = useRef<HTMLDivElement>(null)
 
   console.log('WebsiteTemplateStep: selectedMenuId =', selectedMenuId)
+
+  // GSAP animations on mount
+  useEffect(() => {
+    if (!containerRef.current || !cardsRef.current) return
+
+    const cards = cardsRef.current.querySelectorAll('.website-option-card')
+
+    gsap.set(cards, { y: 30, opacity: 0 })
+
+    gsap.to(cards, {
+      y: 0,
+      opacity: 1,
+      duration: 0.5,
+      stagger: 0.15,
+      ease: 'power2.out',
+    })
+  }, [])
 
   const handleOptionSelect = (option: WebsiteOption) => {
     setSelectedOption(option)
@@ -50,7 +71,7 @@ export function WebsiteTemplateStep({ onTemplatesSelected, onSkip, selectedMenuI
   const isMenuOnlyDisabled = !selectedMenuId
 
   return (
-    <div className="space-y-6">
+    <div ref={containerRef} className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Choose Your Website</h2>
         <p className="text-muted-foreground">Select the type of website you'd like to create</p>
@@ -65,7 +86,7 @@ export function WebsiteTemplateStep({ onTemplatesSelected, onSkip, selectedMenuI
           <CardDescription>Choose between a full website or just a menu page</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Object.entries(WEBSITE_OPTIONS).map(([key, option]) => {
               const Icon = option.icon
               const isSelected = selectedOption === key
@@ -75,12 +96,18 @@ export function WebsiteTemplateStep({ onTemplatesSelected, onSkip, selectedMenuI
                 <Card
                   key={key}
                   className={cn(
-                    'cursor-pointer transition-all hover:shadow-md',
-                    isSelected ? 'border-primary ring-2 ring-primary/20' : 'hover:border-primary',
-                    isDisabled && 'opacity-50 cursor-not-allowed'
+                    'website-option-card cursor-pointer transition-all hover:shadow-md hover:scale-105 relative',
+                    isSelected ? 'border-primary ring-2 ring-primary/20 scale-105' : 'hover:border-primary',
+                    isDisabled && 'opacity-50 cursor-not-allowed hover:scale-100'
                   )}
                   onClick={() => !isDisabled && handleOptionSelect(key as WebsiteOption)}
                 >
+                  {key === 'full' && (
+                    <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-none shadow-lg">
+                      <Star className="w-3 h-3 mr-1" />
+                      Recommended
+                    </Badge>
+                  )}
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
