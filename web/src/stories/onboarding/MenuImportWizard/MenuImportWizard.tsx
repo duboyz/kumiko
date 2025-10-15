@@ -17,6 +17,7 @@ interface MenuImportWizardProps {
   onMenuCreated: (menuId: string) => void
   onSkip: () => void
   onBack: () => void
+  hideInternalStepper?: boolean // Hide the internal stepper when used within parent onboarding flow
 }
 
 export enum ImportStep {
@@ -47,7 +48,13 @@ const getStepProgress = (step: ImportStep): number => {
   return (getStepNumber(step) / 4) * 100
 }
 
-export function MenuImportWizard({ restaurantId, onMenuCreated, onSkip, onBack }: MenuImportWizardProps) {
+export function MenuImportWizard({
+  restaurantId,
+  onMenuCreated,
+  onSkip,
+  onBack,
+  hideInternalStepper = false,
+}: MenuImportWizardProps) {
   const [currentStep, setCurrentStep] = useState<ImportStep>(ImportStep.UPLOAD)
 
   console.log('MenuImportWizard received restaurantId:', restaurantId)
@@ -174,40 +181,59 @@ export function MenuImportWizard({ restaurantId, onMenuCreated, onSkip, onBack }
 
   return (
     <div className="space-y-6">
-      {/* Progress Indicator */}
-      <div className="flex items-center justify-center gap-1 md:gap-2 overflow-x-auto pb-2">
-        {steps.map(({ step, label, icon: Icon }, index) => {
-          const stepIndex = index + 1
-          const isCurrentStep = currentStep === step
-          const isCompleted = getStepNumber(currentStep) > stepIndex
+      {/* Progress Indicator - Conditionally shown */}
+      {!hideInternalStepper ? (
+        <div className="flex items-center justify-center gap-1 md:gap-2 overflow-x-auto pb-2">
+          {steps.map(({ step, label, icon: Icon }, index) => {
+            const stepIndex = index + 1
+            const isCurrentStep = currentStep === step
+            const isCompleted = getStepNumber(currentStep) > stepIndex
 
-          return (
-            <div key={step} className="flex items-center gap-1 md:gap-2 flex-shrink-0">
-              <div className="flex items-center gap-1 md:gap-2">
-                <div
-                  className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium ${
-                    isCurrentStep
-                      ? 'bg-primary text-primary-foreground'
-                      : isCompleted
-                        ? 'bg-green-500 text-white'
-                        : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {isCompleted ? <CheckCircle className="w-3 h-3 md:w-4 md:h-4" /> : stepIndex}
+            return (
+              <div key={step} className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+                <div className="flex items-center gap-1 md:gap-2">
+                  <div
+                    className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium ${
+                      isCurrentStep
+                        ? 'bg-primary text-primary-foreground'
+                        : isCompleted
+                          ? 'bg-green-500 text-white'
+                          : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {isCompleted ? <CheckCircle className="w-3 h-3 md:w-4 md:h-4" /> : stepIndex}
+                  </div>
+                  <span
+                    className={`text-xs md:text-sm font-medium hidden sm:block ${
+                      isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {label}
+                  </span>
                 </div>
-                <span
-                  className={`text-xs md:text-sm font-medium hidden sm:block ${
-                    isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
-                  }`}
-                >
-                  {label}
-                </span>
+                {index < 3 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
               </div>
-              {index < 3 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      ) : (
+        /* Subtle progress dots when stepper is hidden */
+        <div className="flex items-center justify-center gap-2 pb-2">
+          {steps.map((step, index) => {
+            const isCurrentStep = currentStep === step.step
+            const isCompleted = getStepNumber(currentStep) > index + 1
+
+            return (
+              <div
+                key={step.step}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  isCurrentStep ? 'w-8 bg-primary' : isCompleted ? 'w-6 bg-primary/60' : 'w-1.5 bg-muted'
+                }`}
+              />
+            )
+          })}
+        </div>
+      )}
 
       {/* Step Content */}
       {currentStep === ImportStep.UPLOAD && (

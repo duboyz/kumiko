@@ -35,18 +35,23 @@ public class CreateWebsiteFromTemplatesHandler(
         // Note: Menu validation is not performed here as it's handled by the frontend
         // and the menu ID is provided from the onboarding flow
 
-        // Check if subdomain is already taken
-        var existingWebsites = await websiteRepository.FindAsync(w => w.Subdomain == request.Subdomain);
-        if (existingWebsites.Any())
+        // Check if subdomain is already taken and add suffix if needed
+        var finalSubdomain = request.Subdomain;
+        var existingWebsites = await websiteRepository.FindAsync(w => w.Subdomain == finalSubdomain);
+        var counter = 1;
+
+        while (existingWebsites.Any())
         {
-            throw new InvalidOperationException("Subdomain is already taken");
+            finalSubdomain = $"{request.Subdomain}-{counter}";
+            existingWebsites = await websiteRepository.FindAsync(w => w.Subdomain == finalSubdomain);
+            counter++;
         }
 
         // Create the website (auto-publish for onboarding)
         var website = new Entities.Website
         {
             Name = request.WebsiteName,
-            Subdomain = request.Subdomain,
+            Subdomain = finalSubdomain,
             Description = request.Description,
             RestaurantId = request.RestaurantId,
             Type = WebsiteType.Restaurant,

@@ -103,14 +103,44 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
     setDetails(prev => ({ ...prev, [field]: value }))
   }
 
+  // Focus animation
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const inputWrapper = e.target.parentElement
+    if (!inputWrapper) return
+
+    gsap.to(e.target, {
+      scale: 1.01,
+      duration: 0.2,
+      ease: 'power1.out',
+    })
+
+    gsap.to(inputWrapper, {
+      '--ring-opacity': 0.2,
+      duration: 0.2,
+    })
+  }
+
+  // Blur animation
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    gsap.to(e.target, {
+      scale: 1,
+      duration: 0.2,
+      ease: 'power1.out',
+    })
+  }
+
   return (
     <Card ref={cardRef}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Building2 className="w-5 h-5" />
-          Business Details
+          Review what we found
         </CardTitle>
-        <CardDescription>Review and edit your business information</CardDescription>
+        <CardDescription>
+          {businessData
+            ? 'We found your business! Please review and update any details below.'
+            : "Let's set up your restaurant details so we can create your website."}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div ref={formFieldsRef} className="space-y-6">
@@ -120,24 +150,30 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
 
             <div className="grid gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Business Name *</Label>
+                <Label htmlFor="name">What's your restaurant called? *</Label>
                 <Input
                   id="name"
                   value={details.name}
                   onChange={e => handleChange('name', e.target.value)}
-                  placeholder="Enter business name"
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  placeholder="e.g., Mario's Pizza"
                   required
+                  className="transition-transform duration-200"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Tell us about your place</Label>
                 <Textarea
                   id="description"
                   value={details.description}
                   onChange={e => handleChange('description', e.target.value)}
-                  placeholder="Brief description of your business (optional)"
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  placeholder="What makes your restaurant special? (optional)"
                   rows={3}
+                  className="transition-transform duration-200"
                 />
               </div>
             </div>
@@ -149,13 +185,16 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
 
             <div className="grid gap-4">
               <div className="space-y-2">
-                <Label htmlFor="address">Street Address *</Label>
+                <Label htmlFor="address">Where are you located? *</Label>
                 <Input
                   id="address"
                   value={details.address}
                   onChange={e => handleChange('address', e.target.value)}
-                  placeholder="123 Main St"
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  placeholder="e.g., 123 Main Street"
                   required
+                  className="transition-transform duration-200"
                 />
               </div>
 
@@ -166,8 +205,11 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
                     id="city"
                     value={details.city}
                     onChange={e => handleChange('city', e.target.value)}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
                     placeholder="City"
                     required
+                    className="transition-transform duration-200"
                   />
                 </div>
 
@@ -177,6 +219,8 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
                     id="state"
                     value={details.state}
                     onChange={e => handleChange('state', e.target.value)}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
                     placeholder="State"
                   />
                 </div>
@@ -189,7 +233,10 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
                     id="zip"
                     value={details.zip}
                     onChange={e => handleChange('zip', e.target.value)}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
                     placeholder="12345"
+                    className="transition-transform duration-200"
                   />
                 </div>
 
@@ -199,8 +246,11 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
                     id="country"
                     value={details.country}
                     onChange={e => handleChange('country', e.target.value)}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
                     placeholder="NO"
                     required
+                    className="transition-transform duration-200"
                   />
                 </div>
               </div>
@@ -213,24 +263,30 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
 
             <div className="grid gap-4">
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">Phone number (optional)</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={details.phone}
                   onChange={e => handleChange('phone', e.target.value)}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
                   placeholder="+47 123 45 678"
+                  className="transition-transform duration-200"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="website">Website</Label>
+                <Label htmlFor="website">Do you have a website? (optional)</Label>
                 <Input
                   id="website"
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
                   type="url"
                   value={details.website}
                   onChange={e => handleChange('website', e.target.value)}
-                  placeholder="https://example.com"
+                  placeholder="https://yourrestaurant.com"
+                  className="transition-transform duration-200"
                 />
               </div>
             </div>

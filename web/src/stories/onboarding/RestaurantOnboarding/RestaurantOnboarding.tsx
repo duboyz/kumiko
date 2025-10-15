@@ -44,12 +44,17 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
   const [menuId, setMenuId] = useState<string | null>(null)
   const [selectedTemplates, setSelectedTemplates] = useState<PageTemplate[]>([])
   const [websiteData, setWebsiteData] = useState<{ subdomain: string; pagesCount: number } | null>(null)
+  const [isCreatingWebsite, setIsCreatingWebsite] = useState(false)
+  const [creationProgress, setCreationProgress] = useState(0)
   const stepContentRef = useRef<HTMLDivElement>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
   const createRestaurant = useCreateRestaurant()
   const createWebsiteFromTemplates = useCreateWebsiteFromTemplates()
 
   const handleBusinessSelect = (business: ResponseBusinessDetails) => {
     setSelectedBusiness(business)
+    // Auto-advance to details step immediately
+    setCurrentStep('details')
   }
 
   const handleContinueToDetails = () => {
@@ -122,7 +127,27 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
     }
 
     try {
-      const subdomain = businessDetails.name.toLowerCase().replace(/\s+/g, '-') || 'restaurant'
+      setIsCreatingWebsite(true)
+      setCreationProgress(0)
+
+      // Simulate progress steps
+      const progressSteps = ['Creating website...', 'Generating pages...', 'Finalizing...']
+      let stepIndex = 0
+
+      const progressInterval = setInterval(() => {
+        stepIndex++
+        setCreationProgress((stepIndex / progressSteps.length) * 100)
+        if (stepIndex >= progressSteps.length) {
+          clearInterval(progressInterval)
+        }
+      }, 500)
+
+      // Generate clean subdomain from restaurant name
+      const subdomain =
+        businessDetails.name
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '') || 'restaurant'
       const result = await createWebsiteFromTemplates.mutateAsync({
         restaurantId,
         websiteName: `${businessDetails.name} Website`,
@@ -134,17 +159,26 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
         menuId: menuId || undefined,
       })
 
-      // Store website data for celebration step
-      setWebsiteData({
-        subdomain,
-        pagesCount: result.createdPages.length,
-      })
+      clearInterval(progressInterval)
+      setCreationProgress(100)
 
-      // Move to celebration step
-      setCurrentStep('celebration')
+      // Store website data for celebration step
+      if (result?.createdPages) {
+        setWebsiteData({
+          subdomain,
+          pagesCount: result.createdPages.length,
+        })
+      }
+
+      // Small delay to show 100% before transitioning
+      setTimeout(() => {
+        setIsCreatingWebsite(false)
+        setCurrentStep('celebration')
+      }, 300)
     } catch (error) {
       console.error('Failed to create website:', error)
       toast.error('Failed to create website')
+      setIsCreatingWebsite(false)
     }
   }
 
@@ -154,7 +188,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
 
   const handleViewWebsite = () => {
     if (websiteData) {
-      window.open(`/site/${websiteData.subdomain}`, '_blank')
+      window.open(`http://${websiteData.subdomain}.localhost:3003`, '_blank')
     }
   }
 
@@ -164,6 +198,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
 
   const handleBack = () => {
     if (currentStep === 'details') {
+      setSelectedBusiness(null) // Clear selection so user can search again
       setCurrentStep('search')
     } else if (currentStep === 'hours') {
       setCurrentStep('details')
@@ -175,88 +210,161 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
     // Don't call onBack for first step since we're directly on restaurant onboarding
   }
 
-  // GSAP step transitions
+  // GSAP step transitions with blur effect
   useEffect(() => {
     if (!stepContentRef.current) return
 
-    gsap.fromTo(stepContentRef.current, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out' })
+    const tl = gsap.timeline()
+
+    tl.fromTo(
+      stepContentRef.current,
+      { opacity: 0, x: 30, filter: 'blur(10px)' },
+      {
+        opacity: 1,
+        x: 0,
+        filter: 'blur(0px)',
+        duration: 0.5,
+        ease: 'power2.out',
+      }
+    )
   }, [currentStep])
+
+  // Pulse animation for active step
+  useEffect(() => {
+    const activeStepElement = document.querySelector('.active-step-indicator')
+    if (!activeStepElement) return
+
+    const pulseAnimation = gsap.to(activeStepElement, {
+      scale: 1.05,
+      duration: 0.8,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+    })
+
+    return () => {
+      pulseAnimation.kill()
+    }
+  }, [currentStep])
+
+  // Checkmark animation when step completes
+  useEffect(() => {
+    const checkmarks = document.querySelectorAll('.checkmark-icon')
+    if (checkmarks.length === 0) return
+
+    // Animate the most recent checkmark
+    const latestCheckmark = checkmarks[checkmarks.length - 1]
+    gsap.fromTo(
+      latestCheckmark,
+      { scale: 0, rotation: -180, opacity: 0 },
+      { scale: 1, rotation: 0, opacity: 1, duration: 0.5, ease: 'back.out(1.7)' }
+    )
+  }, [currentStep])
+
+  // Loading overlay animation
+  useEffect(() => {
+    if (!overlayRef.current) return
+
+    if (isCreatingWebsite) {
+      gsap.fromTo(overlayRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power2.out' })
+
+      const card = overlayRef.current.querySelector('.loading-card')
+      if (card) {
+        gsap.fromTo(card, { scale: 0.9, y: 20 }, { scale: 1, y: 0, duration: 0.4, ease: 'back.out(1.7)', delay: 0.1 })
+      }
+    }
+  }, [isCreatingWebsite])
+
+  // Calculate progress percentage
+  const stepOrder: Step[] = ['search', 'details', 'hours', 'menu', 'website', 'celebration']
+  const progressPercentage = (stepOrder.indexOf(currentStep) / (stepOrder.length - 1)) * 100
 
   return (
     <div className="space-y-6">
       {/* Progress Indicator */}
-      <div className="flex items-center justify-center gap-1 md:gap-2 overflow-x-auto pb-2">
-        {[
-          { step: 'search', label: 'Find Restaurant', icon: Search },
-          { step: 'details', label: 'Details', icon: CheckCircle },
-          { step: 'hours', label: 'Hours', icon: CheckCircle },
-          { step: 'menu', label: 'Menu', icon: Upload },
-          { step: 'website', label: 'Website', icon: Globe },
-          { step: 'celebration', label: 'Go Live', icon: PartyPopper },
-        ].map(({ step, label, icon: Icon }, index) => {
-          const stepIndex = index + 1
-          const isCurrentStep = currentStep === step
-          const isCompleted =
-            ['search', 'details', 'hours', 'menu', 'website', 'celebration'].indexOf(currentStep) > index
-          const isActive = isCurrentStep || isCompleted
+      <div className="space-y-3">
+        <div className="flex items-center justify-center gap-1 md:gap-2 overflow-x-auto">
+          {[
+            { step: 'search', label: 'Find', icon: Search },
+            { step: 'details', label: 'Details', icon: CheckCircle },
+            { step: 'hours', label: 'Hours', icon: CheckCircle },
+            { step: 'menu', label: 'Menu', icon: Upload },
+            { step: 'website', label: 'Website', icon: Globe },
+            { step: 'celebration', label: 'Live!', icon: PartyPopper },
+          ].map(({ step, label, icon: Icon }, index) => {
+            const stepIndex = index + 1
+            const isCurrentStep = currentStep === step
+            const isCompleted =
+              ['search', 'details', 'hours', 'menu', 'website', 'celebration'].indexOf(currentStep) > index
+            const isActive = isCurrentStep || isCompleted
 
-          return (
-            <div key={step} className="flex items-center gap-1 md:gap-2 flex-shrink-0">
-              <div className="flex items-center gap-1 md:gap-2">
-                <div
-                  className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium ${
-                    isCurrentStep
-                      ? 'bg-primary text-primary-foreground'
-                      : isCompleted
-                        ? 'bg-green-500 text-white'
-                        : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {isCompleted ? <CheckCircle className="w-3 h-3 md:w-4 md:h-4" /> : stepIndex}
+            return (
+              <div key={step} className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+                <div className="flex items-center gap-1 md:gap-2">
+                  <div
+                    className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium transition-all duration-300 ${
+                      isCurrentStep
+                        ? 'bg-primary text-primary-foreground active-step-indicator shadow-lg'
+                        : isCompleted
+                          ? 'bg-green-500 text-white'
+                          : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {isCompleted ? <CheckCircle className="w-3 h-3 md:w-4 md:h-4 checkmark-icon" /> : stepIndex}
+                  </div>
+                  <span
+                    className={`text-xs md:text-sm font-medium hidden sm:block transition-colors duration-200 ${
+                      isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {label}
+                  </span>
                 </div>
-                <span
-                  className={`text-xs md:text-sm font-medium hidden sm:block ${
-                    isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
-                  }`}
-                >
-                  {label}
-                </span>
+                {index < 5 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
               </div>
-              {index < 5 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
       </div>
 
       {/* Step Content */}
       <div ref={stepContentRef}>
         {currentStep === 'search' && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="w-5 h-5" />
-                Find Your Restaurant
-              </CardTitle>
-              <CardDescription>
-                Search for your restaurant using Google Places to automatically fill in the details
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <SearchBusiness onBusinessSelect={handleBusinessSelect} selectedBusiness={selectedBusiness} />
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold mb-3">Is your place on Google?</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                We can automatically find your restaurant and fill in all the details for you! Just search for your
+                business name.
+              </p>
+            </div>
 
-              {selectedBusiness && (
-                <div className="flex gap-3 pt-4 border-t">
-                  <Button onClick={() => setSelectedBusiness(null)} variant="outline" className="flex-1">
-                    Deselect
-                  </Button>
-                  <Button onClick={handleContinueToDetails} className="flex-1">
-                    Next: Business Details
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-8">
+                <SearchBusiness onBusinessSelect={handleBusinessSelect} selectedBusiness={selectedBusiness} />
+
+                {!selectedBusiness && (
+                  <div className="pt-6 border-t mt-6">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-4">Can't find your place? No worries!</p>
+                      <Button onClick={handleContinueToDetails} variant="outline" className="w-full max-w-sm">
+                        Fill in details manually
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {currentStep === 'details' && (
@@ -273,6 +381,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
             onMenuCreated={handleMenuCreated}
             onSkip={handleSkipMenu}
             onBack={() => setCurrentStep('hours')}
+            hideInternalStepper={true}
           />
         )}
 
@@ -308,14 +417,14 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
 
             {currentStep === 'details' && (
               <Button onClick={handleContinueToHours} disabled={!businessDetails}>
-                Next: Business Hours
+                Next: Opening Hours
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             )}
 
             {currentStep === 'hours' && (
               <Button onClick={handleContinueToMenu} disabled={!businessHours || createRestaurant.isPending}>
-                {createRestaurant.isPending ? 'Creating Restaurant...' : 'Next: Import Menu'}
+                {createRestaurant.isPending ? 'Setting up your place...' : 'Next: Add Your Menu'}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             )}
@@ -324,6 +433,43 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
 
       {createRestaurant.error && (
         <p className="text-red-600 text-sm text-center">Error: {createRestaurant.error.message}</p>
+      )}
+
+      {/* Website Creation Loading Overlay */}
+      {isCreatingWebsite && (
+        <div
+          ref={overlayRef}
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center"
+        >
+          <Card className="loading-card w-full max-w-md mx-4">
+            <CardContent className="pt-6">
+              <div className="space-y-4 text-center">
+                <div className="flex justify-center">
+                  <Globe className="w-12 h-12 text-primary animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Creating Your Website</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {creationProgress < 33
+                      ? 'Setting up your website...'
+                      : creationProgress < 66
+                        ? 'Generating pages...'
+                        : 'Finalizing...'}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
+                      style={{ width: `${creationProgress}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">{Math.round(creationProgress)}%</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   )
