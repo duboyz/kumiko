@@ -3,6 +3,7 @@ import {
   CreateMenuStructureRequest,
   CreateMenuStructureResponse,
 } from '../types/menu-structure.types'
+import { ApiResponse } from '../types/apiResponse.types'
 import { apiClient } from './client'
 
 export async function parseMenuStructure(
@@ -41,7 +42,14 @@ export async function parseMenuStructure(
 }
 
 export async function createMenuStructure(request: CreateMenuStructureRequest): Promise<CreateMenuStructureResponse> {
-  const response = await apiClient.post<CreateMenuStructureResponse>('/api/restaurant-menu/create-structure', request)
+  const { data: response } = await apiClient.post<ApiResponse<CreateMenuStructureResponse>>(
+    '/api/restaurant-menu/create-structure',
+    request
+  )
+
+  if (!response.success) {
+    throw new Error(response.message || 'Failed to create menu structure')
+  }
 
   return response.data
 }

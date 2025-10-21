@@ -8,7 +8,7 @@ import type {
   ApiResponse,
   ResponseData,
 } from '@shared'
-import apiClient from './client'
+import apiClient, { publicApiClient } from './client'
 
 export const websiteApi = {
   createWebsite: async (command: CreateWebsiteCommand): Promise<ResponseData<CreateWebsiteResult>> => {
@@ -34,7 +34,7 @@ export const websiteApi = {
   },
 
   getWebsiteBySubdomain: async (subdomain: string): Promise<ResponseData<GetWebsiteBySubdomainResult>> => {
-    const { data } = await apiClient.get<ApiResponse<GetWebsiteBySubdomainResult>>(
+    const { data } = await publicApiClient.get<ApiResponse<GetWebsiteBySubdomainResult>>(
       `/api/website/by-subdomain/${subdomain}`
     )
     if (!data.success) throw new Error(data.message || 'Failed to get website by subdomain')

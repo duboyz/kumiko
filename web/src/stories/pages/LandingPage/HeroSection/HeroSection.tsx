@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { SplitText } from 'gsap/SplitText'
 import { bebasNeue } from '@shared'
+import Image from 'next/image'
+import HeroImage from '../assets/heroImage.png'
 
 // Register the SplitText plugin
 gsap.registerPlugin(SplitText)
@@ -23,6 +25,7 @@ export function HeroSection({}: HeroSectionProps) {
   const line3Ref = useRef<HTMLSpanElement>(null) // IN
   const line4Ref = useRef<HTMLSpanElement>(null) // MINUTES
   const descriptionRef = useRef<HTMLParagraphElement>(null)
+  const heroImageRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (
@@ -35,7 +38,8 @@ export function HeroSection({}: HeroSectionProps) {
       !line2Ref.current ||
       !line3Ref.current ||
       !line4Ref.current ||
-      !descriptionRef.current
+      !descriptionRef.current ||
+      !heroImageRef.current
     )
       return
 
@@ -71,6 +75,7 @@ export function HeroSection({}: HeroSectionProps) {
     gsap.set(splitLine4.chars, { y: -50, opacity: 0 })
     gsap.set(descriptionRef.current, { y: 20, opacity: 0 })
     gsap.set(buttonRef.current, { y: 20, opacity: 0 })
+    gsap.set(heroImageRef.current, { x: 100, opacity: 0, scale: 0.8 })
 
     // Create master timeline
     const tl = gsap.timeline()
@@ -165,6 +170,19 @@ export function HeroSection({}: HeroSectionProps) {
       `+=${config.buttonDelay}`
     )
 
+    // Phase 7: Hero image slides in from the right
+    tl.to(
+      heroImageRef.current,
+      {
+        x: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.8,
+        ease: 'back.out(1.7)',
+      },
+      `+=0.3`
+    )
+
     // Cleanup function
     return () => {
       tl.kill()
@@ -179,7 +197,7 @@ export function HeroSection({}: HeroSectionProps) {
   return (
     <div
       ref={heroRef}
-      className={`min-h-screen flex items-center justify-center from-gray-50 to-gray-100 relative overflow-hidden ${bebasNeue.className}`}
+      className={`min-h-screen flex items-center justify-center from-gray-50 to-gray-100 relative overflow-hidden pt-16 ${bebasNeue.className}`}
     >
       {/* Title Section */}
       <h1
@@ -197,11 +215,15 @@ export function HeroSection({}: HeroSectionProps) {
       {/* Hero Content Section */}
       <div
         ref={heroContentRef}
-        className="flex items-center justify-center w-full max-w-7xl mx-auto px-8 z-20"
+        className="flex flex-col lg:flex-row items-center justify-center w-full max-w-7xl mx-auto px-8 z-20 gap-8 lg:gap-16"
         style={{ perspective: '1000px' }}
       >
-        {/* Hero Text - Centered */}
-        <div ref={heroTextRef} className="text-center px-4" style={{ transformStyle: 'preserve-3d' }}>
+        {/* Hero Text - Left side on desktop, centered on mobile */}
+        <div
+          ref={heroTextRef}
+          className="text-center lg:text-left px-4 flex-1"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
           <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-gray-800 mb-6 sm:mb-8 leading-tight">
             <span ref={line1Ref} className="inline">
               DIGITIZE YOUR
@@ -220,7 +242,7 @@ export function HeroSection({}: HeroSectionProps) {
           </h2>
           <p
             ref={descriptionRef}
-            className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 sm:mb-10 leading-relaxed max-w-2xl mx-auto px-4"
+            className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 sm:mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0 px-4 lg:px-0"
           >
             Transform your paper menu into a stunning digital experience. Get a beautiful, fresh website that's
             optimized for food ordering and ready to take orders immediately—all without any technical skills required.
@@ -241,6 +263,16 @@ export function HeroSection({}: HeroSectionProps) {
             <span className="relative z-10">Get Started</span>
             <div className="absolute inset-0 bg-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
+        </div>
+
+        {/* Hero Image - Right side on desktop, below text on mobile */}
+        <div ref={heroImageRef} className="flex-1 max-w-lg lg:max-w-xl">
+          <Image
+            src={HeroImage}
+            alt="Kumiko - Digital Restaurant Solution"
+            className="w-full h-auto object-contain"
+            priority
+          />
         </div>
       </div>
     </div>

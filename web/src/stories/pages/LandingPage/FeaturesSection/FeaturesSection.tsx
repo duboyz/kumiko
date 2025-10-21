@@ -4,6 +4,11 @@ import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { bebasNeue } from '@shared'
+import Image from 'next/image'
+import WebsiteIcon from './assets/desktopIcon.png'
+import OrderingIcon from './assets/orderingIcon.png'
+import MobileIcon from './assets/mobileIcon.png'
+import UpdatesIcon from './assets/updatesIcon.png'
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger)
@@ -15,38 +20,26 @@ const features = [
   {
     id: 1,
     title: 'Beautiful Website',
-    description: 'Get a fresh, simple website that looks professional and is optimized for food ordering right away.',
-    icon: '🌐',
+    description: 'Get a fresh, professional website that looks great and works perfectly.',
+    icon: WebsiteIcon,
   },
   {
     id: 2,
     title: 'Online Ordering',
-    description: 'Enable customers to place orders directly from your digital menu with integrated payment processing.',
-    icon: '🛒',
+    description: 'Customers can place orders directly from your digital menu.',
+    icon: OrderingIcon,
   },
   {
     id: 3,
-    title: 'Reservation System',
-    description: 'Manage table bookings and reservations seamlessly with our built-in booking system.',
-    icon: '📅',
+    title: 'Mobile Ready',
+    description: 'Your menu looks perfect on any device - phone, tablet, or desktop.',
+    icon: MobileIcon,
   },
   {
     id: 4,
-    title: 'Mobile Responsive',
-    description: 'Your digital menu looks perfect on any device - phone, tablet, or desktop.',
-    icon: '📱',
-  },
-  {
-    id: 5,
     title: 'Easy Updates',
-    description: 'Change prices, add new items, or update descriptions instantly without technical skills.',
-    icon: '⚡',
-  },
-  {
-    id: 6,
-    title: 'Analytics Dashboard',
-    description: 'Track customer behavior, popular items, and sales data to grow your business.',
-    icon: '📊',
+    description: 'Change prices and add new items instantly without technical skills.',
+    icon: UpdatesIcon,
   },
 ] as const
 
@@ -130,33 +123,34 @@ export function FeaturesSection({}: FeaturesSectionProps) {
   }, [])
 
   return (
-    <div ref={sectionRef} className={`py-24 px-8 bg-gradient-to-b from-gray-50 to-white ${bebasNeue.className}`}>
+    <div id="features" ref={sectionRef} className={`py-24 px-8 bg-white ${bebasNeue.className}`}>
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-20">
-          <h2 ref={titleRef} className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-            Beautiful Website + Everything You Need
+        <div className="text-center mb-16">
+          <h2 ref={titleRef} className="text-4xl md:text-5xl font-bold text-black mb-6">
+            Everything You Need
           </h2>
-          <p ref={subtitleRef} className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Get a fresh, professional website that's ready to take orders immediately, plus all the tools you need to
-            grow your business.
+          <p ref={subtitleRef} className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Get a complete digital solution for your restaurant in minutes.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div ref={featuresRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div ref={featuresRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {features.map((feature, index) => (
             <div
               key={feature.id}
               ref={el => {
                 featureRefs.current[index] = el
               }}
-              className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-100"
+              className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-200"
             >
-              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                {feature.icon}
+              {/* Icon */}
+              <div className="mb-6">
+                <Image src={feature.icon} alt={feature.title} width={80} height={80} />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-gray-900 transition-colors duration-300">
+
+              <h3 className="text-2xl font-bold text-black mb-4 group-hover:text-gray-800 transition-colors duration-300">
                 {feature.title}
               </h3>
               <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">

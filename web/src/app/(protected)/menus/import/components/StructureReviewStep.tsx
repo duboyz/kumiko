@@ -144,6 +144,7 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
     setIsCreating(true)
 
     try {
+      console.log('StructureReviewStep: Creating menu with restaurantId:', restaurantId)
       // Create the entire menu structure in one API call
       const request: CreateMenuStructureRequest = {
         restaurantId: restaurantId,
@@ -163,6 +164,7 @@ export function StructureReviewStep({ parsedStructure, onConfirm, onBack, restau
         })),
       }
 
+      console.log('StructureReviewStep: Full request being sent:', request)
       const result = await createMenuStructureMutation.mutateAsync(request)
 
       console.log('Menu structure created successfully:', result)
