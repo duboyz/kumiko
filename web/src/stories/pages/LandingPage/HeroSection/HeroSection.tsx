@@ -5,7 +5,7 @@ import { gsap } from 'gsap'
 import { SplitText } from 'gsap/SplitText'
 import { bebasNeue } from '@shared'
 import Image from 'next/image'
-import HeroImage from '../assets/heroImage.png?url'
+import HeroImage from '../assets/heroImage.png'
 
 // Register the SplitText plugin
 gsap.registerPlugin(SplitText)
