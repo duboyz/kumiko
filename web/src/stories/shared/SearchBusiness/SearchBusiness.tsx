@@ -74,7 +74,7 @@ export default function SearchBusiness({ onBusinessSelect, selectedBusiness }: S
             <Input
               ref={searchInputRef}
               type="text"
-              placeholder="Type your restaurant name here..."
+              placeholder="Search"
               value={query}
               onChange={e => setQuery(e.target.value)}
               className="pl-10 pr-10 h-12 text-center transition-all duration-200 focus:scale-[1.02]"

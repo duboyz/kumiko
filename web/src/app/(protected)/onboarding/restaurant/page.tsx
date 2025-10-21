@@ -10,14 +10,7 @@ export default function RestaurantOnboardingPage() {
   return (
     <ContentContainer>
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Set up your restaurant</h1>
-          <p className="text-muted-foreground">Follow the steps to get your restaurant set up on our platform</p>
-        </div>
-
-        <RestaurantOnboarding
-          onComplete={() => router.push('/dashboard')}
-        />
+        <RestaurantOnboarding onComplete={() => router.push('/dashboard')} />
       </div>
     </ContentContainer>
   )

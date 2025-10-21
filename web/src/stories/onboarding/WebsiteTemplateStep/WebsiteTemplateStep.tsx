@@ -72,11 +72,6 @@ export function WebsiteTemplateStep({ onTemplatesSelected, onSkip, selectedMenuI
 
   return (
     <div ref={containerRef} className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Choose Your Website</h2>
-        <p className="text-muted-foreground">Select the type of website you'd like to create</p>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -103,7 +98,7 @@ export function WebsiteTemplateStep({ onTemplatesSelected, onSkip, selectedMenuI
                   onClick={() => !isDisabled && handleOptionSelect(key as WebsiteOption)}
                 >
                   {key === 'full' && (
-                    <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-none shadow-lg">
+                    <Badge className="absolute -top-2 -right-2 bg-red-500 text-white border-none shadow-lg">
                       <Star className="w-3 h-3 mr-1" />
                       Recommended
                     </Badge>

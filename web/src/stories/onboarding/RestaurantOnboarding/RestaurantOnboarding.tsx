@@ -3,7 +3,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, ArrowRight, CheckCircle, Search, Upload, Globe, PartyPopper } from 'lucide-react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle,
+  Search,
+  Upload,
+  Globe,
+  PartyPopper,
+  Building2,
+  Clock,
+  Menu,
+  Sparkles,
+} from 'lucide-react'
 import { SearchBusiness } from '@/components'
 import {
   BusinessDetailsEditor,
@@ -26,6 +38,7 @@ import {
   useCreateMenuStructure,
 } from '@shared'
 import { toast } from 'sonner'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 interface RestaurantOnboardingProps {
   onBack?: () => void
@@ -36,6 +49,7 @@ type Step = 'search' | 'details' | 'hours' | 'menu' | 'website' | 'celebration'
 
 export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardingProps) {
   const router = useRouter()
+  const isMobile = useIsMobile()
   const [currentStep, setCurrentStep] = useState<Step>('search')
   const [selectedBusiness, setSelectedBusiness] = useState<ResponseBusinessDetails | null>(null)
   const [businessDetails, setBusinessDetails] = useState<BusinessDetails | null>(null)
@@ -97,8 +111,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
       }
 
       const result = await createRestaurant.mutateAsync(command)
-      console.log('Restaurant creation result:', result)
-      console.log('Restaurant ID:', result?.id)
+
       setRestaurantId(result?.id || null)
       toast.success('Restaurant created successfully!')
       setCurrentStep('menu')
@@ -279,84 +292,153 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
   const stepOrder: Step[] = ['search', 'details', 'hours', 'menu', 'website', 'celebration']
   const progressPercentage = (stepOrder.indexOf(currentStep) / (stepOrder.length - 1)) * 100
 
+  // Get contextual header based on current step
+  const getStepHeader = () => {
+    switch (currentStep) {
+      case 'search':
+        return {
+          title: "Welcome! Let's get your restaurant online",
+          description:
+            "We'll help you set up everything you need to start taking orders and building your online presence",
+          icon: Sparkles,
+        }
+      case 'details':
+        return {
+          title: 'Business Details',
+          description: 'Review and update your restaurant information',
+          icon: Building2,
+        }
+      case 'hours':
+        return {
+          title: 'Opening Hours',
+          description: "Set your restaurant's operating hours",
+          icon: Clock,
+        }
+      case 'menu':
+        return {
+          title: 'Add Your Menu',
+          description: 'Import your menu to get started',
+          icon: null,
+        }
+      case 'website':
+        return {
+          title: 'Create Your Website',
+          description: 'Choose what template you want!',
+          icon: Globe,
+        }
+      case 'celebration':
+        return {
+          title: 'All Set!',
+          description: 'Your restaurant is ready to go live',
+          icon: PartyPopper,
+        }
+      default:
+        return {
+          title: 'Set up your restaurant',
+          description: 'Follow the steps to get your restaurant set up on our platform',
+          icon: Sparkles,
+        }
+    }
+  }
+
+  const stepHeader = getStepHeader()
+
   return (
-    <div className="space-y-6">
-      {/* Progress Indicator */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-center gap-1 md:gap-2 overflow-x-auto">
-          {[
-            { step: 'search', label: 'Find', icon: Search },
-            { step: 'details', label: 'Details', icon: CheckCircle },
-            { step: 'hours', label: 'Hours', icon: CheckCircle },
-            { step: 'menu', label: 'Menu', icon: Upload },
-            { step: 'website', label: 'Website', icon: Globe },
-            { step: 'celebration', label: 'Live!', icon: PartyPopper },
-          ].map(({ step, label, icon: Icon }, index) => {
-            const stepIndex = index + 1
-            const isCurrentStep = currentStep === step
-            const isCompleted =
-              ['search', 'details', 'hours', 'menu', 'website', 'celebration'].indexOf(currentStep) > index
-            const isActive = isCurrentStep || isCompleted
-
-            return (
-              <div key={step} className="flex items-center gap-1 md:gap-2 flex-shrink-0">
-                <div className="flex items-center gap-1 md:gap-2">
-                  <div
-                    className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium transition-all duration-300 ${
-                      isCurrentStep
-                        ? 'bg-primary text-primary-foreground active-step-indicator shadow-lg'
-                        : isCompleted
-                          ? 'bg-green-500 text-white'
-                          : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {isCompleted ? <CheckCircle className="w-3 h-3 md:w-4 md:h-4 checkmark-icon" /> : stepIndex}
-                  </div>
-                  <span
-                    className={`text-xs md:text-sm font-medium hidden sm:block transition-colors duration-200 ${
-                      isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
-                    }`}
-                  >
-                    {label}
-                  </span>
-                </div>
-                {index < 5 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Progress Bar */}
-        <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
-            style={{ width: `${progressPercentage}%` }}
-          />
-        </div>
+    <div className="space-y-4">
+      {/* Contextual Header */}
+      <div className="text-center mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center justify-center gap-3">
+          {!!stepHeader.icon && <stepHeader.icon className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />}
+          {/* <stepHeader.icon className="w-6 h-6 sm:w-7 sm:h-7 text-primary" /> */}
+          {stepHeader.title}
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">{stepHeader.description}</p>
       </div>
+
+      {/* Progress Indicator - Hidden on mobile */}
+      {!isMobile && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-center gap-1 md:gap-2 overflow-x-auto">
+            {[
+              { step: 'search', label: 'Find', icon: Search },
+              { step: 'details', label: 'Details', icon: CheckCircle },
+              { step: 'hours', label: 'Hours', icon: CheckCircle },
+              { step: 'menu', label: 'Menu', icon: Upload },
+              { step: 'website', label: 'Website', icon: Globe },
+              { step: 'celebration', label: 'Live!', icon: PartyPopper },
+            ].map(({ step, label, icon: Icon }, index) => {
+              const stepIndex = index + 1
+              const isCurrentStep = currentStep === step
+              const isCompleted =
+                ['search', 'details', 'hours', 'menu', 'website', 'celebration'].indexOf(currentStep) > index
+              const isActive = isCurrentStep || isCompleted
+
+              return (
+                <div key={step} className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <div
+                      className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium transition-all duration-300 ${
+                        isCurrentStep
+                          ? 'bg-primary text-primary-foreground active-step-indicator shadow-lg'
+                          : isCompleted
+                            ? 'bg-green-500 text-white'
+                            : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      {isCompleted ? <CheckCircle className="w-3 h-3 md:w-4 md:h-4 checkmark-icon" /> : stepIndex}
+                    </div>
+                    <span
+                      className={`text-xs md:text-sm font-medium hidden sm:block transition-colors duration-200 ${
+                        isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
+                      }`}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                  {index < 5 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Step Content */}
       <div ref={stepContentRef}>
         {currentStep === 'search' && (
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-3">Is your place on Google?</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                We can automatically find your restaurant and fill in all the details for you! Just search for your
-                business name.
+            {/* <div className="text-center mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3 flex items-center justify-center gap-3">
+                <Search className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
+                Is your restaurant on Google?
+              </h2>
+              <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+                Great news! If your restaurant is listed on Google, we can automatically pull in all your details to
+                save you time. Just search for your restaurant name below.
               </p>
-            </div>
+            </div> */}
 
             <Card className="border-0 shadow-lg">
-              <CardContent className="p-8">
+              <CardContent className="p-6 sm:p-8">
                 <SearchBusiness onBusinessSelect={handleBusinessSelect} selectedBusiness={selectedBusiness} />
 
                 {!selectedBusiness && (
-                  <div className="pt-6 border-t mt-6">
+                  <div className="pt-4 border-t mt-4">
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground mb-4">Can't find your place? No worries!</p>
+                      <p className="text-sm text-muted-foreground mb-3 flex items-center justify-center gap-2">
+                        <Building2 className="w-4 h-4 text-orange-600" />
+                        Don't see your restaurant? No problem at all!
+                      </p>
                       <Button onClick={handleContinueToDetails} variant="outline" className="w-full max-w-sm">
-                        Fill in details manually
+                        Add your details manually
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </div>

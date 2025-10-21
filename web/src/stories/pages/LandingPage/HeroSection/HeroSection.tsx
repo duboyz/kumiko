@@ -179,7 +179,7 @@ export function HeroSection({}: HeroSectionProps) {
   return (
     <div
       ref={heroRef}
-      className={`min-h-screen flex items-center justify-center from-gray-50 to-gray-100 relative overflow-hidden ${bebasNeue.className}`}
+      className={`min-h-screen flex items-center justify-center from-gray-50 to-gray-100 relative overflow-hidden pt-16 ${bebasNeue.className}`}
     >
       {/* Title Section */}
       <h1

@@ -86,23 +86,38 @@ export function PinBasedAnnotationStep({
       setImage(img)
       setImageSize({ width: img.width, height: img.height })
 
-      // Calculate container size with a small delay to ensure DOM is ready
-      setTimeout(() => {
+      // Calculate container size with responsive considerations
+      const calculateContainerSize = () => {
         const container = imageRef.current
         if (container) {
-          const containerWidth = Math.min(container.offsetWidth || 800, 800)
+          // Get available width from container, with responsive max widths
+          const availableWidth = container.offsetWidth || window.innerWidth
+          const maxWidth = window.innerWidth < 768 ? availableWidth - 32 : Math.min(availableWidth, 1000) // 32px padding on mobile
           const aspectRatio = img.width / img.height
-          const containerHeight = containerWidth / aspectRatio
+          const containerHeight = maxWidth / aspectRatio
 
-          setContainerSize({ width: containerWidth, height: containerHeight })
+          setContainerSize({ width: maxWidth, height: containerHeight })
         } else {
-          // Fallback if container is not ready
-          const containerWidth = 800
+          // Fallback with responsive sizing
+          const maxWidth = window.innerWidth < 768 ? window.innerWidth - 32 : Math.min(window.innerWidth * 0.9, 1000)
           const aspectRatio = img.width / img.height
-          const containerHeight = containerWidth / aspectRatio
-          setContainerSize({ width: containerWidth, height: containerHeight })
+          const containerHeight = maxWidth / aspectRatio
+          setContainerSize({ width: maxWidth, height: containerHeight })
         }
-      }, 100)
+      }
+
+      // Calculate immediately and on resize
+      calculateContainerSize()
+
+      const handleResize = () => {
+        calculateContainerSize()
+      }
+
+      window.addEventListener('resize', handleResize)
+
+      return () => {
+        window.removeEventListener('resize', handleResize)
+      }
     }
     img.onerror = () => {
       console.error('Failed to load image:', imagePreview)
@@ -214,10 +229,10 @@ export function PinBasedAnnotationStep({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Progress */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-xs sm:text-sm">
           <span className="font-medium">Annotation Progress</span>
           <span className="text-muted-foreground">{Math.round(progressPercentage)}% complete</span>
         </div>
@@ -232,12 +247,14 @@ export function PinBasedAnnotationStep({
       {/* Current Step Guidance */}
       {nextStep && (
         <Card className="border-primary/20 bg-primary/5">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <div className="text-2xl">{ANNOTATION_TYPES.find(t => t.type === nextStep.type)?.icon}</div>
-              <div>
-                <h3 className="font-semibold text-primary">{nextStep.label}</h3>
-                <p className="text-sm text-muted-foreground">{nextStep.description}</p>
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-start gap-2 sm:gap-3">
+              <div className="text-xl sm:text-2xl flex-shrink-0">
+                {ANNOTATION_TYPES.find(t => t.type === nextStep.type)?.icon}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-primary text-sm sm:text-base">{nextStep.label}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{nextStep.description}</p>
               </div>
             </div>
           </CardContent>
@@ -245,7 +262,7 @@ export function PinBasedAnnotationStep({
       )}
 
       {/* Annotation Type Selector */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {ANNOTATION_TYPES.map(type => {
           const count = getAnnotationCount(type.type)
           const isSelected = selectedType === type.type
@@ -256,13 +273,13 @@ export function PinBasedAnnotationStep({
               variant={isSelected ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedType(type.type)}
-              className="flex items-center gap-2 h-auto p-3"
+              className="flex items-center gap-2 h-auto p-2 sm:p-3 min-h-[60px] sm:min-h-[70px]"
             >
-              <span className="text-lg">{type.icon}</span>
-              <div className="text-left">
-                <div className="font-medium text-xs">{type.label}</div>
+              <span className="text-base sm:text-lg">{type.icon}</span>
+              <div className="text-left flex-1">
+                <div className="font-medium text-xs sm:text-sm leading-tight">{type.label}</div>
                 {count > 0 && (
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-xs mt-1">
                     {count}
                   </Badge>
                 )}
@@ -273,15 +290,16 @@ export function PinBasedAnnotationStep({
       </div>
 
       {/* Image with Pins */}
-      <div className="relative">
+      <div className="relative w-full">
         <div
           ref={imageRef}
-          className="relative cursor-crosshair border rounded-lg overflow-hidden bg-muted"
+          className="relative cursor-crosshair border rounded-lg overflow-hidden bg-muted mx-auto"
           onClick={handleImageClick}
           style={{
             width: containerSize.width || '100%',
             height: containerSize.height || 'auto',
-            minHeight: '400px',
+            minHeight: window.innerWidth < 768 ? '300px' : '400px',
+            maxWidth: '100%',
           }}
         >
           {imagePreview ? (
@@ -292,20 +310,21 @@ export function PinBasedAnnotationStep({
               style={{
                 width: containerSize.width || '100%',
                 height: containerSize.height || 'auto',
-                minHeight: '400px',
+                minHeight: window.innerWidth < 768 ? '300px' : '400px',
               }}
               onLoad={() => {
-                // Recalculate container size when image loads
+                // Recalculate container size when image loads with responsive considerations
                 if (imageRef.current && image) {
-                  const containerWidth = Math.min(imageRef.current.offsetWidth || 800, 800)
+                  const availableWidth = imageRef.current.offsetWidth || window.innerWidth
+                  const maxWidth = window.innerWidth < 768 ? availableWidth - 32 : Math.min(availableWidth, 1000)
                   const aspectRatio = image.width / image.height
-                  const containerHeight = containerWidth / aspectRatio
-                  setContainerSize({ width: containerWidth, height: containerHeight })
+                  const containerHeight = maxWidth / aspectRatio
+                  setContainerSize({ width: maxWidth, height: containerHeight })
                 }
               }}
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
+            <div className="flex items-center justify-center h-full text-muted-foreground min-h-[300px] sm:min-h-[400px]">
               <div className="text-center">
                 <div className="text-lg mb-2">📷</div>
                 <div>Loading image...</div>
@@ -321,7 +340,7 @@ export function PinBasedAnnotationStep({
             return (
               <div
                 key={annotation.id}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer touch-manipulation"
                 style={{
                   left: position.x,
                   top: position.y,
@@ -329,19 +348,19 @@ export function PinBasedAnnotationStep({
                 onClick={e => handlePinClick(annotation.id, e)}
               >
                 <div
-                  className="w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold"
+                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold hover:scale-110 transition-transform"
                   style={{ backgroundColor: annotation.color }}
                 >
-                  <MapPin className="w-3 h-3" />
+                  <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
                 </div>
                 {isSelected && (
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="absolute -top-8 left-1/2 transform -translate-x-1/2 w-6 h-6 p-0"
+                    className="absolute -top-8 sm:-top-10 left-1/2 transform -translate-x-1/2 w-6 h-6 sm:w-7 sm:h-7 p-0 touch-manipulation"
                     onClick={() => handleDeleteAnnotation(annotation.id)}
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 )}
               </div>
@@ -350,23 +369,23 @@ export function PinBasedAnnotationStep({
         </div>
 
         {/* Instructions */}
-        <div className="mt-2 text-center text-sm text-muted-foreground">
-          Click on the image to place {selectedAnnotationType?.label.toLowerCase()} pins
+        <div className="mt-2 text-center text-xs sm:text-sm text-muted-foreground px-2">
+          Tap on the image to place {selectedAnnotationType?.label.toLowerCase()} pins
         </div>
       </div>
 
       {/* Annotation Summary */}
       {annotations.length > 0 && (
         <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold mb-3">Annotation Summary</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <CardContent className="p-3 sm:p-4">
+            <h3 className="font-semibold mb-3 text-sm sm:text-base">Annotation Summary</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               {ANNOTATION_TYPES.map(type => {
                 const count = getAnnotationCount(type.type)
                 return (
-                  <div key={type.type} className="flex items-center gap-2 text-sm">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: type.color }} />
-                    <span>
+                  <div key={type.type} className="flex items-center gap-2 text-xs sm:text-sm">
+                    <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: type.color }} />
+                    <span className="truncate">
                       {type.label}: {count}
                     </span>
                   </div>
@@ -378,14 +397,14 @@ export function PinBasedAnnotationStep({
       )}
 
       {/* Navigation */}
-      <div className="flex items-center justify-between pt-6">
-        <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-6">
+        <Button variant="outline" onClick={onBack} className="flex items-center gap-2 order-2 sm:order-1">
           <ArrowLeft className="w-4 h-4" />
           Back
         </Button>
 
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" onClick={onSkip}>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 order-1 sm:order-2">
+          <Button variant="ghost" onClick={onSkip} className="text-sm">
             Skip annotation
           </Button>
           <Button onClick={handleContinue} disabled={annotations.length === 0} className="flex items-center gap-2">
