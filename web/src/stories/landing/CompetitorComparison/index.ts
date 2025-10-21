@@ -1,3 +1,0 @@
-export { CompetitorComparison } from './CompetitorComparison'
-
-
