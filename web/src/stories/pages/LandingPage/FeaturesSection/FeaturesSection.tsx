@@ -4,6 +4,11 @@ import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { bebasNeue } from '@shared'
+import Image from 'next/image'
+import WebsiteIcon from './assets/desktopIcon.png'
+import OrderingIcon from './assets/orderingIcon.png'
+import MobileIcon from './assets/mobileIcon.png'
+import UpdatesIcon from './assets/updatesIcon.png'
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger)
@@ -16,25 +21,25 @@ const features = [
     id: 1,
     title: 'Beautiful Website',
     description: 'Get a fresh, professional website that looks great and works perfectly.',
-    icon: 'WebsiteIcon', // Replace with your icon component
+    icon: WebsiteIcon,
   },
   {
     id: 2,
     title: 'Online Ordering',
     description: 'Customers can place orders directly from your digital menu.',
-    icon: 'OrderingIcon', // Replace with your icon component
+    icon: OrderingIcon,
   },
   {
     id: 3,
     title: 'Mobile Ready',
     description: 'Your menu looks perfect on any device - phone, tablet, or desktop.',
-    icon: 'MobileIcon', // Replace with your icon component
+    icon: MobileIcon,
   },
   {
     id: 4,
     title: 'Easy Updates',
     description: 'Change prices and add new items instantly without technical skills.',
-    icon: 'UpdatesIcon', // Replace with your icon component
+    icon: UpdatesIcon,
   },
 ] as const
 
@@ -140,9 +145,9 @@ export function FeaturesSection({}: FeaturesSectionProps) {
               }}
               className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-200"
             >
-              {/* Icon placeholder - replace with your icon component */}
-              <div className="w-16 h-16 bg-gray-100 rounded-xl mb-6 flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-300">
-                <span className="text-gray-400 text-sm font-medium">{feature.icon}</span>
+              {/* Icon */}
+              <div className="mb-6">
+                <Image src={feature.icon} alt={feature.title} width={80} height={80} />
               </div>
 
               <h3 className="text-2xl font-bold text-black mb-4 group-hover:text-gray-800 transition-colors duration-300">
