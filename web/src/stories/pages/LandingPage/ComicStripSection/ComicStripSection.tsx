@@ -65,7 +65,13 @@ export function ComicStripSection({}: ComicStripSectionProps) {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {images.map((image, index) => (
-            <div key={index} ref={el => (imageRefs.current[index] = el)} className="relative">
+            <div
+              key={index}
+              ref={el => {
+                imageRefs.current[index] = el
+              }}
+              className="relative"
+            >
               <Image
                 src={image.src}
                 alt={image.alt}
