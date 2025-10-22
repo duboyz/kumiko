@@ -49,9 +49,10 @@ public class LoginHandler(
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Required for SameSite=None
-                    SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = expiresAt
+                    Secure = true, // Required for HTTPS
+                    SameSite = SameSiteMode.Lax, // Try Lax instead of None
+                    Expires = expiresAt,
+                    Path = "/" // Explicitly set path
                     // Don't set Domain - let it default to the request domain
                 };
 
@@ -69,9 +70,10 @@ public class LoginHandler(
                 var refreshCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Required for SameSite=None
-                    SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = DateTime.UtcNow.AddDays(7) // Refresh token lasts longer
+                    Secure = true, // Required for HTTPS
+                    SameSite = SameSiteMode.Lax, // Try Lax instead of None
+                    Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
+                    Path = "/" // Explicitly set path
                     // Don't set Domain - let it default to the request domain
                 };
 
@@ -84,6 +86,13 @@ public class LoginHandler(
                 foreach (var header in setCookieHeaders)
                 {
                     Console.WriteLine($"🍪 Set-Cookie: {header.Value}");
+                }
+                
+                // Log all response headers to debug
+                Console.WriteLine($"🍪 All response headers:");
+                foreach (var header in httpContext.Response.Headers)
+                {
+                    Console.WriteLine($"🍪 {header.Key}: {string.Join(", ", header.Value)}");
                 }
             }
 

@@ -171,7 +171,7 @@ export async function middleware(request: NextRequest) {
 
   console.log('🍪 Middleware cookie check:', {
     hasAccessToken: !!accessToken,
-    hasRefreshToken: !!refreshToken,
+    hasRefreshToken: !!lol,
     accessTokenValue: accessToken?.value ? `${accessToken.value.substring(0, 20)}...` : 'null',
     refreshTokenValue: lol?.value ? `${lol.value.substring(0, 20)}...` : 'null',
     allCookies: request.cookies.getAll().map(c => `${c.name}=${c.value.substring(0, 10)}...`),
