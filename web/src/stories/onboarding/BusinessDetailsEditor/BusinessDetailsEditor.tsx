@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Building2 } from 'lucide-react'
 import type { ResponseBusinessDetails } from '@shared'
 import { gsap } from 'gsap'
+import Image from 'next/image'
+import KumikoBusiness from '../assets/kumiko-business.png'
 
 export interface BusinessDetails {
   name: string
@@ -132,15 +134,28 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
   return (
     <Card ref={cardRef}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Building2 className="w-5 h-5" />
-          Review what we found
-        </CardTitle>
-        <CardDescription>
-          {businessData
-            ? 'We found your business! Please review and update any details below.'
-            : "Let's set up your restaurant details so we can create your website."}
-        </CardDescription>
+        <div className="flex items-center gap-4">
+          {/* Kumiko business icon - spans both lines */}
+          <div className="flex-shrink-0">
+            <Image
+              src={KumikoBusiness}
+              alt="Kumiko helping with business details"
+              width={80}
+              height={80}
+              className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+            />
+          </div>
+
+          {/* Title and description next to Kumiko */}
+          <div className="flex-1">
+            <CardTitle className="flex items-center gap-2">Review what we found</CardTitle>
+            <CardDescription>
+              {businessData
+                ? 'We found your business! Please review and update any details below.'
+                : "Let's set up your restaurant details so we can create your website."}
+            </CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div ref={formFieldsRef} className="space-y-6">

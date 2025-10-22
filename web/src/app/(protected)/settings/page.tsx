@@ -1,9 +1,18 @@
 'use client'
 
-import { ContentContainer, UserSettings, LocationSettings, ContactInformationSettings, BusinessHoursSettings } from '@/components'
+import {
+  ContentContainer,
+  UserSettings,
+  LocationSettings,
+  ContactInformationSettings,
+  BusinessHoursSettings,
+} from '@/components'
 import { useCurrentUser, useLocationSelection } from '@shared'
 import { ErrorState, LoadingSpinner } from '@/components'
 import { useTranslations } from 'next-intl'
+
+// Import Kumiko settings image from public folder
+const KumikoSettingsImage = '/icons/kumiko-settings.png'
 
 export default function SettingsPage() {
   const t = useTranslations()
@@ -17,9 +26,12 @@ export default function SettingsPage() {
   return (
     <ContentContainer>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold">{t('settings.title')}</h1>
-          <p className="text-muted-foreground">Manage your account settings and preferences.</p>
+        <div className="flex items-center gap-4">
+          <img src={KumikoSettingsImage} alt="Kumiko Settings" width={60} height={60} className="rounded-lg" />
+          <div>
+            <h1 className="text-3xl font-bold">{t('settings.title')}</h1>
+            <p className="text-muted-foreground">Manage your account settings and preferences.</p>
+          </div>
         </div>
 
         {/* Account Settings Section */}

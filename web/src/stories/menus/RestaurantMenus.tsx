@@ -12,6 +12,8 @@ import { useRouter } from 'next/navigation'
 import { RestaurantMenuCard } from '@/stories/restaurants/RestaurantMenuCard'
 import { CreateMenuDialog } from '@/components'
 
+const KumikoMenusImage = '/icons/kumiko-menus.png'
+
 export const RestaurantMenus = () => {
   const router = useRouter()
   const { selectedLocation } = useLocationSelection()
@@ -69,11 +71,14 @@ export const RestaurantMenus = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Menus</h1>
-          <p className="text-muted-foreground mt-1">
-            {menusData.menus.length} {menusData.menus.length === 1 ? 'menu' : 'menus'} available
-          </p>
+        <div className="flex items-center gap-4">
+          <img src={KumikoMenusImage} alt="Kumiko Menus" width={80} height={80} className="rounded-lg" />
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Menus</h1>
+            <p className="text-muted-foreground mt-1">
+              {menusData.menus.length} {menusData.menus.length === 1 ? 'menu' : 'menus'} available
+            </p>
+          </div>
         </div>
         <div className="flex gap-2">
           <CreateMenuDialog

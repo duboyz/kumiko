@@ -6,6 +6,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Check, ExternalLink, LayoutDashboard, Copy } from 'lucide-react'
 import { gsap } from 'gsap'
 import { toast } from 'sonner'
+import Image from 'next/image'
+import KumikoCelebration from '../assets/kumiko-celebration.png'
 
 interface CelebrationStepProps {
   websiteName: string
@@ -24,6 +26,7 @@ export function CelebrationStep({
 }: CelebrationStepProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
+  const imageRef = useRef<HTMLDivElement>(null)
   const checklistRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
   const buttonsRef = useRef<HTMLDivElement>(null)
@@ -114,6 +117,7 @@ export function CelebrationStep({
     if (
       !containerRef.current ||
       !headingRef.current ||
+      !imageRef.current ||
       !checklistRef.current ||
       !cardRef.current ||
       !buttonsRef.current
@@ -124,6 +128,7 @@ export function CelebrationStep({
 
     // Set initial states
     gsap.set(headingRef.current, { scale: 0, opacity: 0 })
+    gsap.set(imageRef.current, { scale: 0, opacity: 0, rotation: -10 })
     gsap.set(checkItems, { x: -30, opacity: 0 })
     gsap.set(cardRef.current, { y: 30, opacity: 0 })
     gsap.set(buttonsRef.current, { y: 20, opacity: 0 })
@@ -137,6 +142,17 @@ export function CelebrationStep({
       duration: 0.6,
       ease: 'back.out(1.7)',
     })
+      .to(
+        imageRef.current,
+        {
+          scale: 1,
+          opacity: 1,
+          rotation: 0,
+          duration: 0.8,
+          ease: 'back.out(1.7)',
+        },
+        '+=0.1'
+      )
       .to(
         checkItems,
         {
@@ -187,8 +203,18 @@ export function CelebrationStep({
         <div className="text-center space-y-8">
           {/* Heading */}
           <div ref={headingRef}>
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">🎉 You're Live!</h1>
             <p className="text-xl text-muted-foreground">Your restaurant is now online and ready for customers</p>
+          </div>
+
+          {/* Kumiko Celebration Image */}
+          <div ref={imageRef} className="flex justify-center">
+            <Image
+              src={KumikoCelebration}
+              alt="Kumiko celebrating"
+              width={300}
+              height={300}
+              className="max-w-full h-auto"
+            />
           </div>
 
           {/* Checklist */}

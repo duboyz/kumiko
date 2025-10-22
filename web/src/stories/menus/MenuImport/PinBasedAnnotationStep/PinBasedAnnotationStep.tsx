@@ -4,7 +4,9 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, ArrowRight, Undo, X, MapPin } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Undo, X, MapPin, Target } from 'lucide-react'
+import Image from 'next/image'
+import KumikoAnnotate from '../../../onboarding/assets/kumiko-annotate.png'
 
 export interface PinAnnotation {
   id: string
@@ -80,7 +82,7 @@ export function PinBasedAnnotationStep({
 
   // Load image and calculate dimensions
   useEffect(() => {
-    const img = new Image()
+    const img = new window.Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => {
       setImage(img)
@@ -230,6 +232,22 @@ export function PinBasedAnnotationStep({
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Kumiko annotate image */}
+      <div className="flex flex-col items-center mb-4">
+        <div className="relative">
+          <Image
+            src={KumikoAnnotate}
+            alt="Kumiko helping with annotation"
+            width={100}
+            height={100}
+            className="w-20 h-20 sm:w-24 sm:h-24 object-contain"
+          />
+        </div>
+        <p className="text-sm text-muted-foreground mt-2 text-center max-w-sm">
+          Kumiko is ready to help you annotate your menu and extract the details!
+        </p>
+      </div>
+
       {/* Progress */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs sm:text-sm">

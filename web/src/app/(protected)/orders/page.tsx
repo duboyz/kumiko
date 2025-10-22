@@ -10,6 +10,8 @@ import { OrdersTableView, OrdersKanbanView } from '@/stories/orders'
 import { Button } from '@/components/ui/button'
 import { Table, LayoutGrid } from 'lucide-react'
 
+const KumikoOrdersImage = '/icons/kumiko-orders.png'
+
 type ViewMode = 'table' | 'kanban'
 
 export default function OrdersPage() {
@@ -35,18 +37,17 @@ export default function OrdersPage() {
   return (
     <ContentContainer>
       <div className="flex items-center justify-between mb-6">
-        <PageHeader
-          title="Orders"
-          description="Manage and track your restaurant orders"
-        />
+        <div className="flex items-center gap-4">
+          <img src={KumikoOrdersImage} alt="Kumiko Orders" width={60} height={60} className="rounded-lg" />
+          <div>
+            <h1 className="text-3xl font-bold">Orders</h1>
+            <p className="text-muted-foreground">Manage and track your restaurant orders</p>
+          </div>
+        </div>
 
         {/* View Mode Toggle */}
         <div className="flex gap-2 border rounded-lg p-1">
-          <Button
-            variant={viewMode === 'table' ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={() => setViewMode('table')}
-          >
+          <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('table')}>
             <Table className="h-4 w-4 mr-2" />
             Table
           </Button>
@@ -69,4 +70,3 @@ export default function OrdersPage() {
     </ContentContainer>
   )
 }
-
