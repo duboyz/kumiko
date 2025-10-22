@@ -47,8 +47,8 @@ public class RegisterHandler(
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Required for HTTPS
-                    SameSite = SameSiteMode.Lax, // Allow cross-origin requests
+                    Secure = true, // Required for SameSite=None
+                    SameSite = SameSiteMode.None, // Required for cross-origin
                     Expires = expiresAt,
                     Path = "/", // Explicitly set path
                     Domain = "kumiko.no" // Set domain to frontend domain
@@ -59,8 +59,8 @@ public class RegisterHandler(
                 var refreshCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Required for HTTPS
-                    SameSite = SameSiteMode.Lax, // Allow cross-origin requests
+                    Secure = true, // Required for SameSite=None
+                    SameSite = SameSiteMode.None, // Required for cross-origin
                     Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
                     Path = "/", // Explicitly set path
                     Domain = "kumiko.no" // Set domain to frontend domain
