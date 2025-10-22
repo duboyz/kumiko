@@ -20,10 +20,19 @@ export const authApi = {
     const setCookieHeader = response.headers['set-cookie']
     console.log('🍪 Set-Cookie headers received:', setCookieHeader)
 
+    // Check all response headers
+    console.log('🍪 All response headers:', response.headers)
+
     // Check current cookies in browser
     if (typeof document !== 'undefined') {
       const currentCookies = document.cookie
       console.log('🍪 Current cookies in browser:', currentCookies)
+
+      // Check if cookies are accessible after a short delay
+      setTimeout(() => {
+        const delayedCookies = document.cookie
+        console.log('🍪 Cookies after delay:', delayedCookies)
+      }, 100)
     }
 
     if (!response.data.success) throw new Error(response.data.message || 'Login failed')

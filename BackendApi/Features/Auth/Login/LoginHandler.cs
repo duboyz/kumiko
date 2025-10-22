@@ -60,6 +60,11 @@ public class LoginHandler(
                 Console.WriteLine($"🍪 Cookie options: HttpOnly={cookieOptions.HttpOnly}, Secure={cookieOptions.Secure}, SameSite={cookieOptions.SameSite}");
                 Console.WriteLine($"🍪 Request origin: {httpContext.Request.Headers.Origin}");
                 Console.WriteLine($"🍪 Request host: {httpContext.Request.Host}");
+                Console.WriteLine($"🍪 Request headers:");
+                foreach (var header in httpContext.Request.Headers)
+                {
+                    Console.WriteLine($"🍪   {header.Key}: {string.Join(", ", header.Value)}");
+                }
                 
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
                 
