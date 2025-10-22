@@ -21,6 +21,9 @@ import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { Plus, Edit, Trash2, Package, Upload, CheckCircle, AlertCircle } from 'lucide-react'
+
+// Import Kumiko menu image from public folder
+const KumikoMenuImage = '/icons/kumiko-website.png'
 import { useState, useEffect, Suspense } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
@@ -153,9 +156,12 @@ function MenuItemsPageContent() {
       )}
 
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Menu Items</h1>
-          <p className="text-muted-foreground">Manage all menu items for {selectedLocation.name}</p>
+        <div className="flex items-center gap-4">
+          <img src={KumikoMenuImage} alt="Kumiko Menu" width={60} height={60} className="rounded-lg" />
+          <div>
+            <h1 className="text-3xl font-bold">Menu Items</h1>
+            <p className="text-muted-foreground">Manage all menu items for {selectedLocation.name}</p>
+          </div>
         </div>
       </div>
 
