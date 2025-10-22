@@ -53,9 +53,10 @@ public class RefreshTokenHandler(
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = expiresAt
-                    // Don't set Domain - let it default to the request domain
+                    SameSite = SameSiteMode.Lax,
+                    Expires = expiresAt,
+                    Path = "/", // Explicitly set path
+                    Domain = "kumiko.no" // Set domain to frontend domain
                 };
 
                 httpContext.Response.Cookies.Append("AccessToken", newAccessToken, cookieOptions);
@@ -64,9 +65,10 @@ public class RefreshTokenHandler(
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddDays(7)
-                    // Don't set Domain - let it default to the request domain
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    Path = "/", // Explicitly set path
+                    Domain = "kumiko.no" // Set domain to frontend domain
                 };
 
                 httpContext.Response.Cookies.Append("RefreshToken", newRefreshToken, refreshCookieOptions);

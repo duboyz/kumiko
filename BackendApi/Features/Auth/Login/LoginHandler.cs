@@ -52,8 +52,8 @@ public class LoginHandler(
                     Secure = true, // Required for HTTPS
                     SameSite = SameSiteMode.Lax, // Try Lax instead of None
                     Expires = expiresAt,
-                    Path = "/" // Explicitly set path
-                    // Don't set Domain - let it default to the request domain
+                    Path = "/", // Explicitly set path
+                    Domain = "kumiko.no" // Set domain to frontend domain
                 };
 
                 Console.WriteLine($"🍪 Setting AccessToken cookie: {accessToken.Substring(0, Math.Min(20, accessToken.Length))}...");
@@ -73,8 +73,8 @@ public class LoginHandler(
                     Secure = true, // Required for HTTPS
                     SameSite = SameSiteMode.Lax, // Try Lax instead of None
                     Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
-                    Path = "/" // Explicitly set path
-                    // Don't set Domain - let it default to the request domain
+                    Path = "/", // Explicitly set path
+                    Domain = "kumiko.no" // Set domain to frontend domain
                 };
 
                 Console.WriteLine($"🍪 Setting RefreshToken cookie: {refreshToken.Substring(0, Math.Min(20, refreshToken.Length))}...");

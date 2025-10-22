@@ -47,10 +47,11 @@ public class RegisterHandler(
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Required for SameSite=None
-                    SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = expiresAt
-                    // Don't set Domain - let it default to the request domain
+                    Secure = true, // Required for HTTPS
+                    SameSite = SameSiteMode.Lax, // Allow cross-origin requests
+                    Expires = expiresAt,
+                    Path = "/", // Explicitly set path
+                    Domain = "kumiko.no" // Set domain to frontend domain
                 };
 
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
@@ -58,10 +59,11 @@ public class RegisterHandler(
                 var refreshCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Required for SameSite=None
-                    SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = DateTime.UtcNow.AddDays(7) // Refresh token lasts longer
-                    // Don't set Domain - let it default to the request domain
+                    Secure = true, // Required for HTTPS
+                    SameSite = SameSiteMode.Lax, // Allow cross-origin requests
+                    Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
+                    Path = "/", // Explicitly set path
+                    Domain = "kumiko.no" // Set domain to frontend domain
                 };
 
                 httpContext.Response.Cookies.Append("RefreshToken", refreshToken, refreshCookieOptions);
