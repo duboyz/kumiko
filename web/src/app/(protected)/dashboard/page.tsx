@@ -54,12 +54,14 @@ export default function DashboardPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div>
-            <img src={KumikoDashboardImage} alt="Kumiko Dashboard" width={80} height={80} className="rounded-lg" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
-            <p className="text-muted-foreground">Welcome back! Here's an overview of your restaurant.</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <img src={KumikoDashboardImage} alt="Kumiko Dashboard" width={80} height={80} className="rounded-lg" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
+              <p className="text-muted-foreground">Welcome back! Here's an overview of your restaurant.</p>
+            </div>
           </div>
 
           {/* Time Range Selector */}
