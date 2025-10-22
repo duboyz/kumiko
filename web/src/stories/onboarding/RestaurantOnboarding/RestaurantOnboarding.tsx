@@ -16,6 +16,8 @@ import {
   Menu,
   Sparkles,
 } from 'lucide-react'
+import Image from 'next/image'
+import KumikoSearching from '../assets/kumiko-searching.png'
 import { SearchBusiness } from '@/components'
 import {
   BusinessDetailsEditor,
@@ -297,16 +299,17 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
     switch (currentStep) {
       case 'search':
         return {
-          title: "Welcome! Let's get your restaurant online",
-          description:
-            "We'll help you set up everything you need to start taking orders and building your online presence",
-          icon: Sparkles,
+          // title: "Welcome! Let's get your restaurant online",
+          title: '',
+          description: '',
+          // "We'll help you set up everything you need to start taking orders and building your online presence",
+          icon: null,
         }
       case 'details':
         return {
-          title: 'Business Details',
-          description: 'Review and update your restaurant information',
-          icon: Building2,
+          title: '',
+          description: '',
+          icon: null,
         }
       case 'hours':
         return {
@@ -415,19 +418,27 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
       <div ref={stepContentRef}>
         {currentStep === 'search' && (
           <div className="max-w-4xl mx-auto">
-            {/* <div className="text-center mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-3 flex items-center justify-center gap-3">
-                <Search className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
-                Is your restaurant on Google?
-              </h2>
-              <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-                Great news! If your restaurant is listed on Google, we can automatically pull in all your details to
-                save you time. Just search for your restaurant name below.
-              </p>
-            </div> */}
-
             <Card className="border-0 shadow-lg">
               <CardContent className="p-6 sm:p-8">
+                {/* Kumiko searching image */}
+                <div className="flex flex-col items-center mb-6">
+                  <div className="relative">
+                    <Image
+                      src={KumikoSearching}
+                      alt="Kumiko searching for your restaurant"
+                      width={160}
+                      height={160}
+                      className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+                    />
+                    {/* <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center animate-pulse">
+                      <Search className="w-4 h-4 text-primary-foreground" />
+                    </div> */}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2 text-center max-w-sm">
+                    Kumiko is ready to help you find your restaurant and get it online!
+                  </p>
+                </div>
+
                 <SearchBusiness onBusinessSelect={handleBusinessSelect} selectedBusiness={selectedBusiness} />
 
                 {!selectedBusiness && (

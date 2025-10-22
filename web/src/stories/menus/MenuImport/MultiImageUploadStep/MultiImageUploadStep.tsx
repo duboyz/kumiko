@@ -4,9 +4,11 @@ import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ArrowRight, ArrowLeft, X, Plus, Trash2 } from 'lucide-react'
+import { ArrowRight, ArrowLeft, X, Plus, Trash2, Upload } from 'lucide-react'
 import { Dropzone } from '../Dropzone/Dropzone'
 import { gsap } from 'gsap'
+import Image from 'next/image'
+import KumikoImport from '../../../onboarding/assets/kumiko-import.png'
 
 export interface MenuImage {
   id: string
@@ -184,8 +186,27 @@ export function MultiImageUploadStep({ onImagesSelect, onBack }: MultiImageUploa
 
       {/* Upload Area */}
       {images.length === 0 && (
-        <div ref={uploadAreaRef}>
-          <Dropzone onFileSelect={handleFilesSelect} />
+        <div ref={uploadAreaRef} className="space-y-6">
+          {/* Kumiko import image */}
+          <div className="flex flex-col items-center">
+            <div className="relative">
+              <Image
+                src={KumikoImport}
+                alt="Kumiko ready to import your menu"
+                width={120}
+                height={120}
+                className="w-24 h-24 sm:w-30 sm:h-30 object-contain"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-2 text-center max-w-sm">
+              Kumiko is ready to help you import your menu and get it online!
+            </p>
+          </div>
+
+          <Dropzone
+            onFileSelect={handleFilesSelect}
+            className="border-2 border-dashed rounded-lg p-6 text-center max-w-md mx-auto"
+          />
         </div>
       )}
 

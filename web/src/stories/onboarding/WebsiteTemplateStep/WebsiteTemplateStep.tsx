@@ -8,6 +8,8 @@ import { Globe, Layout, Menu, Check, Star } from 'lucide-react'
 import { PageTemplate } from '@shared'
 import { cn } from '@/lib/utils'
 import { gsap } from 'gsap'
+import Image from 'next/image'
+import KumikoWebsite from '../assets/kumiko-website.png'
 
 interface WebsiteTemplateStepProps {
   onTemplatesSelected: (templates: PageTemplate[]) => void
@@ -72,6 +74,22 @@ export function WebsiteTemplateStep({ onTemplatesSelected, onSkip, selectedMenuI
 
   return (
     <div ref={containerRef} className="space-y-6">
+      {/* Kumiko website image */}
+      <div className="flex flex-col items-center mb-6">
+        <div className="relative">
+          <Image
+            src={KumikoWebsite}
+            alt="Kumiko ready to create your website"
+            width={120}
+            height={120}
+            className="w-24 h-24 sm:w-30 sm:h-30 object-contain"
+          />
+        </div>
+        <p className="text-sm text-muted-foreground mt-2 text-center max-w-sm">
+          Kumiko is ready to help you create your beautiful website!
+        </p>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
