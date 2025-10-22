@@ -54,8 +54,8 @@ public class RefreshTokenHandler(
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = expiresAt,
-                    Domain = ".kumiko.no" // Allow cookies to work across kumiko.no subdomains
+                    Expires = expiresAt
+                    // Don't set Domain - let it default to the request domain
                 };
 
                 httpContext.Response.Cookies.Append("AccessToken", newAccessToken, cookieOptions);
@@ -65,8 +65,8 @@ public class RefreshTokenHandler(
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddDays(7),
-                    Domain = ".kumiko.no" // Allow cookies to work across kumiko.no subdomains
+                    Expires = DateTime.UtcNow.AddDays(7)
+                    // Don't set Domain - let it default to the request domain
                 };
 
                 httpContext.Response.Cookies.Append("RefreshToken", newRefreshToken, refreshCookieOptions);

@@ -51,22 +51,40 @@ public class LoginHandler(
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = expiresAt,
-                    Domain = ".kumiko.no" // Allow cookies to work across kumiko.no subdomains
+                    Expires = expiresAt
+                    // Don't set Domain - let it default to the request domain
                 };
 
+                Console.WriteLine($"🍪 Setting AccessToken cookie: {accessToken.Substring(0, Math.Min(20, accessToken.Length))}...");
+                Console.WriteLine($"🍪 Cookie options: HttpOnly={cookieOptions.HttpOnly}, Secure={cookieOptions.Secure}, SameSite={cookieOptions.SameSite}");
+                Console.WriteLine($"🍪 Request origin: {httpContext.Request.Headers.Origin}");
+                Console.WriteLine($"🍪 Request host: {httpContext.Request.Host}");
+                
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
+                
+                // Verify cookie was set
+                var cookieSet = httpContext.Response.Headers.ContainsKey("Set-Cookie");
+                Console.WriteLine($"🍪 AccessToken cookie set in response headers: {cookieSet}");
 
                 var refreshCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
-                    Domain = ".kumiko.no" // Allow cookies to work across kumiko.no subdomains
+                    Expires = DateTime.UtcNow.AddDays(7) // Refresh token lasts longer
+                    // Don't set Domain - let it default to the request domain
                 };
 
+                Console.WriteLine($"🍪 Setting RefreshToken cookie: {refreshToken.Substring(0, Math.Min(20, refreshToken.Length))}...");
                 httpContext.Response.Cookies.Append("RefreshToken", refreshToken, refreshCookieOptions);
+                
+                // Log all Set-Cookie headers
+                var setCookieHeaders = httpContext.Response.Headers.Where(h => h.Key.Equals("Set-Cookie", StringComparison.OrdinalIgnoreCase)).ToList();
+                Console.WriteLine($"🍪 Total Set-Cookie headers: {setCookieHeaders.Count}");
+                foreach (var header in setCookieHeaders)
+                {
+                    Console.WriteLine($"🍪 Set-Cookie: {header.Value}");
+                }
             }
 
             // For web clients, we don't return tokens in the response body

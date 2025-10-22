@@ -49,8 +49,8 @@ public class RegisterHandler(
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = expiresAt,
-                    Domain = ".kumiko.no" // Allow cookies to work across kumiko.no subdomains
+                    Expires = expiresAt
+                    // Don't set Domain - let it default to the request domain
                 };
 
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
@@ -60,8 +60,8 @@ public class RegisterHandler(
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
-                    Domain = ".kumiko.no" // Allow cookies to work across kumiko.no subdomains
+                    Expires = DateTime.UtcNow.AddDays(7) // Refresh token lasts longer
+                    // Don't set Domain - let it default to the request domain
                 };
 
                 httpContext.Response.Cookies.Append("RefreshToken", refreshToken, refreshCookieOptions);

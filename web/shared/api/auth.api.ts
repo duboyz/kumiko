@@ -3,12 +3,31 @@ import apiClient from './client'
 
 export const authApi = {
   login: async (credentials: Omit<LoginRdto, 'clientType'>): Promise<ResponseData<AuthSdto>> => {
-    const { data } = await apiClient.post<ApiResponse<AuthSdto>>('/api/auth/login', {
+    console.log('🔐 Login API call starting...', { credentials: { ...credentials, password: '[REDACTED]' } })
+
+    const response = await apiClient.post<ApiResponse<AuthSdto>>('/api/auth/login', {
       ...credentials,
       clientType: 'Web',
     })
-    if (!data.success) throw new Error(data.message || 'Login failed')
-    return data.data
+
+    console.log('🔐 Login API response:', {
+      status: response.status,
+      headers: response.headers,
+      data: response.data,
+    })
+
+    // Check if cookies were set in the response
+    const setCookieHeader = response.headers['set-cookie']
+    console.log('🍪 Set-Cookie headers received:', setCookieHeader)
+
+    // Check current cookies in browser
+    if (typeof document !== 'undefined') {
+      const currentCookies = document.cookie
+      console.log('🍪 Current cookies in browser:', currentCookies)
+    }
+
+    if (!response.data.success) throw new Error(response.data.message || 'Login failed')
+    return response.data.data
   },
 
   register: async (credentials: Omit<RegisterRdto, 'clientType'>): Promise<ResponseData<AuthSdto>> => {

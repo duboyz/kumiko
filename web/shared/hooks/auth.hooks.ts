@@ -11,11 +11,26 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (credentials: Omit<LoginRdto, 'clientType'>) => authApi.login(credentials),
     onSuccess: async data => {
+      console.log('✅ Login successful, checking cookies...')
+
+      // Check cookies after successful login
+      if (typeof document !== 'undefined') {
+        const cookies = document.cookie
+        console.log('🍪 Cookies after login:', cookies)
+
+        // Check for specific auth cookies
+        const hasAccessToken = cookies.includes('AccessToken=')
+        const hasRefreshToken = cookies.includes('RefreshToken=')
+        console.log('🍪 Has AccessToken:', hasAccessToken)
+        console.log('🍪 Has RefreshToken:', hasRefreshToken)
+      }
+
       // First, invalidate and wait for user data
       await queryClient.invalidateQueries({ queryKey: ['currentUser'] })
 
       // Check if user has any locations, redirect to onboarding if not
       // The check will happen in the protected layout
+      console.log('🔄 Redirecting to dashboard...')
       router.push('/dashboard')
     },
   })
