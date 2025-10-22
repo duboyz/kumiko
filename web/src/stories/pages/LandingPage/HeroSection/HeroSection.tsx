@@ -44,11 +44,11 @@ export function HeroSection({}: HeroSectionProps) {
 
     // Animation configuration - easy to adjust timing
     const config = {
-      kumikoIn: { duration: 0.5, stagger: 0.1 },
+      kumikoIn: { duration: 0.4, stagger: 0.1 },
       kumikoHold: { duration: 0.3 },
-      kumikoOut: { duration: 0.4, stagger: 0.05 },
-      heroTextDelay: 0.2, // Delay before hero text appears
-      heroTextDuration: 0.6, // Duration for hero text animation
+      kumikoOut: { duration: 0.3, stagger: 0.05 },
+      heroTextDelay: 0.3, // Delay before hero text appears
+      heroTextDuration: 0.3, // Duration for hero text animation
       descriptionDelay: 0.1, // Faster description
       buttonDelay: 0.1, // Faster button
     }
