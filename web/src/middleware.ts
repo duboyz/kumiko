@@ -74,17 +74,14 @@ async function refreshToken(request: NextRequest): Promise<NextResponse | null> 
 
   try {
     // Call the refresh endpoint
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5158'}/api/auth/refresh`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Cookie: `RefreshToken=${refreshTokenCookie.value}`,
-        },
-        body: JSON.stringify({ clientType: 'Web' }),
-      }
-    )
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5158'}/api/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: `RefreshToken=${refreshTokenCookie.value}`,
+      },
+      body: JSON.stringify({ clientType: 'Web' }),
+    })
 
     if (response.ok) {
       // Get the new cookies from the response
