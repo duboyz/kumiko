@@ -12,20 +12,6 @@ builder.Services.AddMediatRServices(); // Add MediatR
 builder.Services.AddCorsConfiguration();
 builder.Services.AddSwaggerConfiguration();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("Production", policy =>
-    {
-        policy.WithOrigins(
-            "https://kumiko.no",
-            "https://*.kumiko.no"  // Allow all subdomains
-        )
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
-    });
-});
-
 var app = builder.Build();
 
 await app.ApplyMigrationsAsync();
@@ -39,7 +25,7 @@ await app.ApplyMigrationsAsync();
 // Configure the HTTP request pipeline
 app.UseMiddleware<ExceptionHandlingMiddleware>(); // Add exception handling first
 app.UseSwaggerConfiguration(app.Environment);
-app.UseCorsConfiguration();
+app.UseCorsConfiguration(); // CORS must be before authentication
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
