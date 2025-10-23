@@ -18,7 +18,9 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
             "https://kumiko.no",
-            "https://*.kumiko.no"  // Allow all subdomains
+            "https://*.kumiko.no",  // Allow all subdomains
+            "https://kumiko-web.vercel.app",  // Vercel deployment
+            "https://*.kumiko-web.vercel.app"  // Vercel subdomains
         )
         .AllowAnyMethod()
         .AllowAnyHeader()

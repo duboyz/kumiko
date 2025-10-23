@@ -59,7 +59,12 @@ public class RegisterHandler(
                 // Set domain for production to allow subdomain access
                 if (isProduction)
                 {
-                    cookieOptions.Domain = ".kumiko.no";
+                    // Only set domain for kumiko.no, not for Vercel
+                    if (httpContext.Request.Host.Host.Contains("kumiko.no"))
+                    {
+                        cookieOptions.Domain = ".kumiko.no";
+                    }
+                    // For Vercel domains, don't set domain (let browser handle it)
                 }
 
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
@@ -76,7 +81,12 @@ public class RegisterHandler(
                 // Set domain for production to allow subdomain access
                 if (isProduction)
                 {
-                    refreshCookieOptions.Domain = ".kumiko.no";
+                    // Only set domain for kumiko.no, not for Vercel
+                    if (httpContext.Request.Host.Host.Contains("kumiko.no"))
+                    {
+                        refreshCookieOptions.Domain = ".kumiko.no";
+                    }
+                    // For Vercel domains, don't set domain (let browser handle it)
                 }
 
                 httpContext.Response.Cookies.Append("RefreshToken", refreshToken, refreshCookieOptions);

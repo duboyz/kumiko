@@ -94,7 +94,11 @@ async function refreshToken(request: NextRequest): Promise<NextResponse | null> 
         const nextResponse = NextResponse.next()
 
         // Parse and set cookies from the backend response
-        const cookies = setCookieHeader.split(',').map(c => c.trim())
+        // Set-Cookie headers are separated by newlines, not commas
+        const cookies = setCookieHeader
+          .split('\n')
+          .map(c => c.trim())
+          .filter(c => c)
         cookies.forEach(cookie => {
           const [nameValue, ...attributes] = cookie.split(';')
           const [name, value] = nameValue.split('=')

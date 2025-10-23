@@ -38,7 +38,22 @@ apiClient.interceptors.request.use(
 )
 
 apiClient.interceptors.response.use(
-  response => response,
+  response => {
+    // Debug cookie headers for auth endpoints
+    if (response.config.url?.includes('/api/auth/login') || response.config.url?.includes('/api/auth/register')) {
+      const setCookieHeader = response.headers['set-cookie']
+      console.log('Login/Register response cookies:', setCookieHeader)
+
+      if (setCookieHeader) {
+        console.log('Cookies should be automatically set by browser:', setCookieHeader)
+        console.log('Response headers:', Object.keys(response.headers))
+      } else {
+        console.warn('No Set-Cookie headers found in login/register response')
+        console.log('Available headers:', Object.keys(response.headers))
+      }
+    }
+    return response
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean
