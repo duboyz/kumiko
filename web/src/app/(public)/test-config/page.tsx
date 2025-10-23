@@ -1,7 +1,7 @@
 'use client'
 
+import { apiClient } from '@shared'
 import { useEffect, useState } from 'react'
-import { apiClient } from '@/shared/api/client'
 
 interface ConfigData {
   Jwt: {

@@ -45,14 +45,14 @@ public class LoginHandler(
         }
         
         // Check HTTP context
-        var httpContext = httpContextAccessor.HttpContext;
-        Console.WriteLine($"🔍 HTTP Context available: {httpContext != null}");
-        if (httpContext != null)
+        var httpContextDebug = httpContextAccessor.HttpContext;
+        Console.WriteLine($"🔍 HTTP Context available: {httpContextDebug != null}");
+        if (httpContextDebug != null)
         {
-            Console.WriteLine($"🔍 Request scheme: {httpContext.Request.Scheme}");
-            Console.WriteLine($"🔍 Request host: {httpContext.Request.Host}");
-            Console.WriteLine($"🔍 Request origin: {httpContext.Request.Headers.Origin}");
-            Console.WriteLine($"🔍 Request referer: {httpContext.Request.Headers.Referer}");
+            Console.WriteLine($"🔍 Request scheme: {httpContextDebug.Request.Scheme}");
+            Console.WriteLine($"🔍 Request host: {httpContextDebug.Request.Host}");
+            Console.WriteLine($"🔍 Request origin: {httpContextDebug.Request.Headers.Origin}");
+            Console.WriteLine($"🔍 Request referer: {httpContextDebug.Request.Headers.Referer}");
         }
         
         Console.WriteLine("🔍 === END DEPENDENCIES DEBUG ===");
