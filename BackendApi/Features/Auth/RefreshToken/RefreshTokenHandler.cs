@@ -53,7 +53,7 @@ public class RefreshTokenHandler(
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.Lax, // More permissive for cross-origin
+                    SameSite = SameSiteMode.None, // Required for cross-origin
                     Expires = expiresAt,
                     Path = "/" // Explicitly set path
                     // Don't set Domain - let it default to the request domain
@@ -65,7 +65,7 @@ public class RefreshTokenHandler(
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.Lax, // More permissive for cross-origin
+                    SameSite = SameSiteMode.None, // Required for cross-origin
                     Expires = DateTime.UtcNow.AddDays(7),
                     Path = "/" // Explicitly set path
                     // Don't set Domain - let it default to the request domain

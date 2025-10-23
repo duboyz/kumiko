@@ -30,6 +30,26 @@ public static class CorsConfiguration
     public static IApplicationBuilder UseCorsConfiguration(this IApplicationBuilder app)
     {
         Console.WriteLine("🌐 CORS middleware being applied...");
+        
+        // Add debugging middleware to log CORS headers
+        app.Use(async (context, next) =>
+        {
+            Console.WriteLine($"🌐 CORS Request: {context.Request.Method} {context.Request.Path}");
+            Console.WriteLine($"🌐 CORS Origin: {context.Request.Headers.Origin}");
+            Console.WriteLine($"🌐 CORS Host: {context.Request.Host}");
+            
+            await next();
+            
+            Console.WriteLine($"🌐 CORS Response Headers:");
+            foreach (var header in context.Response.Headers)
+            {
+                if (header.Key.StartsWith("Access-Control"))
+                {
+                    Console.WriteLine($"🌐   {header.Key}: {string.Join(", ", header.Value)}");
+                }
+            }
+        });
+        
         app.UseCors("AllowAll");
         return app;
     }

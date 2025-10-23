@@ -13,6 +13,50 @@ public class LoginHandler(
 {
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
+        // 🔍 DEBUG: Check all configuration dependencies
+        Console.WriteLine("🔍 === AUTH DEPENDENCIES DEBUG ===");
+        
+        // Check JWT configuration
+        var jwtSecret = configuration["Jwt:Secret"];
+        var jwtIssuer = configuration["Jwt:Issuer"];
+        var jwtAudience = configuration["Jwt:Audience"];
+        var accessTokenExpiration = configuration["Jwt:AccessTokenExpirationMinutes"];
+        var refreshTokenExpiration = configuration["Jwt:RefreshTokenExpirationDays"];
+        
+        Console.WriteLine($"🔍 JWT Secret configured: {!string.IsNullOrEmpty(jwtSecret)} (length: {jwtSecret?.Length ?? 0})");
+        Console.WriteLine($"🔍 JWT Issuer: {jwtIssuer ?? "NOT SET"}");
+        Console.WriteLine($"🔍 JWT Audience: {jwtAudience ?? "NOT SET"}");
+        Console.WriteLine($"🔍 Access Token Expiration: {accessTokenExpiration ?? "NOT SET"}");
+        Console.WriteLine($"🔍 Refresh Token Expiration: {refreshTokenExpiration ?? "NOT SET"}");
+        
+        // Check Frontend configuration
+        var frontendBaseUrl = configuration["Frontend:BaseUrl"];
+        Console.WriteLine($"🔍 Frontend Base URL: {frontendBaseUrl ?? "NOT SET"}");
+        
+        // Check database connection
+        try
+        {
+            var testUser = await userRepository.GetByEmailAsync(request.Email);
+            Console.WriteLine($"🔍 Database connection: OK (user found: {testUser != null})");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"🔍 Database connection: FAILED - {ex.Message}");
+        }
+        
+        // Check HTTP context
+        var httpContext = httpContextAccessor.HttpContext;
+        Console.WriteLine($"🔍 HTTP Context available: {httpContext != null}");
+        if (httpContext != null)
+        {
+            Console.WriteLine($"🔍 Request scheme: {httpContext.Request.Scheme}");
+            Console.WriteLine($"🔍 Request host: {httpContext.Request.Host}");
+            Console.WriteLine($"🔍 Request origin: {httpContext.Request.Headers.Origin}");
+            Console.WriteLine($"🔍 Request referer: {httpContext.Request.Headers.Referer}");
+        }
+        
+        Console.WriteLine("🔍 === END DEPENDENCIES DEBUG ===");
+        
         var user = await userRepository.GetByEmailAsync(request.Email);
         if (user == null)
         {
@@ -49,8 +93,8 @@ public class LoginHandler(
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true, // Required for HTTPS
-                SameSite = SameSiteMode.Lax, // More permissive for cross-origin
+                Secure = true, // Required for SameSite=None
+                SameSite = SameSiteMode.None, // Required for cross-origin
                 Expires = expiresAt,
                 Path = "/" // Explicitly set path
                 // Don't set Domain - let it default to the request domain
@@ -60,11 +104,18 @@ public class LoginHandler(
                 Console.WriteLine($"🍪 Cookie options: HttpOnly={cookieOptions.HttpOnly}, Secure={cookieOptions.Secure}, SameSite={cookieOptions.SameSite}");
                 Console.WriteLine($"🍪 Request origin: {httpContext.Request.Headers.Origin}");
                 Console.WriteLine($"🍪 Request host: {httpContext.Request.Host}");
+                Console.WriteLine($"🍪 Request referer: {httpContext.Request.Headers.Referer}");
                 Console.WriteLine($"🍪 Request headers:");
                 foreach (var header in httpContext.Request.Headers)
                 {
                     Console.WriteLine($"🍪   {header.Key}: {string.Join(", ", header.Value)}");
                 }
+                
+                // Check if this is a cross-origin request
+                var origin = httpContext.Request.Headers.Origin.ToString();
+                var host = httpContext.Request.Host.ToString();
+                var isCrossOrigin = !string.IsNullOrEmpty(origin) && !origin.Contains(host);
+                Console.WriteLine($"🍪 Is cross-origin request: {isCrossOrigin}");
                 
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
                 
@@ -75,8 +126,8 @@ public class LoginHandler(
                 var refreshCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Required for HTTPS
-                    SameSite = SameSiteMode.Lax, // More permissive for cross-origin
+                    Secure = true, // Required for SameSite=None
+                    SameSite = SameSiteMode.None, // Required for cross-origin
                     Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
                     Path = "/" // Explicitly set path
                     // Don't set Domain - let it default to the request domain
