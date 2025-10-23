@@ -11,7 +11,8 @@ namespace BackendApi.Features.Subscription.CreateCheckoutSession;
 public class CreateCheckoutSessionHandler(
     ApplicationDbContext context,
     IHttpContextAccessor httpContextAccessor,
-    IConfiguration configuration)
+    IConfiguration configuration,
+    ILogger<CreateCheckoutSessionHandler> logger)
     : ICommandHandler<CreateCheckoutSessionCommand, CreateCheckoutSessionResult>
 {
     public async Task<CreateCheckoutSessionResult> Handle(CreateCheckoutSessionCommand request, CancellationToken cancellationToken)
@@ -33,8 +34,14 @@ public class CreateCheckoutSessionHandler(
         if (plan == null)
             throw new Exception("Subscription plan not found");
 
+        logger.LogInformation("Found plan: {PlanName} (ID: {PlanId})", plan.Name, plan.Id);
+        logger.LogInformation("Plan price IDs - Monthly: {Monthly}, Yearly: {Yearly}",
+            plan.StripePriceIdMonthly, plan.StripePriceIdYearly);
+
         // Set Stripe API key
-        StripeConfiguration.ApiKey = configuration["Stripe:SecretKey"];
+        var stripeKey = configuration["Stripe:SecretKey"];
+        StripeConfiguration.ApiKey = stripeKey;
+        logger.LogInformation("Using Stripe API key: {KeyPrefix}...", stripeKey?.Substring(0, 20));
 
         // Get or create Stripe customer
         string customerId;
@@ -62,12 +69,17 @@ public class CreateCheckoutSessionHandler(
             ? plan.StripePriceIdYearly
             : plan.StripePriceIdMonthly;
 
+        logger.LogInformation("Billing interval: {Interval}, Selected price ID: {PriceId}",
+            request.BillingInterval, priceId);
+
         if (string.IsNullOrEmpty(priceId))
         {
             throw new Exception($"Stripe price ID not configured for {plan.Name} plan ({request.BillingInterval}). " +
                 $"Please create a product in Stripe Dashboard and update the subscription plan with the price IDs. " +
                 $"Run this SQL: UPDATE \"SubscriptionPlans\" SET \"StripePriceIdMonthly\" = 'price_xxx', \"StripePriceIdYearly\" = 'price_yyy' WHERE \"Id\" = '{plan.Id}'");
         }
+
+        logger.LogInformation("Creating Stripe checkout session with price ID: {PriceId}", priceId);
 
         // Create checkout session with 30-day trial
         var sessionService = new SessionService();

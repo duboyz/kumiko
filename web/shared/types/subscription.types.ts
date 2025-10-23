@@ -35,7 +35,7 @@ export interface GetUserSubscriptionResult {
 
 export interface UserSubscriptionDto {
   id: string
-  plan: SubscriptionPlanInfo
+  plan: UserSubscriptionPlanDto
   status: 'Trialing' | 'Active' | 'Canceled' | 'PastDue' | 'Expired'
   billingInterval: 'Monthly' | 'Yearly'
   trialStartDate?: string
@@ -46,9 +46,10 @@ export interface UserSubscriptionDto {
   currentPeriodEnd?: string
   isTrialing: boolean
   isActive: boolean
+  hasPaymentMethod: boolean
 }
 
-export interface SubscriptionPlanInfo {
+export interface UserSubscriptionPlanDto {
   id: string
   name: string
   tier: string

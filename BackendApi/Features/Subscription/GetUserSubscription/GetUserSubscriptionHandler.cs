@@ -26,7 +26,7 @@ public class GetUserSubscriptionHandler(
 
         var dto = new UserSubscriptionDto(
             subscription.Id,
-            new SubscriptionPlanDto(
+            new UserSubscriptionPlanDto(
                 subscription.SubscriptionPlan.Id,
                 subscription.SubscriptionPlan.Name,
                 subscription.SubscriptionPlan.Tier.ToString(),
@@ -44,7 +44,8 @@ public class GetUserSubscriptionHandler(
             subscription.CurrentPeriodStart,
             subscription.CurrentPeriodEnd,
             subscription.Status == SubscriptionStatus.Trialing,
-            subscription.Status == SubscriptionStatus.Active || subscription.Status == SubscriptionStatus.Trialing
+            subscription.Status == SubscriptionStatus.Active || subscription.Status == SubscriptionStatus.Trialing,
+            !string.IsNullOrEmpty(subscription.StripeSubscriptionId)
         );
 
         return new GetUserSubscriptionResult(dto);

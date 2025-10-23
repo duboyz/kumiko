@@ -6,6 +6,7 @@ import {
   LocationSettings,
   ContactInformationSettings,
   BusinessHoursSettings,
+  SubscriptionSettings,
 } from '@/components'
 import { useCurrentUser, useLocationSelection } from '@shared'
 import { ErrorState, LoadingSpinner } from '@/components'
@@ -41,6 +42,12 @@ export default function SettingsPage() {
             <UserSettings />
             <LocationSettings />
           </div>
+        </div>
+
+        {/* Subscription Settings Section */}
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold">Subscription</h2>
+          <SubscriptionSettings />
         </div>
 
         {/* Restaurant Settings Section */}

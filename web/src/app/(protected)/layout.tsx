@@ -16,10 +16,14 @@ import {
   ShoppingCart,
   LogOut,
 } from 'lucide-react'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { useCurrentUser } from '@shared'
+import { Button } from '@/components/ui/button'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
+  const signOut = useLogout()
   const pathSegments = pathname.split('/').filter(Boolean)
   const { isLoading, hasNoLocations, selectedLocation } = useLocationSelection()
   const selectedLocationType = selectedLocation?.type || 'Restaurant'
@@ -122,10 +126,9 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
                   className={`
                     flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm
                     transition-all duration-200 group
-                    ${
-                      isActive
-                        ? 'bg-gray-900 text-white shadow-sm'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    ${isActive
+                      ? 'bg-gray-900 text-white shadow-sm'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                     }
                   `}
                 >

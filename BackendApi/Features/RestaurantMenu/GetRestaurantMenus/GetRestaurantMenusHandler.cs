@@ -63,7 +63,7 @@ public class GetRestaurantMenusHandler(ApplicationDbContext context) : IQueryHan
                             o.OrderIndex,
                             o.MenuItemId
                         )).ToList(),
-                        categoryItem.MenuItem.Allergens.Select(ma => new AllergenDto(
+                        categoryItem.MenuItem.Allergens.Select(ma => new MenuItemAllergenDto(
                             ma.Allergen.Id,
                             ma.Allergen.Name,
                             ma.Allergen.Description

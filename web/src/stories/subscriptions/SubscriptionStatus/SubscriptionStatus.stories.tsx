@@ -19,6 +19,7 @@ const trialSubscription: UserSubscriptionDto = {
   trialEndDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days from now
   isTrialing: true,
   isActive: true,
+  hasPaymentMethod: false, // Free trial without payment
 }
 
 const activeSubscription: UserSubscriptionDto = {
@@ -38,6 +39,7 @@ const activeSubscription: UserSubscriptionDto = {
   currentPeriodEnd: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
   isTrialing: false,
   isActive: true,
+  hasPaymentMethod: true, // Paid subscription
 }
 
 const enterpriseSubscription: UserSubscriptionDto = {
@@ -57,6 +59,7 @@ const enterpriseSubscription: UserSubscriptionDto = {
   currentPeriodEnd: new Date(Date.now() + 300 * 24 * 60 * 60 * 1000).toISOString(),
   isTrialing: false,
   isActive: true,
+  hasPaymentMethod: true, // Paid subscription
 }
 
 const pastDueSubscription: UserSubscriptionDto = {
@@ -150,6 +153,7 @@ export const YearlyBilling: Story = {
       ...activeSubscription,
       billingInterval: 'Yearly',
       currentPeriodEnd: new Date(Date.now() + 300 * 24 * 60 * 60 * 1000).toISOString(),
+      hasPaymentMethod: true,
     },
     currentLocations: 2,
     currentMenus: 4,

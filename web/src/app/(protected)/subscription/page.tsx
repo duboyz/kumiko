@@ -61,7 +61,13 @@ export default function SubscriptionPage() {
   }
 
   const userSubscription = subscription?.subscription
-  const currentPlanId = userSubscription?.plan.id
+
+  // Only show a plan as "current" if they have payment method set up
+  // Free trial users without payment haven't actually chosen a plan yet
+  const currentPlanId =
+    userSubscription && userSubscription.hasPaymentMethod
+      ? userSubscription.plan.id
+      : null
 
   // Mock usage data - in production, fetch from API
   const currentLocations = 1
@@ -70,20 +76,54 @@ export default function SubscriptionPage() {
   return (
     <div className="container mx-auto space-y-8 py-8">
       <div>
-        <h1 className="text-3xl font-bold">Subscription Management</h1>
-        <p className="text-muted-foreground">Manage your subscription and billing</p>
+        <h1 className="text-3xl font-bold">
+          {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod
+            ? 'Choose Your Plan'
+            : 'Subscription Management'}
+        </h1>
+        <p className="text-muted-foreground">
+          {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod
+            ? 'Select a plan to continue after your free trial ends'
+            : 'Manage your subscription and billing'}
+        </p>
       </div>
 
-      {/* Current Subscription Status */}
-      {userSubscription && (
+      {/* Free Trial Banner */}
+      {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🎉</span>
+              <div>
+                <h3 className="font-semibold text-blue-900">30-Day Free Trial Active</h3>
+                <p className="mt-1 text-sm text-blue-800">
+                  You're currently enjoying full access to all Basic plan features. No payment required until{' '}
+                  <strong>
+                    {userSubscription.trialEndDate
+                      ? new Date(userSubscription.trialEndDate).toLocaleDateString()
+                      : 'N/A'}
+                  </strong>
+                  . Choose a plan below to set up billing and continue using the service after your trial.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Current Subscription Status - Only show if they have payment method */}
+      {userSubscription && userSubscription.hasPaymentMethod && (
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Current Subscription</h2>
+          <h2 className="text-2xl font-semibold">
+            {userSubscription.isTrialing ? 'Trial Subscription' : 'Current Subscription'}
+          </h2>
           <SubscriptionStatus
             subscription={userSubscription}
             currentLocations={currentLocations}
             currentMenus={currentMenus}
           />
 
+          {/* Only show cancel button if they have an active paid subscription */}
           {userSubscription.isActive && (
             <Card>
               <CardHeader>
@@ -103,7 +143,11 @@ export default function SubscriptionPage() {
       {/* Available Plans */}
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold">
-          {userSubscription ? 'Upgrade or Change Plan' : 'Choose a Plan'}
+          {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod
+            ? 'Available Plans'
+            : userSubscription
+              ? 'Upgrade or Change Plan'
+              : 'Choose a Plan'}
         </h2>
 
         <Tabs value={billingInterval} onValueChange={(v) => setBillingInterval(v as 'Monthly' | 'Yearly')}>

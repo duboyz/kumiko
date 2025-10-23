@@ -68,10 +68,19 @@ public class HandleStripeWebhookHandler(
     private async Task HandleCheckoutSessionCompleted(Event stripeEvent, CancellationToken cancellationToken)
     {
         var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
-        if (session == null) return;
+        if (session == null)
+        {
+            logger.LogWarning("Checkout session is null");
+            return;
+        }
+
+        logger.LogInformation("Processing checkout session completed: {SessionId}, Customer: {CustomerId}, Subscription: {SubscriptionId}",
+            session.Id, session.CustomerId, session.SubscriptionId);
 
         var userId = Guid.Parse(session.Metadata["user_id"]);
         var subscriptionPlanId = Guid.Parse(session.Metadata["subscription_plan_id"]);
+
+        logger.LogInformation("User ID: {UserId}, Plan ID: {PlanId}", userId, subscriptionPlanId);
 
         var user = await context.Users
             .Include(u => u.Subscription)
@@ -151,15 +160,17 @@ public class HandleStripeWebhookHandler(
             _ => userSubscription.Status
         };
 
-        // TODO: Update these to match your Stripe.net SDK version
-        // The property names may vary (CurrentPeriodStart, StartDate, etc.)
-        // userSubscription.CurrentPeriodStart = subscription.CurrentPeriodStart;
-        // userSubscription.CurrentPeriodEnd = subscription.CurrentPeriodEnd;
+        // TODO: Update period dates when we figure out the correct Stripe SDK property names
+        // Different versions of Stripe.net use different property names for CurrentPeriodStart/End
+        // userSubscription.CurrentPeriodStart = ...;
+        // userSubscription.CurrentPeriodEnd = ...;
 
         if (subscription.Status == "active" && userSubscription.SubscriptionStartDate == null)
         {
             userSubscription.SubscriptionStartDate = DateTime.UtcNow;
         }
+
+        logger.LogInformation("Updated subscription status to {Status} for user subscription {Id}", subscription.Status, userSubscription.Id);
 
         // Determine billing interval from subscription items
         if (subscription.Items?.Data.Any() == true)
@@ -205,58 +216,22 @@ public class HandleStripeWebhookHandler(
     private async Task HandleInvoicePaymentSucceeded(Event stripeEvent, CancellationToken cancellationToken)
     {
         var invoice = stripeEvent.Data.Object as Invoice;
-        // TODO: Update to match your Stripe.net SDK version - may be invoice.Subscription or invoice.SubscriptionId
         if (invoice == null) return;
 
-        // Extract subscription ID from the invoice object based on your SDK version
-        string? subscriptionId = null;
-        // Try to get the subscription ID - adjust based on your Stripe SDK version
-        // subscriptionId = invoice.SubscriptionId; // or invoice.Subscription?.Id
-
-        if (string.IsNullOrEmpty(subscriptionId)) return;
-
-        var userSubscription = await context.UserSubscriptions
-            .FirstOrDefaultAsync(s => s.StripeSubscriptionId == subscriptionId, cancellationToken);
-
-        if (userSubscription == null)
-        {
-            logger.LogWarning("User subscription not found for invoice: {InvoiceId}", invoice.Id);
-            return;
-        }
-
-        // Update subscription status to active if it was past due
-        if (userSubscription.Status == SubscriptionStatus.PastDue)
-        {
-            userSubscription.Status = SubscriptionStatus.Active;
-            await context.SaveChangesAsync(cancellationToken);
-            logger.LogInformation("Subscription reactivated after payment: {UserSubscriptionId}", userSubscription.Id);
-        }
+        // TODO: Extract subscription ID - property name varies by Stripe SDK version
+        // For now, skip invoice processing - subscription.updated handles most cases
+        logger.LogInformation("Invoice payment succeeded: {InvoiceId}", invoice.Id);
+        await Task.CompletedTask;
     }
 
     private async Task HandleInvoicePaymentFailed(Event stripeEvent, CancellationToken cancellationToken)
     {
         var invoice = stripeEvent.Data.Object as Invoice;
-        // TODO: Update to match your Stripe.net SDK version - may be invoice.Subscription or invoice.SubscriptionId
         if (invoice == null) return;
 
-        // Extract subscription ID from the invoice object based on your SDK version
-        string? subscriptionId = null;
-        // Try to get the subscription ID - adjust based on your Stripe SDK version
-        // subscriptionId = invoice.SubscriptionId; // or invoice.Subscription?.Id
-
-        if (string.IsNullOrEmpty(subscriptionId)) return;
-
-        var userSubscription = await context.UserSubscriptions
-            .FirstOrDefaultAsync(s => s.StripeSubscriptionId == subscriptionId, cancellationToken);
-
-        if (userSubscription == null)
-        {
-            logger.LogWarning("User subscription not found for invoice: {InvoiceId}", invoice.Id);
-            return;
-        }
-
-        userSubscription.Status = SubscriptionStatus.PastDue;
-        await context.SaveChangesAsync(cancellationToken);
-        logger.LogInformation("Subscription marked as past due: {UserSubscriptionId}", userSubscription.Id);
+        // TODO: Extract subscription ID - property name varies by Stripe SDK version
+        // For now, skip invoice processing - subscription.updated handles most cases
+        logger.LogWarning("Invoice payment failed: {InvoiceId}", invoice.Id);
+        await Task.CompletedTask;
     }
 }

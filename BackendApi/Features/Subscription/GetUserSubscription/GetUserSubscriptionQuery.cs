@@ -10,7 +10,7 @@ public record GetUserSubscriptionResult(
 
 public record UserSubscriptionDto(
     Guid Id,
-    SubscriptionPlanDto Plan,
+    UserSubscriptionPlanDto Plan,
     string Status,
     string BillingInterval,
     DateTime? TrialStartDate,
@@ -20,10 +20,11 @@ public record UserSubscriptionDto(
     DateTime? CurrentPeriodStart,
     DateTime? CurrentPeriodEnd,
     bool IsTrialing,
-    bool IsActive
+    bool IsActive,
+    bool HasPaymentMethod
 );
 
-public record SubscriptionPlanDto(
+public record UserSubscriptionPlanDto(
     Guid Id,
     string Name,
     string Tier,
