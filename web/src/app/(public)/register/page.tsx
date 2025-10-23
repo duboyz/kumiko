@@ -69,7 +69,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
       {/* Left side - Branding */}
-      <div className="hidden lg:block relative bg-white">
+      <div className="hidden lg:block relative ">
         <div className="flex flex-col justify-center items-center h-full p-8">
           <img
             src="/icons/kumiko-auth.png"
