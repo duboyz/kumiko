@@ -23,6 +23,16 @@ export const useLogin = () => {
         const hasRefreshToken = cookies.includes('RefreshToken=')
         console.log('🍪 Has AccessToken:', hasAccessToken)
         console.log('🍪 Has RefreshToken:', hasRefreshToken)
+
+        // Wait a bit and check again (cookies might be set asynchronously)
+        setTimeout(() => {
+          const delayedCookies = document.cookie
+          console.log('🍪 Cookies after delay:', delayedCookies)
+          const hasAccessTokenDelayed = delayedCookies.includes('AccessToken=')
+          const hasRefreshTokenDelayed = delayedCookies.includes('RefreshToken=')
+          console.log('🍪 Has AccessToken (delayed):', hasAccessTokenDelayed)
+          console.log('🍪 Has RefreshToken (delayed):', hasRefreshTokenDelayed)
+        }, 500)
       }
 
       // First, invalidate and wait for user data

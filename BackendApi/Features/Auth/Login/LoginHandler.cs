@@ -46,15 +46,15 @@ public class LoginHandler(
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext != null)
             {
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true, // Required for SameSite=None
-                    SameSite = SameSiteMode.None, // Required for cross-origin
-                    Expires = expiresAt,
-                    Path = "/" // Explicitly set path
-                    // Don't set Domain - let it default to the request domain
-                };
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // Required for HTTPS
+                SameSite = SameSiteMode.Lax, // More permissive for cross-origin
+                Expires = expiresAt,
+                Path = "/" // Explicitly set path
+                // Don't set Domain - let it default to the request domain
+            };
 
                 Console.WriteLine($"🍪 Setting AccessToken cookie: {accessToken.Substring(0, Math.Min(20, accessToken.Length))}...");
                 Console.WriteLine($"🍪 Cookie options: HttpOnly={cookieOptions.HttpOnly}, Secure={cookieOptions.Secure}, SameSite={cookieOptions.SameSite}");
@@ -75,8 +75,8 @@ public class LoginHandler(
                 var refreshCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Required for SameSite=None
-                    SameSite = SameSiteMode.None, // Required for cross-origin
+                    Secure = true, // Required for HTTPS
+                    SameSite = SameSiteMode.Lax, // More permissive for cross-origin
                     Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
                     Path = "/" // Explicitly set path
                     // Don't set Domain - let it default to the request domain

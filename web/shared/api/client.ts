@@ -30,6 +30,8 @@ export const apiClient: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Ensure we can access all response headers
+  validateStatus: () => true,
 })
 
 apiClient.interceptors.request.use(

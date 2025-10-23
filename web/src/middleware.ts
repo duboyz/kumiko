@@ -102,7 +102,7 @@ async function refreshToken(request: NextRequest): Promise<NextResponse | null> 
               value: value.trim(),
               httpOnly: true,
               secure: true,
-              sameSite: 'none',
+              sameSite: 'lax',
               path: '/',
             })
           }
