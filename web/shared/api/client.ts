@@ -30,35 +30,15 @@ export const apiClient: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  // Ensure we can access all response headers
-  validateStatus: () => true,
 })
 
 apiClient.interceptors.request.use(
-  config => {
-    console.log('🌐 API Request:', {
-      url: config.url,
-      method: config.method,
-      withCredentials: config.withCredentials,
-      headers: config.headers,
-      baseURL: config.baseURL,
-    })
-    return config
-  },
+  config => config,
   error => Promise.reject(error)
 )
 
 apiClient.interceptors.response.use(
-  response => {
-    console.log('🌐 API Response:', {
-      url: response.config.url,
-      status: response.status,
-      headers: response.headers,
-      setCookie: response.headers['set-cookie'],
-      data: response.data,
-    })
-    return response
-  },
+  response => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean

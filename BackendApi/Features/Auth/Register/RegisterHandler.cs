@@ -1,10 +1,7 @@
-using BackendApi.Data;
-using BackendApi.Entities;
 using BackendApi.Models.Auth;
 using BackendApi.Repositories.UserRepository;
 using BackendApi.Services.Jwt;
 using BackendApi.Shared.Contracts;
-using Microsoft.EntityFrameworkCore;
 
 namespace BackendApi.Features.Auth.Register;
 
@@ -12,8 +9,7 @@ public class RegisterHandler(
     IUserRepository userRepository,
     IJwtService jwtService,
     IConfiguration configuration,
-    IHttpContextAccessor httpContextAccessor,
-    ApplicationDbContext context) : ICommandHandler<RegisterCommand, RegisterResult>
+    IHttpContextAccessor httpContextAccessor) : ICommandHandler<RegisterCommand, RegisterResult>
 {
     public async Task<RegisterResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
@@ -36,28 +32,6 @@ public class RegisterHandler(
         // Save user to database
         await userRepository.AddAsync(user);
 
-        // Create trial subscription (30-day free trial with Basic plan)
-        var basicPlan = await context.SubscriptionPlans
-            .FirstOrDefaultAsync(p => p.Tier == SubscriptionTier.Basic && p.IsActive, cancellationToken);
-
-        if (basicPlan != null)
-        {
-            var trialSubscription = new UserSubscription
-            {
-                UserId = user.Id,
-                SubscriptionPlanId = basicPlan.Id,
-                Status = SubscriptionStatus.Trialing,
-                BillingInterval = BillingInterval.Monthly, // Default to monthly
-                TrialStartDate = DateTime.UtcNow,
-                TrialEndDate = DateTime.UtcNow.AddDays(30),
-                StripeCustomerId = null,
-                StripeSubscriptionId = null
-            };
-
-            context.UserSubscriptions.Add(trialSubscription);
-            await context.SaveChangesAsync(cancellationToken);
-        }
-
         // Generate tokens
         var accessToken = jwtService.GenerateAccessToken(user);
         var refreshToken = jwtService.GenerateRefreshToken();
@@ -70,15 +44,13 @@ public class RegisterHandler(
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext != null)
             {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true, // Required for SameSite=None
-                SameSite = SameSiteMode.None, // Required for cross-origin
-                Expires = expiresAt,
-                Path = "/" // Explicitly set path
-                // Don't set Domain - let it default to the request domain
-            };
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // Required for SameSite=None
+                    SameSite = SameSiteMode.None, // Allow cross-origin requests
+                    Expires = expiresAt
+                };
 
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
 
@@ -86,10 +58,8 @@ public class RegisterHandler(
                 {
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
-                    SameSite = SameSiteMode.None, // Required for cross-origin
-                    Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
-                    Path = "/" // Explicitly set path
-                    // Don't set Domain - let it default to the request domain
+                    SameSite = SameSiteMode.None, // Allow cross-origin requests
+                    Expires = DateTime.UtcNow.AddDays(7) // Refresh token lasts longer
                 };
 
                 httpContext.Response.Cookies.Append("RefreshToken", refreshToken, refreshCookieOptions);

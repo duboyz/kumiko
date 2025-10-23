@@ -11,36 +11,11 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (credentials: Omit<LoginRdto, 'clientType'>) => authApi.login(credentials),
     onSuccess: async data => {
-      console.log('✅ Login successful, checking cookies...')
-
-      // Check cookies after successful login
-      if (typeof document !== 'undefined') {
-        const cookies = document.cookie
-        console.log('🍪 Cookies after login:', cookies)
-
-        // Check for specific auth cookies
-        const hasAccessToken = cookies.includes('AccessToken=')
-        const hasRefreshToken = cookies.includes('RefreshToken=')
-        console.log('🍪 Has AccessToken:', hasAccessToken)
-        console.log('🍪 Has RefreshToken:', hasRefreshToken)
-
-        // Wait a bit and check again (cookies might be set asynchronously)
-        setTimeout(() => {
-          const delayedCookies = document.cookie
-          console.log('🍪 Cookies after delay:', delayedCookies)
-          const hasAccessTokenDelayed = delayedCookies.includes('AccessToken=')
-          const hasRefreshTokenDelayed = delayedCookies.includes('RefreshToken=')
-          console.log('🍪 Has AccessToken (delayed):', hasAccessTokenDelayed)
-          console.log('🍪 Has RefreshToken (delayed):', hasRefreshTokenDelayed)
-        }, 500)
-      }
-
       // First, invalidate and wait for user data
       await queryClient.invalidateQueries({ queryKey: ['currentUser'] })
 
       // Check if user has any locations, redirect to onboarding if not
       // The check will happen in the protected layout
-      console.log('🔄 Redirecting to dashboard...')
       router.push('/dashboard')
     },
   })

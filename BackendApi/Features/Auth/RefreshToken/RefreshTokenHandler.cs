@@ -53,10 +53,8 @@ public class RefreshTokenHandler(
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.None, // Required for cross-origin
-                    Expires = expiresAt,
-                    Path = "/" // Explicitly set path
-                    // Don't set Domain - let it default to the request domain
+                    SameSite = SameSiteMode.None,
+                    Expires = expiresAt
                 };
 
                 httpContext.Response.Cookies.Append("AccessToken", newAccessToken, cookieOptions);
@@ -65,10 +63,8 @@ public class RefreshTokenHandler(
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.None, // Required for cross-origin
-                    Expires = DateTime.UtcNow.AddDays(7),
-                    Path = "/" // Explicitly set path
-                    // Don't set Domain - let it default to the request domain
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(7)
                 };
 
                 httpContext.Response.Cookies.Append("RefreshToken", newRefreshToken, refreshCookieOptions);
