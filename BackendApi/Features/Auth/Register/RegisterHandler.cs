@@ -1,7 +1,10 @@
+using BackendApi.Data;
+using BackendApi.Entities;
 using BackendApi.Models.Auth;
 using BackendApi.Repositories.UserRepository;
 using BackendApi.Services.Jwt;
 using BackendApi.Shared.Contracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendApi.Features.Auth.Register;
 
@@ -9,7 +12,8 @@ public class RegisterHandler(
     IUserRepository userRepository,
     IJwtService jwtService,
     IConfiguration configuration,
-    IHttpContextAccessor httpContextAccessor) : ICommandHandler<RegisterCommand, RegisterResult>
+    IHttpContextAccessor httpContextAccessor,
+    ApplicationDbContext context) : ICommandHandler<RegisterCommand, RegisterResult>
 {
     public async Task<RegisterResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
@@ -31,6 +35,28 @@ public class RegisterHandler(
 
         // Save user to database
         await userRepository.AddAsync(user);
+
+        // Create trial subscription (30-day free trial with Basic plan)
+        var basicPlan = await context.SubscriptionPlans
+            .FirstOrDefaultAsync(p => p.Tier == SubscriptionTier.Basic && p.IsActive, cancellationToken);
+
+        if (basicPlan != null)
+        {
+            var trialSubscription = new UserSubscription
+            {
+                UserId = user.Id,
+                SubscriptionPlanId = basicPlan.Id,
+                Status = SubscriptionStatus.Trialing,
+                BillingInterval = BillingInterval.Monthly, // Default to monthly
+                TrialStartDate = DateTime.UtcNow,
+                TrialEndDate = DateTime.UtcNow.AddDays(30),
+                StripeCustomerId = null,
+                StripeSubscriptionId = null
+            };
+
+            context.UserSubscriptions.Add(trialSubscription);
+            await context.SaveChangesAsync(cancellationToken);
+        }
 
         // Generate tokens
         var accessToken = jwtService.GenerateAccessToken(user);

@@ -42,7 +42,7 @@ public class GetRestaurantMenuItemsHandler(ApplicationDbContext context) : IQuer
                 o.OrderIndex,
                 o.MenuItemId
             )).ToList(),
-            item.Allergens.Select(ma => new AllergenDto(
+            item.Allergens.Select(ma => new MenuItemAllergenDto(
                 ma.Allergen.Id,
                 ma.Allergen.Name,
                 ma.Allergen.Description

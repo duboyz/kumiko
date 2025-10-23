@@ -1,6 +1,13 @@
 'use client'
 
-import { ContentContainer, UserSettings, LocationSettings, ContactInformationSettings, BusinessHoursSettings } from '@/components'
+import {
+  ContentContainer,
+  UserSettings,
+  LocationSettings,
+  ContactInformationSettings,
+  BusinessHoursSettings,
+  SubscriptionSettings,
+} from '@/components'
 import { useCurrentUser, useLocationSelection } from '@shared'
 import { ErrorState, LoadingSpinner } from '@/components'
 import { useTranslations } from 'next-intl'
@@ -29,6 +36,12 @@ export default function SettingsPage() {
             <UserSettings />
             <LocationSettings />
           </div>
+        </div>
+
+        {/* Subscription Settings Section */}
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold">Subscription</h2>
+          <SubscriptionSettings />
         </div>
 
         {/* Restaurant Settings Section */}

@@ -2,7 +2,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { Toaster } from 'sonner'
-import { LocationOption, useLocationSelection } from '@shared'
+import { LocationOption, useLocationSelection, useLogout } from '@shared'
 import { LoadingSpinner } from '@/components'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Link from 'next/link'
@@ -12,12 +12,17 @@ import {
   Settings,
   Menu as MenuIcon, Hotel,
   ForkKnifeCrossed,
-  ShoppingCart
+  ShoppingCart,
+  User
 } from 'lucide-react'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { useCurrentUser } from '@shared'
+import { Button } from '@/components/ui/button'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
+  const signOut = useLogout()
   const pathSegments = pathname.split('/').filter(Boolean)
   const { isLoading, hasNoLocations, selectedLocation } = useLocationSelection()
   const selectedLocationType = selectedLocation?.type || 'Restaurant'
@@ -129,13 +134,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
 
         {/* Bottom Section - Optional user info or branding */}
         <div className="p-6 border-t border-gray-200">
-          <div className="flex items-center gap-3 text-sm text-gray-500">
-            <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
-            <div className="flex-1">
-              <div className="h-3 bg-gray-200 rounded animate-pulse mb-2 w-24" />
-              <div className="h-2 bg-gray-100 rounded animate-pulse w-32" />
-            </div>
-          </div>
+          <UserInfo />
         </div>
       </div>
 
@@ -195,21 +194,27 @@ export function LocationSelector() {
   )
 }
 
-{/* <Popover open={isOpen} onOpenChange={setIsOpen}>
-    <PopoverTrigger asChild>
-      <div className="flex items-center gap-2 cursor-pointer border rounded-md p-3">
-        {locationIcon}
-        {selectedLocation?.name}
-      </div>
-    </PopoverTrigger>
-    <PopoverContent>
-      <div className="space-y-4 mr-4">
-        {userLocations.map(location => (
-          <div key={location.id} onClick={() => handleLocationChange(location.id)} className="flex items-center gap-2 cursor-pointer">
-            {locationIcon}
-            {location.name}
+export function UserInfo() {
+  const { data: user } = useCurrentUser()
+  const [isOpen, setIsOpen] = useState(false)
+  const signOut = useLogout()
+  return (
+    <>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <div className="flex items-center gap-2 cursor-pointer border rounded-md p-3">
+            <User className="h-4 w-4" />
+            {user?.firstName} {user?.lastName}
           </div>
-        ))}
-      </div>
-    </PopoverContent>
-  </Popover> */}
+        </PopoverTrigger>
+        <PopoverContent>
+          <div className="space-y-4 mr-4">
+            <div>{user?.firstName} {user?.lastName}</div>
+            <div>{user?.email}</div>
+            <Button variant="outline" onClick={() => signOut.mutate()}>Logout</Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </>
+  )
+}
