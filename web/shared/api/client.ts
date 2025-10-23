@@ -39,22 +39,34 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   response => {
-    // Check if cookies are actually being set by the browser
+    // Debug cookie setting in production
     if (response.config.url?.includes('/api/auth/login') || response.config.url?.includes('/api/auth/register')) {
-      console.log('🔍 Checking if cookies are set after login...')
+      console.log('🔍 Login/Register Response Debug:')
+      console.log('Response status:', response.status)
+      console.log('Response headers:', Object.keys(response.headers))
+      console.log('Response data:', response.data)
 
       // Check if cookies exist in document.cookie (only non-HttpOnly cookies)
       console.log('Document cookies:', document.cookie)
 
-      // Check if we can make authenticated requests
+      // Check browser's cookie storage
+      console.log(
+        'All cookies from browser:',
+        document.cookie.split(';').map(c => c.trim())
+      )
+
+      // Test authentication after a delay
       setTimeout(async () => {
+        console.log('🧪 Testing authentication after 2 seconds...')
         try {
           const testResponse = await apiClient.get('/api/auth/me')
           console.log('✅ Authentication test successful - cookies are working!')
+          console.log('User data:', testResponse.data)
         } catch (error) {
-          console.log('❌ Authentication test failed - cookies not working:', error)
+          console.log('❌ Authentication test failed - cookies not working:')
+          console.log('Error details:', error)
         }
-      }, 1000)
+      }, 2000)
     }
 
     return response
