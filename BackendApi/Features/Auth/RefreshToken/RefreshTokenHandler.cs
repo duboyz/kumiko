@@ -49,28 +49,13 @@ public class RefreshTokenHandler(
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext != null)
             {
-                var isProduction = httpContext.Request.Host.Host.Contains("kumiko.no") || 
-                                 httpContext.Request.Host.Host.Contains("vercel.app");
-                
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = expiresAt,
-                    Path = "/"
+                    Expires = expiresAt
                 };
-
-                // Set domain for production to allow subdomain access
-                if (isProduction)
-                {
-                    // Only set domain for kumiko.no, not for Vercel
-                    if (httpContext.Request.Host.Host.Contains("kumiko.no"))
-                    {
-                        cookieOptions.Domain = ".kumiko.no";
-                    }
-                    // For Vercel domains, don't set domain (let browser handle it)
-                }
 
                 httpContext.Response.Cookies.Append("AccessToken", newAccessToken, cookieOptions);
 
@@ -79,20 +64,8 @@ public class RefreshTokenHandler(
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddDays(7),
-                    Path = "/"
+                    Expires = DateTime.UtcNow.AddDays(7)
                 };
-
-                // Set domain for production to allow subdomain access
-                if (isProduction)
-                {
-                    // Only set domain for kumiko.no, not for Vercel
-                    if (httpContext.Request.Host.Host.Contains("kumiko.no"))
-                    {
-                        refreshCookieOptions.Domain = ".kumiko.no";
-                    }
-                    // For Vercel domains, don't set domain (let browser handle it)
-                }
 
                 httpContext.Response.Cookies.Append("RefreshToken", newRefreshToken, refreshCookieOptions);
             }

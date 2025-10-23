@@ -44,31 +44,13 @@ public class RegisterHandler(
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext != null)
             {
-                var isProduction = httpContext.Request.Host.Host.Contains("kumiko.no") || 
-                                 httpContext.Request.Host.Host.Contains("vercel.app");
-                
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = expiresAt,
-                    Path = "/"
+                    Expires = expiresAt
                 };
-                
-                // Add Partitioned attribute for cross-origin cookies
-                cookieOptions.Extensions.Add("Partitioned");
-
-                // Set domain for production to allow subdomain access
-                if (isProduction)
-                {
-                    // Only set domain for kumiko.no, not for Vercel
-                    if (httpContext.Request.Host.Host.Contains("kumiko.no"))
-                    {
-                        cookieOptions.Domain = ".kumiko.no";
-                    }
-                    // For Vercel domains, don't set domain (let browser handle it)
-                }
 
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
 
@@ -77,20 +59,8 @@ public class RegisterHandler(
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
-                    Path = "/"
+                    Expires = DateTime.UtcNow.AddDays(7) // Refresh token lasts longer
                 };
-
-                // Set domain for production to allow subdomain access
-                if (isProduction)
-                {
-                    // Only set domain for kumiko.no, not for Vercel
-                    if (httpContext.Request.Host.Host.Contains("kumiko.no"))
-                    {
-                        refreshCookieOptions.Domain = ".kumiko.no";
-                    }
-                    // For Vercel domains, don't set domain (let browser handle it)
-                }
 
                 httpContext.Response.Cookies.Append("RefreshToken", refreshToken, refreshCookieOptions);
             }

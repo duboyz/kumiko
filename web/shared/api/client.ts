@@ -38,39 +38,7 @@ apiClient.interceptors.request.use(
 )
 
 apiClient.interceptors.response.use(
-  response => {
-    // Debug cookie setting in production
-    if (response.config.url?.includes('/api/auth/login') || response.config.url?.includes('/api/auth/register')) {
-      console.log('🔍 Login/Register Response Debug:')
-      console.log('Response status:', response.status)
-      console.log('Response headers:', Object.keys(response.headers))
-      console.log('Response data:', response.data)
-
-      // Check if cookies exist in document.cookie (only non-HttpOnly cookies)
-      console.log('Document cookies:', document.cookie)
-
-      // Check browser's cookie storage
-      console.log(
-        'All cookies from browser:',
-        document.cookie.split(';').map(c => c.trim())
-      )
-
-      // Test authentication after a delay
-      setTimeout(async () => {
-        console.log('🧪 Testing authentication after 2 seconds...')
-        try {
-          const testResponse = await apiClient.get('/api/auth/me')
-          console.log('✅ Authentication test successful - cookies are working!')
-          console.log('User data:', testResponse.data)
-        } catch (error) {
-          console.log('❌ Authentication test failed - cookies not working:')
-          console.log('Error details:', error)
-        }
-      }, 2000)
-    }
-
-    return response
-  },
+  response => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean
