@@ -30,15 +30,35 @@ export const apiClient: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Ensure we can access all response headers
+  validateStatus: () => true,
 })
 
 apiClient.interceptors.request.use(
-  config => config,
+  config => {
+    console.log('🌐 API Request:', {
+      url: config.url,
+      method: config.method,
+      withCredentials: config.withCredentials,
+      headers: config.headers,
+      baseURL: config.baseURL,
+    })
+    return config
+  },
   error => Promise.reject(error)
 )
 
 apiClient.interceptors.response.use(
-  response => response,
+  response => {
+    console.log('🌐 API Response:', {
+      url: response.config.url,
+      status: response.status,
+      headers: response.headers,
+      setCookie: response.headers['set-cookie'],
+      data: response.data,
+    })
+    return response
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean
@@ -86,5 +106,14 @@ apiClient.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+// Public API client for endpoints that don't require authentication
+export const publicApiClient: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: false, // Don't send credentials for public endpoints
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
 
 export default apiClient

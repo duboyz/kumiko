@@ -8,10 +8,10 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useLogin } from '@shared/hooks'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { ContentContainer } from '@/components'
+
+const KumikoAuthImage = '/icons/kumiko-auth.png'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -51,65 +51,86 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome back</CardTitle>
-            <CardDescription>Enter your email and password to access your account</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="name@example.com" type="email" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your password" type="password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+      {/* Left side - Branding */}
+      <div className="hidden lg:block relative bg-white">
+        <div className="flex flex-col justify-center items-center h-full p-8">
+          <img
+            src={KumikoAuthImage}
+            alt="Kumiko Authentication"
+            width={400}
+            height={400}
+            className="object-contain"
+            onError={e => {
+              console.log('Image failed to load:', e)
+              console.log('Image src:', e.currentTarget.src)
+            }}
+          />
+        </div>
+      </div>
 
-                {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</div>}
+      {/* Right side - Login Form */}
+      <div className="flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold">Welcome back</h2>
+            <p className="text-muted-foreground">Enter your email and password to access your account</p>
+          </div>
 
-                <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-                  {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-          <CardFooter className="flex justify-center">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="name@example.com" type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your password" type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</div>}
+
+              <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+                {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
+              </Button>
+            </form>
+          </Form>
+
+          <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Don't have an account?{' '}
               <Link href="/register" className="text-primary hover:underline">
                 Sign up
               </Link>
             </p>
-          </CardFooter>
+          </div>
+
           {process.env.NODE_ENV === 'development' && (
-            <Button type="button" variant="outline" size="sm" onClick={fillTestData} className="w-full">
-              Fill Test Data
-            </Button>
+            <div className="mt-4">
+              <Button type="button" variant="outline" size="sm" onClick={fillTestData} className="w-full">
+                Fill Test Data
+              </Button>
+            </div>
           )}
-        </Card>
+        </div>
       </div>
     </div>
   )

@@ -70,13 +70,15 @@ public class RegisterHandler(
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext != null)
             {
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true, // Required for SameSite=None
-                    SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = expiresAt
-                };
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // Required for SameSite=None
+                SameSite = SameSiteMode.None, // Required for cross-origin
+                Expires = expiresAt,
+                Path = "/" // Explicitly set path
+                // Don't set Domain - let it default to the request domain
+            };
 
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
 
@@ -84,8 +86,10 @@ public class RegisterHandler(
                 {
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
-                    SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = DateTime.UtcNow.AddDays(7) // Refresh token lasts longer
+                    SameSite = SameSiteMode.None, // Required for cross-origin
+                    Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
+                    Path = "/" // Explicitly set path
+                    // Don't set Domain - let it default to the request domain
                 };
 
                 httpContext.Response.Cookies.Append("RefreshToken", refreshToken, refreshCookieOptions);

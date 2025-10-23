@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
+
+// Import Kumiko website image from public folder
+const KumikoWebsiteImage = '/icons/kumiko-website.png'
 import { useRestaurantWebsites, useUpdateWebsite, useLocationSelection } from '@shared'
 import { ContentContainer } from '@/components'
 import { PageHeader } from '@/components'
@@ -54,16 +57,22 @@ export default function WebsitesPage() {
 
   return (
     <ContentContainer>
-      <PageHeader
-        title="Websites"
-        description="Manage your restaurant websites and build pages with prebuilt sections."
-        action={
-          <Button variant="default" onClick={() => setIsCreateOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Website
-          </Button>
-        }
-      />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <img src={KumikoWebsiteImage} alt="Kumiko Website" width={60} height={60} className="rounded-lg" />
+          <div>
+            <h1 className="text-3xl font-bold">Websites</h1>
+            <p className="text-muted-foreground">
+              Manage your restaurant websites and build pages with prebuilt sections.
+            </p>
+          </div>
+        </div>
+
+        <Button variant="default" onClick={() => setIsCreateOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Create Website
+        </Button>
+      </div>
 
       <Websites />
 

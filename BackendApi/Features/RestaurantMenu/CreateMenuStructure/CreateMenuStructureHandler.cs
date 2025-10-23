@@ -13,13 +13,21 @@ public class CreateMenuStructureHandler(ApplicationDbContext context) : ICommand
 
         try
         {
+            // Convert string RestaurantId to Guid
+            if (!Guid.TryParse(request.RestaurantId, out var restaurantId))
+            {
+                Console.WriteLine($"❌ Invalid restaurant ID format: {request.RestaurantId}");
+                throw new ArgumentException("Invalid restaurant ID format");
+            }
+
+
             // Verify restaurant exists
             var restaurant = await context.Restaurants
-                .FirstOrDefaultAsync(r => r.Id == request.RestaurantId, cancellationToken);
+                .FirstOrDefaultAsync(r => r.Id == restaurantId, cancellationToken);
 
             if (restaurant == null)
             {
-                throw new ArgumentException("Restaurant not found");
+                throw new ArgumentException($"Restaurant not found with ID: {restaurantId}");
             }
 
             // Create new restaurant menu
@@ -28,7 +36,7 @@ public class CreateMenuStructureHandler(ApplicationDbContext context) : ICommand
                 Id = Guid.NewGuid(),
                 Name = request.MenuName,
                 Description = request.MenuDescription,
-                RestaurantId = request.RestaurantId,
+                RestaurantId = restaurantId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -40,7 +48,7 @@ public class CreateMenuStructureHandler(ApplicationDbContext context) : ICommand
             var totalItemsCreated = 0;
 
             // Process each category
-            foreach (var categoryCommand in request.Categories.OrderBy(c => c.OrderIndex))
+            foreach (var categoryCommand in (request.Categories ?? []).OrderBy(c => c.OrderIndex))
             {
                 // Create category
                 var category = new MenuCategory
@@ -117,7 +125,7 @@ public class CreateMenuStructureHandler(ApplicationDbContext context) : ICommand
             await context.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
 
-            return new CreateMenuStructureResult
+            var result = new CreateMenuStructureResult
             {
                 MenuId = restaurantMenu.Id,
                 MenuName = restaurantMenu.Name,
@@ -126,11 +134,15 @@ public class CreateMenuStructureHandler(ApplicationDbContext context) : ICommand
                 TotalItemsCreated = totalItemsCreated,
                 TotalCategoriesCreated = createdCategories.Count
             };
+
+            return result;
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"❌ Error creating menu structure: {ex.Message}");
+            Console.WriteLine($"❌ Stack trace: {ex.StackTrace}");
             await transaction.RollbackAsync(cancellationToken);
-            throw;
+            throw new Exception($"Failed to create menu structure: {ex.Message}", ex);
         }
     }
 }

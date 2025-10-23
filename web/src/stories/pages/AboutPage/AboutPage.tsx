@@ -129,22 +129,22 @@ export function AboutPage({}: AboutPageProps) {
                 </p>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8">
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8">
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">500+</div>
+                  <div className="text-3xl font-bold text-gray-800 mb-2">500+</div>
                   <div className="text-sm text-gray-600">Restaurants Served</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">40%</div>
+                  <div className="text-3xl font-bold text-gray-800 mb-2">40%</div>
                   <div className="text-sm text-gray-600">Average Order Increase</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">30min</div>
+                  <div className="text-3xl font-bold text-gray-800 mb-2">30min</div>
                   <div className="text-sm text-gray-600">Average Setup Time</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">99%</div>
+                  <div className="text-3xl font-bold text-gray-800 mb-2">99%</div>
                   <div className="text-sm text-gray-600">Customer Satisfaction</div>
                 </div>
               </div>
@@ -157,7 +157,7 @@ export function AboutPage({}: AboutPageProps) {
       <div ref={missionRef} className="py-16 px-8 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-gray-50 to-gray-100">
               <CardContent className="p-8">
                 <div className="text-4xl mb-4">🎯</div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-4">Our Mission</h3>
@@ -227,7 +227,7 @@ export function AboutPage({}: AboutPageProps) {
                     {member.avatar}
                   </div>
                   <h3 className="text-xl font-bold text-gray-800 mb-2">{member.name}</h3>
-                  <Badge variant="secondary" className="mb-4 bg-blue-100 text-blue-800">
+                  <Badge variant="secondary" className="mb-4 bg-gray-100 text-gray-800">
                     {member.role}
                   </Badge>
                   <p className="text-gray-600 text-sm leading-relaxed">{member.bio}</p>

@@ -24,8 +24,8 @@ const steps = [
   },
   {
     id: 2,
-    title: 'Create Website',
-    description: 'We create a beautiful website for your restaurant. With menu and orders integrated',
+    title: 'Get Beautiful Website',
+    description: 'Fresh, simple website optimized for food ordering. Ready to take orders immediately!',
     image: globeImage,
   },
   {

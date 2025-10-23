@@ -1,0 +1,1 @@
+export { ComicStripSection } from './ComicStripSection'

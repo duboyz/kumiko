@@ -74,17 +74,14 @@ async function refreshToken(request: NextRequest): Promise<NextResponse | null> 
 
   try {
     // Call the refresh endpoint
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5158'}/api/auth/refresh`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Cookie: `RefreshToken=${refreshTokenCookie.value}`,
-        },
-        body: JSON.stringify({ clientType: 'Web' }),
-      }
-    )
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5158'}/api/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: `RefreshToken=${refreshTokenCookie.value}`,
+      },
+      body: JSON.stringify({ clientType: 'Web' }),
+    })
 
     if (response.ok) {
       // Get the new cookies from the response
@@ -122,6 +119,27 @@ async function refreshToken(request: NextRequest): Promise<NextResponse | null> 
 }
 
 export async function middleware(request: NextRequest) {
+  // 🔍 DEBUG: Check frontend dependencies
+  console.log('🔍 === FRONTEND DEPENDENCIES DEBUG ===')
+
+  // Check JWT secret
+  const jwtSecret = process.env.JWT_SECRET
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+  console.log(`🔍 JWT Secret configured: ${!!jwtSecret} (length: ${jwtSecret?.length || 0})`)
+  console.log(`🔍 API URL: ${apiUrl || 'NOT SET'}`)
+
+  // Check if we're in production
+  const isProduction = process.env.NODE_ENV === 'production'
+  console.log(`🔍 Environment: ${process.env.NODE_ENV} (production: ${isProduction})`)
+
+  // Check request details
+  console.log(`🔍 Request URL: ${request.url}`)
+  console.log(`🔍 Request host: ${request.headers.get('host')}`)
+  console.log(`🔍 Request origin: ${request.headers.get('origin')}`)
+  console.log(`🔍 Request referer: ${request.headers.get('referer')}`)
+
+  console.log('🔍 === END FRONTEND DEPENDENCIES DEBUG ===')
+
   const url = request.nextUrl.clone()
   const hostname = request.headers.get('host') || ''
   const pathname = request.nextUrl.pathname
@@ -170,14 +188,28 @@ export async function middleware(request: NextRequest) {
 
   // Get the access token from cookies
   const accessToken = request.cookies.get('AccessToken')
+  const lol = request.cookies.get('RefreshToken')
+
+  console.log('🍪 Middleware cookie check:', {
+    hasAccessToken: !!accessToken,
+    hasRefreshToken: !!lol,
+    accessTokenValue: accessToken?.value ? `${accessToken.value.substring(0, 20)}...` : 'null',
+    refreshTokenValue: lol?.value ? `${lol.value.substring(0, 20)}...` : 'null',
+    allCookies: request.cookies.getAll().map(c => `${c.name}=${c.value.substring(0, 10)}...`),
+    url: request.url,
+    pathname: pathname,
+  })
 
   if (!accessToken) {
+    console.log('❌ No AccessToken found, attempting refresh...')
     // No access token, try to refresh
     const refreshResponse = await refreshToken(request)
     if (refreshResponse) {
+      console.log('✅ Token refresh successful')
       return refreshResponse
     }
 
+    console.log('❌ Token refresh failed, redirecting to login')
     // Redirect to login if no token and refresh failed
     return NextResponse.redirect(new URL('/login', request.url))
   }
@@ -223,8 +255,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - icons (static images)
      * - public folder
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|icons|public).*)',
   ],
 }

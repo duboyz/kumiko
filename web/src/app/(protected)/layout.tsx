@@ -10,10 +10,11 @@ import {
   LayoutDashboard,
   Globe,
   Settings,
-  Menu as MenuIcon, Hotel,
+  Menu as MenuIcon,
+  Hotel,
   ForkKnifeCrossed,
   ShoppingCart,
-  User
+  LogOut,
 } from 'lucide-react'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { useCurrentUser } from '@shared'
@@ -26,38 +27,48 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   const pathSegments = pathname.split('/').filter(Boolean)
   const { isLoading, hasNoLocations, selectedLocation } = useLocationSelection()
   const selectedLocationType = selectedLocation?.type || 'Restaurant'
+  const logoutMutation = useLogout()
 
   const links = useMemo(() => {
-    const links = [{
-      label: 'Dashboard',
-      href: '/dashboard',
-      icon: LayoutDashboard,
-    }]
+    const links = [
+      {
+        label: 'Dashboard',
+        href: '/dashboard',
+        icon: LayoutDashboard,
+      },
+    ]
 
     if (selectedLocationType === 'Restaurant') {
-      links.push(...[{
-        label: 'Menus',
-        href: '/menus',
-        icon: MenuIcon,
-      }, {
-        label: 'Orders',
-        href: '/orders',
-        icon: ShoppingCart,
-      }])
+      links.push(
+        ...[
+          {
+            label: 'Menus',
+            href: '/menus',
+            icon: MenuIcon,
+          },
+          {
+            label: 'Orders',
+            href: '/orders',
+            icon: ShoppingCart,
+          },
+        ]
+      )
     }
 
-    links.push(...[
-      {
-        label: 'Websites',
-        href: '/websites',
-        icon: Globe,
-      },
-      {
-        label: 'Settings',
-        href: '/settings',
-        icon: Settings,
-      },
-    ])
+    links.push(
+      ...[
+        {
+          label: 'Websites',
+          href: '/websites',
+          icon: Globe,
+        },
+        {
+          label: 'Settings',
+          href: '/settings',
+          icon: Settings,
+        },
+      ]
+    )
 
     return links
   }, [selectedLocationType])
@@ -122,8 +133,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
                   `}
                 >
                   <Icon
-                    className={`w-5 h-5 transition-transform duration-200 ${!isActive && 'group-hover:scale-110'
-                      }`}
+                    className={`w-5 h-5 transition-transform duration-200 ${!isActive && 'group-hover:scale-110'}`}
                   />
                   <span>{link.label}</span>
                 </Link>
@@ -132,17 +142,22 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
           </div>
         </nav>
 
-        {/* Bottom Section - Optional user info or branding */}
+        {/* Bottom Section - Logout Button */}
         <div className="p-6 border-t border-gray-200">
-          <UserInfo />
+          <button
+            onClick={() => logoutMutation.mutate()}
+            disabled={logoutMutation.isPending}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <LogOut className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
+            <span>{logoutMutation.isPending ? 'Logging out...' : 'Logout'}</span>
+          </button>
         </div>
       </div>
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto bg-white">
-        <div className="h-full">
-          {children}
-        </div>
+        <div className="h-full">{children}</div>
       </div>
 
       <Toaster richColors position="top-right" />
@@ -154,7 +169,8 @@ export function LocationSelector() {
   const { selectedLocation, userLocations, isLoading, hasNoLocations, setSelectedLocation } = useLocationSelection()
   const [isOpen, setIsOpen] = useState(false)
   const locationType = selectedLocation?.type || 'Restaurant'
-  const locationIcon = locationType === 'Restaurant' ? <ForkKnifeCrossed className="h-4 w-4" /> : <Hotel className="h-4 w-4" />
+  const locationIcon =
+    locationType === 'Restaurant' ? <ForkKnifeCrossed className="h-4 w-4" /> : <Hotel className="h-4 w-4" />
   const handleLocationChange = (value: string) => {
     setSelectedLocation(userLocations.find(location => location.id === value) as LocationOption)
     setIsOpen(false)
@@ -171,14 +187,11 @@ export function LocationSelector() {
 
   if (hasNoLocations) return null
 
-
   return (
     <>
       <Select onValueChange={handleLocationChange} value={selectedLocation?.id}>
         <SelectTrigger className="w-full p-4 py-6">
-          <SelectValue placeholder="Select Location">
-            {selectedLocation?.name}
-          </SelectValue>
+          <SelectValue placeholder="Select Location">{selectedLocation?.name}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           {userLocations.map(location => (
@@ -188,33 +201,27 @@ export function LocationSelector() {
           ))}
         </SelectContent>
       </Select>
-
     </>
-
   )
 }
 
-export function UserInfo() {
-  const { data: user } = useCurrentUser()
-  const [isOpen, setIsOpen] = useState(false)
-  const signOut = useLogout()
-  return (
-    <>
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <div className="flex items-center gap-2 cursor-pointer border rounded-md p-3">
-            <User className="h-4 w-4" />
-            {user?.firstName} {user?.lastName}
+{
+  /* <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <PopoverTrigger asChild>
+      <div className="flex items-center gap-2 cursor-pointer border rounded-md p-3">
+        {locationIcon}
+        {selectedLocation?.name}
+      </div>
+    </PopoverTrigger>
+    <PopoverContent>
+      <div className="space-y-4 mr-4">
+        {userLocations.map(location => (
+          <div key={location.id} onClick={() => handleLocationChange(location.id)} className="flex items-center gap-2 cursor-pointer">
+            {locationIcon}
+            {location.name}
           </div>
-        </PopoverTrigger>
-        <PopoverContent>
-          <div className="space-y-4 mr-4">
-            <div>{user?.firstName} {user?.lastName}</div>
-            <div>{user?.email}</div>
-            <Button variant="outline" onClick={() => signOut.mutate()}>Logout</Button>
-          </div>
-        </PopoverContent>
-      </Popover>
-    </>
-  )
+        ))}
+      </div>
+    </PopoverContent>
+  </Popover> */
 }
