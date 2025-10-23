@@ -44,13 +44,23 @@ public class RegisterHandler(
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext != null)
             {
+                var isProduction = httpContext.Request.Host.Host.Contains("kumiko.no") || 
+                                 httpContext.Request.Host.Host.Contains("vercel.app");
+                
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = expiresAt
+                    Expires = expiresAt,
+                    Path = "/"
                 };
+
+                // Set domain for production to allow subdomain access
+                if (isProduction)
+                {
+                    cookieOptions.Domain = ".kumiko.no";
+                }
 
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
 
@@ -59,8 +69,15 @@ public class RegisterHandler(
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
-                    Expires = DateTime.UtcNow.AddDays(7) // Refresh token lasts longer
+                    Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
+                    Path = "/"
                 };
+
+                // Set domain for production to allow subdomain access
+                if (isProduction)
+                {
+                    refreshCookieOptions.Domain = ".kumiko.no";
+                }
 
                 httpContext.Response.Cookies.Append("RefreshToken", refreshToken, refreshCookieOptions);
             }

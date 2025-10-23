@@ -19,7 +19,7 @@ public static class AuthenticationConfiguration
         })
         .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = false; // Set to true in production
+            options.RequireHttpsMetadata = true; // Required for production
             options.SaveToken = true;
             options.TokenValidationParameters = new TokenValidationParameters
             {

@@ -39,7 +39,15 @@ await app.ApplyMigrationsAsync();
 // Configure the HTTP request pipeline
 app.UseMiddleware<ExceptionHandlingMiddleware>(); // Add exception handling first
 app.UseSwaggerConfiguration(app.Environment);
-app.UseCorsConfiguration();
+// Use production CORS policy in production, otherwise use development policy
+if (app.Environment.IsProduction())
+{
+    app.UseCors("Production");
+}
+else
+{
+    app.UseCorsConfiguration();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
