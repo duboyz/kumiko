@@ -40,6 +40,22 @@ await app.ApplyMigrationsAsync();
 
 // Configure the HTTP request pipeline
 app.UseMiddleware<ExceptionHandlingMiddleware>(); // Add exception handling first
+
+// Add debugging middleware to log response headers
+app.Use(async (context, next) =>
+{
+    await next();
+    
+    if (context.Request.Path.StartsWithSegments("/api/auth/login") || 
+        context.Request.Path.StartsWithSegments("/api/auth/register"))
+    {
+        Console.WriteLine($"Response headers for {context.Request.Path}:");
+        foreach (var header in context.Response.Headers)
+        {
+            Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
+        }
+    }
+});
 app.UseSwaggerConfiguration(app.Environment);
 // Use production CORS policy in production, otherwise use development policy
 if (app.Environment.IsProduction())

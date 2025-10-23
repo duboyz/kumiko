@@ -55,6 +55,9 @@ public class RegisterHandler(
                     Expires = expiresAt,
                     Path = "/"
                 };
+                
+                // Add Partitioned attribute for cross-origin cookies
+                cookieOptions.Extensions.Add("Partitioned");
 
                 // Set domain for production to allow subdomain access
                 if (isProduction)

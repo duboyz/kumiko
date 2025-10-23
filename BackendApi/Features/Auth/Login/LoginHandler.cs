@@ -46,6 +46,9 @@ public class LoginHandler(
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext != null)
             {
+                Console.WriteLine($"Login: Setting cookies for host: {httpContext.Request.Host.Host}");
+                Console.WriteLine($"Login: Request origin: {httpContext.Request.Headers.Origin}");
+                Console.WriteLine($"Login: Request headers: {string.Join(", ", httpContext.Request.Headers.Keys)}");
                 var isProduction = httpContext.Request.Host.Host.Contains("kumiko.no") || 
                                  httpContext.Request.Host.Host.Contains("vercel.app");
                 
@@ -57,6 +60,9 @@ public class LoginHandler(
                     Expires = expiresAt,
                     Path = "/"
                 };
+                
+                // Add Partitioned attribute for cross-origin cookies
+                cookieOptions.Extensions.Add("Partitioned");
 
                 // Set domain for production to allow subdomain access
                 if (isProduction)
@@ -70,6 +76,7 @@ public class LoginHandler(
                 }
 
                 httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
+                Console.WriteLine($"Login: Set AccessToken cookie with domain: {cookieOptions.Domain}");
 
                 var refreshCookieOptions = new CookieOptions
                 {
@@ -79,6 +86,9 @@ public class LoginHandler(
                     Expires = DateTime.UtcNow.AddDays(7), // Refresh token lasts longer
                     Path = "/"
                 };
+                
+                // Add Partitioned attribute for cross-origin cookies
+                refreshCookieOptions.Extensions.Add("Partitioned");
 
                 // Set domain for production to allow subdomain access
                 if (isProduction)
@@ -92,6 +102,8 @@ public class LoginHandler(
                 }
 
                 httpContext.Response.Cookies.Append("RefreshToken", refreshToken, refreshCookieOptions);
+                Console.WriteLine($"Login: Set RefreshToken cookie with domain: {refreshCookieOptions.Domain}");
+                Console.WriteLine($"Login: Response headers after setting cookies: {string.Join(", ", httpContext.Response.Headers.Keys)}");
             }
 
             // For web clients, we don't return tokens in the response body
