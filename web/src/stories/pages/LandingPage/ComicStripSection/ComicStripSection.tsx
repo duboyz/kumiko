@@ -151,37 +151,39 @@ export function ComicStripSection({}: ComicStripSectionProps) {
     // Create a timeline for the text animation
     const tl = gsap.timeline()
 
-    // Animate step number with a subtle bounce
-    tl.to(stepNumberRef.current, {
-      scale: 1.1,
-      duration: 0.2,
-      ease: 'power2.out',
-    }).to(
-      stepNumberRef.current,
-      {
-        scale: 1,
-        duration: 0.3,
-        ease: 'back.out(1.7)',
-      },
-      '-=0.1'
-    )
-
-    // Animate title and description with fade and slide
+    // First fade out current content
     tl.to([stepTitleRef.current, stepDescriptionRef.current], {
       opacity: 0,
       y: 20,
-      duration: 0.2,
+      duration: 0.15,
       ease: 'power2.out',
-    }).to(
-      [stepTitleRef.current, stepDescriptionRef.current],
-      {
+    })
+      // Then fade in new content
+      .to([stepTitleRef.current, stepDescriptionRef.current], {
         opacity: 1,
         y: 0,
-        duration: 0.4,
+        duration: 0.3,
         ease: 'power2.out',
-      },
-      '-=0.1'
-    )
+      })
+      // Animate step number with a subtle bounce
+      .to(
+        stepNumberRef.current,
+        {
+          scale: 1.1,
+          duration: 0.2,
+          ease: 'power2.out',
+        },
+        '-=0.2'
+      )
+      .to(
+        stepNumberRef.current,
+        {
+          scale: 1,
+          duration: 0.3,
+          ease: 'back.out(1.7)',
+        },
+        '-=0.1'
+      )
   }, [activeStep])
 
   return (
