@@ -37,9 +37,8 @@ export function ComicStripSection({}: ComicStripSectionProps) {
     {
       src: kumikoDeploy,
       alt: 'Kumiko Deploy',
-      title: 'Building Her Website',
-      description:
-        "Our AI works its magic, transforming Kumiko's menu into a beautiful, professional website in minutes.",
+      title: 'Builds her website',
+      description: 'Build your website with just one press of a button and we fix the rest.',
     },
     {
       src: kumikoOrders,
@@ -115,7 +114,7 @@ export function ComicStripSection({}: ComicStripSectionProps) {
       }
     })
 
-    // Set up intersection observer to track which image is in view
+    // Set up intersection observer to track which image is in view (desktop only)
     const observer = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
@@ -133,10 +132,12 @@ export function ComicStripSection({}: ComicStripSectionProps) {
       }
     )
 
-    // Observe all images
-    imageRefs.current.forEach(ref => {
-      if (ref) observer.observe(ref)
-    })
+    // Only observe images on desktop (where we have the dynamic text box)
+    if (window.innerWidth >= 1024) {
+      imageRefs.current.forEach(ref => {
+        if (ref) observer.observe(ref)
+      })
+    }
 
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill())
@@ -144,8 +145,10 @@ export function ComicStripSection({}: ComicStripSectionProps) {
     }
   }, [])
 
-  // Animate text content when activeStep changes
+  // Animate text content when activeStep changes (desktop only)
   useEffect(() => {
+    // Only run animations on desktop where we have the dynamic text box
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) return
     if (!stepTitleRef.current || !stepDescriptionRef.current || !stepNumberRef.current) return
 
     // Create a timeline for the text animation
@@ -197,9 +200,10 @@ export function ComicStripSection({}: ComicStripSectionProps) {
           Follow Kumiko's Journey
         </h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* Desktop Layout */}
+        <div className="hidden lg:grid grid-cols-2 gap-8 items-start">
           {/* Dynamic Description Box */}
-          <div ref={descriptionRef} className="lg:sticky lg:top-20">
+          <div ref={descriptionRef} className="sticky top-20">
             <div className="bg-white rounded-xl shadow-lg border border-gray-100 h-full flex flex-col min-h-[400px]">
               {/* Dynamic content based on active step */}
               <div className="flex-1 p-8 flex flex-col justify-center">
@@ -249,6 +253,39 @@ export function ComicStripSection({}: ComicStripSectionProps) {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Mobile Layout */}
+        <div className="lg:hidden space-y-8">
+          {steps.map((step, index) => (
+            <div
+              key={index}
+              ref={el => {
+                imageRefs.current[index] = el
+              }}
+              className="relative group"
+            >
+              <div className="relative overflow-hidden rounded-xl shadow-lg mb-4">
+                <Image
+                  src={step.src}
+                  alt={step.alt}
+                  className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
+                  priority={index < 2}
+                />
+              </div>
+
+              {/* Mobile Text Box */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-bold text-lg">
+                    {index + 1}
+                  </div>
+                  <h4 className={`text-xl font-bold text-gray-800 ${bebasNeue.className}`}>{step.title}</h4>
+                </div>
+                <p className="text-gray-600 leading-relaxed text-base">{step.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
