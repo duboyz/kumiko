@@ -31,9 +31,8 @@ export function ComicStripSection({}: ComicStripSectionProps) {
     {
       src: kumikoSnap,
       alt: 'Kumiko Snap',
-      title: "Kumiko's Menu Photo",
-      description:
-        "Meet Kumiko! She snaps a quick photo of her restaurant's menu - just one picture to start her digital journey.",
+      title: 'She snaps a picture of her menu',
+      description: 'Kumiko takes a picture of her menu and uploads it!',
     },
     {
       src: kumikoDeploy,
