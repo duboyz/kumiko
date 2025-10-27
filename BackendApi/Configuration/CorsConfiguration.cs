@@ -15,7 +15,7 @@ public static class CorsConfiguration
                         return true;
 
                     // Allow localhost subdomains with port 3000
-                    if (origin.StartsWith("http://") && origin.EndsWith(".localhost:3003"))
+                    if (origin.StartsWith("http://") && origin.EndsWith(".localhost:3000"))
                         return true;
 
                     // Allow specific production domains
@@ -25,8 +25,18 @@ public static class CorsConfiguration
                         "https://kumiko.no"
                     };
 
-                    return allowedOrigins.Contains(origin) ||
-                           origin.StartsWith("https://") && (origin.EndsWith(".kumiko-web.vercel.app") || origin.EndsWith(".kumiko.no"));
+                    if (allowedOrigins.Contains(origin))
+                        return true;
+
+                    // Allow any subdomain of kumiko-web.vercel.app
+                    if (origin.StartsWith("https://") && origin.EndsWith(".kumiko-web.vercel.app"))
+                        return true;
+
+                    // Allow any subdomain of kumiko.no
+                    if (origin.StartsWith("https://") && origin.Contains(".kumiko.no"))
+                        return true;
+
+                    return false;
                 })
                 .AllowAnyMethod()
                 .AllowAnyHeader()
