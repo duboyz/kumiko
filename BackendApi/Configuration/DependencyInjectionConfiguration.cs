@@ -19,6 +19,7 @@ public static class DependencyInjectionConfiguration
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IOpenAiService, OpenAiService>();
         services.AddScoped<ISubscriptionService, SubscriptionService>();
+        services.AddScoped<ITwilioSmsService, TwilioSmsService>();
 
 
         // Repositories
