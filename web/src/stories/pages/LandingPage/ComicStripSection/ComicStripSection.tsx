@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import Image from 'next/image'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -19,13 +19,20 @@ interface ComicStripSectionProps {}
 
 export function ComicStripSection({}: ComicStripSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
-  const imageRefs = useRef<(HTMLDivElement | null)[]>([])
+  const desktopImageRefs = useRef<(HTMLDivElement | null)[]>([])
+  const mobileImageRefs = useRef<(HTMLDivElement | null)[]>([])
   const descriptionRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const stepTitleRef = useRef<HTMLHeadingElement>(null)
   const stepDescriptionRef = useRef<HTMLParagraphElement>(null)
   const stepNumberRef = useRef<HTMLDivElement>(null)
+  const scrollTriggerRefs = useRef<ScrollTrigger[]>([])
+  const scrollListenerRef = useRef<(() => void) | null>(null)
   const [activeStep, setActiveStep] = useState(0)
+  const [windowWidth, setWindowWidth] = useState(0)
+
+  // Use desktop refs for desktop viewport, mobile refs for mobile
+  const imageRefs = windowWidth >= 1024 ? desktopImageRefs : mobileImageRefs
 
   const steps = [
     {
@@ -54,13 +61,77 @@ export function ComicStripSection({}: ComicStripSectionProps) {
     },
   ]
 
+  // Set window width on client side
+  useEffect(() => {
+    const updateWindowWidth = () => {
+      setWindowWidth(window.innerWidth)
+    }
+
+    updateWindowWidth()
+    window.addEventListener('resize', updateWindowWidth)
+
+    return () => {
+      window.removeEventListener('resize', updateWindowWidth)
+    }
+  }, [])
+
+  // Scroll handler for step tracking
+  const handleScroll = useCallback(() => {
+    // Check window width inside the function to avoid dependency issues
+    if (window.innerWidth < 1024) return
+
+    const viewportCenter = window.innerHeight / 2
+    let closestIndex = 0
+    let closestDistance = Infinity
+
+    // Filter out images with zero height and calculate distances
+    const imagesWithDimensions = imageRefs.current
+      .map((ref, index) => {
+        if (!ref) return null
+        const rect = ref.getBoundingClientRect()
+        if (rect.height === 0) return null
+
+        return {
+          index,
+          rect,
+          imageCenter: rect.top + rect.height / 2,
+        }
+      })
+      .filter(Boolean) as Array<{ index: number; rect: DOMRect; imageCenter: number }>
+
+    if (imagesWithDimensions.length === 0) {
+      return
+    }
+
+    imagesWithDimensions.forEach(({ index, rect, imageCenter }) => {
+      const distance = Math.abs(imageCenter - viewportCenter)
+
+      if (distance < closestDistance) {
+        closestDistance = distance
+        closestIndex = index
+      }
+    })
+
+    setActiveStep(closestIndex)
+  }, [])
+
+  // Main animation setup effect
   useEffect(() => {
     if (!sectionRef.current || !descriptionRef.current || !titleRef.current) return
+
+    // Clean up previous triggers
+    scrollTriggerRefs.current.forEach(trigger => trigger.kill())
+    scrollTriggerRefs.current = []
 
     // Set initial states
     gsap.set(titleRef.current, { y: 50, opacity: 0 })
     gsap.set(descriptionRef.current, { x: -50, opacity: 0 })
-    gsap.set(imageRefs.current, {
+    gsap.set(desktopImageRefs.current, {
+      opacity: 0,
+      y: 100,
+      scale: 0.8,
+    })
+    gsap.set(mobileImageRefs.current, {
       opacity: 0,
       y: 100,
       scale: 0.8,
@@ -75,6 +146,11 @@ export function ComicStripSection({}: ComicStripSectionProps) {
         toggleActions: 'play none none reverse',
       },
     })
+
+    // Store the main timeline trigger
+    if (tl.scrollTrigger) {
+      scrollTriggerRefs.current.push(tl.scrollTrigger)
+    }
 
     // Animate title first
     tl.to(titleRef.current, {
@@ -98,57 +174,83 @@ export function ComicStripSection({}: ComicStripSectionProps) {
 
     // Animate images one by one as you scroll
     steps.forEach((_, index) => {
-      if (imageRefs.current[index]) {
-        gsap.to(imageRefs.current[index], {
+      const desktopRef = desktopImageRefs.current[index]
+      const mobileRef = mobileImageRefs.current[index]
+
+      if (desktopRef) {
+        const imageTrigger = gsap.to(desktopRef, {
           opacity: 1,
           y: 0,
           scale: 1,
           duration: 0.8,
           ease: 'back.out(1.7)',
           scrollTrigger: {
-            trigger: imageRefs.current[index],
+            trigger: desktopRef,
             start: 'top 85%',
             toggleActions: 'play none none reverse',
           },
         })
+
+        if (imageTrigger.scrollTrigger) {
+          scrollTriggerRefs.current.push(imageTrigger.scrollTrigger)
+        }
+      }
+
+      if (mobileRef) {
+        const imageTrigger = gsap.to(mobileRef, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: 'back.out(1.7)',
+          scrollTrigger: {
+            trigger: mobileRef,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        })
+
+        if (imageTrigger.scrollTrigger) {
+          scrollTriggerRefs.current.push(imageTrigger.scrollTrigger)
+        }
       }
     })
 
-    // Set up intersection observer to track which image is in view (desktop only)
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const index = imageRefs.current.findIndex(ref => ref === entry.target)
-            if (index !== -1) {
-              setActiveStep(index)
-            }
-          }
-        })
-      },
-      {
-        threshold: 0.5, // Trigger when 50% of the image is visible
-        rootMargin: '-20% 0px -20% 0px', // Only trigger when image is in center area
-      }
-    )
-
-    // Only observe images on desktop (where we have the dynamic text box)
+    // Set up scroll listener for step tracking (desktop only)
     if (window.innerWidth >= 1024) {
-      imageRefs.current.forEach(ref => {
-        if (ref) observer.observe(ref)
-      })
+      let ticking = false
+      const throttledScroll = () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            handleScroll()
+            ticking = false
+          })
+          ticking = true
+        }
+      }
+
+      window.addEventListener('scroll', throttledScroll)
+      scrollListenerRef.current = () => window.removeEventListener('scroll', throttledScroll)
+
+      // Initial call - wait longer for images to load
+      setTimeout(handleScroll, 1000)
     }
 
+    // Cleanup function
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-      observer.disconnect()
+      scrollTriggerRefs.current.forEach(trigger => trigger.kill())
+      scrollTriggerRefs.current = []
+      if (scrollListenerRef.current) {
+        scrollListenerRef.current()
+        scrollListenerRef.current = null
+      }
     }
-  }, [])
+  }, [handleScroll])
 
   // Animate text content when activeStep changes (desktop only)
   useEffect(() => {
     // Only run animations on desktop where we have the dynamic text box
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) return
+    if (windowWidth < 1024) return
     if (!stepTitleRef.current || !stepDescriptionRef.current || !stepNumberRef.current) return
 
     // Create a timeline for the text animation
@@ -187,7 +289,7 @@ export function ComicStripSection({}: ComicStripSectionProps) {
         },
         '-=0.1'
       )
-  }, [activeStep])
+  }, [activeStep, windowWidth])
 
   return (
     <section ref={sectionRef} className="py-20 px-4 bg-gradient-to-b from-gray-50 to-white">
@@ -230,10 +332,10 @@ export function ComicStripSection({}: ComicStripSectionProps) {
             {steps.map((step, index) => (
               <div
                 key={index}
-                ref={el => {
-                  imageRefs.current[index] = el
-                }}
                 className="relative group"
+                ref={el => {
+                  desktopImageRefs.current[index] = el
+                }}
               >
                 <div className="relative overflow-hidden rounded-xl shadow-lg">
                   <Image
@@ -261,7 +363,7 @@ export function ComicStripSection({}: ComicStripSectionProps) {
             <div
               key={index}
               ref={el => {
-                imageRefs.current[index] = el
+                mobileImageRefs.current[index] = el
               }}
               className="relative group"
             >
