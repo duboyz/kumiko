@@ -1,8 +1,9 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Plus, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react'
-import { GetMenuByIdResult, Currency, formatPrice, useLocationSelection } from '@shared'
+import { Input } from '@/components/ui/input'
+import { Plus, Minus, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react'
+import { GetMenuByIdResult, Currency, formatPrice, useCartStore } from '@shared'
 import { useState } from 'react'
 
 interface MenuItemCardProps {
@@ -19,11 +20,53 @@ interface MenuItemCardProps {
 
 export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: MenuItemCardProps) {
   const [showOptions, setShowOptions] = useState(false)
+  const { cart, updateQuantity, removeItem } = useCartStore()
 
   if (!item.isAvailable) return null
 
   const hasOptions = item.hasOptions && item.options.length > 0
   const hasAllergens = item.allergens && item.allergens.length > 0
+
+  // Helper function to get quantity from cart
+  const getItemQuantity = (menuItemId: string, menuItemOptionId?: string) => {
+    const cartItem = cart.find(
+      item => item.menuItemId === menuItemId && item.menuItemOptionId === menuItemOptionId
+    )
+    return cartItem?.quantity || 0
+  }
+
+  // Helper function to get cart index
+  const getCartItemIndex = (menuItemId: string, menuItemOptionId?: string) => {
+    return cart.findIndex(
+      item => item.menuItemId === menuItemId && item.menuItemOptionId === menuItemOptionId
+    )
+  }
+
+  // Handle quantity decrease
+  const handleDecrease = (menuItemId: string, menuItemOptionId?: string) => {
+    const index = getCartItemIndex(menuItemId, menuItemOptionId)
+    if (index >= 0) {
+      const currentQuantity = cart[index].quantity
+      if (currentQuantity === 1) {
+        removeItem(index)
+      } else {
+        updateQuantity(index, -1)
+      }
+    }
+  }
+
+  // Handle quantity increase
+  const handleIncrease = (
+    menuItemId: string,
+    menuItemName: string,
+    price: number,
+    menuItemOptionId?: string,
+    menuItemOptionName?: string
+  ) => {
+    onAddToCart(menuItemId, menuItemName, price, menuItemOptionId, menuItemOptionName)
+  }
+
+  const mainItemQuantity = getItemQuantity(item.id)
 
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow">
@@ -62,15 +105,35 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
             )}
           </div>
 
-          {/* Main action button */}
+          {/* Main action button with quantity controls */}
           {!hasOptions && (
-            <Button
-              size="sm"
-              onClick={() => onAddToCart(item.id, item.name, item.price || 0)}
-              className="flex-shrink-0"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {mainItemQuantity > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleDecrease(item.id)}
+                  className="h-8 w-8 p-0"
+                >
+                  <Minus className="w-3 h-3" />
+                </Button>
+              )}
+              {mainItemQuantity > 0 && (
+                <Input
+                  type="number"
+                  value={mainItemQuantity}
+                  readOnly
+                  className="w-12 h-8 text-center p-0"
+                />
+              )}
+              <Button
+                size="sm"
+                onClick={() => handleIncrease(item.id, item.name, item.price || 0)}
+                className="h-8 w-8 p-0"
+              >
+                <Plus className="w-3 h-3" />
+              </Button>
+            </div>
           )}
         </div>
 
@@ -97,34 +160,57 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
               <div className="mt-2 space-y-2 border-t pt-2">
                 {item.options
                   .sort((a, b) => a.orderIndex - b.orderIndex)
-                  .map(option => (
-                    <div key={option.id} className="flex justify-between items-center gap-2">
-                      <div className="flex-1 min-w-0">
+                  .map(option => {
+                    const optionQuantity = getItemQuantity(item.id, option.id)
+                    return (
+                      <div key={option.id} className="flex justify-between items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">{option.name}</span>
+                            {option.description && (
+                              <span className="text-xs text-muted-foreground truncate">
+                                {option.description}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">{option.name}</span>
-                          {option.description && (
-                            <span className="text-xs text-muted-foreground truncate">
-                              {option.description}
-                            </span>
-                          )}
+                          <span className="text-sm font-medium text-green-600">
+                            {formatPrice(option.price, currency)}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            {optionQuantity > 0 && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDecrease(item.id, option.id)}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Minus className="w-3 h-3" />
+                              </Button>
+                            )}
+                            {optionQuantity > 0 && (
+                              <Input
+                                type="number"
+                                value={optionQuantity}
+                                readOnly
+                                className="w-12 h-8 text-center p-0"
+                              />
+                            )}
+                            <Button
+                              size="sm"
+                              onClick={() =>
+                                handleIncrease(item.id, item.name, option.price, option.id, option.name)
+                              }
+                              className="h-8 w-8 p-0"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-green-600">
-                          {formatPrice(option.price, currency)}
-                        </span>
-                        <Button
-                          size="sm"
-                          onClick={() =>
-                            onAddToCart(item.id, item.name, option.price, option.id, option.name)
-                          }
-                          className="h-8 w-8 p-0"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
               </div>
             )}
           </div>
