@@ -38,6 +38,7 @@ const publicRoutes = [
   '/about',
   '/contact',
   '/site',
+  '/order',
   '/pricing',
   '/privacy',
   '/terms',
@@ -134,6 +135,11 @@ export async function middleware(request: NextRequest) {
 
     // Skip if it's the main domain or app subdomain
     if (subdomain !== 'www' && subdomain !== 'app') {
+      // Check if this is an order status page - don't rewrite, just allow through
+      if (pathname.startsWith('/order/')) {
+        return NextResponse.next()
+      }
+
       // Rewrite to the live website page (public route, no auth needed)
       const originalPath = url.pathname
       let newPath: string
@@ -141,6 +147,9 @@ export async function middleware(request: NextRequest) {
       if (originalPath === '/') {
         // Homepage: subdomain.localhost -> /site/subdomain
         newPath = `/site/${subdomain}`
+      } else if (originalPath === '/checkout') {
+        // Checkout page: subdomain.localhost/checkout -> /site/subdomain/checkout
+        newPath = `/site/${subdomain}/checkout`
       } else {
         // Page with slug: subdomain.localhost/about -> /site/subdomain/about
         newPath = `/site/${subdomain}${originalPath}`

@@ -49,7 +49,9 @@ export function OrderForm({ menu, restaurantId, currency = Currency.USD, classNa
 
   const handleProceedToCheckout = () => {
     setIsCartOpen(false)
-    router.push(`/site/${subdomain}/checkout`)
+    // When accessed via subdomain (e.g., subdomain.localhost), just use /checkout
+    // The middleware will handle the rewrite
+    router.push('/checkout')
   }
 
   return (

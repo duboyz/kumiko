@@ -77,7 +77,7 @@ export default function CheckoutPage() {
         ? (customerInfo.pickupTime.split(':').length === 2 ? `${customerInfo.pickupTime}:00` : customerInfo.pickupTime)
         : '12:00:00'
 
-      await createOrderMutation.mutateAsync({
+      const result = await createOrderMutation.mutateAsync({
         customerName: customerInfo.name.trim(),
         customerPhone: customerInfo.phone.trim(),
         customerEmail: customerInfo.email.trim(),
@@ -89,14 +89,14 @@ export default function CheckoutPage() {
         orderItems,
       })
 
-      toast.success('Order placed successfully!')
+      toast.success('Order placed successfully! Redirecting to order status...')
 
       // Reset form
       clearCart()
       clearCustomerInfo()
 
-      // Redirect back to restaurant page
-      router.push(`/site/${subdomain}`)
+      // Redirect to order status page
+      router.push(`/order/${result.id}/status`)
     } catch (error) {
       toast.error('Failed to place order. Please try again.')
     }
