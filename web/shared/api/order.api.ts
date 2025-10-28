@@ -6,6 +6,7 @@ import {
   UpdateOrderStatusCommand,
   UpdateOrderStatusResult,
   OrderDto,
+  GetOrderByIdResult,
 } from '../types/order.types'
 import { ApiResponse, ResponseData } from '../types/apiResponse.types'
 
@@ -30,6 +31,12 @@ export const orderApi = {
       { status }
     )
     if (!response.success || !response.data) throw new Error(response.message || 'Failed to update order status')
+    return response.data
+  },
+
+  getOrderById: async (orderId: string): Promise<ResponseData<GetOrderByIdResult>> => {
+    const { data: response } = await client.get<ApiResponse<GetOrderByIdResult>>(`/api/orders/${orderId}/status`)
+    if (!response.success || !response.data) throw new Error(response.message || 'Failed to get order')
     return response.data
   },
 }

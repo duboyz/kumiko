@@ -94,3 +94,27 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   Cancelled: 'Cancelled',
 }
 
+export interface GetOrderByIdResult {
+  id: string
+  customerName: string
+  customerPhone: string
+  customerEmail: string
+  pickupDate: string
+  pickupTime: string
+  additionalNote: string
+  status: OrderStatus
+  totalAmount: number
+  restaurant: RestaurantInfoDto
+  orderItems: OrderItemDto[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface RestaurantInfoDto {
+  id: string
+  name: string
+  address: string
+  city: string
+  currency: string
+}
+
