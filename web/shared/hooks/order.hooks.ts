@@ -40,3 +40,12 @@ export const useUpdateOrderStatus = () => {
   })
 }
 
+// Get order by ID (unprotected, for customer order status page)
+export const useOrderById = (orderId: string) => {
+  return useQuery({
+    queryKey: ['order', orderId],
+    queryFn: () => orderApi.getOrderById(orderId),
+    enabled: !!orderId,
+  })
+}
+

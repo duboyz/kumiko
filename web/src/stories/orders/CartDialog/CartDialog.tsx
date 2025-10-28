@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button'
 import { CartItemCard } from '../CartItemCard'
 import { CartItem } from '../shared/types'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
-import { useRouter } from 'next/navigation'
 import { Currency, formatPrice } from '@shared'
 
 interface CartDialogProps {

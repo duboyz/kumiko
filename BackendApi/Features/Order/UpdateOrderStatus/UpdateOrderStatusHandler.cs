@@ -8,7 +8,8 @@ namespace BackendApi.Features.Order.UpdateOrderStatus;
 
 public class UpdateOrderStatusHandler(
     ApplicationDbContext context,
-    ITwilioSmsService twilioSmsService) : ICommandHandler<UpdateOrderStatusCommand, UpdateOrderStatusResult>
+    ITwilioSmsService twilioSmsService,
+    IConfiguration configuration) : ICommandHandler<UpdateOrderStatusCommand, UpdateOrderStatusResult>
 {
     public async Task<UpdateOrderStatusResult> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
     {
@@ -33,7 +34,9 @@ public class UpdateOrderStatusHandler(
         if (status == OrderStatus.Confirmed && !string.IsNullOrEmpty(order.CustomerPhone))
         {
             var restaurantName = order.Restaurant.Name;
-            var message = $"Your order has been confirmed! We'll have it ready for pickup on {order.PickupDate:dd/MM/yyyy} at {order.PickupTime:hh\\:mm}. Thank you!";
+            var baseUrl = configuration["Frontend:BaseUrl"] ?? "https://kumiko.no";
+            var orderStatusUrl = $"{baseUrl}/order/{order.Id}/status";
+            var message = $"Your order has been confirmed! We'll have it ready for pickup on {order.PickupDate:dd/MM/yyyy} at {order.PickupTime:hh\\:mm}. Track your order: {orderStatusUrl}";
 
             try
             {
@@ -48,7 +51,9 @@ public class UpdateOrderStatusHandler(
         if (status == OrderStatus.Ready && !string.IsNullOrEmpty(order.CustomerPhone))
         {
             var restaurantName = order.Restaurant.Name;
-            var message = $"Your order is ready for pickup! Please come to the restaurant to pick it up. Thank you!";
+            var baseUrl = configuration["Frontend:BaseUrl"] ?? "https://kumiko.no";
+            var orderStatusUrl = $"{baseUrl}/order/{order.Id}/status";
+            var message = $"Your order is ready for pickup! Please come to the restaurant to pick it up. View details: {orderStatusUrl}";
 
             try
             {
