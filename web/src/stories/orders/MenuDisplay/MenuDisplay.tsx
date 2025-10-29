@@ -1,5 +1,13 @@
 import { GetMenuByIdResult, Currency } from '@shared'
 import { MenuItemCard } from '../MenuItemCard'
+import { useEffect, useRef } from 'react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+// Register GSAP plugins
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger)
+}
 
 interface MenuDisplayProps {
   menu: GetMenuByIdResult
@@ -15,33 +23,105 @@ interface MenuDisplayProps {
 }
 
 export function MenuDisplay({ menu, currency = Currency.USD, onAddToCart, className = '' }: MenuDisplayProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const ctx = gsap.context(() => {
+      // Animate header
+      gsap.fromTo(
+        headerRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+        }
+      )
+
+      // Animate category sections
+      gsap.fromTo(
+        '.category-section',
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'power2.out',
+          stagger: 0.2,
+          scrollTrigger: {
+            trigger: '.category-section',
+            start: 'top 80%',
+            end: 'bottom 20%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      )
+
+      // Animate menu items
+      gsap.fromTo(
+        '.menu-item-card',
+        { opacity: 0, y: 20, scale: 0.95 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.5,
+          ease: 'power2.out',
+          stagger: 0.1,
+          scrollTrigger: {
+            trigger: '.menu-item-card',
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      )
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [menu])
+
   return (
-    <div className={`max-w-4xl mx-auto ${className}`}>
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold mb-4">{menu.name}</h2>
-        {menu.description && <p className="text-lg text-muted-foreground">{menu.description}</p>}
+    <div ref={containerRef} className={`max-w-5xl mx-auto px-4 ${className}`}>
+      <div ref={headerRef} className="text-center mb-16">
+        <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          {menu.name}
+        </h2>
+        {menu.description && (
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">{menu.description}</p>
+        )}
       </div>
 
-      <div className="space-y-12">
-        {menu.categories.map(category => (
-          <div key={category.id}>
-            <h3 className="text-2xl font-bold mb-6 pb-2">{category.name}</h3>
-            {category.description && <p className="text-muted-foreground mb-6">{category.description}</p>}
+      <div className="space-y-16">
+        {menu.categories.map((category, categoryIndex) => (
+          <div key={category.id} className="category-section">
+            <div className="mb-8">
+              <h3 className="text-3xl font-bold mb-3 text-foreground">{category.name}</h3>
+              {category.description && (
+                <p className="text-muted-foreground text-lg max-w-3xl">{category.description}</p>
+              )}
+            </div>
 
-            <div className="space-y-6">
+            <div className="grid gap-4">
               {category.menuCategoryItems
                 .sort((a, b) => a.orderIndex - b.orderIndex)
-                .map(categoryItem => {
+                .map((categoryItem, itemIndex) => {
                   const item = categoryItem.menuItem
                   if (!item) return null
 
                   return (
-                    <MenuItemCard
+                    <div
                       key={categoryItem.id}
-                      item={item}
-                      currency={currency}
-                      onAddToCart={onAddToCart}
-                    />
+                      className="menu-item-card"
+                      style={{
+                        animationDelay: `${itemIndex * 0.1}s`,
+                      }}
+                    >
+                      <MenuItemCard item={item} currency={currency} onAddToCart={onAddToCart} />
+                    </div>
                   )
                 })}
             </div>
