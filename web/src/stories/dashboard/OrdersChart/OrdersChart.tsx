@@ -2,13 +2,16 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ShoppingBag } from 'lucide-react'
-import type { DailyOrderStats } from '@shared'
+import type { DailyOrderStats, WeeklyOrderStats, MonthlyOrderStats } from '@shared'
+
+type OrderData = DailyOrderStats | WeeklyOrderStats | MonthlyOrderStats
 
 interface OrdersChartProps {
-    data: DailyOrderStats[]
+    data: OrderData[]
+    period: 'daily' | 'weekly' | 'monthly'
 }
 
-export function OrdersChart({ data }: OrdersChartProps) {
+export function OrdersChart({ data, period }: OrdersChartProps) {
     if (data.length === 0) {
         return (
             <Card>
@@ -17,7 +20,7 @@ export function OrdersChart({ data }: OrdersChartProps) {
                         <ShoppingBag className="w-5 h-5" />
                         Orders
                     </CardTitle>
-                    <CardDescription>Daily order count</CardDescription>
+                    <CardDescription>{getPeriodLabel(period)} order count</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-muted-foreground text-center py-8">No orders yet</p>
@@ -35,28 +38,25 @@ export function OrdersChart({ data }: OrdersChartProps) {
                     <ShoppingBag className="w-5 h-5" />
                     Orders
                 </CardTitle>
-                <CardDescription>Daily orders over the selected period</CardDescription>
+                <CardDescription>{getPeriodLabel(period)} orders over the selected period</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="space-y-3">
-                    {data.map(day => (
-                        <div key={day.date} className="space-y-1">
+                    {data.map((item, index) => (
+                        <div key={getItemKey(item, index)} className="space-y-1">
                             <div className="flex items-center justify-between text-sm">
                                 <span className="text-muted-foreground">
-                                    {new Date(day.date).toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric'
-                                    })}
+                                    {formatLabel(item, period)}
                                 </span>
                                 <div className="flex items-center gap-4">
-                                    <span className="text-xs text-muted-foreground">{day.itemCount} items</span>
-                                    <span className="font-medium">{day.orderCount} orders</span>
+                                    <span className="text-xs text-muted-foreground">{item.itemCount} items</span>
+                                    <span className="font-medium">{item.orderCount} orders</span>
                                 </div>
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-blue-500 transition-all"
-                                    style={{ width: `${maxOrders > 0 ? (day.orderCount / maxOrders) * 100 : 0}%` }}
+                                    style={{ width: `${maxOrders > 0 ? (item.orderCount / maxOrders) * 100 : 0}%` }}
                                 />
                             </div>
                         </div>
@@ -65,5 +65,42 @@ export function OrdersChart({ data }: OrdersChartProps) {
             </CardContent>
         </Card>
     )
+}
+
+function getPeriodLabel(period: 'daily' | 'weekly' | 'monthly'): string {
+    switch (period) {
+        case 'daily': return 'Daily'
+        case 'weekly': return 'Weekly'
+        case 'monthly': return 'Monthly'
+    }
+}
+
+function getItemKey(item: OrderData, index: number): string {
+    if ('date' in item) return item.date
+    if ('weekStartDate' in item) return `${item.weekStartDate}-${item.weekNumber}`
+    if ('monthStartDate' in item) return `${item.monthStartDate}-${item.month}`
+    return index.toString()
+}
+
+function formatLabel(item: OrderData, period: 'daily' | 'weekly' | 'monthly'): string {
+    if (period === 'daily' && 'date' in item) {
+        return new Date(item.date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        })
+    }
+    
+    if (period === 'weekly' && 'weekStartDate' in item) {
+        return `Week ${item.weekNumber}, ${item.year}`
+    }
+    
+    if (period === 'monthly' && 'monthStartDate' in item) {
+        return new Date(item.monthStartDate).toLocaleDateString('en-US', {
+            month: 'short',
+            year: 'numeric'
+        })
+    }
+    
+    return 'Unknown'
 }
 

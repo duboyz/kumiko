@@ -21,6 +21,36 @@ export interface DailyRevenueStats {
     revenue: number
 }
 
+export interface WeeklyOrderStats {
+    weekStartDate: string
+    weekNumber: number
+    year: number
+    orderCount: number
+    itemCount: number
+}
+
+export interface WeeklyRevenueStats {
+    weekStartDate: string
+    weekNumber: number
+    year: number
+    revenue: number
+}
+
+export interface MonthlyOrderStats {
+    monthStartDate: string
+    month: number
+    year: number
+    orderCount: number
+    itemCount: number
+}
+
+export interface MonthlyRevenueStats {
+    monthStartDate: string
+    month: number
+    year: number
+    revenue: number
+}
+
 export interface OverallStats {
     totalOrders: number
     totalItemsSold: number
@@ -32,6 +62,10 @@ export interface DashboardStatsResult {
     topMenuItems: TopMenuItem[]
     dailyOrders: DailyOrderStats[]
     dailyRevenue: DailyRevenueStats[]
+    weeklyOrders: WeeklyOrderStats[]
+    weeklyRevenue: WeeklyRevenueStats[]
+    monthlyOrders: MonthlyOrderStats[]
+    monthlyRevenue: MonthlyRevenueStats[]
     overall: OverallStats
 }
 
