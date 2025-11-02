@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { authApi } from '../api'
 import { LoginRdto, RegisterRdto, AuthSdto, UserSdto, RefreshTokenResult } from '../types'
+import type { ForgotPasswordCommand, ResetPasswordCommand } from '../types/auth.types'
 import { useRouter } from 'next/navigation'
 import { useLocationStore } from '../stores/location-store'
 
@@ -92,6 +93,24 @@ export const useRefreshToken = () => {
       }
 
       window.location.href = '/login'
+    },
+  })
+}
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: (command: ForgotPasswordCommand) => authApi.forgotPassword(command),
+  })
+}
+
+export const useResetPassword = () => {
+  const router = useRouter()
+
+  return useMutation({
+    mutationFn: (command: ResetPasswordCommand) => authApi.resetPassword(command),
+    onSuccess: () => {
+      // Redirect to login after successful password reset
+      router.push('/login?reset=success')
     },
   })
 }

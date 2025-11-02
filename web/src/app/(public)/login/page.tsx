@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -22,8 +22,10 @@ type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const loginMutation = useLogin()
   const [error, setError] = useState<string | null>(null)
+  const [resetSuccess, setResetSuccess] = useState(false)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -32,6 +34,14 @@ export default function LoginPage() {
       password: '',
     },
   })
+
+  useEffect(() => {
+    if (searchParams.get('reset') === 'success') {
+      setResetSuccess(true)
+      // Clear the query parameter after 5 seconds
+      setTimeout(() => setResetSuccess(false), 5000)
+    }
+  }, [searchParams])
 
   const fillTestData = () => {
     // form.setValue("email", "test@example.com");
@@ -97,7 +107,12 @@ export default function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Password</FormLabel>
+                      <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+                        Forgot password?
+                      </Link>
+                    </div>
                     <FormControl>
                       <Input placeholder="Enter your password" type="password" {...field} />
                     </FormControl>
@@ -105,6 +120,12 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
+
+              {resetSuccess && (
+                <div className="text-sm text-green-600 bg-green-50 p-3 rounded-md">
+                  Password reset successful! You can now log in with your new password.
+                </div>
+              )}
 
               {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</div>}
 

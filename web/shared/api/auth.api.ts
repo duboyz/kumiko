@@ -1,4 +1,5 @@
 import { LoginRdto, RegisterRdto, AuthSdto, UserSdto, ResponseData, ApiResponse, RefreshTokenResult } from '@shared'
+import type { ForgotPasswordCommand, ForgotPasswordResult, ResetPasswordCommand, ResetPasswordResult } from '../types/auth.types'
 import apiClient from './client'
 
 export const authApi = {
@@ -41,6 +42,22 @@ export const authApi = {
     })
     if (!data.success) {
       throw new Error(data.message || 'Token refresh failed')
+    }
+    return data.data
+  },
+
+  forgotPassword: async (command: ForgotPasswordCommand): Promise<ResponseData<ForgotPasswordResult>> => {
+    const { data } = await apiClient.post<ApiResponse<ForgotPasswordResult>>('/api/auth/forgot-password', command)
+    if (!data.success) {
+      throw new Error(data.message || 'Failed to send password reset email')
+    }
+    return data.data
+  },
+
+  resetPassword: async (command: ResetPasswordCommand): Promise<ResponseData<ResetPasswordResult>> => {
+    const { data } = await apiClient.post<ApiResponse<ResetPasswordResult>>('/api/auth/reset-password', command)
+    if (!data.success) {
+      throw new Error(data.message || 'Failed to reset password')
     }
     return data.data
   },

@@ -17,6 +17,10 @@ public class User : BaseEntity
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiresAt { get; set; }
 
+    // Password reset
+    public string? PasswordResetToken { get; set; }
+    public DateTime? PasswordResetTokenExpiresAt { get; set; }
+
     public ICollection<UserRestaurant> Restaurants { get; set; } = [];
     public UserSubscription? Subscription { get; set; }
 }

@@ -1,41 +1,48 @@
-import type { User } from './user.types'
+import { UserSdto } from './user.types'
 
-export type ClientType = 'Web' | 'Mobile'
+// Forgot Password
+export interface ForgotPasswordCommand {
+  email: string
+}
 
+export interface ForgotPasswordResult {
+  message: string
+}
+
+// Reset Password
+export interface ResetPasswordCommand {
+  token: string
+  newPassword: string
+}
+
+export interface ResetPasswordResult {
+  message: string
+}
+
+// Login
 export interface LoginRdto {
   email: string
   password: string
-  clientType: ClientType
+  clientType?: string
 }
 
+export interface AuthSdto {
+  accessToken: string
+  refreshToken: string
+  user: UserSdto
+}
+
+// Register
 export interface RegisterRdto {
   email: string
   password: string
   firstName?: string
   lastName?: string
-  clientType: ClientType
+  clientType?: string
 }
 
-export interface AuthSdto {
-  accessToken?: string
-  refreshToken?: string
-  expiresAt?: string
-}
-
-export interface RefreshTokenRequest {
-  refreshToken?: string
-  clientType?: ClientType
-}
-
+// Refresh Token
 export interface RefreshTokenResult {
-  accessToken?: string
-  refreshToken?: string
-  expiresAt?: string
-}
-
-export interface AuthState {
-  user: User | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  expiresAt: Date | null
+  accessToken: string
+  refreshToken: string
 }
