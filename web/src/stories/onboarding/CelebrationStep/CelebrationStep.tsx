@@ -186,7 +186,7 @@ export function CelebrationStep({
       )
   }, [])
 
-  const websiteUrl = `http://${subdomain}.localhost:3003`
+  const websiteUrl = `http://${subdomain}.kumiko.no`
 
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(websiteUrl)

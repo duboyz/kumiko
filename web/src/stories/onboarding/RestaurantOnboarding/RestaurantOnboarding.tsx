@@ -203,7 +203,11 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
 
   const handleViewWebsite = () => {
     if (websiteData) {
-      window.open(`http://${websiteData.subdomain}.localhost:3003`, '_blank')
+      // Support both local dev and production URLs
+      const prodUrl = `https://${websiteData.subdomain}.kumiko.no`
+      const localUrl = `http://${websiteData.subdomain}.localhost:3003`
+      const url = process.env.NODE_ENV === 'production' ? prodUrl : localUrl
+      window.open(url, '_blank')
     }
   }
 

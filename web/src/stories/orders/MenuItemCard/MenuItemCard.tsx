@@ -29,17 +29,13 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
 
   // Helper function to get quantity from cart
   const getItemQuantity = (menuItemId: string, menuItemOptionId?: string) => {
-    const cartItem = cart.find(
-      item => item.menuItemId === menuItemId && item.menuItemOptionId === menuItemOptionId
-    )
+    const cartItem = cart.find(item => item.menuItemId === menuItemId && item.menuItemOptionId === menuItemOptionId)
     return cartItem?.quantity || 0
   }
 
   // Helper function to get cart index
   const getCartItemIndex = (menuItemId: string, menuItemOptionId?: string) => {
-    return cart.findIndex(
-      item => item.menuItemId === menuItemId && item.menuItemOptionId === menuItemOptionId
-    )
+    return cart.findIndex(item => item.menuItemId === menuItemId && item.menuItemOptionId === menuItemOptionId)
   }
 
   // Handle quantity decrease
@@ -69,34 +65,45 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
   const mainItemQuantity = getItemQuantity(item.id)
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow">
-      <CardContent>
+    <Card className="group overflow-hidden border-0 bg-gradient-to-br from-background to-muted/20 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
+      <CardContent className="p-6">
         {/* Header with name, price, and main action */}
-        <div className="flex justify-between items-start gap-3">
+        <div className="flex justify-between items-start gap-4">
           <div className="flex-1 min-w-0">
-            <div className="flex justify-between items-start gap-2 mb-1">
-              <h4 className="text-base font-semibold leading-tight">{item.name}</h4>
-              <span className="text-sm font-medium text-green-600 whitespace-nowrap">
-                {item.price !== null && item.price !== undefined ? formatPrice(item.price, currency) : ''}
-              </span>
+            <div className="flex justify-between items-start gap-3 mb-2">
+              <h4 className="text-lg font-semibold leading-tight text-foreground group-hover:text-primary transition-colors">
+                {item.name}
+              </h4>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <span className="text-lg font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                  {item.price !== null && item.price !== undefined ? formatPrice(item.price, currency) : ''}
+                </span>
+              </div>
             </div>
 
             {item.description && (
-              <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{item.description}</p>
+              <p className="text-sm text-muted-foreground mb-3 line-clamp-2 leading-relaxed">{item.description}</p>
             )}
 
             {/* Allergens - compact display */}
             {hasAllergens && (
-              <div className="flex items-center gap-1.5 mb-2">
-                <AlertCircle className="w-3 h-3 text-orange-500 flex-shrink-0" />
-                <div className="flex flex-wrap gap-1">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                <div className="flex flex-wrap gap-1.5">
                   {item.allergens.slice(0, 3).map(allergen => (
-                    <Badge key={allergen.id} variant="secondary" className="text-xs px-1.5 py-0.5">
+                    <Badge
+                      key={allergen.id}
+                      variant="secondary"
+                      className="text-xs px-2 py-1 bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 transition-colors"
+                    >
                       {allergen.name}
                     </Badge>
                   ))}
                   {item.allergens.length > 3 && (
-                    <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                    <Badge
+                      variant="secondary"
+                      className="text-xs px-2 py-1 bg-amber-50 text-amber-700 border-amber-200"
+                    >
                       +{item.allergens.length - 3}
                     </Badge>
                   )}
@@ -113,9 +120,9 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
                   size="sm"
                   variant="outline"
                   onClick={() => handleDecrease(item.id)}
-                  className="h-8 w-8 p-0"
+                  className="h-9 w-9 p-0 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-200"
                 >
-                  <Minus className="w-3 h-3" />
+                  <Minus className="w-4 h-4" />
                 </Button>
               )}
               {mainItemQuantity > 0 && (
@@ -123,15 +130,15 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
                   type="number"
                   value={mainItemQuantity}
                   readOnly
-                  className="w-12 h-8 text-center p-0"
+                  className="w-14 h-9 text-center p-0 border-primary/20 focus:border-primary/40 transition-colors"
                 />
               )}
               <Button
                 size="sm"
                 onClick={() => handleIncrease(item.id, item.name, item.price || 0)}
-                className="h-8 w-8 p-0"
+                className="h-9 w-9 p-0 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95"
               >
-                <Plus className="w-3 h-3" />
+                <Plus className="w-4 h-4" />
               </Button>
             </div>
           )}
@@ -139,43 +146,48 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
 
         {/* Options section */}
         {hasOptions && (
-          <div className="mt-3">
+          <div className="mt-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowOptions(!showOptions)}
-              className="w-full justify-between p-2 h-auto"
+              className="w-full justify-between p-3 h-auto hover:bg-muted/30 active:scale-100 focus:scale-100 hover:scale-100 transition-colors rounded-lg"
             >
-              <span className="text-sm font-medium">
+              <span className="text-sm font-medium text-muted-foreground">
                 {item.options.length} option{item.options.length !== 1 ? 's' : ''} available
               </span>
               {showOptions ? (
-                <ChevronUp className="w-4 h-4" />
+                <ChevronUp className="w-4 h-4 text-muted-foreground" />
               ) : (
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
               )}
             </Button>
 
-            {showOptions && (
-              <div className="mt-2 space-y-2 border-t pt-2">
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                showOptions ? 'max-h-[2000px] opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'
+              }`}
+            >
+              <div className="space-y-3 border-t border-border/50 pt-4">
                 {item.options
                   .sort((a, b) => a.orderIndex - b.orderIndex)
                   .map(option => {
                     const optionQuantity = getItemQuantity(item.id, option.id)
                     return (
-                      <div key={option.id} className="flex justify-between items-center gap-2">
+                      <div
+                        key={option.id}
+                        className="flex justify-between items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                      >
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">{option.name}</span>
+                            <span className="text-sm font-medium text-foreground">{option.name}</span>
                             {option.description && (
-                              <span className="text-xs text-muted-foreground truncate">
-                                {option.description}
-                              </span>
+                              <span className="text-xs text-muted-foreground truncate">{option.description}</span>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-green-600">
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                             {formatPrice(option.price, currency)}
                           </span>
                           <div className="flex items-center gap-2">
@@ -184,7 +196,7 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleDecrease(item.id, option.id)}
-                                className="h-8 w-8 p-0"
+                                className="h-8 w-8 p-0 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-200"
                               >
                                 <Minus className="w-3 h-3" />
                               </Button>
@@ -194,15 +206,13 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
                                 type="number"
                                 value={optionQuantity}
                                 readOnly
-                                className="w-12 h-8 text-center p-0"
+                                className="w-12 h-8 text-center p-0 border-primary/20 focus:border-primary/40 transition-colors"
                               />
                             )}
                             <Button
                               size="sm"
-                              onClick={() =>
-                                handleIncrease(item.id, item.name, option.price, option.id, option.name)
-                              }
-                              className="h-8 w-8 p-0"
+                              onClick={() => handleIncrease(item.id, item.name, option.price, option.id, option.name)}
+                              className="h-8 w-8 p-0 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95"
                             >
                               <Plus className="w-3 h-3" />
                             </Button>
@@ -212,7 +222,7 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
                     )
                   })}
               </div>
-            )}
+            </div>
           </div>
         )}
       </CardContent>
