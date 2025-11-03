@@ -8,6 +8,12 @@
     "scheme": "kumikoadmin",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "owner": "duboyz",
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.kumikoadmin"
