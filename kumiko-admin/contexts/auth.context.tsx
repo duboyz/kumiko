@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { authService } from '@/services/auth.service'
 import { storageService } from '@/services/storage.service'
 import { restaurantService } from '@/services/restaurant.service'
+import { notificationService } from '@/services/notification.service'
 import { UserRestaurantDto } from '@/types/restaurant.types'
 
 interface AuthContextType {
@@ -83,6 +84,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const selectLocation = async (locationId: string) => {
     await storageService.saveSelectedLocation(locationId)
     setSelectedLocationId(locationId)
+
+    // Register device for push notifications
+    await notificationService.registerForRestaurant(locationId)
   }
 
   const clearLocation = async () => {

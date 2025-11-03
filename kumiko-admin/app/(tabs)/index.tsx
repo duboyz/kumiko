@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/auth.context'
 import { orderService } from '@/services/order.service'
 import { OrderDto } from '@/types/order.types'
 import OrderDetailModal from '@/components/OrderDetailModal'
+import { notificationService } from '@/services/notification.service'
 
 export default function HomeScreen() {
   const { selectedLocationId, selectedLocation } = useAuth()
@@ -23,9 +24,40 @@ export default function HomeScreen() {
   const [selectedOrder, setSelectedOrder] = useState<OrderDto | null>(null)
   const [modalVisible, setModalVisible] = useState(false)
 
+  const notificationListener = useRef<any>(null)
+  const responseListener = useRef<any>(null)
+
   useEffect(() => {
     if (selectedLocationId) {
       loadOrders()
+    }
+  }, [selectedLocationId])
+
+  useEffect(() => {
+    // Set up notification handlers
+    notificationListener.current = notificationService.addNotificationReceivedListener(
+      (notification) => {
+        console.log('Notification received:', notification)
+        // Refresh orders when notification is received
+        if (selectedLocationId) {
+          loadOrders()
+        }
+      }
+    )
+
+    responseListener.current = notificationService.addNotificationResponseListener(
+      (response) => {
+        console.log('Notification tapped:', response)
+        // Refresh orders when notification is tapped
+        if (selectedLocationId) {
+          loadOrders()
+        }
+      }
+    )
+
+    return () => {
+      notificationListener.current?.remove()
+      responseListener.current?.remove()
     }
   }, [selectedLocationId])
 

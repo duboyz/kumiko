@@ -31,6 +31,7 @@ public static class DependencyInjectionConfiguration
         services.AddScoped<ISubscriptionService, SubscriptionService>();
         services.AddScoped<ITwilioSmsService, TwilioSmsService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddSingleton<IExpoNotificationService, ExpoNotificationService>();
 
 
         // Repositories
