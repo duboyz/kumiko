@@ -49,6 +49,7 @@ public class RegisterHandler(
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
+                    Domain = GetCookieDomain(httpContext),
                     Expires = expiresAt
                 };
 
@@ -59,6 +60,7 @@ public class RegisterHandler(
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
+                    Domain = GetCookieDomain(httpContext),
                     Expires = DateTime.UtcNow.AddDays(7) // Refresh token lasts longer
                 };
 
@@ -75,5 +77,21 @@ public class RegisterHandler(
         }
 
         throw new ArgumentException("Invalid client type");
+    }
+
+    private static string? GetCookieDomain(HttpContext httpContext)
+    {
+        var host = httpContext.Request.Host.Host;
+
+        // For localhost, don't set domain (cookies work on exact host)
+        if (host == "localhost" || host == "127.0.0.1")
+            return null;
+
+        // For production (api.kumiko.no), set domain to .kumiko.no for cross-subdomain sharing
+        if (host.EndsWith(".kumiko.no") || host == "kumiko.no")
+            return ".kumiko.no";
+
+        // For Railway preview environments or other domains, don't set domain
+        return null;
     }
 }

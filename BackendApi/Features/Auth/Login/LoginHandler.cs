@@ -51,6 +51,7 @@ public class LoginHandler(
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
+                    Domain = GetCookieDomain(httpContext),
                     Expires = expiresAt
                 };
 
@@ -61,6 +62,7 @@ public class LoginHandler(
                     HttpOnly = true,
                     Secure = true, // Required for SameSite=None
                     SameSite = SameSiteMode.None, // Allow cross-origin requests
+                    Domain = GetCookieDomain(httpContext),
                     Expires = DateTime.UtcNow.AddDays(7) // Refresh token lasts longer
                 };
 
@@ -77,5 +79,18 @@ public class LoginHandler(
         }
 
         throw new ArgumentException("Invalid client type");
+    }
+
+    private static string? GetCookieDomain(HttpContext httpContext)
+    {
+        var host = httpContext.Request.Host.Host;
+
+        if (host == "localhost" || host == "127.0.0.1")
+            return null;
+
+        if (host.EndsWith(".kumiko.no") || host == "kumiko.no")
+            return ".kumiko.no";
+
+        return null;
     }
 }
