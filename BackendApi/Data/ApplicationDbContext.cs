@@ -12,6 +12,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     // Restaurant-related DbSets
     public DbSet<Restaurant> Restaurants { get; set; }
     public DbSet<UserRestaurant> UserRestaurants { get; set; }
+    public DbSet<DeviceToken> DeviceTokens { get; set; }
 
     // Hospitality-related DbSets
     public DbSet<Hospitality> Hospitalities { get; set; }

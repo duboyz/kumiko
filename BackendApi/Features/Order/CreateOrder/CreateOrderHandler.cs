@@ -1,11 +1,15 @@
 using BackendApi.Data;
 using BackendApi.Entities;
+using BackendApi.Services;
 using BackendApi.Shared.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendApi.Features.Order.CreateOrder;
 
-public class CreateOrderHandler(ApplicationDbContext context) : ICommandHandler<CreateOrderCommand, CreateOrderResult>
+public class CreateOrderHandler(
+    ApplicationDbContext context,
+    IExpoNotificationService notificationService,
+    ILogger<CreateOrderHandler> logger) : ICommandHandler<CreateOrderCommand, CreateOrderResult>
 {
     public async Task<CreateOrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
@@ -119,6 +123,39 @@ public class CreateOrderHandler(ApplicationDbContext context) : ICommandHandler<
         }
 
         await context.SaveChangesAsync(cancellationToken);
+
+        // Send push notifications to all devices registered for this restaurant
+        try
+        {
+            var deviceTokens = await context.DeviceTokens
+                .Where(dt => dt.RestaurantId == order.RestaurantId)
+                .Select(dt => dt.ExpoPushToken)
+                .ToListAsync(cancellationToken);
+
+            if (deviceTokens.Count > 0)
+            {
+                var notificationData = new Dictionary<string, object>
+                {
+                    { "orderId", order.Id.ToString() },
+                    { "restaurantId", order.RestaurantId.ToString() },
+                    { "type", "new_order" }
+                };
+
+                await notificationService.SendPushNotificationsAsync(
+                    deviceTokens,
+                    "New Order Received! 🎉",
+                    $"Order from {order.CustomerName} - {totalAmount:C}",
+                    notificationData
+                );
+
+                logger.LogInformation($"Sent push notifications for order {order.Id} to {deviceTokens.Count} devices");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Failed to send push notifications for order {order.Id}");
+            // Don't fail the order creation if push notifications fail
+        }
 
         return new CreateOrderResult(
             order.Id,
