@@ -13,16 +13,32 @@ import { useAuth } from '@/contexts/auth.context'
 import { useRouter } from 'expo-router'
 import { restaurantService } from '@/services/restaurant.service'
 import { UserRestaurantDto } from '@/types/restaurant.types'
+import { notificationService } from '@/services/notification.service'
+import * as Clipboard from 'expo-clipboard'
 
 export default function SettingsScreen() {
   const { selectedLocation, logout, selectLocation } = useAuth()
   const [restaurants, setRestaurants] = useState<UserRestaurantDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [expoPushToken, setExpoPushToken] = useState<string | null>(null)
+  const [isLoadingToken, setIsLoadingToken] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
     loadRestaurants()
+    loadExpoPushToken()
   }, [])
+
+  const loadExpoPushToken = async () => {
+    try {
+      const token = await notificationService.getExpoPushToken()
+      setExpoPushToken(token)
+    } catch (error) {
+      console.error('Failed to load expo push token:', error)
+    } finally {
+      setIsLoadingToken(false)
+    }
+  }
 
   const loadRestaurants = async () => {
     try {
@@ -41,6 +57,13 @@ export default function SettingsScreen() {
       Alert.alert('Success', `Switched to ${restaurant.restaurant.name}`)
     } catch (error) {
       Alert.alert('Error', 'Failed to change location')
+    }
+  }
+
+  const handleCopyToken = async () => {
+    if (expoPushToken) {
+      await Clipboard.setStringAsync(expoPushToken)
+      Alert.alert('Copied', 'Push token copied to clipboard')
     }
   }
 
@@ -115,6 +138,35 @@ export default function SettingsScreen() {
                   </TouchableOpacity>
                 )
               })}
+            </View>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Push Notifications</Text>
+          {isLoadingToken ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator color="#000" />
+            </View>
+          ) : expoPushToken ? (
+            <View style={styles.tokenCard}>
+              <View style={styles.tokenContent}>
+                <Text style={styles.tokenLabel}>Expo Push Token</Text>
+                <Text style={styles.tokenText} numberOfLines={2} ellipsizeMode="middle">
+                  {expoPushToken}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.copyButton}
+                onPress={handleCopyToken}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.copyButtonText}>Copy</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.tokenCard}>
+              <Text style={styles.noTokenText}>No push token available</Text>
             </View>
           )}
         </View>
@@ -279,5 +331,49 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  tokenCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    marginBottom: 8,
+  },
+  tokenContent: {
+    gap: 8,
+    marginBottom: 12,
+  },
+  tokenLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6b7280',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  tokenText: {
+    fontSize: 13,
+    color: '#1f2937',
+    fontFamily: 'monospace',
+    lineHeight: 20,
+  },
+  copyButton: {
+    backgroundColor: '#000000',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+  },
+  copyButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  noTokenText: {
+    fontSize: 14,
+    color: '#6b7280',
+    textAlign: 'center',
   },
 })

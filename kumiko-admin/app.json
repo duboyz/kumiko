@@ -8,7 +8,7 @@
     "scheme": "kumikoadmin",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "owner": "duboyz",
+    "owner": "vegardlokreim",
     "extra": {
       "eas": {
         "projectId": "f2f0805a-8db2-4ade-a771-d71fffe16efc"
@@ -35,6 +35,15 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ffffff",
+          "sounds": [],
+          "mode": "production"
+        }
+      ],
       [
         "expo-splash-screen",
         {
