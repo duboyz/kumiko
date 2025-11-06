@@ -1,4 +1,5 @@
 using BackendApi.Shared.Contracts;
+using BackendApi.Entities;
 
 namespace BackendApi.Features.RestaurantMenu.GetMenuById;
 
@@ -11,6 +12,7 @@ public record GetMenuByIdResult(
     string Name,
     string? Description,
     Guid RestaurantId,
+    Currency Currency,
     IEnumerable<MenuByIdCategoryDto> Categories
 );
 

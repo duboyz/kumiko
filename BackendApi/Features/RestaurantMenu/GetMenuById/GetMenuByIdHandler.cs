@@ -9,6 +9,7 @@ public class GetMenuByIdHandler(ApplicationDbContext context) : IQueryHandler<Ge
     public async Task<GetMenuByIdResult> Handle(GetMenuByIdQuery request, CancellationToken cancellationToken)
     {
         var menu = await context.RestaurantMenus
+            .Include(m => m.Restaurant)
             .Include(m => m.Categories)
                 .ThenInclude(c => c.MenuCategoryItems)
                     .ThenInclude(mci => mci.MenuItem)
@@ -67,6 +68,7 @@ public class GetMenuByIdHandler(ApplicationDbContext context) : IQueryHandler<Ge
             menu.Name,
             menu.Description,
             menu.RestaurantId,
+            menu.Restaurant.Currency,
             categories
         );
     }

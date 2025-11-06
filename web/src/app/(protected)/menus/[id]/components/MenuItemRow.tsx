@@ -410,7 +410,7 @@ export const MenuItemRow = ({
                   const prices = item.menuItem.options.map(opt => opt.price)
                   const minPrice = Math.min(...prices)
                   const maxPrice = Math.max(...prices)
-                  return `${minPrice.toFixed(0)}-${maxPrice.toFixed(0)}`
+                  return `${formatPrice(minPrice, currency)} - ${formatPrice(maxPrice, currency)}`
                 })()
               ) : item.menuItem.price ? (
                 formatPrice(item.menuItem.price, currency)

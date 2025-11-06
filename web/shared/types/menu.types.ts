@@ -1,3 +1,5 @@
+import { Currency } from './localization.types'
+
 // Menu types based on backend entities
 export interface RestaurantMenuDto {
   id: string
@@ -169,6 +171,7 @@ export interface GetMenuByIdResult {
   name: string
   description?: string
   restaurantId: string
+  currency: Currency
   categories: PublicMenuCategoryDto[]
 }
 

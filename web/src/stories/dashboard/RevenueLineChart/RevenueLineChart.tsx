@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { DollarSign } from 'lucide-react'
-import { formatPrice, getCurrencySymbol } from '@shared'
+import { formatPrice, formatCurrencyShort } from '@shared'
 import type { DailyRevenueStats, WeeklyRevenueStats, MonthlyRevenueStats, Currency } from '@shared'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
@@ -128,16 +128,5 @@ function formatLabel(item: RevenueData, period: 'daily' | 'weekly' | 'monthly'):
     }
 
     return 'Unknown'
-}
-
-function formatCurrencyShort(value: number, currency: Currency): string {
-    const symbol = getCurrencySymbol(currency)
-    if (value >= 1000000) {
-        return `${symbol}${(value / 1000000).toFixed(1)}M`
-    }
-    if (value >= 1000) {
-        return `${symbol}${(value / 1000).toFixed(1)}K`
-    }
-    return `${symbol}${value.toFixed(0)}`
 }
 

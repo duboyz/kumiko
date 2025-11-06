@@ -49,6 +49,7 @@ function MenuSectionWithFetch({
       allowOrdering={allowOrdering}
       isEditing={false}
       restaurantId={menuData.restaurantId}
+      currency={menuData.currency}
     />
   )
 }
