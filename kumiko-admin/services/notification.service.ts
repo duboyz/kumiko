@@ -97,6 +97,7 @@ export const notificationService = {
 
     const success = await this.registerDeviceToken(restaurantId, token)
     if (success) {
+      console.log('Token:', token)
       console.log('Device successfully registered for push notifications')
     } else {
       console.log('Failed to register device for push notifications')

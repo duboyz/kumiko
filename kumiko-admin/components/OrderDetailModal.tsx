@@ -106,149 +106,149 @@ export default function OrderDetailModal({ visible, order, onClose, onStatusUpda
         </View>
 
         <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
-            <View style={styles.statusSection}>
-              <Text style={styles.statusSectionTitle}>Current Status</Text>
-              <View style={[styles.statusBadgeLarge, { backgroundColor: getStatusColor(order.status) }]}>
-                <Text style={styles.statusTextLarge}>{order.status}</Text>
-              </View>
+          <View style={styles.statusSection}>
+            <Text style={styles.statusSectionTitle}>Current Status</Text>
+            <View style={[styles.statusBadgeLarge, { backgroundColor: getStatusColor(order.status) }]}>
+              <Text style={styles.statusTextLarge}>{order.status}</Text>
             </View>
+          </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Change Status</Text>
-              <View style={styles.statusSelectContainer}>
-                {availableStatuses.map((status) => (
-                  <TouchableOpacity
-                    key={status}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Change Status</Text>
+            <View style={styles.statusSelectContainer}>
+              {availableStatuses.map((status) => (
+                <TouchableOpacity
+                  key={status}
+                  style={[
+                    styles.statusSelectOption,
+                    order.status === status && styles.statusSelectOptionActive,
+                  ]}
+                  onPress={() => handleStatusChange(status)}
+                  disabled={isUpdating}
+                  activeOpacity={0.7}
+                >
+                  <View
                     style={[
-                      styles.statusSelectOption,
-                      order.status === status && styles.statusSelectOptionActive,
+                      styles.statusDot,
+                      { backgroundColor: getStatusColor(status) },
                     ]}
-                    onPress={() => handleStatusChange(status)}
-                    disabled={isUpdating}
-                    activeOpacity={0.7}
+                  />
+                  <Text
+                    style={[
+                      styles.statusSelectText,
+                      order.status === status && styles.statusSelectTextActive,
+                    ]}
                   >
-                    <View
-                      style={[
-                        styles.statusDot,
-                        { backgroundColor: getStatusColor(status) },
-                      ]}
-                    />
-                    <Text
-                      style={[
-                        styles.statusSelectText,
-                        order.status === status && styles.statusSelectTextActive,
-                      ]}
-                    >
-                      {status}
-                    </Text>
-                    {order.status === status && (
-                      <Text style={styles.checkIcon}>✓</Text>
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-              {isUpdating && (
-                <View style={styles.updatingOverlay}>
-                  <ActivityIndicator color="#000" />
-                  <Text style={styles.updatingText}>Updating status...</Text>
-                </View>
-              )}
+                    {status}
+                  </Text>
+                  {order.status === status && (
+                    <Text style={styles.checkIcon}>✓</Text>
+                  )}
+                </TouchableOpacity>
+              ))}
             </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Customer Information</Text>
-              <View style={styles.infoCard}>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Name</Text>
-                  <Text style={styles.infoValue}>{order.customerName}</Text>
-                </View>
-                <View style={styles.divider} />
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Phone</Text>
-                  <Text style={styles.infoValue}>{order.customerPhone}</Text>
-                </View>
-                <View style={styles.divider} />
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Email</Text>
-                  <Text style={[styles.infoValue, styles.emailText]}>{order.customerEmail}</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Pickup Details</Text>
-              <View style={styles.infoCard}>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Date</Text>
-                  <Text style={styles.infoValue}>{formatDate(order.pickupDate)}</Text>
-                </View>
-                <View style={styles.divider} />
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Time</Text>
-                  <Text style={styles.infoValue}>{order.pickupTime}</Text>
-                </View>
-              </View>
-            </View>
-
-            {order.additionalNote && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Additional Notes</Text>
-                <View style={styles.noteCard}>
-                  <Text style={styles.noteText}>{order.additionalNote}</Text>
-                </View>
+            {isUpdating && (
+              <View style={styles.updatingOverlay}>
+                <ActivityIndicator color="#000" />
+                <Text style={styles.updatingText}>Updating status...</Text>
               </View>
             )}
+          </View>
 
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Customer Information</Text>
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Name</Text>
+                <Text style={styles.infoValue}>{order.customerName}</Text>
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Phone</Text>
+                <Text style={styles.infoValue}>{order.customerPhone}</Text>
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Email</Text>
+                <Text style={[styles.infoValue, styles.emailText]}>{order.customerEmail}</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Pickup Details</Text>
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Date</Text>
+                <Text style={styles.infoValue}>{formatDate(order.pickupDate)}</Text>
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Time</Text>
+                <Text style={styles.infoValue}>{order.pickupTime}</Text>
+              </View>
+            </View>
+          </View>
+
+          {order.additionalNote && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Order Items</Text>
-              <View style={styles.itemsCard}>
-                {order.orderItems.map((item, index) => (
-                  <View key={item.id}>
-                    {index > 0 && <View style={styles.divider} />}
-                    <View style={styles.orderItem}>
-                      <View style={styles.orderItemLeft}>
-                        <Text style={styles.quantityText}>{item.quantity}x</Text>
-                        <View style={styles.itemDetails}>
-                          <Text style={styles.itemName}>{item.menuItemName}</Text>
-                          {item.menuItemOptionName && (
-                            <Text style={styles.itemOption}>{item.menuItemOptionName}</Text>
-                          )}
-                          {item.specialInstructions && (
-                            <Text style={styles.itemInstructions}>
-                              Note: {item.specialInstructions}
-                            </Text>
-                          )}
-                        </View>
+              <Text style={styles.sectionTitle}>Additional Notes</Text>
+              <View style={styles.noteCard}>
+                <Text style={styles.noteText}>{order.additionalNote}</Text>
+              </View>
+            </View>
+          )}
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Order Items</Text>
+            <View style={styles.itemsCard}>
+              {order.orderItems.map((item, index) => (
+                <View key={item.id}>
+                  {index > 0 && <View style={styles.divider} />}
+                  <View style={styles.orderItem}>
+                    <View style={styles.orderItemLeft}>
+                      <Text style={styles.quantityText}>{item.quantity}x</Text>
+                      <View style={styles.itemDetails}>
+                        <Text style={styles.itemName}>{item.menuItemName}</Text>
+                        {item.menuItemOptionName && (
+                          <Text style={styles.itemOption}>{item.menuItemOptionName}</Text>
+                        )}
+                        {item.specialInstructions && (
+                          <Text style={styles.itemInstructions}>
+                            Note: {item.specialInstructions}
+                          </Text>
+                        )}
                       </View>
-                      <Text style={styles.itemPrice}>{formatCurrency(item.priceAtOrder)}</Text>
                     </View>
+                    <Text style={styles.itemPrice}>{formatCurrency(item.priceAtOrder)}</Text>
                   </View>
-                ))}
-              </View>
-            </View>
-
-            <View style={styles.totalSection}>
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total Amount</Text>
-                <Text style={styles.totalAmount}>{formatCurrency(order.totalAmount)}</Text>
-              </View>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Order Timeline</Text>
-              <View style={styles.infoCard}>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Created</Text>
-                  <Text style={styles.infoValue}>{formatDate(order.createdAt)}</Text>
                 </View>
-                <View style={styles.divider} />
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Updated</Text>
-                  <Text style={styles.infoValue}>{formatDate(order.updatedAt)}</Text>
-                </View>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.totalSection}>
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Total Amount</Text>
+              <Text style={styles.totalAmount}>{formatCurrency(order.totalAmount)}</Text>
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Order Timeline</Text>
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Created</Text>
+                <Text style={styles.infoValue}>{formatDate(order.createdAt)}</Text>
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Updated</Text>
+                <Text style={styles.infoValue}>{formatDate(order.updatedAt)}</Text>
               </View>
             </View>
-          </ScrollView>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     </Modal>
   )
