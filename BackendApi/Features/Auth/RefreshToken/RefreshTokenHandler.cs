@@ -54,6 +54,7 @@ public class RefreshTokenHandler(
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
+                    Domain = GetCookieDomain(httpContext),
                     Expires = expiresAt
                 };
 
@@ -64,6 +65,7 @@ public class RefreshTokenHandler(
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
+                    Domain = GetCookieDomain(httpContext),
                     Expires = DateTime.UtcNow.AddDays(7)
                 };
 
@@ -80,5 +82,18 @@ public class RefreshTokenHandler(
         }
 
         throw new ArgumentException("Invalid client type");
+    }
+
+    private static string? GetCookieDomain(HttpContext httpContext)
+    {
+        var host = httpContext.Request.Host.Host;
+
+        if (host == "localhost" || host == "127.0.0.1")
+            return null;
+
+        if (host.EndsWith(".kumiko.no") || host == "kumiko.no")
+            return ".kumiko.no";
+
+        return null;
     }
 }

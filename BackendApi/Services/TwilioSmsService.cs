@@ -28,7 +28,13 @@ public class TwilioSmsService : ITwilioSmsService
                 phoneNumber = $"+47{phoneNumber}";
             }
 
-            companyName = companyName.ToUpper().Substring(0, 11);
+            // Truncate company name to max 11 characters (Twilio requirement)
+            // Handle cases where name is shorter than 11 characters
+            companyName = companyName.ToUpper();
+            if (companyName.Length > 11)
+            {
+                companyName = companyName.Substring(0, 11);
+            }
 
             var messageResource = await MessageResource.CreateAsync(
                 to: new PhoneNumber(phoneNumber),
