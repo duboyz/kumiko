@@ -44,7 +44,7 @@ export function OrderForm({ menu, restaurantId, currency = Currency.USD, classNa
     menuItemOptionName?: string
   ) => {
     addToCartStore(menuItemId, menuItemName, price, menuItemOptionId, menuItemOptionName)
-    toast.success(`Added ${menuItemName} to cart`)
+    // toast.success(`Added ${menuItemName} to cart`)
   }
 
   const handleProceedToCheckout = () => {
