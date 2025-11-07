@@ -9,8 +9,10 @@ import { PinBasedAnnotationStep, PinAnnotation } from '@/stories/menus/MenuImpor
 import { ProcessStep } from '@/app/(protected)/menus/import/components/ProcessStep'
 import { StructureReviewStep } from '@/app/(protected)/menus/import/components/StructureReviewStep'
 import { useImportFlow } from '@/app/(protected)/menus/import/hooks/useImportFlow'
-import { useCreateMenuStructure } from '@shared'
+import { useCreateMenuStructure, useCreateRestaurantMenu, useRestaurantMenus } from '@shared'
 import { toast } from 'sonner'
+import { RestaurantMenu } from '@/stories/menus/EditableRestaurantMenu/RestaurantMenu/RestaurantMenu'
+import { PenTool } from 'lucide-react'
 
 interface MenuImportWizardProps {
   restaurantId: string
@@ -25,9 +27,15 @@ export enum ImportStep {
   PREVIEW = 'preview',
   PROCESS = 'process',
   REVIEW = 'review',
+  BUILD_MANUAL = 'build_manual',
 }
 
-export type ImportStepType = ImportStep.UPLOAD | ImportStep.PREVIEW | ImportStep.PROCESS | ImportStep.REVIEW
+export type ImportStepType =
+  | ImportStep.UPLOAD
+  | ImportStep.PREVIEW
+  | ImportStep.PROCESS
+  | ImportStep.REVIEW
+  | ImportStep.BUILD_MANUAL
 
 const getStepNumber = (step: ImportStep): number => {
   switch (step) {
@@ -39,6 +47,8 @@ const getStepNumber = (step: ImportStep): number => {
       return 3
     case ImportStep.REVIEW:
       return 4
+    case ImportStep.BUILD_MANUAL:
+      return 1 // Manual build is an alternative to upload
     default:
       return 1
   }
@@ -61,6 +71,7 @@ export function MenuImportWizard({
   const [menuImages, setMenuImages] = useState<MenuImage[]>([])
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [allAnnotations, setAllAnnotations] = useState<PinAnnotation[]>([])
+  const [createdMenuId, setCreatedMenuId] = useState<string | null>(null)
 
   const {
     imageFile,
@@ -83,6 +94,8 @@ export function MenuImportWizard({
   } = useImportFlow()
 
   const createMenuStructure = useCreateMenuStructure()
+  const createRestaurantMenu = useCreateRestaurantMenu()
+  const { data: menusData, refetch: refetchMenus } = useRestaurantMenus(restaurantId)
 
   const handleImagesSelect = (images: MenuImage[]) => {
     setMenuImages(images)
@@ -160,6 +173,31 @@ export function MenuImportWizard({
     }
   }
 
+  const handleBuildManually = async () => {
+    try {
+      const result = await createRestaurantMenu.mutateAsync({
+        restaurantId,
+        name: 'Main Menu',
+        description: 'Our carefully crafted selection of dishes',
+      })
+
+      if (result?.id) {
+        setCreatedMenuId(result.id)
+        await refetchMenus()
+        setCurrentStep(ImportStep.BUILD_MANUAL)
+      }
+    } catch (error) {
+      console.error('Failed to create menu:', error)
+      toast.error('Failed to create menu')
+    }
+  }
+
+  const handleManualMenuContinue = () => {
+    if (createdMenuId) {
+      onMenuCreated(createdMenuId)
+    }
+  }
+
   const handleBack = () => {
     if (currentStep === ImportStep.UPLOAD) {
       onBack()
@@ -169,6 +207,8 @@ export function MenuImportWizard({
       setCurrentStep(ImportStep.PREVIEW)
     } else if (currentStep === ImportStep.REVIEW) {
       setCurrentStep(ImportStep.PROCESS)
+    } else if (currentStep === ImportStep.BUILD_MANUAL) {
+      setCurrentStep(ImportStep.UPLOAD)
     }
   }
 
@@ -237,8 +277,42 @@ export function MenuImportWizard({
 
       {/* Step Content */}
       {currentStep === ImportStep.UPLOAD && (
-        <MultiImageUploadStep onImagesSelect={handleImagesSelect} onBack={handleBack} />
+        <MultiImageUploadStep
+          onImagesSelect={handleImagesSelect}
+          onBack={handleBack}
+          onBuildManually={handleBuildManually}
+        />
       )}
+
+      {currentStep === ImportStep.BUILD_MANUAL &&
+        createdMenuId &&
+        menusData?.menus &&
+        (() => {
+          const menu = menusData.menus.find(m => m.id === createdMenuId)
+          return menu ? (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold mb-2">Build Your Menu</h2>
+                <p className="text-muted-foreground">Add categories and items to build your menu manually</p>
+              </div>
+
+              <div className="border rounded-lg p-6">
+                <RestaurantMenu menu={menu} />
+              </div>
+
+              <div className="flex items-center justify-between pt-6">
+                <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </Button>
+                <Button onClick={handleManualMenuContinue} size="lg" className="flex items-center gap-2">
+                  Continue
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          ) : null
+        })()}
 
       {currentStep === ImportStep.PREVIEW && imageFile && imagePreview && (
         <div className="space-y-4">

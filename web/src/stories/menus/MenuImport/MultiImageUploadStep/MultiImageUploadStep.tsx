@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ArrowRight, ArrowLeft, X, Plus, Trash2, Upload } from 'lucide-react'
+import { ArrowRight, ArrowLeft, X, Plus, Trash2, Upload, PenTool } from 'lucide-react'
 import { Dropzone } from '../Dropzone/Dropzone'
 import { gsap } from 'gsap'
 import Image from 'next/image'
@@ -20,9 +20,10 @@ export interface MenuImage {
 interface MultiImageUploadStepProps {
   onImagesSelect: (images: MenuImage[]) => void
   onBack: () => void
+  onBuildManually?: () => void
 }
 
-export function MultiImageUploadStep({ onImagesSelect, onBack }: MultiImageUploadStepProps) {
+export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }: MultiImageUploadStepProps) {
   const [images, setImages] = useState<MenuImage[]>([])
   const [isAnimating, setIsAnimating] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -207,6 +208,23 @@ export function MultiImageUploadStep({ onImagesSelect, onBack }: MultiImageUploa
             onFileSelect={handleFilesSelect}
             className="border-2 border-dashed rounded-lg p-6 text-center max-w-md mx-auto"
           />
+
+          {/* Divider */}
+          <div className="flex items-center gap-4 max-w-md mx-auto">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-sm text-muted-foreground">or</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
+          {/* Build Manually Option */}
+          {onBuildManually && (
+            <div className="flex justify-center">
+              <Button variant="outline" onClick={onBuildManually} className="flex items-center gap-2">
+                <PenTool className="w-4 h-4" />
+                Build Menu Manually
+              </Button>
+            </div>
+          )}
         </div>
       )}
 

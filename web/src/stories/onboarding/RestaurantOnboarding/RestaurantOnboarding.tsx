@@ -81,6 +81,11 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
     setCurrentStep('details')
   }
 
+  const handleAddDetailsManually = () => {
+    // Allow manual entry without requiring a selected business
+    setCurrentStep('details')
+  }
+
   const handleContinueToHours = () => {
     if (!businessDetails) {
       toast.error('Please fill in business details')
@@ -452,7 +457,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
                         <Building2 className="w-4 h-4 text-orange-600" />
                         Don't see your restaurant? No problem at all!
                       </p>
-                      <Button onClick={handleContinueToDetails} variant="outline" className="w-full max-w-sm">
+                      <Button onClick={handleAddDetailsManually} variant="outline" className="w-full max-w-sm">
                         Add your details manually
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
@@ -465,7 +470,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
         )}
 
         {currentStep === 'details' && (
-          <BusinessDetailsEditor businessData={selectedBusiness!} onChange={setBusinessDetails} />
+          <BusinessDetailsEditor businessData={selectedBusiness || undefined} onChange={setBusinessDetails} />
         )}
 
         {currentStep === 'hours' && (
