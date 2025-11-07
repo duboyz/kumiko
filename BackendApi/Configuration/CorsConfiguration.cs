@@ -15,7 +15,7 @@ public static class CorsConfiguration
                         return true;
 
                     // Allow localhost subdomains with port 3000
-                    if (origin.StartsWith("http://") && origin.EndsWith(".localhost:3000"))
+                    if (origin.StartsWith("http://") && (origin.EndsWith(".localhost:3000") || origin.EndsWith(".localhost:3003")))
                         return true;
 
                     // Allow specific production domains
