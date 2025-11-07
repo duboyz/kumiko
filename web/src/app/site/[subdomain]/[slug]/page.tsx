@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 import { useWebsiteBySubdomain, useRestaurantMenus } from '@shared'
 import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components'
-import { WebsitePage } from '@/stories/websites'
+import { WebsitePage, PoweredByKumiko } from '@/stories/websites'
 import { PublicWebsiteHeader } from '@/components'
 
 export default function PublicWebsitePageWithSlug() {
@@ -102,13 +102,16 @@ export default function PublicWebsitePageWithSlug() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <PublicWebsiteHeader
         websiteName={websiteData.name}
         pages={websiteData.pages.map(p => ({ id: p.id, title: p.title, slug: p.slug }))}
         currentPageSlug={slug}
       />
-      <WebsitePage page={adaptedPage} availableMenus={[]} />
+      <div className="flex-1">
+        <WebsitePage page={adaptedPage} availableMenus={[]} />
+      </div>
+      <PoweredByKumiko />
     </div>
   )
 }

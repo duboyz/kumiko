@@ -1,0 +1,1 @@
+export { PoweredByKumiko } from './PoweredByKumiko'

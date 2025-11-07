@@ -7,6 +7,7 @@ import { useCartStore, useCreateOrder, CreateOrderItemDto, formatPrice } from '@
 import { toast } from 'sonner'
 import { CartItemCard } from '@/stories/orders/CartItemCard'
 import { ArrowLeft } from 'lucide-react'
+import { PoweredByKumiko } from '@/stories/websites'
 
 export default function CheckoutPage() {
   const params = useParams()
@@ -98,7 +99,9 @@ export default function CheckoutPage() {
       clearCustomerInfo()
 
       // Redirect to order status page
-      router.push(`/order/${result.id}/status`)
+      if (result?.id) {
+        router.push(`/order/${result.id}/status`)
+      }
     } catch (error) {
       toast.error('Failed to place order. Please try again.')
     }
@@ -120,8 +123,8 @@ export default function CheckoutPage() {
   const totalAmount = getTotalAmount()
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 sm:pb-8">
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 flex-1">
         {/* Header */}
         <div className="mb-4 sm:mb-6">
           <Button
@@ -181,6 +184,7 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+      <PoweredByKumiko />
     </div>
   )
 }
