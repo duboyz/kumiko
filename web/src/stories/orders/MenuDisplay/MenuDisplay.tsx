@@ -24,24 +24,11 @@ interface MenuDisplayProps {
 
 export function MenuDisplay({ menu, currency = Currency.USD, onAddToCart, className = '' }: MenuDisplayProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
 
     const ctx = gsap.context(() => {
-      // Animate header
-      gsap.fromTo(
-        headerRef.current,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power2.out',
-        }
-      )
-
       // Animate category sections
       gsap.fromTo(
         '.category-section',
@@ -85,27 +72,23 @@ export function MenuDisplay({ menu, currency = Currency.USD, onAddToCart, classN
   }, [menu])
 
   return (
-    <div ref={containerRef} className={`max-w-5xl mx-auto px-4 ${className}`}>
-      <div ref={headerRef} className="text-center mb-16">
-        <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-          {menu.name}
-        </h2>
-        {menu.description && (
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">{menu.description}</p>
-        )}
-      </div>
-
-      <div className="space-y-16">
+    <div
+      ref={containerRef}
+      className={`max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 ${className}`}
+    >
+      <div className="space-y-8 sm:space-y-12 lg:space-y-16">
         {menu.categories.map((category, categoryIndex) => (
           <div key={category.id} className="category-section">
-            <div className="mb-8">
-              <h3 className="text-3xl font-bold mb-3 text-foreground">{category.name}</h3>
+            <div className="mb-6 sm:mb-8">
+              <h3 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-foreground px-1">{category.name}</h3>
               {category.description && (
-                <p className="text-muted-foreground text-lg max-w-3xl">{category.description}</p>
+                <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-3xl px-1">
+                  {category.description}
+                </p>
               )}
             </div>
 
-            <div className="grid gap-4">
+            <div className="grid gap-3 sm:gap-4">
               {category.menuCategoryItems
                 .sort((a, b) => a.orderIndex - b.orderIndex)
                 .map((categoryItem, itemIndex) => {

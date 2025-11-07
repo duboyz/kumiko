@@ -101,7 +101,9 @@ export default function PublicWebsitePage() {
         pages={websiteData.pages.map(p => ({ id: p.id, title: p.title, slug: p.slug }))}
         currentPageSlug="home"
       />
-      <WebsitePage page={adaptedPage} availableMenus={[]} />
+      <div className="w-full overflow-x-hidden">
+        <WebsitePage page={adaptedPage} availableMenus={[]} />
+      </div>
     </div>
   )
 }
