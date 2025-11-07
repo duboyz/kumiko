@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { CartItemCard } from '@/stories/orders/CartItemCard'
 import { ArrowLeft } from 'lucide-react'
 import { PoweredByKumiko } from '@/stories/websites'
+import Image from 'next/image'
 
 export default function CheckoutPage() {
   const params = useParams()
@@ -135,8 +136,19 @@ export default function CheckoutPage() {
             <ArrowLeft className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Back
           </Button>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Checkout</h1>
-          <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-1 sm:mt-2">Complete your order details</p>
+          <div className="flex items-start gap-3">
+            <Image
+              src="/icons/kumiko-checkout.png"
+              alt="Kumiko"
+              width={60}
+              height={60}
+              className="w-12 h-12 sm:w-16 sm:h-16 object-contain flex-shrink-0"
+            />
+            <div className="flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Checkout</h1>
+              <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-1 sm:mt-2">Complete your order details</p>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">

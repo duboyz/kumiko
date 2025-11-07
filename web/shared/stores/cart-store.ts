@@ -34,11 +34,16 @@ interface CartStore {
   getItemCount: () => number
 }
 
+const getTodayDate = (): string => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+}
+
 const initialCustomerInfo: CustomerInfo = {
   name: '',
   phone: '',
   email: '',
-  pickupDate: '',
+  pickupDate: getTodayDate(),
   pickupTime: '12:00',
   additionalNote: '',
 }
@@ -89,7 +94,7 @@ export const useCartStore = create<CartStore>()(
         set({ cart: newCart })
       },
 
-      removeItem: (index) => {
+      removeItem: index => {
         const { cart } = get()
         const newCart = [...cart]
         newCart.splice(index, 1)
@@ -103,7 +108,13 @@ export const useCartStore = create<CartStore>()(
         set({ customerInfo: { ...customerInfo, [field]: value } })
       },
 
-      clearCustomerInfo: () => set({ customerInfo: initialCustomerInfo }),
+      clearCustomerInfo: () =>
+        set({
+          customerInfo: {
+            ...initialCustomerInfo,
+            pickupDate: getTodayDate(),
+          },
+        }),
 
       setRestaurantContext: (restaurantId, menuId, currency) => {
         set({ restaurantId, menuId, currency })
