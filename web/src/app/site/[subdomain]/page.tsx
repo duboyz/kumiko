@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 import { useWebsiteBySubdomain } from '@shared'
 import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components'
-import { WebsitePage } from '@/stories/websites'
+import { WebsitePage, PoweredByKumiko } from '@/stories/websites'
 import { PublicWebsiteHeader } from '@/components'
 
 export default function PublicWebsitePage() {
@@ -95,13 +95,16 @@ export default function PublicWebsitePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <PublicWebsiteHeader
         websiteName={websiteData.name}
         pages={websiteData.pages.map(p => ({ id: p.id, title: p.title, slug: p.slug }))}
         currentPageSlug="home"
       />
-      <WebsitePage page={adaptedPage} availableMenus={[]} />
+      <div className="w-full overflow-x-hidden flex-1">
+        <WebsitePage page={adaptedPage} availableMenus={[]} />
+      </div>
+      <PoweredByKumiko />
     </div>
   )
 }
