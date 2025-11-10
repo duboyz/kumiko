@@ -15,7 +15,7 @@ type Period = 'daily' | 'weekly' | 'monthly'
 type ChartType = 'bar' | 'line'
 
 export default function DashboardPage() {
-  const t = useTranslations()
+  const t = useTranslations('dashboard')
   const { selectedLocation } = useLocationSelection()
   const [timeRange, setTimeRange] = useState<TimeRange>(30)
   const [period, setPeriod] = useState<Period>('daily')
@@ -42,16 +42,16 @@ export default function DashboardPage() {
     return (
       <ContentContainer>
         <div>
-          <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
-          <p className="text-muted-foreground">Dashboard is currently only available for restaurants.</p>
+          <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('dashboardOnlyForRestaurants')}</p>
         </div>
       </ContentContainer>
     )
   }
 
   if (isLoading) return <LoadingState variant="page" />
-  if (error) return <ErrorState message={error instanceof Error ? error.message : 'Failed to load dashboard stats'} />
-  if (!stats) return <ErrorState message="No data available" />
+  if (error) return <ErrorState message={error instanceof Error ? error.message : t('failedToLoad')} />
+  if (!stats) return <ErrorState message={t('noDataAvailable')} />
 
   return (
     <ContentContainer>
@@ -63,21 +63,21 @@ export default function DashboardPage() {
               <img src={KumikoDashboardImage} alt="Kumiko Dashboard" width={80} height={80} className="rounded-lg" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
-              <p className="text-muted-foreground">Welcome back! Here's an overview of your restaurant.</p>
+              <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
+              <p className="text-muted-foreground">{t('welcomeBack')}</p>
             </div>
           </div>
 
           {/* Time Range Selector */}
           <div className="flex gap-2">
             <Button variant={timeRange === 7 ? 'default' : 'outline'} size="sm" onClick={() => setTimeRange(7)}>
-              7 days
+              {t('days7')}
             </Button>
             <Button variant={timeRange === 14 ? 'default' : 'outline'} size="sm" onClick={() => setTimeRange(14)}>
-              14 days
+              {t('days14')}
             </Button>
             <Button variant={timeRange === 30 ? 'default' : 'outline'} size="sm" onClick={() => setTimeRange(30)}>
-              30 days
+              {t('days30')}
             </Button>
           </div>
         </div>
@@ -85,33 +85,33 @@ export default function DashboardPage() {
         {/* Overall Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
-            title="Total Revenue"
+            title={t('totalRevenue')}
             value={stats.overall.totalRevenue}
             icon={DollarSign}
             isCurrency
             currency={selectedLocation.currency}
           />
           <StatCard
-            title="Total Orders"
+            title={t('totalOrders')}
             value={stats.overall.totalOrders}
             icon={ShoppingBag}
-            description={`${stats.overall.totalItemsSold} items sold`}
+            description={t('itemsSoldDescription', { count: stats.overall.totalItemsSold })}
           />
           <StatCard
-            title="Average Order Value"
+            title={t('averageOrderValue')}
             value={stats.overall.averageOrderValue}
             icon={TrendingUp}
             isCurrency
             currency={selectedLocation.currency}
           />
-          <StatCard title="Items Sold" value={stats.overall.totalItemsSold} icon={Package} />
+          <StatCard title={t('itemsSold')} value={stats.overall.totalItemsSold} icon={Package} />
         </div>
 
         {/* Charts */}
         <div className="space-y-4">
           {/* Period and Chart Type Selectors */}
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Analytics</h2>
+            <h2 className="text-xl font-semibold">{t('analytics')}</h2>
             <div className="flex gap-4">
               {/* Chart Type Toggle */}
               <div className="flex gap-2 border rounded-lg p-1">
@@ -121,7 +121,7 @@ export default function DashboardPage() {
                   onClick={() => setChartType('bar')}
                 >
                   <BarChart3 className="h-4 w-4 mr-2" />
-                  Bar
+                  {t('bar')}
                 </Button>
                 <Button
                   variant={chartType === 'line' ? 'secondary' : 'ghost'}
@@ -129,7 +129,7 @@ export default function DashboardPage() {
                   onClick={() => setChartType('line')}
                 >
                   <LineChart className="h-4 w-4 mr-2" />
-                  Line
+                  {t('line')}
                 </Button>
               </div>
 
@@ -140,21 +140,21 @@ export default function DashboardPage() {
                   size="sm"
                   onClick={() => setPeriod('daily')}
                 >
-                  Daily
+                  {t('daily')}
                 </Button>
                 <Button
                   variant={period === 'weekly' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setPeriod('weekly')}
                 >
-                  Weekly
+                  {t('weekly')}
                 </Button>
                 <Button
                   variant={period === 'monthly' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setPeriod('monthly')}
                 >
-                  Monthly
+                  {t('monthly')}
                 </Button>
               </div>
             </div>

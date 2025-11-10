@@ -11,10 +11,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { RestaurantMenuCard } from '@/stories/restaurants/RestaurantMenuCard'
 import { CreateMenuDialog } from '@/components'
+import { useTranslations } from 'next-intl'
 
 const KumikoMenusImage = '/icons/kumiko-menus.png'
 
 export const RestaurantMenus = () => {
+  const t = useTranslations('menus')
   const router = useRouter()
   const { selectedLocation } = useLocationSelection()
   const { data: menusData, isLoading, error } = useRestaurantMenus(selectedLocation?.id || '')
@@ -23,7 +25,7 @@ export const RestaurantMenus = () => {
   if (isLoading) return <LoadingState />
   if (error)
     return (
-      <ErrorState title="Failed to load menus" message="There was an error loading your menus. Please try again." />
+      <ErrorState title={t('failedToLoadMenus')} message={t('errorLoadingMenus')} />
     )
 
   const filteredMenus =
@@ -39,26 +41,26 @@ export const RestaurantMenus = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Menus</h1>
-            <p className="text-muted-foreground mt-1">Manage your restaurant menus and offerings</p>
+            <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+            <p className="text-muted-foreground mt-1">{t('manageMenus')}</p>
           </div>
           <CreateMenuDialog
             restaurantName={selectedLocation?.name || ''}
             router={router}
-            triggerText="Create Menu"
+            triggerText={t('createMenu')}
             triggerVariant="default"
           />
         </div>
 
         <EmptyState
           icon={MenuSquare}
-          title="No menus yet"
-          description="Create your first menu to start managing your restaurant offerings."
+          title={t('noMenusYet')}
+          description={t('createFirstMenu')}
           actionComponent={
             <CreateMenuDialog
               restaurantName={selectedLocation?.name || ''}
               router={router}
-              triggerText="Create Your First Menu"
+              triggerText={t('createYourFirstMenu')}
               triggerVariant="default"
             />
           }
@@ -67,6 +69,9 @@ export const RestaurantMenus = () => {
     )
   }
 
+  const menuCount = menusData.menus.length
+  const menuPlural = menuCount === 1 ? t('menu') : t('title').toLowerCase()
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -74,9 +79,9 @@ export const RestaurantMenus = () => {
         <div className="flex items-center gap-4">
           <img src={KumikoMenusImage} alt="Kumiko Menus" width={80} height={80} className="rounded-lg" />
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Menus</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
             <p className="text-muted-foreground mt-1">
-              {menusData.menus.length} {menusData.menus.length === 1 ? 'menu' : 'menus'} available
+              {t('menusAvailable', { count: menuCount, plural: menuPlural })}
             </p>
           </div>
         </div>
@@ -84,12 +89,12 @@ export const RestaurantMenus = () => {
           <CreateMenuDialog
             restaurantName={selectedLocation?.name || ''}
             router={router}
-            triggerText="Create Menu"
+            triggerText={t('createMenu')}
             triggerVariant="default"
           />
           <Button onClick={() => router.push('/menus/import')} size="lg">
             <FileUp className="w-4 h-4 mr-2" />
-            Import Menu
+            {t('importMenu')}
           </Button>
         </div>
       </div>
@@ -99,7 +104,7 @@ export const RestaurantMenus = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search menus by name or description..."
+            placeholder={t('searchMenusPlaceholder')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -107,7 +112,7 @@ export const RestaurantMenus = () => {
         </div>
         <Button variant="outline" size="default">
           <SlidersHorizontal className="w-4 h-4 mr-2" />
-          Filters
+          {t('filters')}
         </Button>
       </div>
 
@@ -115,8 +120,8 @@ export const RestaurantMenus = () => {
       {filteredMenus.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed rounded-lg">
           <Search className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">No menus found</h3>
-          <p className="text-muted-foreground">Try adjusting your search query or create a new menu.</p>
+          <h3 className="text-lg font-medium mb-2">{t('noMenusFound')}</h3>
+          <p className="text-muted-foreground">{t('adjustSearchQuery')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

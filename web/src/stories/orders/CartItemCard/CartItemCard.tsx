@@ -6,6 +6,7 @@ import { ChangeEvent } from 'react'
 import { Currency, formatPrice } from '@shared'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { useTranslations } from 'next-intl'
 
 interface CartItemCardProps {
   item: CartItem
@@ -16,11 +17,9 @@ interface CartItemCardProps {
 }
 
 export function CartItemCard({ item, index, currency = Currency.USD, onUpdateQuantity, onRemove }: CartItemCardProps) {
-  const handleMinus = () => {
-    if (item.quantity > 0) onUpdateQuantity(index, -1)
-  }
-
-  const handlePlus = () => onUpdateQuantity(index, 1)
+  const t = useTranslations('orders')
+  const handleMinus = () => (item.quantity > 0) && onUpdateQuantity(index, -1)
+  const handlePlus = () => (item.quantity > 0) && onUpdateQuantity(index, 1)
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newQuantity = Number(e.target.value)
@@ -46,7 +45,7 @@ export function CartItemCard({ item, index, currency = Currency.USD, onUpdateQua
             {item.specialInstructions && (
               <div className="mt-2 pt-2 border-t border-border/50">
                 <p className="text-xs text-muted-foreground italic">
-                  <span className="font-medium">Note:</span> {item.specialInstructions}
+                  <span className="font-medium">{t('note')}:</span> {item.specialInstructions}
                 </p>
               </div>
             )}
@@ -56,7 +55,7 @@ export function CartItemCard({ item, index, currency = Currency.USD, onUpdateQua
               {formatPrice(totalPrice, currency)}
             </p>
             {item.quantity > 1 && (
-              <p className="text-xs text-muted-foreground mt-0.5">{formatPrice(unitPrice, currency)} each</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{formatPrice(unitPrice, currency)} {t('each')}</p>
             )}
           </div>
         </div>
@@ -95,7 +94,7 @@ export function CartItemCard({ item, index, currency = Currency.USD, onUpdateQua
             size="sm"
             onClick={() => onRemove(index)}
             className="h-8 w-8 sm:h-9 sm:w-9 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
-            aria-label="Remove item"
+            aria-label={t('removeItem')}
           >
             <Trash2 className="h-4 w-4 sm:h-4 sm:w-4" />
           </Button>

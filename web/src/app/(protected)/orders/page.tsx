@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { ContentContainer, PageHeader } from '@/components'
 import { LoadingSpinner } from '@/components'
 import { useLocationSelection, useRestaurantOrders } from '@shared'
@@ -15,6 +16,8 @@ const KumikoOrdersImage = '/icons/kumiko-orders.png'
 type ViewMode = 'table' | 'kanban'
 
 export default function OrdersPage() {
+  const t = useTranslations('orders')
+  const tMenuItems = useTranslations('menuItems')
   const { selectedLocation, isLoading: locationLoading, hasNoLocations } = useLocationSelection()
   const restaurantId = selectedLocation?.type === 'Restaurant' ? selectedLocation.id : null
   const [viewMode, setViewMode] = useState<ViewMode>('kanban')
@@ -40,8 +43,8 @@ export default function OrdersPage() {
         <div className="flex items-center gap-4">
           <img src={KumikoOrdersImage} alt="Kumiko Orders" width={60} height={60} className="rounded-lg" />
           <div>
-            <h1 className="text-3xl font-bold">Orders</h1>
-            <p className="text-muted-foreground">Manage and track your restaurant orders</p>
+            <h1 className="text-3xl font-bold">{t('title')}</h1>
+            <p className="text-muted-foreground">{t('subtitle')}</p>
           </div>
         </div>
 
@@ -49,7 +52,7 @@ export default function OrdersPage() {
         <div className="flex gap-2 border rounded-lg p-1">
           <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('table')}>
             <Table className="h-4 w-4 mr-2" />
-            Table
+            {tMenuItems('table')}
           </Button>
           <Button
             variant={viewMode === 'kanban' ? 'secondary' : 'ghost'}
@@ -57,7 +60,7 @@ export default function OrdersPage() {
             onClick={() => setViewMode('kanban')}
           >
             <LayoutGrid className="h-4 w-4 mr-2" />
-            Kanban
+            {t('kanban')}
           </Button>
         </div>
       </div>

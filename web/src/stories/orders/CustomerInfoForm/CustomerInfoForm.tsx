@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { CustomerInfo } from '../shared/types'
+import { useTranslations } from 'next-intl'
 
 interface CustomerInfoFormProps {
   customerInfo: CustomerInfo
@@ -9,30 +10,31 @@ interface CustomerInfoFormProps {
 }
 
 export function CustomerInfoForm({ customerInfo, onCustomerInfoChange }: CustomerInfoFormProps) {
+  const t = useTranslations('checkout')
   return (
     <div className="space-y-3 sm:space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div>
           <Label htmlFor="customerName" className="text-sm sm:text-base">
-            Name *
+            {t('name')} {t('requiredField')}
           </Label>
           <Input
             id="customerName"
             value={customerInfo.name}
             onChange={e => onCustomerInfoChange('name', e.target.value)}
-            placeholder="John Doe"
+            placeholder={t('namePlaceholder')}
             className="mt-1.5 sm:mt-2"
           />
         </div>
         <div>
           <Label htmlFor="customerPhone" className="text-sm sm:text-base">
-            Phone *
+            {t('phone')} {t('requiredField')}
           </Label>
           <Input
             id="customerPhone"
             value={customerInfo.phone}
             onChange={e => onCustomerInfoChange('phone', e.target.value)}
-            placeholder="555-1234"
+            placeholder={t('phonePlaceholder')}
             className="mt-1.5 sm:mt-2"
           />
         </div>
@@ -40,14 +42,14 @@ export function CustomerInfoForm({ customerInfo, onCustomerInfoChange }: Custome
 
       <div>
         <Label htmlFor="customerEmail" className="text-sm sm:text-base">
-          Email *
+          {t('email')} {t('requiredField')}
         </Label>
         <Input
           id="customerEmail"
           type="email"
           value={customerInfo.email}
           onChange={e => onCustomerInfoChange('email', e.target.value)}
-          placeholder="john@example.com"
+          placeholder={t('emailPlaceholder')}
           className="mt-1.5 sm:mt-2"
         />
       </div>
@@ -55,7 +57,7 @@ export function CustomerInfoForm({ customerInfo, onCustomerInfoChange }: Custome
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div>
           <Label htmlFor="pickupDate" className="text-sm sm:text-base">
-            Pickup Date *
+            {t('pickupDate')} {t('requiredField')}
           </Label>
           <Input
             id="pickupDate"
@@ -68,7 +70,7 @@ export function CustomerInfoForm({ customerInfo, onCustomerInfoChange }: Custome
         </div>
         <div>
           <Label htmlFor="pickupTime" className="text-sm sm:text-base">
-            Pickup Time *
+            {t('pickupTime')} {t('requiredField')}
           </Label>
           <Input
             id="pickupTime"
@@ -82,13 +84,13 @@ export function CustomerInfoForm({ customerInfo, onCustomerInfoChange }: Custome
 
       <div>
         <Label htmlFor="additionalNote" className="text-sm sm:text-base">
-          Additional Notes
+          {t('additionalNotes')}
         </Label>
         <Textarea
           id="additionalNote"
           value={customerInfo.additionalNote}
           onChange={e => onCustomerInfoChange('additionalNote', e.target.value)}
-          placeholder="Any special requests or dietary restrictions?"
+          placeholder={t('additionalNotesPlaceholder')}
           rows={3}
           className="mt-1.5 sm:mt-2"
         />

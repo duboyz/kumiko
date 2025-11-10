@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, CheckCircle, Search } from 'lucide-react'
 import { SearchBusiness } from '@/components'
 import { useCreateHospitality, ResponseBusinessDetails } from '@shared'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface HospitalityOnboardingProps {
     onBack?: () => void
@@ -14,6 +15,7 @@ interface HospitalityOnboardingProps {
 }
 
 export function HospitalityOnboarding({ onBack, onComplete }: HospitalityOnboardingProps) {
+    const t = useTranslations('onboarding.hospitalityOnboarding')
     const [selectedBusiness, setSelectedBusiness] = useState<ResponseBusinessDetails | null>(null)
     const createHospitality = useCreateHospitality()
 
@@ -23,7 +25,7 @@ export function HospitalityOnboarding({ onBack, onComplete }: HospitalityOnboard
 
     const handleComplete = async () => {
         if (!selectedBusiness) {
-            toast.error('Please select a business first')
+            toast.error(t('pleaseSelectBusiness'))
             return
         }
 
@@ -41,11 +43,11 @@ export function HospitalityOnboarding({ onBack, onComplete }: HospitalityOnboard
                 description: `${selectedBusiness.name} - Hospitality business`,
             })
 
-            toast.success('Hospitality business created successfully!')
+            toast.success(t('businessCreated'))
             onComplete?.()
         } catch (error) {
             console.error('Failed to create hospitality:', error)
-            toast.error('Failed to create hospitality business')
+            toast.error(t('failedToCreate'))
         }
     }
 
@@ -56,10 +58,10 @@ export function HospitalityOnboarding({ onBack, onComplete }: HospitalityOnboard
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Search className="w-5 h-5" />
-                        Find Your Hospitality Business
+                        {t('findYourBusiness')}
                     </CardTitle>
                     <CardDescription>
-                        Search for your hotel or hospitality business using Google Places
+                        {t('searchDescription')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -72,30 +74,30 @@ export function HospitalityOnboarding({ onBack, onComplete }: HospitalityOnboard
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <CheckCircle className="h-5 w-5 text-green-600" />
-                            Selected Business
+                            {t('selectedBusiness')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-2">
                             <p>
-                                <strong>Name:</strong> {selectedBusiness.name}
+                                <strong>{t('name')}:</strong> {selectedBusiness.name}
                             </p>
                             <p>
-                                <strong>Address:</strong> {selectedBusiness.formattedAddress}
+                                <strong>{t('address')}:</strong> {selectedBusiness.formattedAddress}
                             </p>
                             {selectedBusiness.formattedPhoneNumber && (
                                 <p>
-                                    <strong>Phone:</strong> {selectedBusiness.formattedPhoneNumber}
+                                    <strong>{t('phone')}:</strong> {selectedBusiness.formattedPhoneNumber}
                                 </p>
                             )}
                             {selectedBusiness.website && (
                                 <p>
-                                    <strong>Website:</strong> {selectedBusiness.website}
+                                    <strong>{t('website')}:</strong> {selectedBusiness.website}
                                 </p>
                             )}
                             {selectedBusiness.rating && (
                                 <p>
-                                    <strong>Rating:</strong> {selectedBusiness.rating} ⭐ ({selectedBusiness.userRatingsTotal} reviews)
+                                    <strong>{t('rating')}:</strong> {selectedBusiness.rating} ⭐ ({selectedBusiness.userRatingsTotal} {t('reviews')})
                                 </p>
                             )}
                         </div>
@@ -107,21 +109,21 @@ export function HospitalityOnboarding({ onBack, onComplete }: HospitalityOnboard
             <div className="flex items-center justify-between pt-6">
                 <Button onClick={onBack} variant="outline">
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
+                    {t('back')}
                 </Button>
 
                 <Button
                     onClick={handleComplete}
                     disabled={!selectedBusiness || createHospitality.isPending}
                 >
-                    {createHospitality.isPending ? 'Creating Business...' : 'Complete Setup'}
+                    {createHospitality.isPending ? t('creatingBusiness') : t('completeSetup')}
                     <CheckCircle className="w-4 h-4 ml-2" />
                 </Button>
             </div>
 
             {createHospitality.error && (
                 <p className="text-red-600 text-sm text-center">
-                    Error: {createHospitality.error instanceof Error ? createHospitality.error.message : 'Failed to create business'}
+                    Error: {createHospitality.error instanceof Error ? createHospitality.error.message : t('failedToCreate')}
                 </p>
             )}
         </div>

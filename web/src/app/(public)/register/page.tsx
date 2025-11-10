@@ -6,30 +6,38 @@ import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { useTranslations } from 'next-intl'
 import { useRegister } from '@shared/hooks'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
-const registerSchema = z
-  .object({
-    email: z.string().email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string(),
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
-  })
-  .refine(data => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  })
-
-type RegisterFormValues = z.infer<typeof registerSchema>
+type RegisterFormValues = {
+  email: string
+  password: string
+  confirmPassword: string
+  firstName?: string
+  lastName?: string
+}
 
 export default function RegisterPage() {
+  const t = useTranslations('auth')
   const router = useRouter()
   const registerMutation = useRegister()
   const [error, setError] = useState<string | null>(null)
+
+  const registerSchema = z
+    .object({
+      email: z.string().email(t('invalidEmail')),
+      password: z.string().min(6, t('passwordMinLength')),
+      confirmPassword: z.string(),
+      firstName: z.string().optional(),
+      lastName: z.string().optional(),
+    })
+    .refine(data => data.password === data.confirmPassword, {
+      message: t('passwordsDontMatch'),
+      path: ['confirmPassword'],
+    })
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -54,7 +62,7 @@ export default function RegisterPage() {
       })
       // The useRegister hook handles navigation to dashboard
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.')
+      setError(err instanceof Error ? err.message : t('registerFailed'))
     }
   }
 
@@ -89,8 +97,8 @@ export default function RegisterPage() {
       <div className="flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold">Create an account</h2>
-            <p className="text-muted-foreground">Enter your details to get started</p>
+            <h2 className="text-2xl font-bold">{t('createAccount')}</h2>
+            <p className="text-muted-foreground">{t('registerSubtitle')}</p>
           </div>
 
           <Form {...form}>
@@ -101,9 +109,9 @@ export default function RegisterPage() {
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name</FormLabel>
+                      <FormLabel>{t('firstName')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="John" {...field} />
+                        <Input placeholder={t('firstNamePlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -114,9 +122,9 @@ export default function RegisterPage() {
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Name</FormLabel>
+                      <FormLabel>{t('lastName')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Doe" {...field} />
+                        <Input placeholder={t('lastNamePlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -129,9 +137,9 @@ export default function RegisterPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="name@example.com" type="email" {...field} />
+                      <Input placeholder={t('emailPlaceholder')} type="email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -143,9 +151,9 @@ export default function RegisterPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{t('password')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Create a password" type="password" {...field} />
+                      <Input placeholder={t('createPasswordPlaceholder')} type="password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,9 +165,9 @@ export default function RegisterPage() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel>{t('confirmPassword')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Confirm your password" type="password" {...field} />
+                      <Input placeholder={t('confirmPasswordPlaceholder')} type="password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -169,16 +177,16 @@ export default function RegisterPage() {
               {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</div>}
 
               <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
-                {registerMutation.isPending ? 'Creating account...' : 'Sign up'}
+                {registerMutation.isPending ? t('creatingAccount') : t('signUp')}
               </Button>
             </form>
           </Form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Already have an account?{' '}
+              {t('alreadyHaveAccount')}{' '}
               <Link href="/login" className="text-primary hover:underline">
-                Sign in
+                {t('signIn')}
               </Link>
             </p>
           </div>
@@ -186,7 +194,7 @@ export default function RegisterPage() {
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-4">
               <Button type="button" variant="outline" size="sm" onClick={fillTestData} className="w-full">
-                Fill Test Data
+                {t('fillTestData')}
               </Button>
             </div>
           )}

@@ -1,6 +1,7 @@
 'use client'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Toaster } from 'sonner'
 import { LocationOption, useLocationSelection, useLogout } from '@shared'
 import { LoadingSpinner } from '@/components'
@@ -24,6 +25,7 @@ import { useCurrentUser } from '@shared'
 import { Button } from '@/components/ui/button'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+  const t = useTranslations('navigation')
   const pathname = usePathname()
   const router = useRouter()
   const signOut = useLogout()
@@ -36,7 +38,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   const links = useMemo(() => {
     const links = [
       {
-        label: 'Dashboard',
+        label: t('dashboard'),
         href: '/dashboard',
         icon: LayoutDashboard,
       },
@@ -46,12 +48,12 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
       links.push(
         ...[
           {
-            label: 'Menus',
+            label: t('menus'),
             href: '/menus',
             icon: MenuIcon,
           },
           {
-            label: 'Orders',
+            label: t('orders'),
             href: '/orders',
             icon: ShoppingCart,
           },
@@ -62,12 +64,12 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     links.push(
       ...[
         {
-          label: 'Websites',
+          label: t('websites'),
           href: '/websites',
           icon: Globe,
         },
         {
-          label: 'Settings',
+          label: t('settings'),
           href: '/settings',
           icon: Settings,
         },
@@ -75,7 +77,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     )
 
     return links
-  }, [selectedLocationType])
+  }, [selectedLocationType, t])
 
   // Check if current path matches or starts with the link href
   const isActiveLink = (href: string) => {
@@ -127,7 +129,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-72 p-0">
           <SheetHeader className="sr-only">
-            <SheetTitle>Navigation Menu</SheetTitle>
+            <SheetTitle>{t('navigationMenu')}</SheetTitle>
           </SheetHeader>
           <SidebarContent
             links={links}
@@ -144,7 +146,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
           <button
             onClick={() => setIsMobileMenuOpen(true)}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            aria-label="Open menu"
+            aria-label={t('openMenu')}
           >
             <Menu className="w-6 h-6 text-gray-700" />
           </button>
@@ -177,6 +179,8 @@ function SidebarContent({
   isActiveLink: (href: string) => boolean
   logoutMutation: ReturnType<typeof useLogout>
 }) {
+  const t = useTranslations('navigation')
+
   return (
     <>
       {/* Location Selector Section */}
@@ -222,7 +226,7 @@ function SidebarContent({
           className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <LogOut className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
-          <span>{logoutMutation.isPending ? 'Logging out...' : 'Logout'}</span>
+          <span>{logoutMutation.isPending ? t('loggingOut') : t('logout')}</span>
         </button>
       </div>
     </>
@@ -230,6 +234,7 @@ function SidebarContent({
 }
 
 export function LocationSelector() {
+  const t = useTranslations('navigation')
   const { selectedLocation, userLocations, isLoading, hasNoLocations, setSelectedLocation } = useLocationSelection()
   const [isOpen, setIsOpen] = useState(false)
   const locationType = selectedLocation?.type || 'Restaurant'
@@ -255,7 +260,7 @@ export function LocationSelector() {
     <>
       <Select onValueChange={handleLocationChange} value={selectedLocation?.id}>
         <SelectTrigger className="w-full p-4 py-6">
-          <SelectValue placeholder="Select Location">{selectedLocation?.name}</SelectValue>
+          <SelectValue placeholder={t('selectLocation')}>{selectedLocation?.name}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           {userLocations.map(location => (

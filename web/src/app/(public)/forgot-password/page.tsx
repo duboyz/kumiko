@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { useTranslations } from 'next-intl'
 import { useForgotPassword } from '@shared/hooks'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -13,16 +14,19 @@ import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react'
 
 const KumikoAuthImage = '/icons/kumiko-auth.png'
 
-const forgotPasswordSchema = z.object({
-    email: z.string().email('Invalid email address'),
-})
-
-type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
+type ForgotPasswordFormValues = {
+    email: string
+}
 
 export default function ForgotPasswordPage() {
+    const t = useTranslations('auth')
     const forgotPasswordMutation = useForgotPassword()
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
+
+    const forgotPasswordSchema = z.object({
+        email: z.string().email(t('invalidEmail')),
+    })
 
     const form = useForm<ForgotPasswordFormValues>({
         resolver: zodResolver(forgotPasswordSchema),
@@ -38,7 +42,7 @@ export default function ForgotPasswordPage() {
             await forgotPasswordMutation.mutateAsync(data)
             setSuccess(true)
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to send reset email. Please try again.')
+            setError(err instanceof Error ? err.message : t('forgotPasswordFailed'))
         }
     }
 
@@ -68,9 +72,9 @@ export default function ForgotPasswordPage() {
                                         <Mail className="w-8 h-8 text-primary" />
                                     </div>
                                 </div>
-                                <h2 className="text-2xl font-bold">Forgot your password?</h2>
+                                <h2 className="text-2xl font-bold">{t('forgotPasswordTitle')}</h2>
                                 <p className="text-muted-foreground mt-2">
-                                    No worries! Enter your email and we'll send you a reset link.
+                                    {t('forgotPasswordSubtitle')}
                                 </p>
                             </div>
 
@@ -81,9 +85,9 @@ export default function ForgotPasswordPage() {
                                         name="email"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Email</FormLabel>
+                                                <FormLabel>{t('email')}</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="name@example.com" type="email" {...field} />
+                                                    <Input placeholder={t('emailPlaceholder')} type="email" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -93,7 +97,7 @@ export default function ForgotPasswordPage() {
                                     {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</div>}
 
                                     <Button type="submit" className="w-full" disabled={forgotPasswordMutation.isPending}>
-                                        {forgotPasswordMutation.isPending ? 'Sending...' : 'Send Reset Link'}
+                                        {forgotPasswordMutation.isPending ? t('sending') : t('sendResetLink')}
                                     </Button>
                                 </form>
                             </Form>
@@ -101,7 +105,7 @@ export default function ForgotPasswordPage() {
                             <div className="mt-6">
                                 <Link href="/login" className="flex items-center justify-center text-sm text-muted-foreground hover:text-primary">
                                     <ArrowLeft className="w-4 h-4 mr-2" />
-                                    Back to login
+                                    {t('backToLogin')}
                                 </Link>
                             </div>
                         </>
@@ -112,14 +116,13 @@ export default function ForgotPasswordPage() {
                                     <CheckCircle2 className="w-12 h-12 text-green-600" />
                                 </div>
                             </div>
-                            <h2 className="text-2xl font-bold mb-2">Check your email</h2>
+                            <h2 className="text-2xl font-bold mb-2">{t('checkEmail')}</h2>
                             <p className="text-muted-foreground mb-6">
-                                If an account exists with <strong>{form.getValues('email')}</strong>, you'll receive a password reset
-                                link shortly.
+                                {t('checkEmailMessage', { email: form.getValues('email') })}
                             </p>
                             <div className="space-y-3">
                                 <p className="text-sm text-muted-foreground">
-                                    Didn't receive the email? Check your spam folder or try again.
+                                    {t('didntReceiveEmail')}
                                 </p>
                                 <Button
                                     variant="outline"
@@ -129,12 +132,12 @@ export default function ForgotPasswordPage() {
                                         form.reset()
                                     }}
                                 >
-                                    Try Another Email
+                                    {t('tryAnotherEmail')}
                                 </Button>
                                 <Link href="/login" className="block">
                                     <Button variant="ghost" className="w-full">
                                         <ArrowLeft className="w-4 h-4 mr-2" />
-                                        Back to Login
+                                        {t('backToLogin')}
                                     </Button>
                                 </Link>
                             </div>

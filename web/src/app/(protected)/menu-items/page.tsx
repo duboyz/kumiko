@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { ContentContainer } from '@/components'
 import { DeleteConfirmDialog, LoadingSpinner } from '@/components'
 import MenuItemTableView from '@/stories/menus/MenuItemTableView/MenuItemTableView'
@@ -34,6 +35,8 @@ import { LoadingState } from '@/components'
 import { EmptyState } from '@/components'
 
 function MenuItemsPageContent() {
+  const t = useTranslations('menuItems')
+  const tCommon = useTranslations('common')
   const { selectedLocation, isLoading, hasNoLocations } = useLocationSelection()
   const restaurantId = selectedLocation?.type === 'Restaurant' ? selectedLocation.id : null
   const currency = selectedLocation?.currency ?? Currency.USD
@@ -71,7 +74,7 @@ function MenuItemsPageContent() {
   if (isLoading) {
     return (
       <div className="container mx-auto py-6">
-        <LoadingState message="Loading..." />
+        <LoadingState message={tCommon('loading')} />
       </div>
     )
   }
@@ -150,7 +153,7 @@ function MenuItemsPageContent() {
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right duration-300">
           <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
             <CheckCircle className="w-5 h-5" />
-            <span className="font-medium">Menu items added successfully!</span>
+            <span className="font-medium">{t('addedSuccessfully')}</span>
           </div>
         </div>
       )}
@@ -159,8 +162,8 @@ function MenuItemsPageContent() {
         <div className="flex items-center gap-4">
           <img src={KumikoMenuImage} alt="Kumiko Menu" width={60} height={60} className="rounded-lg" />
           <div>
-            <h1 className="text-3xl font-bold">Menu Items</h1>
-            <p className="text-muted-foreground">Manage all menu items for {selectedLocation.name}</p>
+            <h1 className="text-3xl font-bold">{t('title')}</h1>
+            <p className="text-muted-foreground">{t('subtitle', { location: selectedLocation.name })}</p>
           </div>
         </div>
       </div>
@@ -183,8 +186,8 @@ function MenuItemsPageContent() {
           ) : menuItems.length === 0 ? (
             <EmptyState
               icon={Package}
-              title="No Menu Items"
-              description="Get started by creating your first menu item or importing from a photo."
+              title={t('noItems')}
+              description={t('noItemsDescription')}
             />
           ) : (
             <>
@@ -198,14 +201,14 @@ function MenuItemsPageContent() {
                           <Upload className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-sm">Import More Items</h3>
+                          <h3 className="font-semibold text-sm">{t('importMore')}</h3>
                           <p className="text-xs text-muted-foreground">
-                            Have a menu photo? Import multiple items at once with AI.
+                            {t('importMoreDescription')}
                           </p>
                         </div>
                       </div>
                       <Button asChild size="sm">
-                        <Link href="/menu-items/import">Import</Link>
+                        <Link href="/menu-items/import">{t('import')}</Link>
                       </Button>
                     </div>
                   </CardContent>
@@ -281,6 +284,7 @@ function MenuItemCard({
   onEdit: (item: MenuItemDto) => void
   onDelete: (id: string) => void
 }) {
+  const t = useTranslations('menuItems')
   const { selectedLocation } = useLocationSelection()
   const c = selectedLocation?.currency ?? Currency.USD
   return (
@@ -292,9 +296,9 @@ function MenuItemCard({
               <h3 className="font-medium truncate">{item.name}</h3>
               <div className={`w-2 h-2 rounded-full ${item.isAvailable ? 'bg-green-500' : 'bg-gray-400'}`} />
             </div>
-            <p className="text-sm text-muted-foreground truncate">{item.description || 'No description'}</p>
+            <p className="text-sm text-muted-foreground truncate">{item.description || t('noDescription')}</p>
             <p className="text-lg font-semibold text-green-600 mt-1">
-              {item.price !== null ? formatPrice(item.price, currency) : 'Variable price'}
+              {item.price !== null ? formatPrice(item.price, currency) : t('variablePrice')}
             </p>
             {item.allergens && item.allergens.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1 items-center">

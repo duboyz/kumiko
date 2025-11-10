@@ -21,12 +21,14 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import { useTranslations } from 'next-intl'
 
 interface OrdersTableViewProps {
     orders: OrderDto[]
 }
 
 export function OrdersTableView({ orders }: OrdersTableViewProps) {
+    const t = useTranslations('orders')
     const { selectedLocation } = useLocationSelection()
     const currency = selectedLocation?.currency ?? Currency.USD
     const updateOrderStatus = useUpdateOrderStatus()
@@ -35,16 +37,16 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
     const handleStatusChange = async (orderId: string, newStatus: string) => {
         try {
             await updateOrderStatus.mutateAsync({ orderId, status: newStatus })
-            toast.success('Order status updated successfully')
+            toast.success(t('orderStatusUpdatedSuccessfully'))
         } catch (error) {
-            toast.error('Failed to update order status')
+            toast.error(t('failedToUpdateStatus'))
         }
     }
 
     if (orders.length === 0) {
         return (
             <div className="text-center py-12 bg-muted/50 rounded-lg">
-                <p className="text-muted-foreground">No orders to display</p>
+                <p className="text-muted-foreground">{t('noOrdersToDisplay')}</p>
             </div>
         )
     }
@@ -55,14 +57,14 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-muted/50">
-                            <TableHead>Order #</TableHead>
-                            <TableHead>Customer</TableHead>
-                            <TableHead>Contact</TableHead>
-                            <TableHead>Pickup</TableHead>
-                            <TableHead>Items</TableHead>
-                            <TableHead>Total</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Actions</TableHead>
+                            <TableHead>{t('orderNumber')}</TableHead>
+                            <TableHead>{t('customer')}</TableHead>
+                            <TableHead>{t('contact')}</TableHead>
+                            <TableHead>{t('pickup')}</TableHead>
+                            <TableHead>{t('items')}</TableHead>
+                            <TableHead>{t('total')}</TableHead>
+                            <TableHead>{t('status')}</TableHead>
+                            <TableHead>{t('actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -100,7 +102,7 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <span className="text-sm">{order.orderItems.length} items</span>
+                                    <span className="text-sm">{t('itemsCount', { count: order.orderItems.length })}</span>
                                 </TableCell>
                                 <TableCell>
                                     <span className="font-semibold">{formatPrice(order.totalAmount, currency)}</span>
@@ -117,11 +119,11 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
                                             </Badge>
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Pending">Pending</SelectItem>
-                                            <SelectItem value="Confirmed">Confirmed</SelectItem>
-                                            <SelectItem value="Ready">Ready</SelectItem>
-                                            <SelectItem value="Completed">Completed</SelectItem>
-                                            <SelectItem value="Cancelled">Cancelled</SelectItem>
+                                            <SelectItem value="Pending">{t('pending')}</SelectItem>
+                                            <SelectItem value="Confirmed">{t('confirmed')}</SelectItem>
+                                            <SelectItem value="Ready">{t('ready')}</SelectItem>
+                                            <SelectItem value="Completed">{t('completed')}</SelectItem>
+                                            <SelectItem value="Cancelled">{t('cancelled')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </TableCell>
@@ -146,23 +148,23 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
                     {selectedOrder && (
                         <>
                             <DialogHeader>
-                                <DialogTitle>Order Details - {selectedOrder.customerName}</DialogTitle>
+                                <DialogTitle>{t('orderDetails')} - {selectedOrder.customerName}</DialogTitle>
                                 <DialogDescription>
-                                    Order ID: {selectedOrder.id}
+                                    {t('orderId')}: {selectedOrder.id}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4">
                                 {/* Customer Info */}
                                 <div>
-                                    <h4 className="font-semibold mb-2">Customer Information</h4>
+                                    <h4 className="font-semibold mb-2">{t('customerInformation')}</h4>
                                     <dl className="grid grid-cols-2 gap-2 text-sm">
-                                        <dt className="text-muted-foreground">Name:</dt>
+                                        <dt className="text-muted-foreground">{t('name')}:</dt>
                                         <dd>{selectedOrder.customerName}</dd>
-                                        <dt className="text-muted-foreground">Phone:</dt>
+                                        <dt className="text-muted-foreground">{t('phone')}:</dt>
                                         <dd>{selectedOrder.customerPhone}</dd>
                                         {selectedOrder.customerEmail && (
                                             <>
-                                                <dt className="text-muted-foreground">Email:</dt>
+                                                <dt className="text-muted-foreground">{t('email')}:</dt>
                                                 <dd>{selectedOrder.customerEmail}</dd>
                                             </>
                                         )}
@@ -171,18 +173,18 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
 
                                 {/* Pickup Info */}
                                 <div>
-                                    <h4 className="font-semibold mb-2">Pickup Information</h4>
+                                    <h4 className="font-semibold mb-2">{t('pickupInformation')}</h4>
                                     <dl className="grid grid-cols-2 gap-2 text-sm">
-                                        <dt className="text-muted-foreground">Date:</dt>
+                                        <dt className="text-muted-foreground">{t('date')}:</dt>
                                         <dd>{new Date(selectedOrder.pickupDate).toLocaleDateString()}</dd>
-                                        <dt className="text-muted-foreground">Time:</dt>
+                                        <dt className="text-muted-foreground">{t('time')}:</dt>
                                         <dd>{selectedOrder.pickupTime}</dd>
                                     </dl>
                                 </div>
 
                                 {/* Order Items */}
                                 <div>
-                                    <h4 className="font-semibold mb-2">Order Items</h4>
+                                    <h4 className="font-semibold mb-2">{t('orderItems')}</h4>
                                     <div className="space-y-2">
                                         {selectedOrder.orderItems.map(item => (
                                             <div key={item.id} className="flex justify-between items-start p-3 bg-muted rounded-lg">
@@ -192,7 +194,7 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
                                                         <p className="text-sm text-muted-foreground">{item.menuItemOptionName}</p>
                                                     )}
                                                     {item.specialInstructions && (
-                                                        <p className="text-xs text-muted-foreground mt-1">Note: {item.specialInstructions}</p>
+                                                        <p className="text-xs text-muted-foreground mt-1">{t('note')}: {item.specialInstructions}</p>
                                                     )}
                                                 </div>
                                                 <div className="text-right">
@@ -207,14 +209,14 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
                                 {/* Additional Notes */}
                                 {selectedOrder.additionalNote && (
                                     <div>
-                                        <h4 className="font-semibold mb-2">Additional Notes</h4>
+                                        <h4 className="font-semibold mb-2">{t('additionalNotes')}</h4>
                                         <p className="text-sm text-muted-foreground">{selectedOrder.additionalNote}</p>
                                     </div>
                                 )}
 
                                 {/* Total */}
                                 <div className="flex justify-between items-center pt-4 border-t">
-                                    <span className="font-semibold">Total:</span>
+                                    <span className="font-semibold">{t('total')}:</span>
                                     <span className="text-2xl font-bold">{formatPrice(selectedOrder.totalAmount, currency)}</span>
                                 </div>
                             </div>

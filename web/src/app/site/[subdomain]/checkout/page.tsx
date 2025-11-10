@@ -9,8 +9,11 @@ import { CartItemCard } from '@/stories/orders/CartItemCard'
 import { ArrowLeft } from 'lucide-react'
 import { PoweredByKumiko } from '@/stories/websites'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 
 export default function CheckoutPage() {
+  const t = useTranslations('checkout')
+  const tCommon = useTranslations('common')
   const params = useParams()
   const router = useRouter()
   const subdomain = params.subdomain as string
@@ -38,28 +41,28 @@ export default function CheckoutPage() {
   const handleSubmitOrder = async () => {
     // Validation
     if (!customerInfo.name.trim()) {
-      toast.error('Please enter your name')
+      toast.error(t('enterName'))
       return
     }
     if (!customerInfo.phone.trim()) {
-      toast.error('Please enter your phone number')
+      toast.error(t('enterPhone'))
       return
     }
     if (!customerInfo.email.trim()) {
-      toast.error('Please enter your email')
+      toast.error(t('enterEmail'))
       return
     }
     if (!customerInfo.pickupDate) {
-      toast.error('Please select a pickup date')
+      toast.error(t('selectPickupDate'))
       return
     }
     if (cart.length === 0) {
-      toast.error('Your cart is empty')
+      toast.error(t('cartEmpty'))
       router.push(`/site/${subdomain}`)
       return
     }
     if (!restaurantId || !menuId) {
-      toast.error('Restaurant information is missing')
+      toast.error(t('restaurantInfoMissing'))
       return
     }
 
@@ -93,7 +96,7 @@ export default function CheckoutPage() {
         orderItems,
       })
 
-      toast.success('Order placed successfully! Redirecting to order status...')
+      toast.success(t('orderPlacedSuccessfully'))
 
       // Reset form
       clearCart()
@@ -104,7 +107,7 @@ export default function CheckoutPage() {
         router.push(`/order/${result.id}/status`)
       }
     } catch (error) {
-      toast.error('Failed to place order. Please try again.')
+      toast.error(t('failedToPlaceOrder'))
     }
   }
 
@@ -113,9 +116,9 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-gray-900">Your cart is empty</h1>
-          <p className="text-gray-600">Add items to your cart before checking out.</p>
-          <Button onClick={() => router.push(`/site/${subdomain}`)}>Back to Menu</Button>
+          <h1 className="text-2xl font-bold text-gray-900">{t('cartEmpty')}</h1>
+          <p className="text-gray-600">{t('addItemsFirst')}</p>
+          <Button onClick={() => router.push(`/site/${subdomain}`)}>{t('backToMenu')}</Button>
         </div>
       </div>
     )
@@ -134,7 +137,7 @@ export default function CheckoutPage() {
             className="mb-2 sm:mb-3 text-sm sm:text-base -ml-2 sm:-ml-0"
           >
             <ArrowLeft className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            Back
+            {tCommon('back')}
           </Button>
           <div className="flex items-start gap-3">
             <Image
@@ -145,8 +148,8 @@ export default function CheckoutPage() {
               className="w-12 h-12 sm:w-16 sm:h-16 object-contain flex-shrink-0"
             />
             <div className="flex-1">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Checkout</h1>
-              <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-1 sm:mt-2">Complete your order details</p>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{t('title')}</h1>
+              <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-1 sm:mt-2">{t('completeOrderDetails')}</p>
             </div>
           </div>
         </div>
@@ -154,13 +157,13 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
           {/* Left Column - Customer Info Form */}
           <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-5 lg:p-6 order-2 lg:order-1">
-            <h2 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">Customer Information</h2>
+            <h2 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">{t('customerInformation')}</h2>
             <CustomerInfoForm customerInfo={customerInfo} onCustomerInfoChange={handleCustomerInfoChange} />
           </div>
 
           {/* Right Column - Order Summary */}
           <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-5 lg:p-6 order-1 lg:order-2">
-            <h2 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">Order Summary</h2>
+            <h2 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">{t('orderSummary')}</h2>
 
             {/* Cart Items */}
             <div className="space-y-2 sm:space-y-3 md:space-y-4 mb-3 sm:mb-4 md:mb-6 max-h-[350px] sm:max-h-[400px] md:max-h-96 overflow-y-auto -mx-3 sm:-mx-4 md:-mx-5 lg:-mx-6 px-3 sm:px-4 md:px-5 lg:px-6">
@@ -179,7 +182,7 @@ export default function CheckoutPage() {
             {/* Total */}
             <div className="border-t pt-3 sm:pt-4">
               <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold mb-3 sm:mb-4 md:mb-6">
-                <span>Total:</span>
+                <span>{t('total')}:</span>
                 <span>{formatPrice(totalAmount, currency)}</span>
               </div>
 
@@ -190,7 +193,7 @@ export default function CheckoutPage() {
                 size="lg"
                 disabled={createOrderMutation.isPending}
               >
-                {createOrderMutation.isPending ? 'Placing Order...' : 'Place Order'}
+                {createOrderMutation.isPending ? t('placingOrder') : t('placeOrder')}
               </Button>
             </div>
           </div>

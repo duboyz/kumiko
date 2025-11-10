@@ -13,8 +13,10 @@ import { Websites } from '@/stories/websites'
 import { LoadingState } from '@/components'
 import { ErrorState } from '@/components'
 import { CreateWebsiteWizard } from '@/components/websites/CreateWebsiteWizard'
+import { useTranslations } from 'next-intl'
 
 export default function WebsitesPage() {
+  const t = useTranslations('websites')
   const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   const { selectedLocation } = useLocationSelection()
@@ -48,8 +50,8 @@ export default function WebsitesPage() {
     return (
       <ContentContainer>
         <ErrorState
-          title="Failed to load websites"
-          message="There was an error loading your websites. Please try again."
+          title={t('failedToLoadWebsites')}
+          message={t('failedToLoadError')}
         />
       </ContentContainer>
     )
@@ -61,16 +63,16 @@ export default function WebsitesPage() {
         <div className="flex items-center gap-4">
           <img src={KumikoWebsiteImage} alt="Kumiko Website" width={60} height={60} className="rounded-lg" />
           <div>
-            <h1 className="text-3xl font-bold">Websites</h1>
+            <h1 className="text-3xl font-bold">{t('title')}</h1>
             <p className="text-muted-foreground">
-              Manage your restaurant websites and build pages with prebuilt sections.
+              {t('manageWebsitesDescription')}
             </p>
           </div>
         </div>
 
         <Button variant="default" onClick={() => setIsCreateOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Create Website
+          {t('createWebsite')}
         </Button>
       </div>
 

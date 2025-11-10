@@ -19,8 +19,10 @@ import { PricingCard } from '@/stories/subscriptions/PricingCard/PricingCard'
 import { SubscriptionStatus } from '@/stories/subscriptions/SubscriptionStatus/SubscriptionStatus'
 import { LoadingSpinner } from '@/components'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 export default function SubscriptionPage() {
+  const t = useTranslations('subscription')
   const [billingInterval, setBillingInterval] = useState<'Monthly' | 'Yearly'>('Monthly')
   const [showCancelDialog, setShowCancelDialog] = useState(false)
 
@@ -36,7 +38,7 @@ export default function SubscriptionPage() {
         billingInterval,
       })
     } catch (error) {
-      toast.error('Failed to create checkout session')
+      toast.error(t('failedToCreateCheckout'))
     }
   }
 
@@ -48,7 +50,7 @@ export default function SubscriptionPage() {
       }
       setShowCancelDialog(false)
     } catch (error) {
-      toast.error('Failed to cancel subscription')
+      toast.error(t('failedToCancel'))
     }
   }
 
@@ -78,13 +80,13 @@ export default function SubscriptionPage() {
       <div>
         <h1 className="text-3xl font-bold">
           {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod
-            ? 'Choose Your Plan'
-            : 'Subscription Management'}
+            ? t('chooseYourPlan')
+            : t('subscriptionManagement')}
         </h1>
         <p className="text-muted-foreground">
           {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod
-            ? 'Select a plan to continue after your free trial ends'
-            : 'Manage your subscription and billing'}
+            ? t('selectPlan')
+            : t('manageBilling')}
         </p>
       </div>
 
@@ -95,15 +97,13 @@ export default function SubscriptionPage() {
             <div className="flex items-start gap-3">
               <span className="text-2xl">🎉</span>
               <div>
-                <h3 className="font-semibold text-blue-900">30-Day Free Trial Active</h3>
+                <h3 className="font-semibold text-blue-900">{t('freeTrialActive')}</h3>
                 <p className="mt-1 text-sm text-blue-800">
-                  You're currently enjoying full access to all Basic plan features. No payment required until{' '}
-                  <strong>
-                    {userSubscription.trialEndDate
+                  {t('freeTrialMessage', {
+                    date: userSubscription.trialEndDate
                       ? new Date(userSubscription.trialEndDate).toLocaleDateString()
-                      : 'N/A'}
-                  </strong>
-                  . Choose a plan below to set up billing and continue using the service after your trial.
+                      : 'N/A'
+                  })}
                 </p>
               </div>
             </div>
@@ -115,7 +115,7 @@ export default function SubscriptionPage() {
       {userSubscription && userSubscription.hasPaymentMethod && (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">
-            {userSubscription.isTrialing ? 'Trial Subscription' : 'Current Subscription'}
+            {userSubscription.isTrialing ? t('trialSubscription') : t('currentSubscription')}
           </h2>
           <SubscriptionStatus
             subscription={userSubscription}
@@ -127,12 +127,12 @@ export default function SubscriptionPage() {
           {userSubscription.isActive && (
             <Card>
               <CardHeader>
-                <CardTitle>Manage Subscription</CardTitle>
-                <CardDescription>Cancel or modify your subscription</CardDescription>
+                <CardTitle>{t('manageSubscription')}</CardTitle>
+                <CardDescription>{t('cancelOrModify')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button variant="destructive" onClick={() => setShowCancelDialog(true)}>
-                  Cancel Subscription
+                  {t('cancelSubscription')}
                 </Button>
               </CardContent>
             </Card>
@@ -144,18 +144,18 @@ export default function SubscriptionPage() {
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold">
           {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod
-            ? 'Available Plans'
+            ? t('availablePlans')
             : userSubscription
-              ? 'Upgrade or Change Plan'
-              : 'Choose a Plan'}
+              ? t('upgradeOrChangePlan')
+              : t('choosePlan')}
         </h2>
 
         <Tabs value={billingInterval} onValueChange={(v) => setBillingInterval(v as 'Monthly' | 'Yearly')}>
           <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="Monthly">Monthly</TabsTrigger>
+            <TabsTrigger value="Monthly">{t('monthly')}</TabsTrigger>
             <TabsTrigger value="Yearly">
-              Yearly
-              <span className="ml-2 text-xs text-green-600">(Save 17%)</span>
+              {t('yearly')}
+              <span className="ml-2 text-xs text-green-600">({t('save17Percent')})</span>
             </TabsTrigger>
           </TabsList>
 
@@ -181,19 +181,19 @@ export default function SubscriptionPage() {
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel Subscription?</AlertDialogTitle>
+            <AlertDialogTitle>{t('cancelTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to cancel your subscription? You'll continue to have access until the end of your current billing period.
+              {t('cancelDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
+            <AlertDialogCancel>{t('keepSubscription')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancelSubscription}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={cancelSubscription.isPending}
             >
-              {cancelSubscription.isPending ? 'Canceling...' : 'Cancel Subscription'}
+              {cancelSubscription.isPending ? t('canceling') : t('cancelSubscription')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

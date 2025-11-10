@@ -7,6 +7,7 @@ import { Building2, Edit, Save, X } from 'lucide-react'
 import { BusinessDetailsEditor, BusinessDetails, BusinessHoursEditor, BusinessHours } from '@/stories/onboarding'
 import { useUpdateRestaurant, RestaurantBaseDto, UpdateRestaurantCommand } from '@shared'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface RestaurantDetailsSettingsProps {
     restaurant: RestaurantBaseDto
@@ -23,6 +24,8 @@ const parseBusinessHours = (hoursJson?: string | null): BusinessHours | null => 
 }
 
 export function RestaurantDetailsSettings({ restaurant }: RestaurantDetailsSettingsProps) {
+    const t = useTranslations('restaurantSettings')
+    const tCommon = useTranslations('common')
     const [isEditing, setIsEditing] = useState(false)
     const [businessDetails, setBusinessDetails] = useState<BusinessDetails | null>(null)
     const [businessHours, setBusinessHours] = useState<BusinessHours | null>(null)
@@ -58,7 +61,7 @@ export function RestaurantDetailsSettings({ restaurant }: RestaurantDetailsSetti
 
     const handleSave = async () => {
         if (!businessDetails || !businessHours) {
-            toast.error('Please fill in all required fields')
+            toast.error(t('fillRequiredFields'))
             return
         }
 
@@ -80,12 +83,12 @@ export function RestaurantDetailsSettings({ restaurant }: RestaurantDetailsSetti
             }
 
             await updateRestaurant.mutateAsync(command)
-            toast.success('Restaurant details updated successfully')
+            toast.success(t('updatedSuccessfully'))
             setIsEditing(false)
             setBusinessDetails(null)
             setBusinessHours(null)
         } catch (error) {
-            toast.error('Failed to update restaurant details')
+            toast.error(t('failedToUpdate'))
             console.error('Error updating restaurant:', error)
         }
     }
@@ -105,30 +108,30 @@ export function RestaurantDetailsSettings({ restaurant }: RestaurantDetailsSetti
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <Building2 className="w-5 h-5" />
-                            <CardTitle>Restaurant Details</CardTitle>
+                            <CardTitle>{t('restaurantDetails')}</CardTitle>
                         </div>
                         <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
                             <Edit className="w-4 h-4 mr-2" />
-                            Edit
+                            {tCommon('edit')}
                         </Button>
                     </div>
-                    <CardDescription>View and manage your restaurant information</CardDescription>
+                    <CardDescription>{t('viewAndManage')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-6">
                         {/* Basic Information */}
                         <div>
                             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                                Basic Information
+                                {t('basicInformation')}
                             </h3>
                             <dl className="grid grid-cols-1 gap-3">
                                 <div>
-                                    <dt className="text-sm font-medium text-muted-foreground">Name</dt>
+                                    <dt className="text-sm font-medium text-muted-foreground">{tCommon('name') || 'Name'}</dt>
                                     <dd className="text-sm">{restaurant.name}</dd>
                                 </div>
                                 {restaurant.description && (
                                     <div>
-                                        <dt className="text-sm font-medium text-muted-foreground">Description</dt>
+                                        <dt className="text-sm font-medium text-muted-foreground">{tCommon('description') || 'Description'}</dt>
                                         <dd className="text-sm">{restaurant.description}</dd>
                                     </div>
                                 )}
@@ -137,10 +140,10 @@ export function RestaurantDetailsSettings({ restaurant }: RestaurantDetailsSetti
 
                         {/* Location */}
                         <div>
-                            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Location</h3>
+                            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">{t('location')}</h3>
                             <dl className="grid grid-cols-1 gap-3">
                                 <div>
-                                    <dt className="text-sm font-medium text-muted-foreground">Address</dt>
+                                    <dt className="text-sm font-medium text-muted-foreground">{tCommon('address') || 'Address'}</dt>
                                     <dd className="text-sm">
                                         {restaurant.address}
                                         {restaurant.city && `, ${restaurant.city}`}
@@ -156,14 +159,14 @@ export function RestaurantDetailsSettings({ restaurant }: RestaurantDetailsSetti
                         {parsedBusinessHours && (
                             <div>
                                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                                    Business Hours
+                                    {t('businessHours')}
                                 </h3>
                                 <dl className="grid grid-cols-1 gap-2">
                                     {Object.entries(parsedBusinessHours).map(([day, hours]) => (
                                         <div key={day} className="flex justify-between items-center py-1">
                                             <dt className="text-sm font-medium capitalize">{day}</dt>
                                             <dd className="text-sm text-muted-foreground">
-                                                {hours ? `${hours.open} - ${hours.close}` : 'Closed'}
+                                                {hours ? `${hours.open} - ${hours.close}` : t('closed')}
                                             </dd>
                                         </div>
                                     ))}
@@ -183,12 +186,12 @@ export function RestaurantDetailsSettings({ restaurant }: RestaurantDetailsSetti
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <Building2 className="w-5 h-5" />
-                            <CardTitle>Edit Restaurant Details</CardTitle>
+                            <CardTitle>{t('editRestaurantDetails')}</CardTitle>
                         </div>
                         <div className="flex gap-2">
                             <Button onClick={handleCancel} variant="outline" size="sm" disabled={updateRestaurant.isPending}>
                                 <X className="w-4 h-4 mr-2" />
-                                Cancel
+                                {tCommon('cancel')}
                             </Button>
                             <Button
                                 onClick={handleSave}
@@ -196,7 +199,7 @@ export function RestaurantDetailsSettings({ restaurant }: RestaurantDetailsSetti
                                 disabled={!businessDetails || !businessHours || updateRestaurant.isPending}
                             >
                                 <Save className="w-4 h-4 mr-2" />
-                                {updateRestaurant.isPending ? 'Saving...' : 'Save Changes'}
+                                {updateRestaurant.isPending ? t('saving') : t('saveChanges')}
                             </Button>
                         </div>
                     </div>

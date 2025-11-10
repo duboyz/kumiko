@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { useTranslations } from 'next-intl'
 import { useResetPassword } from '@shared/hooks'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -14,19 +15,14 @@ import { Lock, Eye, EyeOff } from 'lucide-react'
 
 const KumikoAuthImage = '/icons/kumiko-auth.png'
 
-const resetPasswordSchema = z
-    .object({
-        newPassword: z.string().min(8, 'Password must be at least 8 characters'),
-        confirmPassword: z.string().min(8, 'Password must be at least 8 characters'),
-    })
-    .refine(data => data.newPassword === data.confirmPassword, {
-        message: "Passwords don't match",
-        path: ['confirmPassword'],
-    })
-
-type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>
+type ResetPasswordFormValues = {
+    newPassword: string
+    confirmPassword: string
+}
 
 function ResetPasswordForm() {
+    const t = useTranslations('auth')
+    const tCommon = useTranslations('common')
     const router = useRouter()
     const searchParams = useSearchParams()
     const resetPasswordMutation = useResetPassword()
@@ -34,6 +30,16 @@ function ResetPasswordForm() {
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [token, setToken] = useState<string | null>(null)
+
+    const resetPasswordSchema = z
+        .object({
+            newPassword: z.string().min(8, t('passwordMinLength8')),
+            confirmPassword: z.string().min(8, t('passwordMinLength8')),
+        })
+        .refine(data => data.newPassword === data.confirmPassword, {
+            message: t('passwordsDontMatch'),
+            path: ['confirmPassword'],
+        })
 
     const form = useForm<ResetPasswordFormValues>({
         resolver: zodResolver(resetPasswordSchema),
@@ -46,15 +52,15 @@ function ResetPasswordForm() {
     useEffect(() => {
         const tokenParam = searchParams.get('token')
         if (!tokenParam) {
-            setError('Invalid or missing reset token')
+            setError(t('invalidToken'))
         } else {
             setToken(tokenParam)
         }
-    }, [searchParams])
+    }, [searchParams, t])
 
     const onSubmit = async (data: ResetPasswordFormValues) => {
         if (!token) {
-            setError('Invalid or missing reset token')
+            setError(t('invalidToken'))
             return
         }
 
@@ -67,7 +73,7 @@ function ResetPasswordForm() {
             })
             // The useResetPassword hook handles navigation to login
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to reset password. Please try again.')
+            setError(err instanceof Error ? err.message : t('resetFailed'))
         }
     }
 
@@ -75,7 +81,7 @@ function ResetPasswordForm() {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <p className="text-muted-foreground">Loading...</p>
+                    <p className="text-muted-foreground">{tCommon('loading')}</p>
                 </div>
             </div>
         )
@@ -105,8 +111,8 @@ function ResetPasswordForm() {
                                 <Lock className="w-8 h-8 text-primary" />
                             </div>
                         </div>
-                        <h2 className="text-2xl font-bold">Reset your password</h2>
-                        <p className="text-muted-foreground mt-2">Enter your new password below.</p>
+                        <h2 className="text-2xl font-bold">{t('resetPasswordTitle')}</h2>
+                        <p className="text-muted-foreground mt-2">{t('resetPasswordSubtitle')}</p>
                     </div>
 
                     <Form {...form}>
@@ -116,11 +122,11 @@ function ResetPasswordForm() {
                                 name="newPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>New Password</FormLabel>
+                                        <FormLabel>{t('newPassword')}</FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
-                                                    placeholder="Enter your new password"
+                                                    placeholder={t('newPasswordPlaceholder')}
                                                     type={showPassword ? 'text' : 'password'}
                                                     {...field}
                                                 />
@@ -142,11 +148,11 @@ function ResetPasswordForm() {
                                 name="confirmPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Confirm Password</FormLabel>
+                                        <FormLabel>{t('confirmPassword')}</FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
-                                                    placeholder="Confirm your new password"
+                                                    placeholder={t('confirmPasswordPlaceholder')}
                                                     type={showConfirmPassword ? 'text' : 'password'}
                                                     {...field}
                                                 />
@@ -167,14 +173,14 @@ function ResetPasswordForm() {
                             {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</div>}
 
                             <Button type="submit" className="w-full" disabled={resetPasswordMutation.isPending || !token}>
-                                {resetPasswordMutation.isPending ? 'Resetting...' : 'Reset Password'}
+                                {resetPasswordMutation.isPending ? t('resetting') : t('resetPassword')}
                             </Button>
                         </form>
                     </Form>
 
                     <div className="mt-6 text-center">
                         <Link href="/login" className="text-sm text-muted-foreground hover:text-primary">
-                            Back to login
+                            {t('backToLogin')}
                         </Link>
                     </div>
                 </div>
@@ -184,11 +190,13 @@ function ResetPasswordForm() {
 }
 
 export default function ResetPasswordPage() {
+    const tCommon = useTranslations('common')
+
     return (
         <Suspense
             fallback={
                 <div className="flex items-center justify-center min-h-screen">
-                    <p className="text-muted-foreground">Loading...</p>
+                    <p className="text-muted-foreground">{tCommon('loading')}</p>
                 </div>
             }
         >

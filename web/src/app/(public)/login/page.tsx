@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { useTranslations } from 'next-intl'
 import { useLogin } from '@shared/hooks'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -13,19 +14,23 @@ import { Input } from '@/components/ui/input'
 
 const KumikoAuthImage = '/icons/kumiko-auth.png'
 
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-})
-
-type LoginFormValues = z.infer<typeof loginSchema>
+type LoginFormValues = {
+  email: string
+  password: string
+}
 
 export default function LoginPage() {
+  const t = useTranslations('auth')
   const router = useRouter()
   const searchParams = useSearchParams()
   const loginMutation = useLogin()
   const [error, setError] = useState<string | null>(null)
   const [resetSuccess, setResetSuccess] = useState(false)
+
+  const loginSchema = z.object({
+    email: z.string().email(t('invalidEmail')),
+    password: z.string().min(6, t('passwordMinLength')),
+  })
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -56,7 +61,7 @@ export default function LoginPage() {
       await loginMutation.mutateAsync(data)
       // The useLogin hook handles navigation to dashboard
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.')
+      setError(err instanceof Error ? err.message : t('loginFailed'))
     }
   }
 
@@ -83,8 +88,8 @@ export default function LoginPage() {
       <div className="flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold">Welcome back</h2>
-            <p className="text-muted-foreground">Enter your email and password to access your account</p>
+            <h2 className="text-2xl font-bold">{t('welcomeBack')}</h2>
+            <p className="text-muted-foreground">{t('loginSubtitle')}</p>
           </div>
 
           <Form {...form}>
@@ -94,9 +99,9 @@ export default function LoginPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="name@example.com" type="email" {...field} />
+                      <Input placeholder={t('emailPlaceholder')} type="email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -108,13 +113,13 @@ export default function LoginPage() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>{t('password')}</FormLabel>
                       <Link href="/forgot-password" className="text-xs text-primary hover:underline">
-                        Forgot password?
+                        {t('forgotPassword')}
                       </Link>
                     </div>
                     <FormControl>
-                      <Input placeholder="Enter your password" type="password" {...field} />
+                      <Input placeholder={t('passwordPlaceholder')} type="password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -123,23 +128,23 @@ export default function LoginPage() {
 
               {resetSuccess && (
                 <div className="text-sm text-green-600 bg-green-50 p-3 rounded-md">
-                  Password reset successful! You can now log in with your new password.
+                  {t('passwordResetSuccess')}
                 </div>
               )}
 
               {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</div>}
 
               <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-                {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
+                {loginMutation.isPending ? t('signingIn') : t('signIn')}
               </Button>
             </form>
           </Form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have an account?{' '}
+              {t('dontHaveAccount')}{' '}
               <Link href="/register" className="text-primary hover:underline">
-                Sign up
+                {t('signUp')}
               </Link>
             </p>
           </div>
@@ -147,7 +152,7 @@ export default function LoginPage() {
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-4">
               <Button type="button" variant="outline" size="sm" onClick={fillTestData} className="w-full">
-                Fill Test Data
+                {t('fillTestData')}
               </Button>
             </div>
           )}
