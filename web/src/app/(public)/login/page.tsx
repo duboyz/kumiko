@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useTranslations } from 'next-intl'
-import { useLogin } from '@shared/hooks'
+import { useLogin, useCurrentUser } from '@shared/hooks'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -26,6 +26,7 @@ export default function LoginPage() {
   const loginMutation = useLogin()
   const [error, setError] = useState<string | null>(null)
   const [resetSuccess, setResetSuccess] = useState(false)
+  const { data: currentUser, isLoading: isCheckingAuth } = useCurrentUser()
 
   const loginSchema = z.object({
     email: z.string().email(t('invalidEmail')),
@@ -39,6 +40,13 @@ export default function LoginPage() {
       password: '',
     },
   })
+
+  // Redirect to dashboard if user is already logged in
+  useEffect(() => {
+    if (currentUser && !isCheckingAuth) {
+      router.push('/dashboard')
+    }
+  }, [currentUser, isCheckingAuth, router])
 
   useEffect(() => {
     if (searchParams.get('reset') === 'success') {

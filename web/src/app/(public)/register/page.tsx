@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useTranslations } from 'next-intl'
-import { useRegister } from '@shared/hooks'
+import { useRegister, useCurrentUser } from '@shared/hooks'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -25,6 +25,7 @@ export default function RegisterPage() {
   const router = useRouter()
   const registerMutation = useRegister()
   const [error, setError] = useState<string | null>(null)
+  const { data: currentUser, isLoading: isCheckingAuth } = useCurrentUser()
 
   const registerSchema = z
     .object({
@@ -49,6 +50,13 @@ export default function RegisterPage() {
       lastName: '',
     },
   })
+
+  // Redirect to dashboard if user is already logged in
+  useEffect(() => {
+    if (currentUser && !isCheckingAuth) {
+      router.push('/dashboard')
+    }
+  }, [currentUser, isCheckingAuth, router])
 
   const onSubmit = async (data: RegisterFormValues) => {
     setError(null)

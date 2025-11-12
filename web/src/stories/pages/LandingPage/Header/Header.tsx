@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import { useCurrentUser } from '@shared/hooks'
 
-interface HeaderProps {}
+interface HeaderProps { }
 
-export function Header({}: HeaderProps) {
+export function Header({ }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { data: currentUser, isLoading } = useCurrentUser()
 
   const handleLogin = () => {
     if (typeof window !== 'undefined') {
@@ -17,6 +19,12 @@ export function Header({}: HeaderProps) {
   const handleGetStarted = () => {
     if (typeof window !== 'undefined') {
       window.location.href = '/register'
+    }
+  }
+
+  const handleDashboard = () => {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/dashboard'
     }
   }
 
@@ -44,15 +52,26 @@ export function Header({}: HeaderProps) {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <button onClick={handleLogin} className="text-gray-600 hover:text-gray-900 transition-colors font-medium">
-              Login
-            </button>
-            <button
-              onClick={handleGetStarted}
-              className="bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors"
-            >
-              Get Started
-            </button>
+            {!isLoading && currentUser ? (
+              <button
+                onClick={handleDashboard}
+                className="bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+              >
+                Go to Dashboard
+              </button>
+            ) : !isLoading ? (
+              <>
+                <button onClick={handleLogin} className="text-gray-600 hover:text-gray-900 transition-colors font-medium">
+                  Login
+                </button>
+                <button
+                  onClick={handleGetStarted}
+                  className="bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+                >
+                  Get Started
+                </button>
+              </>
+            ) : null}
           </div>
 
           {/* Mobile menu button */}
@@ -92,24 +111,38 @@ export function Header({}: HeaderProps) {
                 Pricing
               </a>
               <div className="border-t border-gray-200 pt-3 mt-3">
-                <button
-                  onClick={() => {
-                    handleLogin()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="block w-full text-left px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
-                >
-                  Login
-                </button>
-                <button
-                  onClick={() => {
-                    handleGetStarted()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="block w-full text-left px-3 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors mt-2"
-                >
-                  Get Started
-                </button>
+                {!isLoading && currentUser ? (
+                  <button
+                    onClick={() => {
+                      handleDashboard()
+                      setIsMobileMenuOpen(false)
+                    }}
+                    className="block w-full text-left px-3 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+                  >
+                    Go to Dashboard
+                  </button>
+                ) : !isLoading ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        handleLogin()
+                        setIsMobileMenuOpen(false)
+                      }}
+                      className="block w-full text-left px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                    >
+                      Login
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleGetStarted()
+                        setIsMobileMenuOpen(false)
+                      }}
+                      className="block w-full text-left px-3 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors mt-2"
+                    >
+                      Get Started
+                    </button>
+                  </>
+                ) : null}
               </div>
             </div>
           </div>
