@@ -18,12 +18,12 @@ public record OrderDto(
     decimal TotalAmount,
     Guid RestaurantId,
     Guid RestaurantMenuId,
-    List<OrderItemDto> OrderItems,
+    List<RestaurantOrderItemDto> OrderItems,
     DateTime CreatedAt,
     DateTime UpdatedAt
 );
 
-public record OrderItemDto(
+public record RestaurantOrderItemDto(
     Guid Id,
     Guid MenuItemId,
     string MenuItemName,

@@ -6,6 +6,7 @@ import type {
   CreateCheckoutSessionResult,
   GetUserSubscriptionResult,
   CancelSubscriptionResult,
+  GetUsageStatsResult,
 } from '../types/subscription.types'
 
 export const subscriptionApi = {
@@ -47,6 +48,15 @@ export const subscriptionApi = {
   cancelSubscription: async (): Promise<ResponseData<CancelSubscriptionResult>> => {
     const { data: response } = await apiClient.post<ApiResponse<CancelSubscriptionResult>>('/api/subscriptions/cancel')
     if (!response.success) throw new Error(response.message || 'Failed to cancel subscription')
+    return response.data
+  },
+
+  /**
+   * Get usage statistics for the current user's subscription
+   */
+  getUsageStats: async (): Promise<ResponseData<GetUsageStatsResult>> => {
+    const { data: response } = await apiClient.get<ApiResponse<GetUsageStatsResult>>('/api/subscriptions/usage')
+    if (!response.success) throw new Error(response.message || 'Failed to get usage statistics')
     return response.data
   },
 }

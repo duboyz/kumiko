@@ -122,12 +122,12 @@ public class SubscriptionService(ApplicationDbContext context) : ISubscriptionSe
 
         if (subscription == null)
         {
-            // Check if user's trial period has expired (30 days from registration)
+            // Check if user's trial period has expired (14 days from registration)
             var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
             if (user == null) return false;
 
-            // If registered more than 30 days ago, trial has expired
-            if (user.CreatedAt.AddDays(30) < DateTime.UtcNow)
+            // If registered more than 14 days ago, trial has expired
+            if (user.CreatedAt.AddDays(14) < DateTime.UtcNow)
             {
                 return false;
             }

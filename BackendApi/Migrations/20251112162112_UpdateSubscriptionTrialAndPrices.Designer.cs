@@ -3,6 +3,7 @@ using System;
 using BackendApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackendApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251112162112_UpdateSubscriptionTrialAndPrices")]
+    partial class UpdateSubscriptionTrialAndPrices
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -878,7 +881,7 @@ namespace BackendApi.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2025, 11, 12, 17, 30, 37, 187, DateTimeKind.Utc).AddTicks(2310),
+                            CreatedAt = new DateTime(2025, 11, 12, 16, 21, 12, 591, DateTimeKind.Utc).AddTicks(3270),
                             IsActive = true,
                             IsDeleted = false,
                             MaxLocations = 1,
@@ -891,7 +894,7 @@ namespace BackendApi.Migrations
                         new
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            CreatedAt = new DateTime(2025, 11, 12, 17, 30, 37, 187, DateTimeKind.Utc).AddTicks(2320),
+                            CreatedAt = new DateTime(2025, 11, 12, 16, 21, 12, 591, DateTimeKind.Utc).AddTicks(3270),
                             IsActive = true,
                             IsDeleted = false,
                             MaxLocations = 3,
@@ -904,7 +907,7 @@ namespace BackendApi.Migrations
                         new
                         {
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            CreatedAt = new DateTime(2025, 11, 12, 17, 30, 37, 187, DateTimeKind.Utc).AddTicks(2320),
+                            CreatedAt = new DateTime(2025, 11, 12, 16, 21, 12, 591, DateTimeKind.Utc).AddTicks(3290),
                             IsActive = true,
                             IsDeleted = false,
                             MaxLocations = -1,

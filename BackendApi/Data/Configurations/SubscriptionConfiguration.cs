@@ -63,6 +63,9 @@ public static class SubscriptionConfiguration
                 YearlyPrice = 299.99m,
                 MaxLocations = 1,
                 MaxMenusPerLocation = 3,
+                // Stripe price IDs will be populated from appsettings.json on startup
+                StripePriceIdMonthly = null,
+                StripePriceIdYearly = null,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             },
@@ -75,6 +78,9 @@ public static class SubscriptionConfiguration
                 YearlyPrice = 799.99m,
                 MaxLocations = 3,
                 MaxMenusPerLocation = 3,
+                // Stripe price IDs will be populated from appsettings.json on startup
+                StripePriceIdMonthly = null,
+                StripePriceIdYearly = null,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             },
@@ -87,6 +93,9 @@ public static class SubscriptionConfiguration
                 YearlyPrice = 1999.99m,
                 MaxLocations = -1, // -1 represents unlimited
                 MaxMenusPerLocation = -1, // -1 represents unlimited
+                // Stripe price IDs will be populated from appsettings.json on startup
+                StripePriceIdMonthly = null,
+                StripePriceIdYearly = null,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             }

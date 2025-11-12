@@ -7,22 +7,36 @@ namespace BackendApi.Features.Subscription.HandleStripeWebhook;
 
 [Route("api/webhooks")]
 [Tags("Webhook")]
-public class HandleStripeWebhookController(IMediator mediator) : BaseController(mediator)
+public class HandleStripeWebhookController(IMediator mediator, ILogger<HandleStripeWebhookController> logger) : BaseController(mediator)
 {
     [HttpPost("stripe")]
     public async Task<ActionResult<ApiResponse<HandleStripeWebhookResult>>> HandleWebhook()
     {
+        // Use both Console and Logger to ensure output
+        var timestamp = DateTime.UtcNow;
+        Console.WriteLine($"[WEBHOOK] Received at {timestamp}");
+        Console.Error.WriteLine($"[WEBHOOK] Received at {timestamp}"); // Also write to stderr
+        logger.LogWarning($"WEBHOOK RECEIVED at {timestamp}"); // Use Warning level to bypass log filtering
+
         var payload = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
         var signature = HttpContext.Request.Headers["Stripe-Signature"].ToString();
+
+        Console.WriteLine($"[WEBHOOK] Signature: {signature?.Substring(0, Math.Min(20, signature?.Length ?? 0))}...");
+        Console.WriteLine($"[WEBHOOK] Payload length: {payload?.Length} bytes");
+        logger.LogWarning($"Webhook signature: {signature?.Substring(0, Math.Min(20, signature?.Length ?? 0))}..., Payload: {payload?.Length} bytes");
 
         var command = new HandleStripeWebhookCommand(payload, signature);
         var result = await Mediator.Send(command);
 
         if (!result.Success)
         {
+            Console.WriteLine($"[WEBHOOK] FAILED: {result.Message}");
+            logger.LogWarning($"WEBHOOK FAILED: {result.Message}");
             return CreateResponse(result, ApiResponseStatusCode.BadRequest, result.Message);
         }
 
+        Console.WriteLine("[WEBHOOK] PROCESSED SUCCESSFULLY");
+        logger.LogWarning("WEBHOOK PROCESSED SUCCESSFULLY");
         return CreateResponse(result, ApiResponseStatusCode.Success, "Webhook processed successfully");
     }
 }

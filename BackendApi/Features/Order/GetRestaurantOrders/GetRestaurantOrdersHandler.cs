@@ -38,7 +38,7 @@ public class GetRestaurantOrdersHandler(ApplicationDbContext context) : IQueryHa
             order.OrderItems.Sum(oi => oi.PriceAtOrder * oi.Quantity),
             order.RestaurantId,
             order.RestaurantMenuId,
-            order.OrderItems.Select(oi => new OrderItemDto(
+            order.OrderItems.Select(oi => new RestaurantOrderItemDto(
                 oi.Id,
                 oi.MenuItemId,
                 oi.MenuItem.Name,

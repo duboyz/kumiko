@@ -41,7 +41,7 @@ public class InitializeTrialHandler(
             Status = SubscriptionStatus.Trialing,
             BillingInterval = BillingInterval.Monthly,
             TrialStartDate = DateTime.UtcNow,
-            TrialEndDate = DateTime.UtcNow.AddDays(30),
+            TrialEndDate = DateTime.UtcNow.AddDays(14),
             StripeCustomerId = null,
             StripeSubscriptionId = null
         };
@@ -49,6 +49,6 @@ public class InitializeTrialHandler(
         context.UserSubscriptions.Add(trialSubscription);
         await context.SaveChangesAsync(cancellationToken);
 
-        return new InitializeTrialResult(true, $"30-day free trial activated! Trial ends on {trialSubscription.TrialEndDate:yyyy-MM-dd}");
+        return new InitializeTrialResult(true, $"14-day free trial activated! Trial ends on {trialSubscription.TrialEndDate:yyyy-MM-dd}");
     }
 }

@@ -51,3 +51,13 @@ export const useCancelSubscription = () => {
     },
   })
 }
+
+/**
+ * Hook to get usage statistics for the current user's subscription
+ */
+export const useUsageStats = () => {
+  return useQuery({
+    queryKey: ['usageStats'],
+    queryFn: () => subscriptionApi.getUsageStats(),
+  })
+}

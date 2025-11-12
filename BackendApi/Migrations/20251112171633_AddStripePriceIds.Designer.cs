@@ -3,6 +3,7 @@ using System;
 using BackendApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackendApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251112171633_AddStripePriceIds")]
+    partial class AddStripePriceIds
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -878,39 +881,45 @@ namespace BackendApi.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2025, 11, 12, 17, 30, 37, 187, DateTimeKind.Utc).AddTicks(2310),
+                            CreatedAt = new DateTime(2025, 11, 12, 17, 16, 33, 122, DateTimeKind.Utc).AddTicks(1980),
                             IsActive = true,
                             IsDeleted = false,
                             MaxLocations = 1,
                             MaxMenusPerLocation = 3,
                             MonthlyPrice = 29.99m,
                             Name = "Basic",
+                            StripePriceIdMonthly = "price_1QJy6tRsePuJe49XRwxjIXBr",
+                            StripePriceIdYearly = "price_1QJy6tRsePuJe49XfT5UGKBl",
                             Tier = "Basic",
                             YearlyPrice = 299.99m
                         },
                         new
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            CreatedAt = new DateTime(2025, 11, 12, 17, 30, 37, 187, DateTimeKind.Utc).AddTicks(2320),
+                            CreatedAt = new DateTime(2025, 11, 12, 17, 16, 33, 122, DateTimeKind.Utc).AddTicks(1990),
                             IsActive = true,
                             IsDeleted = false,
                             MaxLocations = 3,
                             MaxMenusPerLocation = 3,
                             MonthlyPrice = 79.99m,
                             Name = "Premium",
+                            StripePriceIdMonthly = "price_1QJy7YRsePuJe49XNWlGMJqV",
+                            StripePriceIdYearly = "price_1QJy7YRsePuJe49X5cEKyIQi",
                             Tier = "Premium",
                             YearlyPrice = 799.99m
                         },
                         new
                         {
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            CreatedAt = new DateTime(2025, 11, 12, 17, 30, 37, 187, DateTimeKind.Utc).AddTicks(2320),
+                            CreatedAt = new DateTime(2025, 11, 12, 17, 16, 33, 122, DateTimeKind.Utc).AddTicks(1990),
                             IsActive = true,
                             IsDeleted = false,
                             MaxLocations = -1,
                             MaxMenusPerLocation = -1,
                             MonthlyPrice = 199.99m,
                             Name = "Enterprise",
+                            StripePriceIdMonthly = "price_1QJy8ARsePuJe49X6xxfqRHb",
+                            StripePriceIdYearly = "price_1QJy8ARsePuJe49XazFRO0J8",
                             Tier = "Enterprise",
                             YearlyPrice = 1999.99m
                         });

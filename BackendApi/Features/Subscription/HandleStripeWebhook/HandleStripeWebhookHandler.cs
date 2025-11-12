@@ -18,14 +18,20 @@ public class HandleStripeWebhookHandler(
         {
             var webhookSecret = configuration["Stripe:WebhookSecret"];
 
+            logger.LogInformation("Received webhook with signature: {SignaturePrefix}...",
+                request.Signature?.Length > 20 ? request.Signature.Substring(0, 20) : request.Signature);
+
             // Verify webhook signature
+            // throwOnApiVersionMismatch: false allows handling webhooks from different API versions
             var stripeEvent = EventUtility.ConstructEvent(
                 request.Payload,
                 request.Signature,
-                webhookSecret
+                webhookSecret,
+                throwOnApiVersionMismatch: false
             );
 
-            logger.LogInformation("Processing Stripe webhook event: {EventType}", stripeEvent.Type);
+            logger.LogInformation("Processing Stripe webhook event: {EventType}, EventId: {EventId}",
+                stripeEvent.Type, stripeEvent.Id);
 
             // Handle different event types
             switch (stripeEvent.Type)
@@ -74,13 +80,86 @@ public class HandleStripeWebhookHandler(
             return;
         }
 
-        logger.LogInformation("Processing checkout session completed: {SessionId}, Customer: {CustomerId}, Subscription: {SubscriptionId}",
-            session.Id, session.CustomerId, session.SubscriptionId);
+        logger.LogInformation("Processing checkout session completed: {SessionId}, Customer: {CustomerId}, Subscription: {SubscriptionId}, PaymentStatus: {PaymentStatus}",
+            session.Id, session.CustomerId, session.SubscriptionId, session.PaymentStatus);
 
-        var userId = Guid.Parse(session.Metadata["user_id"]);
-        var subscriptionPlanId = Guid.Parse(session.Metadata["subscription_plan_id"]);
+        // Try to get metadata - be more flexible
+        Guid? userId = null;
+        Guid? subscriptionPlanId = null;
 
-        logger.LogInformation("User ID: {UserId}, Plan ID: {PlanId}", userId, subscriptionPlanId);
+        if (session.Metadata != null)
+        {
+            if (session.Metadata.TryGetValue("user_id", out var userIdStr))
+                userId = Guid.Parse(userIdStr);
+            if (session.Metadata.TryGetValue("subscription_plan_id", out var planIdStr))
+                subscriptionPlanId = Guid.Parse(planIdStr);
+        }
+
+        // If we don't have metadata, log but continue if we have customer email
+        if (!userId.HasValue || !subscriptionPlanId.HasValue)
+        {
+            logger.LogWarning("Metadata incomplete. Attempting to find user by email: {Email}", session.CustomerEmail);
+
+            if (!string.IsNullOrEmpty(session.CustomerEmail))
+            {
+                var userByEmail = await context.Users
+                    .FirstOrDefaultAsync(u => u.Email.ToLower() == session.CustomerEmail.ToLower(), cancellationToken);
+
+                if (userByEmail != null)
+                {
+                    userId = userByEmail.Id;
+                    logger.LogInformation("Found user by email: {UserId}", userId);
+
+                    // Try to determine plan from Stripe subscription
+                    if (!string.IsNullOrEmpty(session.SubscriptionId))
+                    {
+                        // Get the subscription from Stripe to find the actual price ID
+                        var subscriptionService = new Stripe.SubscriptionService();
+                        try
+                        {
+                            var stripeSubscription = await subscriptionService.GetAsync(session.SubscriptionId, cancellationToken: cancellationToken);
+                            if (stripeSubscription?.Items?.Data?.Any() == true)
+                            {
+                                var priceId = stripeSubscription.Items.Data[0].Price.Id;
+                                var matchedPlan = await context.SubscriptionPlans
+                                    .FirstOrDefaultAsync(p => p.StripePriceIdMonthly == priceId || p.StripePriceIdYearly == priceId, cancellationToken);
+
+                                if (matchedPlan != null)
+                                {
+                                    subscriptionPlanId = matchedPlan.Id;
+                                    logger.LogInformation("Determined plan from Stripe subscription - {PlanName}: {PlanId}", matchedPlan.Name, subscriptionPlanId);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Failed to fetch subscription from Stripe: {SubscriptionId}", session.SubscriptionId);
+                        }
+
+                        // If we still don't have a plan, default to Basic (trial default)
+                        if (!subscriptionPlanId.HasValue)
+                        {
+                            var basicPlan = await context.SubscriptionPlans
+                                .FirstOrDefaultAsync(p => p.Tier == SubscriptionTier.Basic && p.IsActive, cancellationToken);
+
+                            if (basicPlan != null)
+                            {
+                                subscriptionPlanId = basicPlan.Id;
+                                logger.LogInformation("Defaulting to Basic plan: {PlanId}", subscriptionPlanId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!userId.HasValue || !subscriptionPlanId.HasValue)
+            {
+                logger.LogWarning("Cannot process checkout session without user or plan information");
+                return;
+            }
+        }
+
+        logger.LogInformation("Processing for User ID: {UserId}, Plan ID: {PlanId}", userId, subscriptionPlanId);
 
         var user = await context.Users
             .Include(u => u.Subscription)
@@ -101,6 +180,12 @@ public class HandleStripeWebhookHandler(
             return;
         }
 
+        // Simple logic: If payment was made, activate the subscription
+        bool isPaidSubscription = session.PaymentStatus == "paid";
+
+        logger.LogInformation("Payment status: {PaymentStatus}, Is paid: {IsPaid}, SubscriptionId: {SubscriptionId}",
+            session.PaymentStatus, isPaidSubscription, session.SubscriptionId);
+
         // Create or update user subscription
         if (user.Subscription == null)
         {
@@ -110,30 +195,52 @@ public class HandleStripeWebhookHandler(
 
             user.Subscription = new UserSubscription
             {
-                UserId = userId,
-                SubscriptionPlanId = subscriptionPlanId,
-                Status = SubscriptionStatus.Trialing,
+                UserId = userId.Value,
+                SubscriptionPlanId = subscriptionPlanId.Value,
+                Status = isPaidSubscription ? SubscriptionStatus.Active : SubscriptionStatus.Trialing,
                 BillingInterval = billingInterval,
                 StripeCustomerId = session.CustomerId,
                 StripeSubscriptionId = session.SubscriptionId,
-                TrialStartDate = DateTime.UtcNow,
-                TrialEndDate = DateTime.UtcNow.AddDays(30)
+                TrialStartDate = isPaidSubscription ? null : DateTime.UtcNow,
+                TrialEndDate = isPaidSubscription ? null : DateTime.UtcNow.AddDays(14),
+                SubscriptionStartDate = isPaidSubscription ? DateTime.UtcNow : null
             };
 
             await context.UserSubscriptions.AddAsync(user.Subscription, cancellationToken);
         }
         else
         {
-            user.Subscription.SubscriptionPlanId = subscriptionPlanId;
+            logger.LogInformation("Updating existing subscription for user {UserId}. Current status: {CurrentStatus}",
+                userId, user.Subscription.Status);
+
+            user.Subscription.SubscriptionPlanId = subscriptionPlanId.Value;
             user.Subscription.StripeCustomerId = session.CustomerId;
             user.Subscription.StripeSubscriptionId = session.SubscriptionId;
-            user.Subscription.Status = SubscriptionStatus.Trialing;
-            user.Subscription.TrialStartDate = DateTime.UtcNow;
-            user.Subscription.TrialEndDate = DateTime.UtcNow.AddDays(30);
+
+            // Simple: If payment was made, activate the subscription
+            if (isPaidSubscription)
+            {
+                logger.LogInformation("ACTIVATING PAID SUBSCRIPTION for user {UserId}", userId);
+
+                user.Subscription.Status = SubscriptionStatus.Active;
+                user.Subscription.SubscriptionStartDate = DateTime.UtcNow;
+                // Clear trial dates since user has now paid
+                user.Subscription.TrialStartDate = null;
+                user.Subscription.TrialEndDate = null;
+            }
+            else
+            {
+                // Only set to trialing if payment wasn't made
+                logger.LogInformation("Setting subscription to TRIALING for user {UserId}", userId);
+                user.Subscription.Status = SubscriptionStatus.Trialing;
+                user.Subscription.TrialStartDate = user.Subscription.TrialStartDate ?? DateTime.UtcNow;
+                user.Subscription.TrialEndDate = user.Subscription.TrialEndDate ?? DateTime.UtcNow.AddDays(14);
+            }
         }
 
         await context.SaveChangesAsync(cancellationToken);
-        logger.LogInformation("Subscription created for user: {UserId}", userId);
+        logger.LogInformation("Subscription {Status} for user: {UserId}",
+            isPaidSubscription ? "activated" : "trial started", userId);
     }
 
     private async Task HandleSubscriptionUpdated(Event stripeEvent, CancellationToken cancellationToken)
@@ -160,10 +267,10 @@ public class HandleStripeWebhookHandler(
             _ => userSubscription.Status
         };
 
-        // TODO: Update period dates when we figure out the correct Stripe SDK property names
-        // Different versions of Stripe.net use different property names for CurrentPeriodStart/End
-        // userSubscription.CurrentPeriodStart = ...;
-        // userSubscription.CurrentPeriodEnd = ...;
+        // TODO: Update period dates when Stripe SDK properties are confirmed
+        // The Stripe.Subscription object doesn't directly expose CurrentPeriodStart/End
+        // These might be available through subscription.Items or another property
+        // For now, we'll track them through webhook events
 
         if (subscription.Status == "active" && userSubscription.SubscriptionStartDate == null)
         {
@@ -172,7 +279,7 @@ public class HandleStripeWebhookHandler(
 
         logger.LogInformation("Updated subscription status to {Status} for user subscription {Id}", subscription.Status, userSubscription.Id);
 
-        // Determine billing interval from subscription items
+        // Determine billing interval and update plan from subscription items
         if (subscription.Items?.Data.Any() == true)
         {
             var priceId = subscription.Items.Data[0].Price.Id;
@@ -181,9 +288,16 @@ public class HandleStripeWebhookHandler(
 
             if (plan != null)
             {
+                // Update the subscription plan ID based on the price
+                userSubscription.SubscriptionPlanId = plan.Id;
+
+                // Update billing interval
                 userSubscription.BillingInterval = priceId == plan.StripePriceIdYearly
                     ? BillingInterval.Yearly
                     : BillingInterval.Monthly;
+
+                logger.LogInformation("Updated subscription plan to {PlanName} (ID: {PlanId}) for user subscription {Id}",
+                    plan.Name, plan.Id, userSubscription.Id);
             }
         }
 

@@ -68,26 +68,12 @@ export function SubscriptionSettings() {
 
   const statusBadge = getStatusBadge()
 
-  const getTierIcon = (tier: string) => {
-    switch (tier) {
-      case 'Basic':
-        return '🥉'
-      case 'Premium':
-        return '🥈'
-      case 'Enterprise':
-        return '🥇'
-      default:
-        return '📦'
-    }
-  }
-
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-yellow-500" />
               Subscription Plan
             </CardTitle>
             <CardDescription>
@@ -102,23 +88,20 @@ export function SubscriptionSettings() {
       <CardContent className="space-y-4">
         {/* Current Plan */}
         <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">{getTierIcon(subscription.plan.tier)}</span>
-            <div>
-              <h3 className="font-semibold text-lg">
-                {subscription.isTrialing && !subscription.hasPaymentMethod
-                  ? 'Trial Access'
-                  : `${subscription.plan.name} Plan`}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {subscription.plan.maxLocations === -1 ? 'Unlimited' : subscription.plan.maxLocations}{' '}
-                {subscription.plan.maxLocations === 1 ? 'location' : 'locations'} •{' '}
-                {subscription.plan.maxMenusPerLocation === -1
-                  ? 'Unlimited'
-                  : subscription.plan.maxMenusPerLocation}{' '}
-                menus per location
-              </p>
-            </div>
+          <div>
+            <h3 className="font-semibold text-lg">
+              {subscription.isTrialing && !subscription.hasPaymentMethod
+                ? 'Trial Access'
+                : `${subscription.plan.name} Plan`}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {subscription.plan.maxLocations === -1 ? 'Unlimited' : subscription.plan.maxLocations}{' '}
+              {subscription.plan.maxLocations === 1 ? 'location' : 'locations'} •{' '}
+              {subscription.plan.maxMenusPerLocation === -1
+                ? 'Unlimited'
+                : subscription.plan.maxMenusPerLocation}{' '}
+              menus per location
+            </p>
           </div>
         </div>
 
@@ -168,10 +151,10 @@ export function SubscriptionSettings() {
         {subscription.isTrialing && !subscription.hasPaymentMethod && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-900 mb-2">
-              <strong>🎉 Free Trial Active!</strong>
+              <strong>Free Trial Active!</strong>
             </p>
             <p className="text-sm text-blue-900">
-              You're enjoying a 30-day free trial. <strong>No payment required</strong> until{' '}
+              You're enjoying a 14-day free trial. <strong>No payment required</strong> until{' '}
               {subscription.trialEndDate
                 ? new Date(subscription.trialEndDate).toLocaleDateString()
                 : 'N/A'}

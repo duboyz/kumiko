@@ -20,6 +20,7 @@ export interface SubscriptionPlanDto {
 export interface CreateCheckoutSessionCommand {
   subscriptionPlanId: string
   billingInterval: 'Monthly' | 'Yearly'
+  skipTrial?: boolean
 }
 
 export interface CreateCheckoutSessionResult {
@@ -64,4 +65,16 @@ export interface CancelSubscriptionCommand {}
 export interface CancelSubscriptionResult {
   success: boolean
   message: string
+}
+
+// Usage Statistics
+export interface GetUsageStatsQuery {}
+
+export interface GetUsageStatsResult {
+  currentLocations: number
+  maxLocations: number
+  currentMenusPerLocation: number
+  maxMenusPerLocation: number
+  isUnlimitedLocations: boolean
+  isUnlimitedMenus: boolean
 }

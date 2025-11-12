@@ -81,7 +81,7 @@ public class CreateCheckoutSessionHandler(
 
         logger.LogInformation("Creating Stripe checkout session with price ID: {PriceId}", priceId);
 
-        // Create checkout session with 30-day trial
+        // Create checkout session with optional trial
         var sessionService = new SessionService();
         var options = new SessionCreateOptions
         {
@@ -98,7 +98,7 @@ public class CreateCheckoutSessionHandler(
             Mode = "subscription",
             SubscriptionData = new SessionSubscriptionDataOptions
             {
-                TrialPeriodDays = 30,
+                TrialPeriodDays = request.SkipTrial ? null : 14, // Skip trial if requested, otherwise 14-day trial
                 Metadata = new Dictionary<string, string>
                 {
                     { "user_id", userId.ToString() },
@@ -110,7 +110,8 @@ public class CreateCheckoutSessionHandler(
             Metadata = new Dictionary<string, string>
             {
                 { "user_id", userId.ToString() },
-                { "subscription_plan_id", plan.Id.ToString() }
+                { "subscription_plan_id", plan.Id.ToString() },
+                { "skip_trial", request.SkipTrial ? "true" : "false" }
             }
         };
 
