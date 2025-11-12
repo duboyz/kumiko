@@ -6,7 +6,7 @@ const meta: Meta<typeof MenuItemCard> = {
   title: 'Orders/MenuItemCard',
   component: MenuItemCard,
   parameters: {
-    layout: 'centered',
+    layout: 'padded',
   },
   argTypes: {
     onAddToCart: { action: 'add to cart' },
@@ -50,20 +50,20 @@ const itemWithOptions: NonNullable<GetMenuByIdResult['categories'][0]['menuCateg
   isAvailable: true,
   hasOptions: true,
   options: [
-      {
-        id: 'opt1',
-        name: 'Regular',
-        description: 'Single patty',
-        price: 10.99,
-        orderIndex: 1,
-      },
-      {
-        id: 'opt2',
-        name: 'Double',
-        description: 'Double patty',
-        price: 13.99,
-        orderIndex: 2,
-      },
+    {
+      id: 'opt1',
+      name: 'Regular',
+      description: 'Single patty',
+      price: 10.99,
+      orderIndex: 1,
+    },
+    {
+      id: 'opt2',
+      name: 'Double',
+      description: 'Double patty',
+      price: 13.99,
+      orderIndex: 2,
+    },
   ],
   allergens: [],
 }
