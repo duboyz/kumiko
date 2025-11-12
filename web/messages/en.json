@@ -290,7 +290,10 @@
     "confirmed": "Confirmed",
     "ready": "Ready",
     "completed": "Completed",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "searchByNamePhoneEmail": "Search by name, phone, or email...",
+    "showingResults": "Showing {count} of {total} orders",
+    "noOrdersMatchSearch": "No orders match your search"
   },
   "onboarding": {
     "welcome": "Welcome to Kumiko",

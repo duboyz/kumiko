@@ -290,7 +290,10 @@
     "confirmed": "Bekreftet",
     "ready": "Klar",
     "completed": "Fullført",
-    "cancelled": "Avbrutt"
+    "cancelled": "Avbrutt",
+    "searchByNamePhoneEmail": "Søk etter navn, telefon eller e-post...",
+    "showingResults": "Viser {count} av {total} bestillinger",
+    "noOrdersMatchSearch": "Ingen bestillinger samsvarer med søket ditt"
   },
   "onboarding": {
     "welcome": "Velkommen til Kumiko",

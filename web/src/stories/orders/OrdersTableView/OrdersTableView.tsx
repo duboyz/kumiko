@@ -3,6 +3,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
     Select,
     SelectContent,
@@ -10,10 +11,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { Eye, Phone, Mail } from 'lucide-react'
+import { Eye, Phone, Mail, Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { OrderDto, ORDER_STATUS_COLORS, ORDER_STATUS_LABELS, OrderStatus, useUpdateOrderStatus, Currency, formatPrice, useLocationSelection } from '@shared'
 import { toast } from 'sonner'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -27,12 +28,18 @@ interface OrdersTableViewProps {
     orders: OrderDto[]
 }
 
+type SortField = 'customerName' | 'pickupDate' | 'totalAmount' | 'status' | 'createdAt'
+type SortDirection = 'asc' | 'desc' | null
+
 export function OrdersTableView({ orders }: OrdersTableViewProps) {
     const t = useTranslations('orders')
     const { selectedLocation } = useLocationSelection()
     const currency = selectedLocation?.currency ?? Currency.USD
     const updateOrderStatus = useUpdateOrderStatus()
     const [selectedOrder, setSelectedOrder] = useState<OrderDto | null>(null)
+    const [searchTerm, setSearchTerm] = useState('')
+    const [sortField, setSortField] = useState<SortField | null>(null)
+    const [sortDirection, setSortDirection] = useState<SortDirection>(null)
 
     const handleStatusChange = async (orderId: string, newStatus: string) => {
         try {
@@ -42,6 +49,85 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
             toast.error(t('failedToUpdateStatus'))
         }
     }
+
+    const handleSort = (field: SortField) => {
+        if (sortField === field) {
+            // Cycle through: asc -> desc -> null
+            if (sortDirection === 'asc') {
+                setSortDirection('desc')
+            } else if (sortDirection === 'desc') {
+                setSortDirection(null)
+                setSortField(null)
+            }
+        } else {
+            setSortField(field)
+            setSortDirection('asc')
+        }
+    }
+
+    const getSortIcon = (field: SortField) => {
+        if (sortField !== field) {
+            return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />
+        }
+        if (sortDirection === 'asc') {
+            return <ArrowUp className="h-4 w-4 ml-1" />
+        }
+        return <ArrowDown className="h-4 w-4 ml-1" />
+    }
+
+    // Filter and sort orders
+    const filteredAndSortedOrders = useMemo(() => {
+        let filtered = orders
+
+        // Apply search filter
+        if (searchTerm) {
+            const search = searchTerm.toLowerCase()
+            filtered = filtered.filter(order => 
+                order.customerName.toLowerCase().includes(search) ||
+                order.customerPhone.toLowerCase().includes(search) ||
+                order.customerEmail?.toLowerCase().includes(search)
+            )
+        }
+
+        // Apply sorting
+        if (sortField && sortDirection) {
+            filtered = [...filtered].sort((a, b) => {
+                let aValue: any
+                let bValue: any
+
+                switch (sortField) {
+                    case 'customerName':
+                        aValue = a.customerName.toLowerCase()
+                        bValue = b.customerName.toLowerCase()
+                        break
+                    case 'pickupDate':
+                        aValue = new Date(a.pickupDate).getTime()
+                        bValue = new Date(b.pickupDate).getTime()
+                        break
+                    case 'totalAmount':
+                        aValue = a.totalAmount
+                        bValue = b.totalAmount
+                        break
+                    case 'status':
+                        aValue = a.status
+                        bValue = b.status
+                        break
+                    case 'createdAt':
+                        aValue = new Date(a.createdAt).getTime()
+                        bValue = new Date(b.createdAt).getTime()
+                        break
+                    default:
+                        return 0
+                }
+
+                if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+                if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+                return 0
+            })
+        }
+
+        return filtered
+    }, [orders, searchTerm, sortField, sortDirection])
 
     if (orders.length === 0) {
         return (
@@ -53,22 +139,88 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
 
     return (
         <>
-            <div className="border rounded-lg overflow-hidden">
-                <Table>
-                    <TableHeader>
-                        <TableRow className="bg-muted/50">
-                            <TableHead>{t('orderNumber')}</TableHead>
-                            <TableHead>{t('customer')}</TableHead>
-                            <TableHead>{t('contact')}</TableHead>
-                            <TableHead>{t('pickup')}</TableHead>
-                            <TableHead>{t('items')}</TableHead>
-                            <TableHead>{t('total')}</TableHead>
-                            <TableHead>{t('status')}</TableHead>
-                            <TableHead>{t('actions')}</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {orders.map(order => (
+            {/* Search Input */}
+            <div className="mb-4">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder={t('searchByNamePhoneEmail') || 'Search by name, phone, or email...'}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
+                {searchTerm && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                        {t('showingResults', { count: filteredAndSortedOrders.length, total: orders.length }) || 
+                        `Showing ${filteredAndSortedOrders.length} of ${orders.length} orders`}
+                    </p>
+                )}
+            </div>
+
+            {filteredAndSortedOrders.length === 0 ? (
+                <div className="text-center py-12 bg-muted/50 rounded-lg border">
+                    <p className="text-muted-foreground">
+                        {searchTerm ? t('noOrdersMatchSearch') || 'No orders match your search' : t('noOrdersToDisplay')}
+                    </p>
+                </div>
+            ) : (
+                <div className="border rounded-lg overflow-hidden">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-muted/50">
+                                <TableHead>{t('orderNumber')}</TableHead>
+                                <TableHead>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 px-2 flex items-center hover:bg-muted/50"
+                                        onClick={() => handleSort('customerName')}
+                                    >
+                                        {t('customer')}
+                                        {getSortIcon('customerName')}
+                                    </Button>
+                                </TableHead>
+                                <TableHead>{t('contact')}</TableHead>
+                                <TableHead>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 px-2 flex items-center hover:bg-muted/50"
+                                        onClick={() => handleSort('pickupDate')}
+                                    >
+                                        {t('pickup')}
+                                        {getSortIcon('pickupDate')}
+                                    </Button>
+                                </TableHead>
+                                <TableHead>{t('items')}</TableHead>
+                                <TableHead>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 px-2 flex items-center hover:bg-muted/50"
+                                        onClick={() => handleSort('totalAmount')}
+                                    >
+                                        {t('total')}
+                                        {getSortIcon('totalAmount')}
+                                    </Button>
+                                </TableHead>
+                                <TableHead>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 px-2 flex items-center hover:bg-muted/50"
+                                        onClick={() => handleSort('status')}
+                                    >
+                                        {t('status')}
+                                        {getSortIcon('status')}
+                                    </Button>
+                                </TableHead>
+                                <TableHead>{t('actions')}</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {filteredAndSortedOrders.map(order => (
                             <TableRow key={order.id} className="hover:bg-muted/30">
                                 <TableCell className="font-mono text-xs">
                                     {order.id.slice(0, 8)}
@@ -141,6 +293,7 @@ export function OrdersTableView({ orders }: OrdersTableViewProps) {
                     </TableBody>
                 </Table>
             </div>
+            )}
 
             {/* Order Details Dialog */}
             <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>

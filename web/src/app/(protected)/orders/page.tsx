@@ -24,7 +24,7 @@ export default function OrdersPage() {
 
   const { data: orders, isLoading: ordersLoading } = useRestaurantOrders(restaurantId || '')
 
-  if (locationLoading) {
+  if (locationLoading || ordersLoading) {
     return (
       <div className="container mx-auto py-6">
         <LoadingSpinner size="lg" />
@@ -35,7 +35,10 @@ export default function OrdersPage() {
   if (hasNoLocations) return <NoLocation />
   if (!selectedLocation || selectedLocation.type !== 'Restaurant') return <RestaurantRequired />
 
-  const allActiveOrders = orders?.filter(o => o.status !== 'Completed' && o.status !== 'Cancelled') || []
+  // For kanban view, show only active orders
+  const activeOrders = orders?.filter(o => o.status !== 'Completed' && o.status !== 'Cancelled') || []
+  // For table view, show all orders
+  const allOrders = orders || []
 
   return (
     <ContentContainer>
@@ -66,9 +69,9 @@ export default function OrdersPage() {
       </div>
 
       {viewMode === 'table' ? (
-        <OrdersTableView orders={allActiveOrders} />
+        <OrdersTableView orders={allOrders} />
       ) : (
-        <OrdersKanbanView orders={allActiveOrders} />
+        <OrdersKanbanView orders={activeOrders} />
       )}
     </ContentContainer>
   )
