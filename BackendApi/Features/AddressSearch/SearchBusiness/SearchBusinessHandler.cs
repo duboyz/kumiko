@@ -1,5 +1,6 @@
 using BackendApi.Models.Address;
 using BackendApi.Shared.Contracts;
+using BackendApi.Services;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -38,7 +39,7 @@ public class SearchBusinessHandler(
         try
         {
             // Use Text Search API to find businesses
-            var textSearchUrl = $"{TextSearchUrl}?query={Uri.EscapeDataString(request.Query)}&key={apiKey}&language=no&region=no&types=establishment";
+            var textSearchUrl = $"{TextSearchUrl}?query={Uri.EscapeDataString(request.Query)}&key={apiKey}&languageCode=no&region=no&types=establishment";
 
             var response = await httpClient.GetAsync(textSearchUrl);
             response.EnsureSuccessStatusCode();
@@ -83,7 +84,7 @@ public class SearchBusinessHandler(
     {
         try
         {
-            var detailsUrl = $"{DetailsUrl}?place_id={placeId}&fields=place_id,name,formatted_address,formatted_phone_number,international_phone_number,website,business_status,types,rating,user_ratings_total,price_level,vicinity,opening_hours,geometry,photos,reviews&key={apiKey}";
+            var detailsUrl = $"{DetailsUrl}?place_id={placeId}&fields=place_id,name,formatted_address,formatted_phone_number,international_phone_number,website,business_status,types,rating,user_ratings_total,price_level,vicinity,opening_hours,geometry,photos,reviews,address_components&key={apiKey}";
 
             var response = await httpClient.GetAsync(detailsUrl);
             response.EnsureSuccessStatusCode();
@@ -97,6 +98,19 @@ public class SearchBusinessHandler(
             if (detailsResponse?.Result != null)
             {
                 var business = detailsResponse.Result;
+                
+                // Parse address components
+                var addressDetails = ParseAddressComponents(business.AddressComponents);
+                
+                // Parse business hours if available
+                string? parsedBusinessHours = null;
+                if (business.OpeningHours?.WeekdayText != null && business.OpeningHours.WeekdayText.Any())
+                {
+                    logger.LogInformation("Parsing business hours for {PlaceId}", placeId);
+                    parsedBusinessHours = BusinessHoursParser.ParseBusinessHours(business.OpeningHours.WeekdayText);
+                    logger.LogInformation("Parsed business hours: {ParsedHours}", parsedBusinessHours);
+                }
+                
                 return new ResponseBusinessDetails
                 {
                     PlaceId = business.PlaceId,
@@ -116,6 +130,7 @@ public class SearchBusinessHandler(
                         OpenNow = business.OpeningHours.OpenNow,
                         WeekdayText = business.OpeningHours.WeekdayText ?? new List<string>()
                     } : null,
+                    ParsedBusinessHours = parsedBusinessHours,
                     Geometry = business.Geometry != null ? new BusinessGeometry
                     {
                         Location = new BusinessLocation
@@ -136,7 +151,13 @@ public class SearchBusinessHandler(
                         Rating = r.Rating,
                         Text = r.Text,
                         Time = r.Time
-                    }).ToList() ?? new List<BusinessReview>()
+                    }).ToList() ?? new List<BusinessReview>(),
+                    // Parsed address components
+                    Street = addressDetails.Street,
+                    City = addressDetails.City,
+                    State = addressDetails.State,
+                    PostalCode = addressDetails.PostalCode,
+                    Country = addressDetails.Country
                 };
             }
 
@@ -147,6 +168,125 @@ public class SearchBusinessHandler(
             logger.LogError(ex, "Error getting business details for place_id: {PlaceId}", placeId);
             return null;
         }
+    }
+
+    private AddressDetails ParseAddressComponents(List<GoogleAddressComponent>? addressComponents)
+    {
+        var streetNumber = "";
+        var streetName = "";
+        var postalCode = "";
+        var locality = "";
+        var postalTown = "";
+        var sublocalityLevel1 = "";
+        var sublocality = "";
+        var adminLevel2 = "";
+        var state = "";
+        var country = "";
+
+        if (addressComponents != null)
+        {
+            logger.LogDebug("Parsing address components");
+            
+            // First pass: collect all components
+            foreach (var component in addressComponents)
+            {
+                var types = component.Types ?? new List<string>();
+                var longName = component.LongName ?? "";
+                var shortName = component.ShortName ?? "";
+
+                logger.LogDebug("  Types: {Types}, Long: {LongName}, Short: {ShortName}", 
+                    string.Join(", ", types), longName, shortName);
+
+                if (types.Contains("street_number"))
+                {
+                    streetNumber = longName;
+                }
+                else if (types.Contains("route"))
+                {
+                    streetName = longName;
+                }
+                else if (types.Contains("postal_code"))
+                {
+                    postalCode = longName;
+                }
+                else if (types.Contains("postal_town"))
+                {
+                    postalTown = longName;
+                }
+                else if (types.Contains("locality"))
+                {
+                    locality = longName;
+                }
+                else if (types.Contains("sublocality_level_1"))
+                {
+                    sublocalityLevel1 = longName;
+                }
+                else if (types.Contains("sublocality"))
+                {
+                    sublocality = longName;
+                }
+                else if (types.Contains("administrative_area_level_2"))
+                {
+                    adminLevel2 = longName;
+                }
+                else if (types.Contains("administrative_area_level_1"))
+                {
+                    state = longName;
+                }
+                else if (types.Contains("country"))
+                {
+                    country = longName;
+                }
+            }
+
+            // Determine city with proper priority
+            // Priority: postal_town > locality > administrative_area_level_2 > sublocality_level_1 > sublocality
+            var city = "";
+            if (!string.IsNullOrEmpty(postalTown))
+            {
+                city = postalTown;
+            }
+            else if (!string.IsNullOrEmpty(locality))
+            {
+                city = locality;
+            }
+            else if (!string.IsNullOrEmpty(adminLevel2))
+            {
+                city = adminLevel2;
+            }
+            else if (!string.IsNullOrEmpty(sublocalityLevel1))
+            {
+                city = sublocalityLevel1;
+            }
+            else if (!string.IsNullOrEmpty(sublocality))
+            {
+                city = sublocality;
+            }
+
+            logger.LogDebug("City candidates - PostalTown: '{PostalTown}', Locality: '{Locality}', AdminLevel2: '{AdminLevel2}', Sublocality1: '{Sublocality1}', Sublocality: '{Sublocality}' -> Selected: '{City}'",
+                postalTown, locality, adminLevel2, sublocalityLevel1, sublocality, city);
+
+            logger.LogDebug("Final mapping - Street: '{StreetName} {StreetNumber}', City: '{City}', State: '{State}', PostalCode: '{PostalCode}', Country: '{Country}'",
+                streetName, streetNumber, city, state, postalCode, country);
+
+            // Combine street name and number
+            var street = streetName;
+            if (!string.IsNullOrEmpty(streetNumber))
+            {
+                street = $"{streetName} {streetNumber}";
+            }
+
+            return new AddressDetails
+            {
+                Street = street,
+                City = city,
+                State = state,
+                PostalCode = postalCode,
+                Country = country
+            };
+        }
+
+        return new AddressDetails();
     }
 
     // DTOs for Google Places API responses
@@ -235,6 +375,9 @@ public class SearchBusinessHandler(
 
         [JsonPropertyName("reviews")]
         public List<GoogleReview>? Reviews { get; set; }
+
+        [JsonPropertyName("address_components")]
+        public List<GoogleAddressComponent>? AddressComponents { get; set; }
     }
 
     private class GoogleOpeningHours
@@ -286,5 +429,26 @@ public class SearchBusinessHandler(
 
         [JsonPropertyName("time")]
         public long Time { get; set; }
+    }
+
+    private class GoogleAddressComponent
+    {
+        [JsonPropertyName("long_name")]
+        public string LongName { get; set; } = string.Empty;
+
+        [JsonPropertyName("short_name")]
+        public string ShortName { get; set; } = string.Empty;
+
+        [JsonPropertyName("types")]
+        public List<string> Types { get; set; } = new();
+    }
+
+    private class AddressDetails
+    {
+        public string Street { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public string State { get; set; } = string.Empty;
+        public string PostalCode { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
     }
 }

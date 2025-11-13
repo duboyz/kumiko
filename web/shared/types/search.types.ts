@@ -49,9 +49,16 @@ export interface ResponseBusinessDetails {
   priceLevel?: number
   vicinity: string
   openingHours?: BusinessOpeningHours
+  parsedBusinessHours?: string // Parsed and structured business hours in JSON format
   geometry: BusinessGeometry
   photos: BusinessPhoto[]
   reviews: BusinessReview[]
+  // Parsed address components
+  street: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
 }
 
 export interface SearchBusinessResult {

@@ -104,9 +104,14 @@ public class SearchAddressHandler(
             var streetNumber = "";
             var streetName = "";
             var postalCode = "";
-            var city = "";
+            var locality = "";
+            var postalTown = "";
+            var sublocalityLevel1 = "";
+            var sublocality = "";
+            var adminLevel2 = "";
             var state = "";
             var district = "";
+            var city = "";
             var latitude = 0.0;
             var longitude = 0.0;
 
@@ -123,6 +128,8 @@ public class SearchAddressHandler(
                 if (detailsResponse.Result.AddressComponents != null)
                 {
                     logger.LogDebug("Address components for {PlaceId}:", placeId);
+                    
+                    // First pass: collect all components
                     foreach (var component in detailsResponse.Result.AddressComponents)
                     {
                         var types = component.Types ?? new List<string>();
@@ -142,27 +149,58 @@ public class SearchAddressHandler(
                         {
                             postalCode = longName;
                         }
+                        else if (types.Contains("postal_town"))
+                        {
+                            postalTown = longName;
+                        }
                         else if (types.Contains("locality"))
                         {
-                            city = longName;
+                            locality = longName;
                         }
                         else if (types.Contains("sublocality_level_1"))
                         {
-                            district = longName;
+                            sublocalityLevel1 = longName;
+                            district = longName; // Keep for backward compatibility
                         }
-                        else if (types.Contains("sublocality") && string.IsNullOrEmpty(city))
+                        else if (types.Contains("sublocality"))
                         {
-                            city = longName;
+                            sublocality = longName;
                         }
-                        else if (types.Contains("administrative_area_level_2") && string.IsNullOrEmpty(city))
+                        else if (types.Contains("administrative_area_level_2"))
                         {
-                            city = longName;
+                            adminLevel2 = longName;
                         }
                         else if (types.Contains("administrative_area_level_1"))
                         {
                             state = longName;
                         }
                     }
+
+                    // Determine city with proper priority
+                    // Priority: postal_town > locality > administrative_area_level_2 > sublocality_level_1 > sublocality
+                    if (!string.IsNullOrEmpty(postalTown))
+                    {
+                        city = postalTown;
+                    }
+                    else if (!string.IsNullOrEmpty(locality))
+                    {
+                        city = locality;
+                    }
+                    else if (!string.IsNullOrEmpty(adminLevel2))
+                    {
+                        city = adminLevel2;
+                    }
+                    else if (!string.IsNullOrEmpty(sublocalityLevel1))
+                    {
+                        city = sublocalityLevel1;
+                    }
+                    else if (!string.IsNullOrEmpty(sublocality))
+                    {
+                        city = sublocality;
+                    }
+
+                    logger.LogDebug("City candidates - PostalTown: '{PostalTown}', Locality: '{Locality}', AdminLevel2: '{AdminLevel2}', Sublocality1: '{Sublocality1}', Sublocality: '{Sublocality}' -> Selected: '{City}'",
+                        postalTown, locality, adminLevel2, sublocalityLevel1, sublocality, city);
 
                     logger.LogDebug("Final mapping - Street: '{StreetName} {StreetNumber}', City: '{City}', PostalCode: '{PostalCode}'",
                         streetName, streetNumber, city, postalCode);

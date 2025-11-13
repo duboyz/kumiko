@@ -225,6 +225,12 @@ export function RestaurantDetailsSettings({ restaurant }: RestaurantDetailsSetti
                     },
                     photos: [],
                     reviews: [],
+                    // Parsed address components
+                    street: restaurant.address,
+                    city: restaurant.city,
+                    state: restaurant.state,
+                    postalCode: restaurant.zip,
+                    country: restaurant.country,
                 }}
                 onChange={setBusinessDetails}
             />

@@ -39,11 +39,11 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
     if (businessData) {
       return {
         name: businessData.name || '',
-        address: businessData.formattedAddress || '',
-        city: businessData.vicinity || '',
-        state: '',
-        zip: '',
-        country: 'NO',
+        address: businessData.street || businessData.formattedAddress || '',
+        city: businessData.city || businessData.vicinity || '',
+        state: businessData.state || '',
+        zip: businessData.postalCode || '',
+        country: businessData.country || 'NO',
         phone: businessData.formattedPhoneNumber || '',
         website: businessData.website || '',
         description: '',

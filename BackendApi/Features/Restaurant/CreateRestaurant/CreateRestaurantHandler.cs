@@ -4,6 +4,7 @@ using BackendApi.Shared.Contracts;
 using BackendApi.Entities;
 using BackendApi.Extensions;
 using BackendApi.Services;
+using Microsoft.Extensions.Logging;
 
 namespace BackendApi.Features.Restaurant.CreateRestaurant;
 
@@ -11,7 +12,8 @@ public class CreateRestaurantHandler(
     IRestaurantRepository restaurantRepository,
     IUserRestaurantRepository userRestaurantRepository,
     IHttpContextAccessor httpContextAccessor,
-    ISubscriptionService subscriptionService
+    ISubscriptionService subscriptionService,
+    ILogger<CreateRestaurantHandler> logger
 ) : ICommandHandler<CreateRestaurantCommand, RestaurantBaseDto>
 {
     public async Task<RestaurantBaseDto> Handle(CreateRestaurantCommand request, CancellationToken cancellationToken)
@@ -25,24 +27,9 @@ public class CreateRestaurantHandler(
             throw new Exception("You have reached the maximum number of locations for your subscription plan. Please upgrade to create more locations.");
         }
 
-        // Parse business hours if provided
-        string? parsedBusinessHours = null;
-        if (!string.IsNullOrEmpty(request.BusinessHours))
-        {
-            try
-            {
-                var weekdayText = System.Text.Json.JsonSerializer.Deserialize<List<string>>(request.BusinessHours);
-                if (weekdayText != null)
-                {
-                    parsedBusinessHours = BusinessHoursParser.ParseBusinessHours(weekdayText);
-                }
-            }
-            catch
-            {
-                // If parsing fails, store the original data
-                parsedBusinessHours = request.BusinessHours;
-            }
-        }
+        // BusinessHours should already be parsed from SearchBusinessHandler
+        // Just use it as-is
+        logger.LogInformation("Storing business hours: {BusinessHours}", request.BusinessHours ?? "NULL");
 
         var restaurant = await restaurantRepository.AddAsync(new Entities.Restaurant
         {
@@ -55,7 +42,7 @@ public class CreateRestaurantHandler(
             Latitude = request.Latitude,
             Longitude = request.Longitude,
             GooglePlaceId = request.GooglePlaceId,
-            BusinessHours = parsedBusinessHours,
+            BusinessHours = request.BusinessHours,
             IsOpenNow = request.IsOpenNow
         });
 

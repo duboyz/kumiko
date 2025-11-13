@@ -32,17 +32,17 @@ export function TopMenuItems({ items, currency }: TopMenuItemsProps) {
 
     return (
         <Card>
-            <CardHeader>
+            <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2">
                     <Trophy className="w-5 h-5" />
                     Top Selling Items
                 </CardTitle>
-                <CardDescription>Your most popular menu items</CardDescription>
+                <CardDescription>Most popular items in this period</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {items.map((item, index) => (
-                        <div key={item.menuItemId} className="space-y-2">
+                        <div key={item.menuItemId} className="space-y-1.5">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <span className="text-sm font-bold text-muted-foreground w-6">#{index + 1}</span>

@@ -32,11 +32,11 @@ export function HospitalityOnboarding({ onBack, onComplete }: HospitalityOnboard
         try {
             await createHospitality.mutateAsync({
                 name: selectedBusiness.name,
-                address: selectedBusiness.formattedAddress,
-                city: selectedBusiness.vicinity || '',
-                state: '',
-                zip: '',
-                country: 'NO',
+                address: selectedBusiness.street || selectedBusiness.formattedAddress,
+                city: selectedBusiness.city || selectedBusiness.vicinity || '',
+                state: selectedBusiness.state || '',
+                zip: selectedBusiness.postalCode || '',
+                country: selectedBusiness.country || 'NO',
                 latitude: selectedBusiness.geometry.location.lat.toString(),
                 longitude: selectedBusiness.geometry.location.lng.toString(),
                 googlePlaceId: selectedBusiness.placeId,

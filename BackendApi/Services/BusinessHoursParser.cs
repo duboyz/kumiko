@@ -37,6 +37,8 @@ public class BusinessHoursParser
 
     private static (string? day, object? hours) ParseDayHours(string dayText)
     {
+        Console.WriteLine($"[BusinessHoursParser] Parsing: '{dayText}'");
+        
         // Extract day name (case insensitive)
         var dayMatch = Regex.Match(dayText, @"^(\w+):", RegexOptions.IgnoreCase);
         if (!dayMatch.Success)
@@ -72,7 +74,7 @@ public class BusinessHoursParser
             return (day, new { open = openTime24, close = closeTime24 });
         }
 
-        // Try to parse time range without AM/PM (e.g., "12:00 – 8:00 PM")
+        // Try to parse time range without AM/PM on opening time (e.g., "3:00 – 11:30 PM")
         var timeMatchNoAMPM = Regex.Match(dayText, @"(\d{1,2}):(\d{2})\s*[–-]\s*(\d{1,2}):(\d{2})\s*(AM|PM)", RegexOptions.IgnoreCase);
         if (timeMatchNoAMPM.Success)
         {
@@ -82,10 +84,48 @@ public class BusinessHoursParser
             var closeMinute = int.Parse(timeMatchNoAMPM.Groups[4].Value);
             var closePeriod = timeMatchNoAMPM.Groups[5].Value.ToUpper();
 
-            // Assume open time is in 24-hour format if no AM/PM
-            var openTime24 = $"{openHour:D2}:{openMinute:D2}";
+            Console.WriteLine($"[BusinessHoursParser] Matched NoAMPM pattern: Open={openHour}:{openMinute:D2}, Close={closeHour}:{closeMinute:D2} {closePeriod}");
+
+            // Infer the opening time's AM/PM based on closing time and typical business patterns
+            string openPeriod;
+            if (closePeriod == "PM")
+            {
+                // Heuristic: determine if opening time is AM or PM based on the hour value
+                // Hours 1-7 are more likely PM when closing is PM (e.g., "3:00 – 11:30 PM" = afternoon/evening)
+                // Hours 8-11 are more likely AM when closing is PM (e.g., "10:00 – 9:00 PM" = all day)
+                // Hour 12 is noon (PM)
+                
+                if (openHour >= 1 && openHour <= 7)
+                {
+                    // Afternoon/evening opening (1 PM - 7 PM)
+                    openPeriod = "PM";
+                    Console.WriteLine($"[BusinessHoursParser] Inferred opening time as PM (hour {openHour} is 1-7)");
+                }
+                else if (openHour == 12)
+                {
+                    // Noon
+                    openPeriod = "PM";
+                    Console.WriteLine($"[BusinessHoursParser] Inferred opening time as PM (hour 12 = noon)");
+                }
+                else // openHour >= 8 && openHour <= 11
+                {
+                    // Morning opening (8 AM - 11 AM)
+                    openPeriod = "AM";
+                    Console.WriteLine($"[BusinessHoursParser] Inferred opening time as AM (hour {openHour} is 8-11)");
+                }
+            }
+            else // closePeriod == "AM"
+            {
+                // If closing time is AM (rare, usually overnight businesses),
+                // opening time is likely PM from previous day, but for simplicity assume AM
+                openPeriod = "AM";
+                Console.WriteLine($"[BusinessHoursParser] Closing is AM, assuming opening is also AM");
+            }
+
+            var openTime24 = ConvertTo24Hour(openHour, openMinute, openPeriod);
             var closeTime24 = ConvertTo24Hour(closeHour, closeMinute, closePeriod);
 
+            Console.WriteLine($"[BusinessHoursParser] Result: {openTime24} - {closeTime24}");
             return (day, new { open = openTime24, close = closeTime24 });
         }
 

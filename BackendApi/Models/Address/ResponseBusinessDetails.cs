@@ -15,9 +15,17 @@ public class ResponseBusinessDetails
     public int? PriceLevel { get; set; }
     public string Vicinity { get; set; } = string.Empty;
     public BusinessOpeningHours? OpeningHours { get; set; }
+    public string? ParsedBusinessHours { get; set; } // Parsed and structured business hours in JSON format
     public BusinessGeometry Geometry { get; set; } = new();
     public List<BusinessPhoto> Photos { get; set; } = new();
     public List<BusinessReview> Reviews { get; set; } = new();
+    
+    // Parsed address components
+    public string Street { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
+    public string State { get; set; } = string.Empty;
+    public string PostalCode { get; set; } = string.Empty;
+    public string Country { get; set; } = string.Empty;
 }
 
 public class BusinessOpeningHours

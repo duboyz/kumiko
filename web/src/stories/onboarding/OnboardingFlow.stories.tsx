@@ -45,6 +45,22 @@ const mockBusinessData: ResponseBusinessDetails = {
       'Sunday: 10:00 AM – 9:00 PM',
     ],
   },
+  // Parsed address components
+  street: '123 Main Street',
+  city: 'Oslo',
+  state: '',
+  postalCode: '0150',
+  country: 'Norway',
+  // Parsed business hours
+  parsedBusinessHours: JSON.stringify({
+    monday: { open: '11:00', close: '22:00' },
+    tuesday: { open: '11:00', close: '22:00' },
+    wednesday: { open: '11:00', close: '22:00' },
+    thursday: { open: '11:00', close: '22:00' },
+    friday: { open: '11:00', close: '23:00' },
+    saturday: { open: '10:00', close: '23:00' },
+    sunday: { open: '10:00', close: '21:00' },
+  }),
 }
 
 const meta: Meta = {

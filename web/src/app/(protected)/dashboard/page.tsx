@@ -57,14 +57,12 @@ export default function DashboardPage() {
     <ContentContainer>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img src={KumikoDashboardImage} alt="Kumiko Dashboard" width={60} height={60} className="rounded-lg" />
             <div>
-              <img src={KumikoDashboardImage} alt="Kumiko Dashboard" width={80} height={80} className="rounded-lg" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
-              <p className="text-muted-foreground">{t('welcomeBack')}</p>
+              <h1 className="text-3xl font-bold">{t('title')}</h1>
+              <p className="text-sm text-muted-foreground">{t('welcomeBack')}</p>
             </div>
           </div>
 
@@ -107,54 +105,58 @@ export default function DashboardPage() {
           <StatCard title={t('itemsSold')} value={stats.overall.totalItemsSold} icon={Package} />
         </div>
 
-        {/* Charts */}
+        {/* Charts Section */}
         <div className="space-y-4">
-          {/* Period and Chart Type Selectors */}
-          <div className="flex items-center justify-between">
+          {/* Section Header with Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b">
             <h2 className="text-xl font-semibold">{t('analytics')}</h2>
-            <div className="flex gap-4">
+            
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Period Selector */}
+              <div className="flex gap-1 border rounded-lg p-1 bg-muted/30">
+                <Button
+                  variant={period === 'daily' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setPeriod('daily')}
+                  className="h-8"
+                >
+                  {t('daily')}
+                </Button>
+                <Button
+                  variant={period === 'weekly' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setPeriod('weekly')}
+                  className="h-8"
+                >
+                  {t('weekly')}
+                </Button>
+                <Button
+                  variant={period === 'monthly' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setPeriod('monthly')}
+                  className="h-8"
+                >
+                  {t('monthly')}
+                </Button>
+              </div>
+
               {/* Chart Type Toggle */}
-              <div className="flex gap-2 border rounded-lg p-1">
+              <div className="flex gap-1 border rounded-lg p-1 bg-muted/30">
                 <Button
                   variant={chartType === 'bar' ? 'secondary' : 'ghost'}
                   size="sm"
                   onClick={() => setChartType('bar')}
+                  className="h-8"
                 >
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  {t('bar')}
+                  <BarChart3 className="h-4 w-4" />
                 </Button>
                 <Button
                   variant={chartType === 'line' ? 'secondary' : 'ghost'}
                   size="sm"
                   onClick={() => setChartType('line')}
+                  className="h-8"
                 >
-                  <LineChart className="h-4 w-4 mr-2" />
-                  {t('line')}
-                </Button>
-              </div>
-
-              {/* Period Selector */}
-              <div className="flex gap-2">
-                <Button
-                  variant={period === 'daily' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setPeriod('daily')}
-                >
-                  {t('daily')}
-                </Button>
-                <Button
-                  variant={period === 'weekly' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setPeriod('weekly')}
-                >
-                  {t('weekly')}
-                </Button>
-                <Button
-                  variant={period === 'monthly' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setPeriod('monthly')}
-                >
-                  {t('monthly')}
+                  <LineChart className="h-4 w-4" />
                 </Button>
               </div>
             </div>
