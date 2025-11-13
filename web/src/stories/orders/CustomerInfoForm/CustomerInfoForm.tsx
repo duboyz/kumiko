@@ -14,6 +14,7 @@ interface CustomerInfoFormProps {
   minTime?: string
   maxTime?: string
   onDateChange?: (date: string) => void
+  errors?: Record<string, string>
 }
 
 export function CustomerInfoForm({
@@ -24,6 +25,7 @@ export function CustomerInfoForm({
   minTime,
   maxTime,
   onDateChange,
+  errors = {},
 }: CustomerInfoFormProps) {
   const t = useTranslations('checkout')
 
@@ -73,8 +75,15 @@ export function CustomerInfoForm({
             value={customerInfo.name}
             onChange={e => onCustomerInfoChange('name', e.target.value)}
             placeholder={t('namePlaceholder')}
-            className="mt-1.5 sm:mt-2"
+            className={`mt-1.5 sm:mt-2 ${errors.name ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? 'customerName-error' : undefined}
           />
+          {errors.name && (
+            <p id="customerName-error" className="text-destructive text-sm mt-1">
+              {errors.name}
+            </p>
+          )}
         </div>
         <div>
           <Label htmlFor="customerPhone" className="text-sm sm:text-base">
@@ -85,8 +94,15 @@ export function CustomerInfoForm({
             value={customerInfo.phone}
             onChange={e => onCustomerInfoChange('phone', e.target.value)}
             placeholder={t('phonePlaceholder')}
-            className="mt-1.5 sm:mt-2"
+            className={`mt-1.5 sm:mt-2 ${errors.phone ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            aria-invalid={!!errors.phone}
+            aria-describedby={errors.phone ? 'customerPhone-error' : undefined}
           />
+          {errors.phone && (
+            <p id="customerPhone-error" className="text-destructive text-sm mt-1">
+              {errors.phone}
+            </p>
+          )}
         </div>
       </div>
 
@@ -100,8 +116,15 @@ export function CustomerInfoForm({
           value={customerInfo.email}
           onChange={e => onCustomerInfoChange('email', e.target.value)}
           placeholder={t('emailPlaceholder')}
-          className="mt-1.5 sm:mt-2"
+          className={`mt-1.5 sm:mt-2 ${errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? 'customerEmail-error' : undefined}
         />
+        {errors.email && (
+          <p id="customerEmail-error" className="text-destructive text-sm mt-1">
+            {errors.email}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -116,21 +139,35 @@ export function CustomerInfoForm({
             onChange={e => handleDateChange(e.target.value)}
             min={minDate || new Date().toISOString().split('T')[0]}
             max={maxDate}
-            className="mt-1.5 sm:mt-2"
+            className={`mt-1.5 sm:mt-2 ${errors.pickupDate ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            aria-invalid={!!errors.pickupDate}
+            aria-describedby={errors.pickupDate ? 'pickupDate-error' : undefined}
           />
+          {errors.pickupDate && (
+            <p id="pickupDate-error" className="text-destructive text-sm mt-1">
+              {errors.pickupDate}
+            </p>
+          )}
         </div>
         <div>
           <Label htmlFor="pickupTime" className="text-sm sm:text-base">
             {t('pickupTime')} {t('requiredField')}
           </Label>
           <div className="mt-1.5 sm:mt-2">
-            <TimePicker
-              value={customerInfo.pickupTime}
-              onChange={value => onCustomerInfoChange('pickupTime', value)}
-              min={minTime}
-              max={maxTime}
-            />
+            <div className={errors.pickupTime ? 'rounded-md border border-destructive' : ''}>
+              <TimePicker
+                value={customerInfo.pickupTime}
+                onChange={value => onCustomerInfoChange('pickupTime', value)}
+                min={minTime}
+                max={maxTime}
+              />
+            </div>
           </div>
+          {errors.pickupTime && (
+            <p id="pickupTime-error" className="text-destructive text-sm mt-1">
+              {errors.pickupTime}
+            </p>
+          )}
         </div>
       </div>
 

@@ -87,37 +87,76 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [minDate]) // Only depend on minDate to avoid loops
 
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+
   const handleCustomerInfoChange = (field: keyof typeof customerInfo, value: string) => {
     setCustomerInfo(field, value)
+    // Clear error for this field when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
   }
 
-  const handleSubmitOrder = async () => {
-    // Validation
+  const validateForm = (): { isValid: boolean; errors: Record<string, string> } => {
+    const errors: Record<string, string> = {}
+
     if (!customerInfo.name.trim()) {
-      toast.error(t('enterName'))
-      return
+      errors.name = t('enterName')
     }
     if (!customerInfo.phone.trim()) {
-      toast.error(t('enterPhone'))
-      return
+      errors.phone = t('enterPhone')
     }
     if (!customerInfo.email.trim()) {
-      toast.error(t('enterEmail'))
-      return
+      errors.email = t('enterEmail')
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
+      errors.email = t('invalidEmail') || 'Please enter a valid email address'
     }
     if (!customerInfo.pickupDate) {
-      toast.error(t('selectPickupDate'))
-      return
+      errors.pickupDate = t('selectPickupDate')
+    }
+    if (!customerInfo.pickupTime) {
+      errors.pickupTime = t('selectPickupTime') || 'Please select a pickup time'
     }
 
     // Validate pickup time against business hours
-    if (businessHours) {
+    if (businessHours && customerInfo.pickupDate && customerInfo.pickupTime) {
       const pickupDate = new Date(customerInfo.pickupDate)
       if (!isTimeAvailable(pickupDate, customerInfo.pickupTime, businessHours)) {
-        toast.error(t('pickupTimeOutsideHours') || 'Selected pickup time is outside business hours')
-        return
+        errors.pickupTime = t('pickupTimeOutsideHours') || 'Selected pickup time is outside business hours'
       }
     }
+
+    setValidationErrors(errors)
+    return { isValid: Object.keys(errors).length === 0, errors }
+  }
+
+  const handleSubmitOrder = async () => {
+    // Validate form
+    const { isValid, errors } = validateForm()
+
+    if (!isValid) {
+      // Scroll to first error
+      const firstErrorField = Object.keys(errors)[0]
+      if (firstErrorField) {
+        // Use setTimeout to ensure DOM is updated with error messages
+        setTimeout(() => {
+          const element = document.getElementById(firstErrorField)
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            element.focus()
+          }
+        }, 100)
+      }
+      // Show a general toast message
+      const firstError = Object.values(errors)[0]
+      toast.error(firstError)
+      return
+    }
+
     if (cart.length === 0) {
       toast.error(t('cartEmpty'))
       router.push(`/site/${subdomain}`)
@@ -227,6 +266,7 @@ export default function CheckoutPage() {
               minTime={minTime}
               maxTime={maxTime}
               onDateChange={handleDateChange}
+              errors={validationErrors}
             />
 
             {/* Total and Place Order Button - Desktop */}
