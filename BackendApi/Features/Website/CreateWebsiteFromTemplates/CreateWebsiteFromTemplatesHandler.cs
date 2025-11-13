@@ -227,7 +227,7 @@ public class CreateWebsiteFromTemplatesHandler(
             RestaurantMenuSection = new Entities.RestaurantMenuSection
             {
                 RestaurantMenuId = menuId.Value,
-                AllowOrdering = false
+                AllowOrdering = true
             }
         };
 
