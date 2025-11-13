@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { DollarSign } from 'lucide-react'
 import { formatPrice } from '@shared'
 import type { DailyRevenueStats, WeeklyRevenueStats, MonthlyRevenueStats, Currency } from '@shared'
+import { useTranslations, useLocale } from 'next-intl'
 
 type RevenueData = DailyRevenueStats | WeeklyRevenueStats | MonthlyRevenueStats
 
@@ -14,18 +15,21 @@ interface RevenueChartProps {
 }
 
 export function RevenueChart({ data, currency, period }: RevenueChartProps) {
+    const t = useTranslations('dashboard')
+    const locale = useLocale()
+
     if (data.length === 0) {
         return (
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <DollarSign className="w-5 h-5" />
-                        Revenue
+                        {t('revenue')}
                     </CardTitle>
-                    <CardDescription>{getPeriodLabel(period)} revenue breakdown</CardDescription>
+                    <CardDescription>{t('revenueBreakdown', { period: t(period) })}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-muted-foreground text-center py-8">No revenue data yet</p>
+                    <p className="text-sm text-muted-foreground text-center py-8">{t('noRevenueDataYet')}</p>
                 </CardContent>
             </Card>
         )
@@ -38,9 +42,9 @@ export function RevenueChart({ data, currency, period }: RevenueChartProps) {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <DollarSign className="w-5 h-5" />
-                    Revenue
+                    {t('revenue')}
                 </CardTitle>
-                <CardDescription>{getPeriodLabel(period)} revenue over the selected period</CardDescription>
+                <CardDescription>{t('revenueOverPeriod', { period: t(period) })}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="space-y-3">
@@ -48,7 +52,7 @@ export function RevenueChart({ data, currency, period }: RevenueChartProps) {
                         <div key={getItemKey(item, index)} className="space-y-1">
                             <div className="flex items-center justify-between text-sm">
                                 <span className="text-muted-foreground">
-                                    {formatLabel(item, period)}
+                                    {formatLabel(item, period, locale)}
                                 </span>
                                 <span className="font-medium">{formatPrice(item.revenue, currency)}</span>
                             </div>
@@ -66,14 +70,6 @@ export function RevenueChart({ data, currency, period }: RevenueChartProps) {
     )
 }
 
-function getPeriodLabel(period: 'daily' | 'weekly' | 'monthly'): string {
-    switch (period) {
-        case 'daily': return 'Daily'
-        case 'weekly': return 'Weekly'
-        case 'monthly': return 'Monthly'
-    }
-}
-
 function getItemKey(item: RevenueData, index: number): string {
     if ('date' in item) return item.date
     if ('weekStartDate' in item) return `${item.weekStartDate}-${item.weekNumber}`
@@ -81,25 +77,26 @@ function getItemKey(item: RevenueData, index: number): string {
     return index.toString()
 }
 
-function formatLabel(item: RevenueData, period: 'daily' | 'weekly' | 'monthly'): string {
+function formatLabel(item: RevenueData, period: 'daily' | 'weekly' | 'monthly', locale: string = 'en-US'): string {
     if (period === 'daily' && 'date' in item) {
-        return new Date(item.date).toLocaleDateString('en-US', {
+        return new Date(item.date).toLocaleDateString(locale, {
             month: 'short',
             day: 'numeric'
         })
     }
-    
+
     if (period === 'weekly' && 'weekStartDate' in item) {
-        return `Week ${item.weekNumber}, ${item.year}`
+        // This will be translated using the translation keys
+        return `W${item.weekNumber}, ${item.year}`
     }
-    
+
     if (period === 'monthly' && 'monthStartDate' in item) {
-        return new Date(item.monthStartDate).toLocaleDateString('en-US', {
+        return new Date(item.monthStartDate).toLocaleDateString(locale, {
             month: 'short',
             year: 'numeric'
         })
     }
-    
-    return 'Unknown'
+
+    return ''
 }
 

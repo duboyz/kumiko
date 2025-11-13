@@ -5,6 +5,7 @@ import { DollarSign } from 'lucide-react'
 import { formatPrice, formatCurrencyShort } from '@shared'
 import type { DailyRevenueStats, WeeklyRevenueStats, MonthlyRevenueStats, Currency } from '@shared'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useTranslations, useLocale } from 'next-intl'
 
 type RevenueData = DailyRevenueStats | WeeklyRevenueStats | MonthlyRevenueStats
 
@@ -15,18 +16,20 @@ interface RevenueLineChartProps {
 }
 
 export function RevenueLineChart({ data, currency, period }: RevenueLineChartProps) {
+    const t = useTranslations('dashboard')
+    const locale = useLocale()
     if (data.length === 0) {
         return (
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <DollarSign className="w-5 h-5" />
-                        Revenue
+                        {t('revenue')}
                     </CardTitle>
-                    <CardDescription>{getPeriodLabel(period)} revenue breakdown</CardDescription>
+                    <CardDescription>{t('revenueBreakdown', { period: t(period) })}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-muted-foreground text-center py-8">No revenue data yet</p>
+                    <p className="text-sm text-muted-foreground text-center py-8">{t('noRevenueDataYet')}</p>
                 </CardContent>
             </Card>
         )
@@ -34,7 +37,7 @@ export function RevenueLineChart({ data, currency, period }: RevenueLineChartPro
 
     // Transform data for recharts
     const chartData = data.map((item, index) => ({
-        name: formatLabel(item, period),
+        name: formatLabel(item, period, locale),
         revenue: item.revenue,
         index,
     }))
@@ -44,9 +47,9 @@ export function RevenueLineChart({ data, currency, period }: RevenueLineChartPro
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <DollarSign className="w-5 h-5" />
-                    Revenue
+                    {t('revenue')}
                 </CardTitle>
-                <CardDescription>{getPeriodLabel(period)} revenue over the selected period</CardDescription>
+                <CardDescription>{t('revenueOverPeriod', { period: t(period) })}</CardDescription>
             </CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -101,17 +104,9 @@ export function RevenueLineChart({ data, currency, period }: RevenueLineChartPro
     )
 }
 
-function getPeriodLabel(period: 'daily' | 'weekly' | 'monthly'): string {
-    switch (period) {
-        case 'daily': return 'Daily'
-        case 'weekly': return 'Weekly'
-        case 'monthly': return 'Monthly'
-    }
-}
-
-function formatLabel(item: RevenueData, period: 'daily' | 'weekly' | 'monthly'): string {
+function formatLabel(item: RevenueData, period: 'daily' | 'weekly' | 'monthly', locale: string = 'en-US'): string {
     if (period === 'daily' && 'date' in item) {
-        return new Date(item.date).toLocaleDateString('en-US', {
+        return new Date(item.date).toLocaleDateString(locale, {
             month: 'short',
             day: 'numeric'
         })
@@ -122,11 +117,11 @@ function formatLabel(item: RevenueData, period: 'daily' | 'weekly' | 'monthly'):
     }
 
     if (period === 'monthly' && 'monthStartDate' in item) {
-        return new Date(item.monthStartDate).toLocaleDateString('en-US', {
+        return new Date(item.monthStartDate).toLocaleDateString(locale, {
             month: 'short'
         })
     }
 
-    return 'Unknown'
+    return ''
 }
 

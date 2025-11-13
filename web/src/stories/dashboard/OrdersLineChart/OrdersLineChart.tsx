@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ShoppingBag } from 'lucide-react'
 import type { DailyOrderStats, WeeklyOrderStats, MonthlyOrderStats } from '@shared'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useTranslations, useLocale } from 'next-intl'
 
 type OrderData = DailyOrderStats | WeeklyOrderStats | MonthlyOrderStats
 
@@ -13,18 +14,20 @@ interface OrdersLineChartProps {
 }
 
 export function OrdersLineChart({ data, period }: OrdersLineChartProps) {
+    const t = useTranslations('dashboard')
+    const locale = useLocale()
     if (data.length === 0) {
         return (
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <ShoppingBag className="w-5 h-5" />
-                        Orders
+                        {t('orders')}
                     </CardTitle>
-                    <CardDescription>{getPeriodLabel(period)} order count</CardDescription>
+                    <CardDescription>{t('orderCount', { period: t(period) })}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-muted-foreground text-center py-8">No orders yet</p>
+                    <p className="text-sm text-muted-foreground text-center py-8">{t('noOrdersYet')}</p>
                 </CardContent>
             </Card>
         )
@@ -32,7 +35,7 @@ export function OrdersLineChart({ data, period }: OrdersLineChartProps) {
 
     // Transform data for recharts
     const chartData = data.map((item, index) => ({
-        name: formatLabel(item, period),
+        name: formatLabel(item, period, locale),
         orders: item.orderCount,
         items: item.itemCount,
         index,
@@ -43,9 +46,9 @@ export function OrdersLineChart({ data, period }: OrdersLineChartProps) {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <ShoppingBag className="w-5 h-5" />
-                    Orders
+                    {t('orders')}
                 </CardTitle>
-                <CardDescription>{getPeriodLabel(period)} orders over the selected period</CardDescription>
+                <CardDescription>{t('ordersOverPeriod', { period: t(period) })}</CardDescription>
             </CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -74,10 +77,10 @@ export function OrdersLineChart({ data, period }: OrdersLineChartProps) {
                                                         {payload[0].payload.name}
                                                     </span>
                                                     <span className="font-bold text-muted-foreground">
-                                                        {payload[0].value} orders
+                                                        {t('ordersCount', { count: payload[0].value as number })}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground">
-                                                        {payload[0].payload.items} items
+                                                        {t('itemsCount', { count: payload[0].payload.items })}
                                                     </span>
                                                 </div>
                                             </div>
@@ -102,17 +105,9 @@ export function OrdersLineChart({ data, period }: OrdersLineChartProps) {
     )
 }
 
-function getPeriodLabel(period: 'daily' | 'weekly' | 'monthly'): string {
-    switch (period) {
-        case 'daily': return 'Daily'
-        case 'weekly': return 'Weekly'
-        case 'monthly': return 'Monthly'
-    }
-}
-
-function formatLabel(item: OrderData, period: 'daily' | 'weekly' | 'monthly'): string {
+function formatLabel(item: OrderData, period: 'daily' | 'weekly' | 'monthly', locale: string = 'en-US'): string {
     if (period === 'daily' && 'date' in item) {
-        return new Date(item.date).toLocaleDateString('en-US', {
+        return new Date(item.date).toLocaleDateString(locale, {
             month: 'short',
             day: 'numeric'
         })
@@ -123,11 +118,11 @@ function formatLabel(item: OrderData, period: 'daily' | 'weekly' | 'monthly'): s
     }
 
     if (period === 'monthly' && 'monthStartDate' in item) {
-        return new Date(item.monthStartDate).toLocaleDateString('en-US', {
+        return new Date(item.monthStartDate).toLocaleDateString(locale, {
             month: 'short'
         })
     }
 
-    return 'Unknown'
+    return ''
 }
 

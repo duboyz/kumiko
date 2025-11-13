@@ -59,7 +59,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src={KumikoDashboardImage} alt="Kumiko Dashboard" width={60} height={60} className="rounded-lg" />
+            <img src={KumikoDashboardImage} alt={t('dashboardImageAlt')} width={60} height={60} className="rounded-lg" />
             <div>
               <h1 className="text-3xl font-bold">{t('title')}</h1>
               <p className="text-sm text-muted-foreground">{t('welcomeBack')}</p>

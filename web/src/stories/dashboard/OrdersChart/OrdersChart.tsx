@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ShoppingBag } from 'lucide-react'
 import type { DailyOrderStats, WeeklyOrderStats, MonthlyOrderStats } from '@shared'
+import { useTranslations, useLocale } from 'next-intl'
 
 type OrderData = DailyOrderStats | WeeklyOrderStats | MonthlyOrderStats
 
@@ -12,18 +13,20 @@ interface OrdersChartProps {
 }
 
 export function OrdersChart({ data, period }: OrdersChartProps) {
+    const t = useTranslations('dashboard')
+    const locale = useLocale()
     if (data.length === 0) {
         return (
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <ShoppingBag className="w-5 h-5" />
-                        Orders
+                        {t('orders')}
                     </CardTitle>
-                    <CardDescription>{getPeriodLabel(period)} order count</CardDescription>
+                    <CardDescription>{t('orderCount', { period: t(period) })}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-muted-foreground text-center py-8">No orders yet</p>
+                    <p className="text-sm text-muted-foreground text-center py-8">{t('noOrdersYet')}</p>
                 </CardContent>
             </Card>
         )
@@ -36,9 +39,9 @@ export function OrdersChart({ data, period }: OrdersChartProps) {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <ShoppingBag className="w-5 h-5" />
-                    Orders
+                    {t('orders')}
                 </CardTitle>
-                <CardDescription>{getPeriodLabel(period)} orders over the selected period</CardDescription>
+                <CardDescription>{t('ordersOverPeriod', { period: t(period) })}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="space-y-3">
@@ -46,11 +49,11 @@ export function OrdersChart({ data, period }: OrdersChartProps) {
                         <div key={getItemKey(item, index)} className="space-y-1">
                             <div className="flex items-center justify-between text-sm">
                                 <span className="text-muted-foreground">
-                                    {formatLabel(item, period)}
+                                    {formatLabel(item, period, locale)}
                                 </span>
                                 <div className="flex items-center gap-4">
-                                    <span className="text-xs text-muted-foreground">{item.itemCount} items</span>
-                                    <span className="font-medium">{item.orderCount} orders</span>
+                                    <span className="text-xs text-muted-foreground">{t('itemsCount', { count: item.itemCount })}</span>
+                                    <span className="font-medium">{t('ordersCount', { count: item.orderCount })}</span>
                                 </div>
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -67,14 +70,6 @@ export function OrdersChart({ data, period }: OrdersChartProps) {
     )
 }
 
-function getPeriodLabel(period: 'daily' | 'weekly' | 'monthly'): string {
-    switch (period) {
-        case 'daily': return 'Daily'
-        case 'weekly': return 'Weekly'
-        case 'monthly': return 'Monthly'
-    }
-}
-
 function getItemKey(item: OrderData, index: number): string {
     if ('date' in item) return item.date
     if ('weekStartDate' in item) return `${item.weekStartDate}-${item.weekNumber}`
@@ -82,25 +77,25 @@ function getItemKey(item: OrderData, index: number): string {
     return index.toString()
 }
 
-function formatLabel(item: OrderData, period: 'daily' | 'weekly' | 'monthly'): string {
+function formatLabel(item: OrderData, period: 'daily' | 'weekly' | 'monthly', locale: string = 'en-US'): string {
     if (period === 'daily' && 'date' in item) {
-        return new Date(item.date).toLocaleDateString('en-US', {
+        return new Date(item.date).toLocaleDateString(locale, {
             month: 'short',
             day: 'numeric'
         })
     }
-    
+
     if (period === 'weekly' && 'weekStartDate' in item) {
-        return `Week ${item.weekNumber}, ${item.year}`
+        return `W${item.weekNumber}, ${item.year}`
     }
-    
+
     if (period === 'monthly' && 'monthStartDate' in item) {
-        return new Date(item.monthStartDate).toLocaleDateString('en-US', {
+        return new Date(item.monthStartDate).toLocaleDateString(locale, {
             month: 'short',
             year: 'numeric'
         })
     }
-    
-    return 'Unknown'
+
+    return ''
 }
 

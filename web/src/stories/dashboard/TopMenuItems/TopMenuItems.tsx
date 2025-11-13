@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Trophy } from 'lucide-react'
 import { formatPrice } from '@shared'
 import type { TopMenuItem, Currency } from '@shared'
+import { useTranslations } from 'next-intl'
 
 interface TopMenuItemsProps {
     items: TopMenuItem[]
@@ -11,18 +12,20 @@ interface TopMenuItemsProps {
 }
 
 export function TopMenuItems({ items, currency }: TopMenuItemsProps) {
+    const t = useTranslations('dashboard')
+
     if (items.length === 0) {
         return (
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Trophy className="w-5 h-5" />
-                        Top Selling Items
+                        {t('topSellingItems')}
                     </CardTitle>
-                    <CardDescription>Your most popular menu items</CardDescription>
+                    <CardDescription>{t('topSellingItemsDescription')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-muted-foreground text-center py-8">No orders yet</p>
+                    <p className="text-sm text-muted-foreground text-center py-8">{t('noOrdersYet')}</p>
                 </CardContent>
             </Card>
         )
@@ -35,9 +38,9 @@ export function TopMenuItems({ items, currency }: TopMenuItemsProps) {
             <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2">
                     <Trophy className="w-5 h-5" />
-                    Top Selling Items
+                    {t('topSellingItems')}
                 </CardTitle>
-                <CardDescription>Most popular items in this period</CardDescription>
+                <CardDescription>{t('mostPopularItemsPeriod')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="space-y-3">
@@ -49,7 +52,10 @@ export function TopMenuItems({ items, currency }: TopMenuItemsProps) {
                                     <div>
                                         <p className="text-sm font-medium">{item.menuItemName}</p>
                                         <p className="text-xs text-muted-foreground">
-                                            {item.totalQuantitySold} sold · {formatPrice(item.totalRevenue, currency)}
+                                            {t('soldWithRevenue', {
+                                                count: item.totalQuantitySold,
+                                                revenue: formatPrice(item.totalRevenue, currency)
+                                            })}
                                         </p>
                                     </div>
                                 </div>

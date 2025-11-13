@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LucideIcon } from 'lucide-react'
 import { formatPrice } from '@shared'
 import { Currency } from '@shared'
+import { useTranslations } from 'next-intl'
 
 interface StatCardProps {
     title: string
@@ -19,6 +20,7 @@ interface StatCardProps {
 }
 
 export function StatCard({ title, value, icon: Icon, description, isCurrency, currency, trend }: StatCardProps) {
+    const t = useTranslations('dashboard')
     const displayValue = isCurrency && typeof value === 'number'
         ? formatPrice(value, currency || Currency.USD)
         : value
@@ -34,7 +36,7 @@ export function StatCard({ title, value, icon: Icon, description, isCurrency, cu
                 {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
                 {trend && (
                     <p className={`text-xs mt-1 ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                        {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}% from previous period
+                        {trend.isPositive ? '↑' : '↓'} {t('fromPreviousPeriod', { value: Math.abs(trend.value) })}
                     </p>
                 )}
             </CardContent>
