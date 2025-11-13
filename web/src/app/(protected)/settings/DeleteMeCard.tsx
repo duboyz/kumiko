@@ -49,8 +49,7 @@ export function DeleteMeCard() {
                 onSuccess: () => {
                     toast.success(t('settings.accountDeleted'))
                     setIsOpen(false)
-                    router.replace('/goodbye')
-                    router.refresh()
+                    router.replace('/login')
                 },
                 onError: () => {
                     toast.error(t('settings.failedToDeleteAccount'))

@@ -10,6 +10,7 @@ public class DeleteMeHandler(
     IUserRepository userRepository,
     ApplicationDbContext context,
     IConfiguration configuration,
+    IHttpContextAccessor httpContextAccessor,
     ILogger<DeleteMeHandler> logger) : ICommandHandler<DeleteMeCommand>
 {
     public async Task Handle(DeleteMeCommand request, CancellationToken cancellationToken)
@@ -102,5 +103,35 @@ public class DeleteMeHandler(
         await userRepository.DeleteAsync(user.Id);
 
         logger.LogInformation("User account deleted successfully: {UserId}", request.UserId);
+
+        // Clear authentication cookies
+        var httpContext = httpContextAccessor.HttpContext;
+        if (httpContext != null)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                Domain = GetCookieDomain(httpContext),
+                Secure = true,
+                SameSite = SameSiteMode.None
+            };
+
+            httpContext.Response.Cookies.Delete("AccessToken", cookieOptions);
+            httpContext.Response.Cookies.Delete("RefreshToken", cookieOptions);
+
+            logger.LogInformation("Cleared authentication cookies for deleted user: {UserId}", request.UserId);
+        }
+    }
+
+    private static string? GetCookieDomain(HttpContext httpContext)
+    {
+        var host = httpContext.Request.Host.Host;
+
+        if (host is "localhost" or "127.0.0.1")
+            return null;
+
+        if (host.EndsWith(".kumiko.no") || host == "kumiko.no")
+            return ".kumiko.no";
+
+        return null;
     }
 }
