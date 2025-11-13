@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { useCurrentUser } from '@shared/hooks'
+import { Button } from '@/components/ui/button'
 
 interface HeaderProps { }
 
@@ -53,12 +54,11 @@ export function Header({ }: HeaderProps) {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
             {!isLoading && currentUser ? (
-              <button
+              <Button
                 onClick={handleDashboard}
-                className="bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors"
               >
                 Go to Dashboard
-              </button>
+              </Button>
             ) : !isLoading ? (
               <>
                 <button onClick={handleLogin} className="text-gray-600 hover:text-gray-900 transition-colors font-medium">

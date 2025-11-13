@@ -4,6 +4,7 @@
     "save": "Lagre",
     "cancel": "Avbryt",
     "delete": "Slett",
+    "deleting": "Sletter...",
     "edit": "Rediger",
     "back": "Tilbake",
     "next": "Neste",
@@ -193,7 +194,22 @@
       "pleaseSetHours": "Vennligst sett åpningstider",
       "updateSuccess": "Åpningstider oppdatert",
       "updateError": "Kunne ikke oppdatere åpningstider"
-    }
+    },
+    "dangerZone": "Faresone",
+    "dangerZoneDescription": "Slett kontoen din og all tilhørende data permanent",
+    "deleteAccountWarning": "Denne handlingen kan ikke angres. Dette vil permanent slette kontoen din og all data tilknyttet den.",
+    "confirmEmail": "E-post",
+    "confirmPassword": "Passord",
+    "enterPassword": "Skriv inn passord",
+    "understandIrreversible": "Jeg forstår at denne handlingen er irreversibel",
+    "deleteAccount": "Slett konto",
+    "confirmDeleteTitle": "Er du helt sikker?",
+    "confirmDeleteDescription": "Denne handlingen kan ikke angres. Dette vil permanent slette kontoen din og fjerne all data fra våre servere.",
+    "typeToConfirm": "Skriv",
+    "typeHere": "Skriv her for å bekrefte",
+    "confirmDelete": "Bekreft sletting",
+    "accountDeleted": "Kontoen din har blitt slettet",
+    "failedToDeleteAccount": "Kunne ikke slette konto. Vennligst sjekk legitimasjonen din og prøv igjen."
   },
   "restaurant": {
     "title": "Restaurant",

@@ -8,6 +8,8 @@ import {
   BusinessHoursSettings,
   SubscriptionSettings,
 } from '@/components'
+import { DeleteMeCard } from './DeleteMeCard'
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCurrentUser, useLocationSelection } from '@shared'
 import { ErrorState, LoadingSpinner } from '@/components'
@@ -71,6 +73,7 @@ export default function SettingsPage() {
                 <span>{t('settings.restaurantTab')}</span>
               </TabsTrigger>
             )}
+
           </TabsList>
 
           {/* Account Tab */}
@@ -78,6 +81,9 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <UserSettings />
               <LocationSettings />
+              <div className="col-span-2">
+                <DeleteMeCard />
+              </div>
             </div>
           </TabsContent>
 

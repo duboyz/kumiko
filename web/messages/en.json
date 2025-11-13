@@ -4,6 +4,7 @@
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
+    "deleting": "Deleting...",
     "edit": "Edit",
     "back": "Back",
     "next": "Next",
@@ -193,7 +194,22 @@
       "pleaseSetHours": "Please set business hours",
       "updateSuccess": "Business hours updated successfully",
       "updateError": "Failed to update business hours"
-    }
+    },
+    "dangerZone": "Danger Zone",
+    "dangerZoneDescription": "Permanently delete your account and all associated data",
+    "deleteAccountWarning": "This action cannot be undone. This will permanently delete your account and all data associated with it.",
+    "confirmEmail": "Email",
+    "confirmPassword": "Password",
+    "enterPassword": "Enter your password",
+    "understandIrreversible": "I understand that this action is irreversible",
+    "deleteAccount": "Delete Account",
+    "confirmDeleteTitle": "Are you absolutely sure?",
+    "confirmDeleteDescription": "This action cannot be undone. This will permanently delete your account and remove all your data from our servers.",
+    "typeToConfirm": "Type",
+    "typeHere": "Type here to confirm",
+    "confirmDelete": "Confirm Delete",
+    "accountDeleted": "Your account has been successfully deleted",
+    "failedToDeleteAccount": "Failed to delete account. Please check your credentials and try again."
   },
   "restaurant": {
     "title": "Restaurant",
