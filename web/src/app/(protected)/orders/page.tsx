@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ContentContainer, PageHeader } from '@/components'
 import { LoadingSpinner } from '@/components'
-import { useLocationSelection, useRestaurantOrders } from '@shared'
+import { useLocationSelection, useRestaurantOrders, OrderStatus } from '@shared'
 import { NoLocation } from '@/stories/restaurants/NoLocation/NoLocation'
 import { RestaurantRequired } from '@/stories/restaurants/RestaurantRequired/RestaurantRequired'
 import { OrdersTableView, OrdersKanbanView } from '@/stories/orders'
@@ -36,7 +36,7 @@ export default function OrdersPage() {
   if (!selectedLocation || selectedLocation.type !== 'Restaurant') return <RestaurantRequired />
 
   // For kanban view, show only active orders
-  const activeOrders = orders?.filter(o => o.status !== 'Completed' && o.status !== 'Cancelled') || []
+  const activeOrders = orders?.filter(o => o.status !== OrderStatus.Completed && o.status !== OrderStatus.Cancelled) || []
   // For table view, show all orders
   const allOrders = orders || []
 
