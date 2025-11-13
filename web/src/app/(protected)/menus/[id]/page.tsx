@@ -2,12 +2,12 @@
 
 import { useParams } from 'next/navigation'
 import { useRestaurantMenus, useLocationSelection, useCreateMenuCategory, useReorderCategories } from '@shared'
-import { LoadingSpinner } from '@/components'
+import { LoadingSpinner, EmptyState } from '@/components'
 import { ContentLoadingError } from '@/stories/shared/ContentLoadingError/ContentLoadingError'
 import { ContentNotFound } from '@/stories/shared/ContentNotFound/ContentNotFound'
 import { ContentContainer } from '@/components'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Plus, LayoutList } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
@@ -130,7 +130,7 @@ export default function MenuEditPage() {
     )
 
   return (
-    <ContentContainer className="bg-white">
+    <ContentContainer>
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -158,15 +158,28 @@ export default function MenuEditPage() {
         )}
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
-        <div className="space-y-6 min-h-[200px]">
-          <SortableContext items={categories.map(cat => cat.id)} strategy={verticalListSortingStrategy}>
-            {categories.map(category => (
-              <SortableCategory key={category.id} menuCategory={category} />
-            ))}
-          </SortableContext>
-        </div>
-      </DndContext>
+      {categories.length === 0 && !showAddCategoryForm ? (
+        <EmptyState
+          icon={LayoutList}
+          title={t('noCategoriesYet')}
+          description={t('addFirstCategory')}
+          action={{
+            label: t('addYourFirstCategory'),
+            onClick: handleAddCategory,
+            variant: 'default',
+          }}
+        />
+      ) : (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
+          <div className="space-y-6 min-h-[200px]">
+            <SortableContext items={categories.map(cat => cat.id)} strategy={verticalListSortingStrategy}>
+              {categories.map(category => (
+                <SortableCategory key={category.id} menuCategory={category} />
+              ))}
+            </SortableContext>
+          </div>
+        </DndContext>
+      )}
     </ContentContainer>
   )
 }
