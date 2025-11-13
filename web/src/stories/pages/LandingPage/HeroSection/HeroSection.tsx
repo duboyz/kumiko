@@ -178,6 +178,8 @@ export function HeroSection({}: HeroSectionProps) {
             style={{
               fontSize: 'clamp(2.5rem, 8vw, 7rem)',
               lineHeight: 'clamp(3rem, 9vw, 8rem)',
+              opacity: 0,
+              transform: 'translateY(30px)',
             }}
           >
             DIGITIZE YOUR
@@ -189,6 +191,10 @@ export function HeroSection({}: HeroSectionProps) {
           <p
             ref={descriptionRef}
             className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
+            style={{
+              opacity: 0,
+              transform: 'translateY(20px)',
+            }}
           >
             Transform your paper menu into a stunning digital experience. Get a beautiful, fresh website that's
             optimized for food ordering and ready to take orders immediately—all without any technical skills required.
@@ -198,6 +204,8 @@ export function HeroSection({}: HeroSectionProps) {
             className="group relative bg-black text-white px-10 py-5 rounded-2xl text-lg font-semibold overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:bg-gray-800"
             style={{
               boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+              opacity: 0,
+              transform: 'translateY(20px)',
             }}
             onClick={() => {
               // Simple navigation that works in both Next.js and Storybook
@@ -212,7 +220,14 @@ export function HeroSection({}: HeroSectionProps) {
         </div>
 
         {/* Hero Image - Right side on desktop, below text on mobile */}
-        <div ref={heroImageRef} className="flex-1 lg:max-w-2xl flex justify-center lg:justify-end">
+        <div
+          ref={heroImageRef}
+          className="flex-1 lg:max-w-2xl flex justify-center lg:justify-end"
+          style={{
+            opacity: 0,
+            transform: 'translateX(100px) scale(0.8)',
+          }}
+        >
           <div className="w-full max-w-md lg:max-w-lg">
             <Image
               src={HeroImage}
