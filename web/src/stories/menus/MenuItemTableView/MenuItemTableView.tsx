@@ -649,7 +649,7 @@ export default function MenuItemTableView({
                     onCheckedChange={handleSelectAll}
                     ref={el => {
                       if (el) {
-                        ;(el as any).indeterminate = isIndeterminate
+                        ; (el as any).indeterminate = isIndeterminate
                       }
                     }}
                   />

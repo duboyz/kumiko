@@ -94,60 +94,40 @@ export function ContactInformationSettings({ restaurant }: ContactInformationSet
               Edit
             </Button>
           </div>
-          <CardDescription>Manage your business contact details</CardDescription>
+          <CardDescription>Business contact details</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {/* Basic Information */}
+          <dl className="space-y-4">
+            {/* Name */}
             <div>
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                Basic Information
-              </h3>
-              <dl className="grid grid-cols-1 gap-3">
-                <div>
-                  <dt className="text-sm font-medium text-muted-foreground">Name</dt>
-                  <dd className="text-sm">{restaurant.name}</dd>
-                </div>
-                {restaurant.description && (
-                  <div>
-                    <dt className="text-sm font-medium text-muted-foreground">Description</dt>
-                    <dd className="text-sm">{restaurant.description}</dd>
-                  </div>
-                )}
-              </dl>
+              <dt className="text-sm font-medium text-muted-foreground mb-1">Business Name</dt>
+              <dd className="text-sm">{restaurant.name}</dd>
             </div>
 
-            {/* Location */}
+            {/* Description */}
+            {restaurant.description && (
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground mb-1">Description</dt>
+                <dd className="text-sm text-muted-foreground">{restaurant.description}</dd>
+              </div>
+            )}
+
+            {/* Address - Compact format */}
             <div>
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Location</h3>
-              <dl className="grid grid-cols-1 gap-3">
-                <div>
-                  <dt className="text-sm font-medium text-muted-foreground">Street Address</dt>
-                  <dd className="text-sm">{restaurant.address}</dd>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <dt className="text-sm font-medium text-muted-foreground">City</dt>
-                    <dd className="text-sm">{restaurant.city || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-muted-foreground">State/Province</dt>
-                    <dd className="text-sm">{restaurant.state || '-'}</dd>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <dt className="text-sm font-medium text-muted-foreground">Postal Code</dt>
-                    <dd className="text-sm">{restaurant.zip || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-muted-foreground">Country</dt>
-                    <dd className="text-sm">{restaurant.country || '-'}</dd>
-                  </div>
-                </div>
-              </dl>
+              <dt className="text-sm font-medium text-muted-foreground mb-1">Address</dt>
+              <dd className="text-sm">
+                {restaurant.address}
+                <br />
+                {[restaurant.city, restaurant.state, restaurant.zip].filter(Boolean).join(', ')}
+                {restaurant.country && (
+                  <>
+                    <br />
+                    {restaurant.country}
+                  </>
+                )}
+              </dd>
             </div>
-          </div>
+          </dl>
         </CardContent>
       </Card>
     )

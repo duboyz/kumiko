@@ -77,15 +77,15 @@ export function BusinessHoursSettings({ restaurant }: BusinessHoursSettingsProps
               Edit
             </Button>
           </div>
-          <CardDescription>Manage your opening hours for each day of the week</CardDescription>
+          <CardDescription>Opening hours</CardDescription>
         </CardHeader>
         <CardContent>
           {parsedBusinessHours ? (
-            <dl className="grid grid-cols-1 gap-2">
+            <dl className="space-y-2">
               {Object.entries(parsedBusinessHours).map(([day, hours]) => (
-                <div key={day} className="flex justify-between items-center py-2 border-b last:border-b-0">
-                  <dt className="text-sm font-medium capitalize">{day}</dt>
-                  <dd className="text-sm text-muted-foreground">
+                <div key={day} className="flex justify-between items-center text-sm">
+                  <dt className="font-medium capitalize text-muted-foreground">{day}</dt>
+                  <dd className="text-foreground">
                     {hours ? `${hours.open} - ${hours.close}` : 'Closed'}
                   </dd>
                 </div>

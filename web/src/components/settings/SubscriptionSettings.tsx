@@ -85,11 +85,11 @@ export function SubscriptionSettings() {
           <Badge className={statusBadge.color}>{statusBadge.text}</Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Current Plan */}
-        <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-          <div>
-            <h3 className="font-semibold text-lg">
+      <CardContent className="space-y-6">
+        {/* Current Plan - Compact View */}
+        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+          <div className="space-y-1">
+            <h3 className="font-semibold text-base">
               {subscription.isTrialing && !subscription.hasPaymentMethod
                 ? 'Trial Access'
                 : `${subscription.plan.name} Plan`}
@@ -100,95 +100,83 @@ export function SubscriptionSettings() {
               {subscription.plan.maxMenusPerLocation === -1
                 ? 'Unlimited'
                 : subscription.plan.maxMenusPerLocation}{' '}
-              menus per location
+              menus
             </p>
           </div>
+          {subscription.hasPaymentMethod && (
+            <div className="text-right">
+              <p className="text-lg font-semibold">${subscription.plan.monthlyPrice}</p>
+              <p className="text-xs text-muted-foreground">per {subscription.billingInterval.toLowerCase()}</p>
+            </div>
+          )}
         </div>
 
-        {/* Billing Info */}
-        {subscription.hasPaymentMethod ? (
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-start gap-2">
-              <CreditCard className="h-4 w-4 mt-0.5 text-muted-foreground" />
+        {/* Key Info - Compact Grid */}
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          {subscription.hasPaymentMethod && (
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm font-medium">Billing Interval</p>
-                <p className="text-sm text-muted-foreground">{subscription.billingInterval}</p>
+                <p className="text-muted-foreground">Billing</p>
+                <p className="font-medium">{subscription.billingInterval}</p>
               </div>
             </div>
-            <div className="flex items-start gap-2">
-              <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">
-                  {subscription.isTrialing ? 'Trial Ends' : 'Next Billing'}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {subscription.isTrialing
-                    ? subscription.trialEndDate
-                      ? new Date(subscription.trialEndDate).toLocaleDateString()
-                      : 'N/A'
-                    : subscription.currentPeriodEnd
-                      ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
-                      : 'N/A'}
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-start gap-2 p-3 bg-muted rounded-lg">
-            <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground" />
+          )}
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
             <div>
-              <p className="text-sm font-medium">Trial Ends</p>
-              <p className="text-sm text-muted-foreground">
-                {subscription.trialEndDate
-                  ? new Date(subscription.trialEndDate).toLocaleDateString()
-                  : 'N/A'}
+              <p className="text-muted-foreground">
+                {subscription.isTrialing ? 'Trial Ends' : 'Next Billing'}
+              </p>
+              <p className="font-medium">
+                {subscription.isTrialing
+                  ? subscription.trialEndDate
+                    ? new Date(subscription.trialEndDate).toLocaleDateString()
+                    : 'N/A'
+                  : subscription.currentPeriodEnd
+                    ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
+                    : 'N/A'}
               </p>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Trial Banner - Only show if no payment method */}
+        {/* Trial Banner - Compact */}
         {subscription.isTrialing && !subscription.hasPaymentMethod && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-900 mb-2">
-              <strong>Free Trial Active!</strong>
-            </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-sm text-blue-900">
-              You're enjoying a 14-day free trial. <strong>No payment required</strong> until{' '}
+              <strong>Free Trial:</strong> No payment required until{' '}
               {subscription.trialEndDate
                 ? new Date(subscription.trialEndDate).toLocaleDateString()
                 : 'N/A'}
-              . To continue using the service after your trial, choose a plan and set up payment.
             </p>
           </div>
         )}
 
-        {/* Paid Trial Banner - Has payment method */}
         {subscription.isTrialing && subscription.hasPaymentMethod && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-sm text-blue-900">
-              <strong>Trial Period!</strong> Your trial ends on{' '}
+              <strong>Trial Period:</strong> Billing starts on{' '}
               {subscription.trialEndDate
                 ? new Date(subscription.trialEndDate).toLocaleDateString()
                 : 'N/A'}
-              . After that, you'll be charged ${subscription.plan.monthlyPrice}/month.
             </p>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-2">
           {subscription.hasPaymentMethod ? (
             <>
-              <Button onClick={() => router.push('/subscription')} variant="default">
+              <Button onClick={() => router.push('/subscription')} variant="default" size="sm">
                 Change Plan
               </Button>
-              <Button onClick={() => router.push('/subscription')} variant="outline">
-                Manage Subscription
+              <Button onClick={() => router.push('/subscription')} variant="outline" size="sm">
+                Manage Billing
               </Button>
             </>
           ) : (
-            <Button onClick={() => router.push('/subscription')} variant="default">
+            <Button onClick={() => router.push('/subscription')} variant="default" size="sm">
               Choose a Plan
             </Button>
           )}

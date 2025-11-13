@@ -86,7 +86,7 @@ export default function SubscriptionPage() {
       <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Crown className="h-12 w-12 text-yellow-500" />
+          <p>Asset goes here</p>
           <div>
             <h1 className="text-3xl font-bold">
               {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod

@@ -73,7 +73,6 @@ export default function MenuEditPage() {
       },
       {
         onSuccess: () => {
-          toast.success(t('categoryCreated'))
           setShowAddCategoryForm(false)
         },
         onError: (error) => {
@@ -106,9 +105,6 @@ export default function MenuEditPage() {
       onError: () => {
         setCategories(categories)
         toast.error('Failed to reorder categories')
-      },
-      onSuccess: () => {
-        toast.success('Categories reordered successfully')
       },
     })
   }

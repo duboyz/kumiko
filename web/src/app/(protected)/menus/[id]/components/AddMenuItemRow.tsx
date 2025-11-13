@@ -224,20 +224,24 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
         <TableCell>
           <div className="flex gap-2">
             <Button
-              variant="default"
+              variant="outline"
+              className="bg-green-600 text-white hover:bg-green-700 hover:text-white flex-1"
               size="sm"
               onClick={handleSave}
               disabled={isSubmitting}
             >
               <Save className="h-4 w-4" />
+              <p>Save</p>
             </Button>
             <Button
-              variant="outline"
+              variant="destructive"
               size="sm"
+              className="flex-1"
               onClick={onCancel}
               disabled={isSubmitting}
             >
               <X className="h-4 w-4" />
+              <p>Cancel</p>
             </Button>
           </div>
         </TableCell>

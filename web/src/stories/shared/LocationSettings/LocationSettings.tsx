@@ -83,18 +83,18 @@ export function LocationSettings() {
             <CardHeader>
                 <CardTitle>{t('settings.locationSettings')}</CardTitle>
                 <CardDescription>
-                    Settings for {selectedLocation.name} ({selectedLocation.type})
+                    {selectedLocation.name} • {selectedLocation.type}
                 </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="space-y-2">
-                    <Label>{t('settings.currency')}</Label>
+            <CardContent>
+                <div className="space-y-3">
+                    <Label className="text-sm font-medium">{t('settings.currency')}</Label>
                     <div className="flex gap-2">
                         <Select
                             value={currentLocationCurrency.toString()}
                             onValueChange={value => setLocationCurrency(Number(value) as Currency)}
                         >
-                            <SelectTrigger className="w-[200px]">
+                            <SelectTrigger className="flex-1">
                                 <SelectValue>
                                     {t(`currencies.${getCurrencyTranslationKey(currentLocationCurrency)}`)}
                                 </SelectValue>
@@ -111,6 +111,7 @@ export function LocationSettings() {
                         </Select>
                         <Button
                             onClick={handleLocationCurrencyUpdate}
+                            size="sm"
                             disabled={
                                 updateRestaurantSettings.isPending ||
                                 updateHospitalitySettings.isPending ||
@@ -119,7 +120,7 @@ export function LocationSettings() {
                             }
                         >
                             {updateRestaurantSettings.isPending || updateHospitalitySettings.isPending
-                                ? 'Updating...'
+                                ? 'Saving...'
                                 : t('common.save')}
                         </Button>
                     </div>

@@ -391,11 +391,13 @@ export const MenuItemRow = ({
             </TableCell>
             <TableCell>
               <div className="flex gap-2">
-                <Button variant="default" size="sm" onClick={handleSave}>
+                <Button variant="outline" className="bg-green-600 text-white hover:bg-green-700 hover:text-white flex-1" size="sm" onClick={handleSave}>
                   <Save className="h-4 w-4" />
+                  <p>Save</p>
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleCancel}>
+                <Button variant="destructive" size="sm" onClick={handleCancel} className="flex-1">
                   <X className="h-4 w-4" />
+                  Cancel
                 </Button>
               </div>
             </TableCell>
@@ -437,10 +439,10 @@ export const MenuItemRow = ({
             </TableCell>
             <TableCell>
               <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={() => startEditing(item.id)}>
+                <Button variant="secondary" size="sm" onClick={() => startEditing(item.id)}>
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm"><Trash2 className="h-4 w-4" /></Button>
+                <Button variant="destructive" size="sm"><Trash2 className="h-4 w-4" /></Button>
               </div>
             </TableCell>
           </>

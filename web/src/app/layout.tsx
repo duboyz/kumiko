@@ -45,7 +45,6 @@ export default async function RootLayout({
       <body className={inter.variable}>
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
-          <Toaster position="bottom-left" />
         </NextIntlClientProvider>
       </body>
     </html>

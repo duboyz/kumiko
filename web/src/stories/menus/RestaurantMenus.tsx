@@ -20,20 +20,12 @@ export const RestaurantMenus = () => {
   const router = useRouter()
   const { selectedLocation } = useLocationSelection()
   const { data: menusData, isLoading, error } = useRestaurantMenus(selectedLocation?.id || '')
-  const [searchQuery, setSearchQuery] = useState('')
 
   if (isLoading) return <LoadingState />
   if (error)
     return (
       <ErrorState title={t('failedToLoadMenus')} message={t('errorLoadingMenus')} />
     )
-
-  const filteredMenus =
-    menusData?.menus?.filter(
-      menu =>
-        menu.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        menu.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || []
 
   if (!menusData?.menus || menusData.menus.length === 0) {
     return (
@@ -99,37 +91,12 @@ export const RestaurantMenus = () => {
         </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder={t('searchMenusPlaceholder')}
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <Button variant="outline" size="default">
-          <SlidersHorizontal className="w-4 h-4 mr-2" />
-          {t('filters')}
-        </Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {menusData.menus.map(menu => (
+          <RestaurantMenuCard key={menu.id} menu={menu} router={router} />
+        ))}
       </div>
 
-      {/* Menu Grid */}
-      {filteredMenus.length === 0 ? (
-        <div className="text-center py-12 border-2 border-dashed rounded-lg">
-          <Search className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">{t('noMenusFound')}</h3>
-          <p className="text-muted-foreground">{t('adjustSearchQuery')}</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMenus.map(menu => (
-            <RestaurantMenuCard key={menu.id} menu={menu} router={router} />
-          ))}
-        </div>
-      )}
     </div>
   )
 }

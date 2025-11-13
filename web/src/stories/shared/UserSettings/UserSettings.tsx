@@ -76,17 +76,17 @@ export function UserSettings() {
         <Card>
             <CardHeader>
                 <CardTitle>{t('settings.userSettings')}</CardTitle>
-                <CardDescription>Configure your personal preferences</CardDescription>
+                <CardDescription>Personal preferences</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="space-y-2">
-                    <Label>{t('settings.preferredLanguage')}</Label>
+            <CardContent>
+                <div className="space-y-3">
+                    <Label className="text-sm font-medium">{t('settings.preferredLanguage')}</Label>
                     <div className="flex gap-2">
                         <Select
                             value={currentUserLanguage.toString()}
                             onValueChange={value => setUserLanguage(Number(value) as Language)}
                         >
-                            <SelectTrigger className="w-[200px]">
+                            <SelectTrigger className="flex-1">
                                 <SelectValue placeholder={t('settings.selectLanguage')} />
                             </SelectTrigger>
                             <SelectContent>
@@ -99,13 +99,14 @@ export function UserSettings() {
                         </Select>
                         <Button
                             onClick={handleUserLanguageUpdate}
+                            size="sm"
                             disabled={
                                 updateUserSettings.isPending ||
                                 userLanguage === null ||
                                 currentUserLanguage === user?.preferredLanguage
                             }
                         >
-                            {updateUserSettings.isPending ? 'Updating...' : t('common.save')}
+                            {updateUserSettings.isPending ? 'Saving...' : t('common.save')}
                         </Button>
                     </div>
                 </div>
