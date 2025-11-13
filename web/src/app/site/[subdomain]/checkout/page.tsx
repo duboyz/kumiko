@@ -3,13 +3,24 @@
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { CustomerInfoForm } from '@/stories/orders/CustomerInfoForm'
-import { useCartStore, useCreateOrder, CreateOrderItemDto, formatPrice } from '@shared'
+import {
+  useCartStore,
+  useCreateOrder,
+  CreateOrderItemDto,
+  formatPrice,
+  useWebsiteBySubdomain,
+  parseBusinessHours,
+  getMinDate,
+  getMinTime,
+  getMaxTime,
+  isTimeAvailable,
+} from '@shared'
 import { toast } from 'sonner'
-import { CartItemCard } from '@/stories/orders/CartItemCard'
 import { ArrowLeft } from 'lucide-react'
 import { PoweredByKumiko } from '@/stories/websites'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
+import { useMemo, useState, useEffect } from 'react'
 
 export default function CheckoutPage() {
   const t = useTranslations('checkout')
@@ -28,11 +39,53 @@ export default function CheckoutPage() {
     clearCart,
     clearCustomerInfo,
     getTotalAmount,
-    updateQuantity,
-    removeItem,
   } = useCartStore()
 
+  const { data: websiteData } = useWebsiteBySubdomain(subdomain)
   const createOrderMutation = useCreateOrder()
+
+  // Parse business hours
+  const businessHours = useMemo(() => {
+    return parseBusinessHours(websiteData?.businessHours)
+  }, [websiteData?.businessHours])
+
+  // Calculate min date
+  const minDate = useMemo(() => {
+    return getMinDate(businessHours)
+  }, [businessHours])
+
+  // Calculate min/max time for selected date
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    return customerInfo.pickupDate || minDate || new Date().toISOString().split('T')[0]
+  })
+
+  const { minTime, maxTime } = useMemo(() => {
+    if (!selectedDate || !businessHours) {
+      return { minTime: undefined, maxTime: undefined }
+    }
+
+    const date = new Date(selectedDate)
+    const min = getMinTime(date, businessHours)
+    const max = getMaxTime(date, businessHours)
+
+    return { minTime: min, maxTime: max }
+  }, [selectedDate, businessHours])
+
+  const handleDateChange = (date: string) => {
+    setSelectedDate(date)
+    setCustomerInfo('pickupDate', date)
+  }
+
+  // Update selectedDate when minDate changes (if current date is invalid)
+  useEffect(() => {
+    if (minDate && (!selectedDate || selectedDate < minDate)) {
+      setSelectedDate(minDate)
+      if (!customerInfo.pickupDate || customerInfo.pickupDate < minDate) {
+        setCustomerInfo('pickupDate', minDate)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [minDate]) // Only depend on minDate to avoid loops
 
   const handleCustomerInfoChange = (field: keyof typeof customerInfo, value: string) => {
     setCustomerInfo(field, value)
@@ -55,6 +108,15 @@ export default function CheckoutPage() {
     if (!customerInfo.pickupDate) {
       toast.error(t('selectPickupDate'))
       return
+    }
+
+    // Validate pickup time against business hours
+    if (businessHours) {
+      const pickupDate = new Date(customerInfo.pickupDate)
+      if (!isTimeAvailable(pickupDate, customerInfo.pickupTime, businessHours)) {
+        toast.error(t('pickupTimeOutsideHours') || 'Selected pickup time is outside business hours')
+        return
+      }
     }
     if (cart.length === 0) {
       toast.error(t('cartEmpty'))
@@ -128,18 +190,18 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 flex-1">
+      <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8 flex-1 pb-24 sm:pb-8">
         {/* Header */}
-        <div className="mb-4 sm:mb-6">
+        <div className="mb-6 sm:mb-8">
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="mb-2 sm:mb-3 text-sm sm:text-base -ml-2 sm:-ml-0"
+            className="mb-3 sm:mb-4 text-sm sm:text-base -ml-2 sm:-ml-0"
           >
             <ArrowLeft className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
             {tCommon('back')}
           </Button>
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-3 sm:gap-4">
             <Image
               src="/icons/kumiko-checkout.png"
               alt="Kumiko"
@@ -154,51 +216,58 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-          {/* Left Column - Customer Info Form */}
-          <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-5 lg:p-6 order-2 lg:order-1">
-            <h2 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">{t('customerInformation')}</h2>
-            <CustomerInfoForm customerInfo={customerInfo} onCustomerInfoChange={handleCustomerInfoChange} />
-          </div>
+        <div className="max-w-2xl mx-auto">
+          {/* Customer Info Form */}
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-5 md:p-6 lg:p-6 flex flex-col">
+            <h2 className="text-lg sm:text-xl md:text-xl font-semibold mb-4 sm:mb-5">Customer Information</h2>
+            <CustomerInfoForm
+              customerInfo={customerInfo}
+              onCustomerInfoChange={handleCustomerInfoChange}
+              minDate={minDate}
+              minTime={minTime}
+              maxTime={maxTime}
+              onDateChange={handleDateChange}
+            />
 
-          {/* Right Column - Order Summary */}
-          <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-5 lg:p-6 order-1 lg:order-2">
-            <h2 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">{t('orderSummary')}</h2>
-
-            {/* Cart Items */}
-            <div className="space-y-2 sm:space-y-3 md:space-y-4 mb-3 sm:mb-4 md:mb-6 max-h-[350px] sm:max-h-[400px] md:max-h-96 overflow-y-auto -mx-3 sm:-mx-4 md:-mx-5 lg:-mx-6 px-3 sm:px-4 md:px-5 lg:px-6">
-              {cart.map((item, index) => (
-                <CartItemCard
-                  key={index}
-                  item={item}
-                  index={index}
-                  currency={currency}
-                  onUpdateQuantity={updateQuantity}
-                  onRemove={removeItem}
-                />
-              ))}
-            </div>
-
-            {/* Total */}
-            <div className="border-t pt-3 sm:pt-4">
-              <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold mb-3 sm:mb-4 md:mb-6">
-                <span>{t('total')}:</span>
-                <span>{formatPrice(totalAmount, currency)}</span>
+            {/* Total and Place Order Button - Desktop */}
+            <div className="hidden lg:block mt-6 pt-6 border-t border-gray-200">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-lg font-semibold text-gray-700">Total:</span>
+                <span className="text-xl font-bold text-gray-900">{formatPrice(totalAmount, currency)}</span>
               </div>
-
-              {/* Place Order Button */}
               <Button
                 onClick={handleSubmitOrder}
-                className="w-full text-sm sm:text-base"
+                className="w-full text-base font-semibold"
                 size="lg"
                 disabled={createOrderMutation.isPending}
               >
-                {createOrderMutation.isPending ? t('placingOrder') : t('placeOrder')}
+                {createOrderMutation.isPending ? 'Placing Order...' : 'Place Order'}
               </Button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Sticky Total and Place Order Button - Mobile only */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div className="px-4 pt-3 pb-2">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-base font-semibold text-gray-700">Total:</span>
+            <span className="text-lg font-bold text-gray-900">{formatPrice(totalAmount, currency)}</span>
+          </div>
+        </div>
+        <div className="px-4 pb-4">
+          <Button
+            onClick={handleSubmitOrder}
+            className="w-full text-base font-semibold"
+            size="lg"
+            disabled={createOrderMutation.isPending}
+          >
+            {createOrderMutation.isPending ? 'Placing Order...' : 'Place Order'}
+          </Button>
+        </div>
+      </div>
+
       <PoweredByKumiko />
     </div>
   )

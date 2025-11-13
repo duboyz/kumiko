@@ -69,7 +69,8 @@ public class GetWebsiteBySubdomainHandler(IWebsiteRepository websiteRepository) 
             website.Description,
             website.IsPublished,
             website.Type.ToString(),
-            pages
+            pages,
+            website.Restaurant?.BusinessHours
         );
     }
 }

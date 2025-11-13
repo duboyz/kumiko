@@ -115,6 +115,7 @@ export interface GetWebsiteBySubdomainResult {
   isPublished: boolean
   type: string
   pages: PublicWebsitePageDto[]
+  businessHours?: string | null
 }
 
 export interface PublicWebsitePageDto {
