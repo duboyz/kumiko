@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { useEffect, useRef } from 'react'
-import { useOrderById, ORDER_STATUS_COLORS, ORDER_STATUS_LABELS, formatPrice, Currency } from '@shared'
+import { useOrderById, ORDER_STATUS_COLORS, ORDER_STATUS_LABELS, formatPrice, Currency, OrderStatus } from '@shared'
 import { LoadingSpinner } from '@/components'
 import { ErrorMessage } from '@/components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -25,9 +25,14 @@ export default function OrderStatusPage() {
 
   const { data: order, isLoading, error } = useOrderById(orderId)
 
-  // Confetti animation
+  // Confetti animation - only show on initial order confirmation (Pending or Confirmed status)
   useEffect(() => {
     if (!order) return
+
+    // Only show confetti for initial order statuses (Pending or Confirmed)
+    if (order.status !== OrderStatus.Pending) {
+      return
+    }
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -215,6 +220,36 @@ export default function OrderStatusPage() {
     day: 'numeric',
   })
 
+  // Get status-based image and message
+  const getStatusImage = () => {
+    switch (order.status) {
+      case OrderStatus.Confirmed:
+        return '/icons/kumiko-working.png'
+      case OrderStatus.Ready:
+        return '/icons/kumiko-ready.png'
+      default:
+        return KumikoCelebration
+    }
+  }
+
+  const getStatusMessage = () => {
+    switch (order.status) {
+      case OrderStatus.Confirmed:
+        return 'Your order has been confirmed and is being prepared'
+      case OrderStatus.Ready:
+        return 'Your order is ready for pickup!'
+      case OrderStatus.Completed:
+        return 'Order completed'
+      case OrderStatus.Cancelled:
+        return 'Order cancelled'
+      default:
+        return 'Your order has been sent'
+    }
+  }
+
+  const statusImage = getStatusImage()
+  const statusMessage = getStatusMessage()
+
   return (
     <div ref={containerRef} className="relative min-h-screen bg-gray-50 py-8 px-4">
       {/* Confetti canvas */}
@@ -223,23 +258,23 @@ export default function OrderStatusPage() {
       <div className="relative z-10 max-w-4xl mx-auto space-y-6">
         {/* Celebration Header */}
         <div className="text-center space-y-6 pb-6">
-          {/* Kumiko Celebration Image */}
+          {/* Status-based Kumiko Image */}
           <div ref={imageRef} className="flex justify-center">
             <Image
-              src={KumikoCelebration}
-              alt="Kumiko celebrating"
+              src={statusImage}
+              alt={`Kumiko - ${order.status}`}
               width={300}
               height={300}
               className="max-w-full h-auto w-48 sm:w-64"
             />
           </div>
 
-          {/* Success Message */}
+          {/* Status Message */}
           <div ref={successRef} className="flex items-center justify-center gap-3 text-lg">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 dark:bg-green-900">
               <Check className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
-            <span className="font-medium text-gray-700">Your order has been confirmed</span>
+            <span className="font-medium text-gray-700">{statusMessage}</span>
           </div>
         </div>
 
@@ -385,7 +420,7 @@ export default function OrderStatusPage() {
 
           {/* Order Metadata */}
           <Card>
-            <CardContent className="pt-6">
+            <CardContent>
               <div className="text-sm text-gray-500 space-y-1">
                 <p>Order placed: {new Date(order.createdAt).toLocaleString()}</p>
                 <p>Last updated: {new Date(order.updatedAt).toLocaleString()}</p>

@@ -20,7 +20,7 @@ interface OrdersKanbanViewProps {
     orders: OrderDto[]
 }
 
-const STATUSES: OrderStatus[] = ['Pending', 'Confirmed', 'Ready']
+const STATUSES: OrderStatus[] = [OrderStatus.Pending, OrderStatus.Confirmed, OrderStatus.Ready]
 
 export function OrdersKanbanView({ orders }: OrdersKanbanViewProps) {
     const t = useTranslations('orders')
@@ -138,12 +138,12 @@ export function OrdersKanbanView({ orders }: OrdersKanbanViewProps) {
                                                             ← {t('back')}
                                                         </Button>
                                                     )}
-                                                    {order.status === 'Ready' ? (
+                                                    {order.status === OrderStatus.Ready ? (
                                                         <Button
                                                             variant="default"
                                                             size="sm"
                                                             className="flex-1"
-                                                            onClick={() => handleStatusChange(order.id, 'Completed')}
+                                                            onClick={() => handleStatusChange(order.id, OrderStatus.Completed)}
                                                             disabled={updateOrderStatus.isPending}
                                                         >
                                                             {t('done')}

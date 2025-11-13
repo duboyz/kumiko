@@ -13,7 +13,8 @@ public record GetWebsiteBySubdomainResult(
     string? Description,
     bool IsPublished,
     string Type,
-    IEnumerable<WebsitePageDto> Pages
+    IEnumerable<WebsitePageDto> Pages,
+    string? BusinessHours = null
 );
 
 public record WebsitePageDto(
