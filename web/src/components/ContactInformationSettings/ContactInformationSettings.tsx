@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { MapPin, Edit, Save, X } from 'lucide-react'
 import { useUpdateRestaurant, RestaurantBaseDto, UpdateRestaurantCommand } from '@shared'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface ContactInformationSettingsProps {
   restaurant: RestaurantBaseDto
@@ -25,6 +26,7 @@ interface ContactDetails {
 }
 
 export function ContactInformationSettings({ restaurant }: ContactInformationSettingsProps) {
+  const t = useTranslations('settings.contactInfo')
   const [isEditing, setIsEditing] = useState(false)
   const [contactDetails, setContactDetails] = useState<ContactDetails | null>(null)
   const updateRestaurant = useUpdateRestaurant()
@@ -45,7 +47,7 @@ export function ContactInformationSettings({ restaurant }: ContactInformationSet
 
   const handleSave = async () => {
     if (!contactDetails) {
-      toast.error('Please fill in the required fields')
+      toast.error(t('fillRequiredFields'))
       return
     }
 
@@ -62,11 +64,11 @@ export function ContactInformationSettings({ restaurant }: ContactInformationSet
       }
 
       await updateRestaurant.mutateAsync(command)
-      toast.success('Contact information updated successfully')
+      toast.success(t('updateSuccess'))
       setIsEditing(false)
       setContactDetails(null)
     } catch (error) {
-      toast.error('Failed to update contact information')
+      toast.error(t('updateError'))
       console.error('Error updating contact information:', error)
     }
   }
@@ -87,34 +89,34 @@ export function ContactInformationSettings({ restaurant }: ContactInformationSet
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5" />
-              <CardTitle>Contact Information</CardTitle>
+              <CardTitle>{t('title')}</CardTitle>
             </div>
             <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
               <Edit className="w-4 h-4 mr-2" />
-              Edit
+              {t('edit')}
             </Button>
           </div>
-          <CardDescription>Business contact details</CardDescription>
+          <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <dl className="space-y-4">
             {/* Name */}
             <div>
-              <dt className="text-sm font-medium text-muted-foreground mb-1">Business Name</dt>
+              <dt className="text-sm font-medium text-muted-foreground mb-1">{t('businessName')}</dt>
               <dd className="text-sm">{restaurant.name}</dd>
             </div>
 
             {/* Description */}
             {restaurant.description && (
               <div>
-                <dt className="text-sm font-medium text-muted-foreground mb-1">Description</dt>
+                <dt className="text-sm font-medium text-muted-foreground mb-1">{t('businessDescription')}</dt>
                 <dd className="text-sm text-muted-foreground">{restaurant.description}</dd>
               </div>
             )}
 
             {/* Address - Compact format */}
             <div>
-              <dt className="text-sm font-medium text-muted-foreground mb-1">Address</dt>
+              <dt className="text-sm font-medium text-muted-foreground mb-1">{t('address')}</dt>
               <dd className="text-sm">
                 {restaurant.address}
                 <br />
@@ -139,16 +141,16 @@ export function ContactInformationSettings({ restaurant }: ContactInformationSet
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MapPin className="w-5 h-5" />
-            <CardTitle>Edit Contact Information</CardTitle>
+            <CardTitle>{t('editTitle')}</CardTitle>
           </div>
           <div className="flex gap-2">
             <Button onClick={handleCancel} variant="outline" size="sm" disabled={updateRestaurant.isPending}>
               <X className="w-4 h-4 mr-2" />
-              Cancel
+              {t('cancel')}
             </Button>
-            <Button onClick={handleSave} size="sm" disabled={!contactDetails || updateRestaurant.isPending}>
+            <Button variant="default" onClick={handleSave} size="sm" disabled={!contactDetails || updateRestaurant.isPending}>
               <Save className="w-4 h-4 mr-2" />
-              {updateRestaurant.isPending ? 'Saving...' : 'Save Changes'}
+              {updateRestaurant.isPending ? t('saving') : t('saveChanges')}
             </Button>
           </div>
         </div>
@@ -158,26 +160,26 @@ export function ContactInformationSettings({ restaurant }: ContactInformationSet
           <div className="space-y-6">
             {/* Basic Information */}
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Basic Information</h3>
-              
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('basicInformationSection')}</h3>
+
               <div className="space-y-2">
-                <Label htmlFor="name">Business Name *</Label>
+                <Label htmlFor="name">{t('businessNameLabel')}</Label>
                 <Input
                   id="name"
                   value={contactDetails.name}
                   onChange={e => handleChange('name', e.target.value)}
-                  placeholder="Enter business name"
+                  placeholder={t('businessNamePlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('descriptionLabel')}</Label>
                 <Textarea
                   id="description"
                   value={contactDetails.description}
                   onChange={e => handleChange('description', e.target.value)}
-                  placeholder="Brief description of your business (optional)"
+                  placeholder={t('descriptionPlaceholder')}
                   rows={3}
                 />
               </div>
@@ -185,60 +187,60 @@ export function ContactInformationSettings({ restaurant }: ContactInformationSet
 
             {/* Location */}
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Location</h3>
-              
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('locationSection')}</h3>
+
               <div className="space-y-2">
-                <Label htmlFor="address">Street Address *</Label>
+                <Label htmlFor="address">{t('streetAddressLabel')}</Label>
                 <Input
                   id="address"
                   value={contactDetails.address}
                   onChange={e => handleChange('address', e.target.value)}
-                  placeholder="123 Main St"
+                  placeholder={t('streetAddressPlaceholder')}
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="city">City *</Label>
+                  <Label htmlFor="city">{t('cityLabel')}</Label>
                   <Input
                     id="city"
                     value={contactDetails.city}
                     onChange={e => handleChange('city', e.target.value)}
-                    placeholder="City"
+                    placeholder={t('cityPlaceholder')}
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="state">State/Province</Label>
+                  <Label htmlFor="state">{t('stateLabel')}</Label>
                   <Input
                     id="state"
                     value={contactDetails.state}
                     onChange={e => handleChange('state', e.target.value)}
-                    placeholder="State"
+                    placeholder={t('statePlaceholder')}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="zip">Postal Code</Label>
+                  <Label htmlFor="zip">{t('postalCodeLabel')}</Label>
                   <Input
                     id="zip"
                     value={contactDetails.zip}
                     onChange={e => handleChange('zip', e.target.value)}
-                    placeholder="12345"
+                    placeholder={t('postalCodePlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="country">Country *</Label>
+                  <Label htmlFor="country">{t('countryLabel')}</Label>
                   <Input
                     id="country"
                     value={contactDetails.country}
                     onChange={e => handleChange('country', e.target.value)}
-                    placeholder="NO"
+                    placeholder={t('countryPlaceholder')}
                     required
                   />
                 </div>

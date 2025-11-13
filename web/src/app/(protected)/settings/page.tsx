@@ -27,8 +27,8 @@ export default function SettingsPage() {
   const { selectedLocation } = useLocationSelection()
 
   if (isLoadingUser) return <LoadingSpinner />
-  if (userError) return <ErrorState message="Failed to load user data" />
-  if (!user) return <ErrorState message="User not found" />
+  if (userError) return <ErrorState message={t('settings.failedToLoadUser')} />
+  if (!user) return <ErrorState message={t('settings.userNotFound')} />
 
   const hasRestaurant = selectedLocation && selectedLocation.type === 'Restaurant' && selectedLocation.restaurant
 
@@ -47,10 +47,10 @@ export default function SettingsPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <img src={KumikoSettingsImage} alt="Kumiko Settings" width={60} height={60} className="rounded-lg" />
+          <img src={KumikoSettingsImage} alt={t('settings.settingsImageAlt')} width={60} height={60} className="rounded-lg" />
           <div>
             <h1 className="text-3xl font-bold">{t('settings.title')}</h1>
-            <p className="text-muted-foreground">Manage your account settings and preferences.</p>
+            <p className="text-muted-foreground">{t('settings.description')}</p>
           </div>
         </div>
 
@@ -59,16 +59,16 @@ export default function SettingsPage() {
           <TabsList className={`grid w-full mb-6 ${hasRestaurant ? 'grid-cols-3' : 'grid-cols-2'}`}>
             <TabsTrigger value="account" className="flex items-center gap-2">
               <User className="w-4 h-4" />
-              <span>Account</span>
+              <span>{t('settings.accountTab')}</span>
             </TabsTrigger>
             <TabsTrigger value="subscription" className="flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
-              <span>Subscription</span>
+              <span>{t('settings.subscriptionTab')}</span>
             </TabsTrigger>
             {hasRestaurant && (
               <TabsTrigger value="restaurant" className="flex items-center gap-2">
                 <Store className="w-4 h-4" />
-                <span>Restaurant</span>
+                <span>{t('settings.restaurantTab')}</span>
               </TabsTrigger>
             )}
           </TabsList>

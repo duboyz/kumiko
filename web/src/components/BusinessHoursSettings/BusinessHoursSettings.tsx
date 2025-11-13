@@ -7,6 +7,7 @@ import { Clock, Edit, Save, X } from 'lucide-react'
 import { BusinessHoursEditor, BusinessHours } from '@/stories/onboarding'
 import { useUpdateRestaurant, RestaurantBaseDto, UpdateRestaurantCommand } from '@shared'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface BusinessHoursSettingsProps {
   restaurant: RestaurantBaseDto
@@ -23,6 +24,7 @@ const parseBusinessHours = (hoursJson?: string | null): BusinessHours | null => 
 }
 
 export function BusinessHoursSettings({ restaurant }: BusinessHoursSettingsProps) {
+  const t = useTranslations('settings.businessHours')
   const [isEditing, setIsEditing] = useState(false)
   const [businessHours, setBusinessHours] = useState<BusinessHours | null>(null)
   const updateRestaurant = useUpdateRestaurant()
@@ -36,7 +38,7 @@ export function BusinessHoursSettings({ restaurant }: BusinessHoursSettingsProps
 
   const handleSave = async () => {
     if (!businessHours) {
-      toast.error('Please set business hours')
+      toast.error(t('pleaseSetHours'))
       return
     }
 
@@ -47,11 +49,11 @@ export function BusinessHoursSettings({ restaurant }: BusinessHoursSettingsProps
       }
 
       await updateRestaurant.mutateAsync(command)
-      toast.success('Business hours updated successfully')
+      toast.success(t('updateSuccess'))
       setIsEditing(false)
       setBusinessHours(null)
     } catch (error) {
-      toast.error('Failed to update business hours')
+      toast.error(t('updateError'))
       console.error('Error updating business hours:', error)
     }
   }
@@ -70,14 +72,14 @@ export function BusinessHoursSettings({ restaurant }: BusinessHoursSettingsProps
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
-              <CardTitle>Business Hours</CardTitle>
+              <CardTitle>{t('title')}</CardTitle>
             </div>
             <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
               <Edit className="w-4 h-4 mr-2" />
-              Edit
+              {t('edit')}
             </Button>
           </div>
-          <CardDescription>Opening hours</CardDescription>
+          <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent>
           {parsedBusinessHours ? (
@@ -86,13 +88,13 @@ export function BusinessHoursSettings({ restaurant }: BusinessHoursSettingsProps
                 <div key={day} className="flex justify-between items-center text-sm">
                   <dt className="font-medium capitalize text-muted-foreground">{day}</dt>
                   <dd className="text-foreground">
-                    {hours ? `${hours.open} - ${hours.close}` : 'Closed'}
+                    {hours ? `${hours.open} - ${hours.close}` : t('closed')}
                   </dd>
                 </div>
               ))}
             </dl>
           ) : (
-            <p className="text-sm text-muted-foreground">No business hours set</p>
+            <p className="text-sm text-muted-foreground">{t('noBusinessHoursSet')}</p>
           )}
         </CardContent>
       </Card>
@@ -106,16 +108,16 @@ export function BusinessHoursSettings({ restaurant }: BusinessHoursSettingsProps
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
-              <CardTitle>Edit Business Hours</CardTitle>
+              <CardTitle>{t('editTitle')}</CardTitle>
             </div>
             <div className="flex gap-2">
               <Button onClick={handleCancel} variant="outline" size="sm" disabled={updateRestaurant.isPending}>
                 <X className="w-4 h-4 mr-2" />
-                Cancel
+                {t('cancel')}
               </Button>
               <Button onClick={handleSave} size="sm" disabled={!businessHours || updateRestaurant.isPending}>
                 <Save className="w-4 h-4 mr-2" />
-                {updateRestaurant.isPending ? 'Saving...' : 'Save Changes'}
+                {updateRestaurant.isPending ? t('saving') : t('saveChanges')}
               </Button>
             </div>
           </div>

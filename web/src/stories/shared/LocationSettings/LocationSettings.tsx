@@ -70,7 +70,7 @@ export function LocationSettings() {
             setLocationCurrency(null)
         } catch (error) {
             console.error('Failed to update location currency:', error)
-            toast.error('Failed to update currency settings. Please try again.')
+            toast.error(t('settings.failedToUpdateCurrency'))
         }
     }
 
@@ -120,7 +120,7 @@ export function LocationSettings() {
                             }
                         >
                             {updateRestaurantSettings.isPending || updateHospitalitySettings.isPending
-                                ? 'Saving...'
+                                ? t('common.saving')
                                 : t('common.save')}
                         </Button>
                     </div>

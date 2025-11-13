@@ -7,8 +7,10 @@ import { useUserSubscription } from '@shared/hooks/subscription.hooks'
 import { LoadingSpinner } from '@/components'
 import { useRouter } from 'next/navigation'
 import { Crown, Calendar, CreditCard } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export function SubscriptionSettings() {
+  const t = useTranslations('settings.subscription')
   const router = useRouter()
   const { data: result, isLoading } = useUserSubscription()
 
@@ -16,8 +18,8 @@ export function SubscriptionSettings() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Subscription Plan</CardTitle>
-          <CardDescription>Manage your subscription and billing</CardDescription>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('manageDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <LoadingSpinner />
@@ -30,14 +32,14 @@ export function SubscriptionSettings() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Subscription Plan</CardTitle>
-          <CardDescription>You don't have an active subscription</CardDescription>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('noActiveSubscription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            Subscribe to unlock all features and create unlimited menus.
+            {t('subscribePrompt')}
           </p>
-          <Button onClick={() => router.push('/subscription')}>View Plans</Button>
+          <Button onClick={() => router.push('/subscription')}>{t('viewPlans')}</Button>
         </CardContent>
       </Card>
     )
@@ -47,20 +49,20 @@ export function SubscriptionSettings() {
 
   const getStatusBadge = () => {
     if (subscription.isTrialing && !subscription.hasPaymentMethod) {
-      return { text: 'Free Trial', color: 'bg-blue-500' }
+      return { text: t('status.freeTrial'), color: 'bg-blue-500' }
     }
     if (subscription.isTrialing && subscription.hasPaymentMethod) {
-      return { text: 'Trial Period', color: 'bg-blue-500' }
+      return { text: t('status.trialPeriod'), color: 'bg-blue-500' }
     }
     switch (subscription.status) {
       case 'Active':
-        return { text: 'Active', color: 'bg-green-500' }
+        return { text: t('status.active'), color: 'bg-green-500' }
       case 'Canceled':
-        return { text: 'Canceled', color: 'bg-yellow-500' }
+        return { text: t('status.canceled'), color: 'bg-yellow-500' }
       case 'PastDue':
-        return { text: 'Past Due', color: 'bg-red-500' }
+        return { text: t('status.pastDue'), color: 'bg-red-500' }
       case 'Expired':
-        return { text: 'Expired', color: 'bg-gray-500' }
+        return { text: t('status.expired'), color: 'bg-gray-500' }
       default:
         return { text: subscription.status, color: 'bg-gray-500' }
     }
@@ -74,12 +76,12 @@ export function SubscriptionSettings() {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              Subscription Plan
+              {t('title')}
             </CardTitle>
             <CardDescription>
               {subscription.isTrialing && !subscription.hasPaymentMethod
-                ? 'Your free trial is active'
-                : 'Manage your subscription and billing'}
+                ? t('freeTrialActive')
+                : t('manageDescription')}
             </CardDescription>
           </div>
           <Badge className={statusBadge.color}>{statusBadge.text}</Badge>
@@ -91,22 +93,22 @@ export function SubscriptionSettings() {
           <div className="space-y-1">
             <h3 className="font-semibold text-base">
               {subscription.isTrialing && !subscription.hasPaymentMethod
-                ? 'Trial Access'
-                : `${subscription.plan.name} Plan`}
+                ? t('trialAccess')
+                : t('planName', { name: subscription.plan.name })}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {subscription.plan.maxLocations === -1 ? 'Unlimited' : subscription.plan.maxLocations}{' '}
-              {subscription.plan.maxLocations === 1 ? 'location' : 'locations'} •{' '}
+              {subscription.plan.maxLocations === -1 ? t('unlimited') : subscription.plan.maxLocations}{' '}
+              {subscription.plan.maxLocations === 1 ? t('location') : t('locations')} •{' '}
               {subscription.plan.maxMenusPerLocation === -1
-                ? 'Unlimited'
+                ? t('unlimited')
                 : subscription.plan.maxMenusPerLocation}{' '}
-              menus
+              {t('menus')}
             </p>
           </div>
           {subscription.hasPaymentMethod && (
             <div className="text-right">
               <p className="text-lg font-semibold">${subscription.plan.monthlyPrice}</p>
-              <p className="text-xs text-muted-foreground">per {subscription.billingInterval.toLowerCase()}</p>
+              <p className="text-xs text-muted-foreground">{t('perInterval', { interval: subscription.billingInterval.toLowerCase() })}</p>
             </div>
           )}
         </div>
@@ -117,7 +119,7 @@ export function SubscriptionSettings() {
             <div className="flex items-center gap-2">
               <CreditCard className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-muted-foreground">Billing</p>
+                <p className="text-muted-foreground">{t('billing')}</p>
                 <p className="font-medium">{subscription.billingInterval}</p>
               </div>
             </div>
@@ -126,16 +128,16 @@ export function SubscriptionSettings() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
             <div>
               <p className="text-muted-foreground">
-                {subscription.isTrialing ? 'Trial Ends' : 'Next Billing'}
+                {subscription.isTrialing ? t('trialEnds') : t('nextBilling')}
               </p>
               <p className="font-medium">
                 {subscription.isTrialing
                   ? subscription.trialEndDate
                     ? new Date(subscription.trialEndDate).toLocaleDateString()
-                    : 'N/A'
+                    : t('notAvailable')
                   : subscription.currentPeriodEnd
                     ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
-                    : 'N/A'}
+                    : t('notAvailable')}
               </p>
             </div>
           </div>
@@ -145,10 +147,11 @@ export function SubscriptionSettings() {
         {subscription.isTrialing && !subscription.hasPaymentMethod && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-sm text-blue-900">
-              <strong>Free Trial:</strong> No payment required until{' '}
-              {subscription.trialEndDate
-                ? new Date(subscription.trialEndDate).toLocaleDateString()
-                : 'N/A'}
+              <strong>{t('freeTrialLabel')}:</strong> {t('freeTrialMessage', {
+                date: subscription.trialEndDate
+                  ? new Date(subscription.trialEndDate).toLocaleDateString()
+                  : t('notAvailable')
+              })}
             </p>
           </div>
         )}
@@ -156,10 +159,11 @@ export function SubscriptionSettings() {
         {subscription.isTrialing && subscription.hasPaymentMethod && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-sm text-blue-900">
-              <strong>Trial Period:</strong> Billing starts on{' '}
-              {subscription.trialEndDate
-                ? new Date(subscription.trialEndDate).toLocaleDateString()
-                : 'N/A'}
+              <strong>{t('trialPeriodLabel')}:</strong> {t('trialPeriodMessage', {
+                date: subscription.trialEndDate
+                  ? new Date(subscription.trialEndDate).toLocaleDateString()
+                  : t('notAvailable')
+              })}
             </p>
           </div>
         )}
@@ -169,15 +173,15 @@ export function SubscriptionSettings() {
           {subscription.hasPaymentMethod ? (
             <>
               <Button onClick={() => router.push('/subscription')} variant="default" size="sm">
-                Change Plan
+                {t('changePlan')}
               </Button>
               <Button onClick={() => router.push('/subscription')} variant="outline" size="sm">
-                Manage Billing
+                {t('manageBilling')}
               </Button>
             </>
           ) : (
             <Button onClick={() => router.push('/subscription')} variant="default" size="sm">
-              Choose a Plan
+              {t('choosePlan')}
             </Button>
           )}
         </div>

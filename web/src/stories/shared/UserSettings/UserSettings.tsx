@@ -68,7 +68,7 @@ export function UserSettings() {
             }, 1000)
         } catch (error) {
             console.error('Failed to update user language:', error)
-            toast.error('Failed to update language settings. Please try again.')
+            toast.error(t('settings.failedToUpdateLanguage'))
         }
     }
 
@@ -76,7 +76,7 @@ export function UserSettings() {
         <Card>
             <CardHeader>
                 <CardTitle>{t('settings.userSettings')}</CardTitle>
-                <CardDescription>Personal preferences</CardDescription>
+                <CardDescription>{t('settings.userSettingsDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="space-y-3">
@@ -106,7 +106,7 @@ export function UserSettings() {
                                 currentUserLanguage === user?.preferredLanguage
                             }
                         >
-                            {updateUserSettings.isPending ? 'Saving...' : t('common.save')}
+                            {updateUserSettings.isPending ? t('common.saving') : t('common.save')}
                         </Button>
                     </div>
                 </div>
