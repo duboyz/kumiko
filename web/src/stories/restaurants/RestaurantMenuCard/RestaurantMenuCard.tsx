@@ -60,18 +60,31 @@ export const RestaurantMenuCard = ({ menu, router }: { menu: RestaurantMenuDto; 
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => router.push(`/menus/${menu.id}`)}>
+                <DropdownMenuItem
+                  onClick={e => {
+                    e.stopPropagation()
+                    router.push(`/menus/${menu.id}`)
+                  }}
+                >
                   <Edit />
                   Edit Menu
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setShowPreview(true)}>
+                <DropdownMenuItem
+                  onClick={e => {
+                    e.stopPropagation()
+                    setShowPreview(true)
+                  }}
+                >
                   <Eye />
                   Preview
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-destructive focus:text-destructive"
-                  onClick={() => setShowDeleteDialog(true)}
+                  onClick={e => {
+                    e.stopPropagation()
+                    setShowDeleteDialog(true)
+                  }}
                 >
                   <Trash2 />
                   Delete
