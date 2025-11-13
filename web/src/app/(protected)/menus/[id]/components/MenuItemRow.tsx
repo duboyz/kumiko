@@ -16,7 +16,7 @@ import { ChevronDown, ChevronRight, Edit, GripVertical, Trash2, Save, X, CornerD
 import { useState, useEffect } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { MenuCategoryItemDto, useUpdateMenuItem, useAllergens, formatPrice, useLocationSelection, Currency } from '@shared'
+import { MenuCategoryItemDto, useUpdateMenuItem, useRemoveMenuItemFromCategory, useAllergens, formatPrice, useLocationSelection, Currency } from '@shared'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 
@@ -42,6 +42,7 @@ export const MenuItemRow = ({
   const t = useTranslations('menus')
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
   const updateMutation = useUpdateMenuItem()
+  const removeMutation = useRemoveMenuItemFromCategory()
   const { data: allergensData } = useAllergens()
   const { selectedLocation } = useLocationSelection()
   const currency = selectedLocation?.currency ?? Currency.USD
@@ -59,6 +60,7 @@ export const MenuItemRow = ({
   const [savedOptions, setSavedOptions] = useState<typeof editedData.options>([])
   const [showRemoveOptionDialog, setShowRemoveOptionDialog] = useState(false)
   const [optionToRemove, setOptionToRemove] = useState<number | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   // Reset edited data when item changes
   useEffect(() => {
@@ -311,6 +313,19 @@ export const MenuItemRow = ({
     }))
   }
 
+  const handleDelete = () => {
+    removeMutation.mutate(item.id, {
+      onSuccess: () => {
+        toast.success('Menu item removed from category')
+        setShowDeleteDialog(false)
+      },
+      onError: (error: any) => {
+        const message = error?.response?.data?.message || 'Failed to remove menu item'
+        toast.error(message)
+      },
+    })
+  }
+
 
   return (
     <>
@@ -442,7 +457,9 @@ export const MenuItemRow = ({
                 <Button variant="secondary" size="sm" onClick={() => startEditing(item.id)}>
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button variant="destructive" size="sm"><Trash2 className="h-4 w-4" /></Button>
+                <Button variant="destructive" size="sm" onClick={() => setShowDeleteDialog(true)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </TableCell>
           </>
@@ -577,6 +594,28 @@ export const MenuItemRow = ({
             <AlertDialogCancel onClick={cancelRemoveOption}>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmRemoveOption}>
               {t('removeAndConvert')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Menu Item Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Menu Item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove &quot;{item.menuItem.name}&quot; from this category? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={removeMutation.isPending}>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={removeMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {removeMutation.isPending ? 'Removing...' : 'Remove'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
