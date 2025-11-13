@@ -16,6 +16,8 @@ import { Save, X, CornerDownRight, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
+import { useAllergens } from '@shared'
+import { MenuItemAllergens } from './MenuItemAllergens'
 
 interface MenuItemOption {
   id: string
@@ -39,6 +41,7 @@ interface AddMenuItemRowProps {
 
 export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRowProps) => {
   const t = useTranslations('menus')
+  const { data: allergensData } = useAllergens()
   const [data, setData] = useState({
     name: '',
     description: '',
@@ -169,6 +172,15 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
         price: priceToUse,
       }))
     }
+  }
+
+  const toggleAllergen = (allergenId: string) => {
+    setData(prev => ({
+      ...prev,
+      allergenIds: prev.allergenIds.includes(allergenId)
+        ? prev.allergenIds.filter(id => id !== allergenId)
+        : [...prev.allergenIds, allergenId],
+    }))
   }
 
   return (
@@ -303,6 +315,21 @@ export const AddMenuItemRow = ({ onSave, onCancel, isSubmitting }: AddMenuItemRo
           </Button>
         </TableCell>
       </TableRow>
+
+      {/* Allergens row */}
+      {allergensData && allergensData.length > 0 && (
+        <TableRow className="bg-blue-50/50">
+          <TableCell colSpan={8} className="py-2 px-4">
+            <MenuItemAllergens
+              allergens={[]}
+              selectedAllergenIds={data.allergenIds}
+              isEditing={true}
+              allAllergens={allergensData}
+              onToggleAllergen={toggleAllergen}
+            />
+          </TableCell>
+        </TableRow>
+      )}
 
       {/* Remove Option Confirmation Dialog */}
       <AlertDialog open={showRemoveOptionDialog} onOpenChange={setShowRemoveOptionDialog}>

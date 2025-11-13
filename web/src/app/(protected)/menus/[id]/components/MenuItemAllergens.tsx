@@ -1,17 +1,13 @@
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AlertTriangle } from 'lucide-react'
-
-interface Allergen {
-  id: string
-  name: string
-}
+import { AllergenDto } from '@shared'
 
 interface MenuItemAllergensProps {
-  allergens: Allergen[]
+  allergens: AllergenDto[]
   selectedAllergenIds: string[]
   isEditing: boolean
-  allAllergens?: Allergen[]
+  allAllergens?: AllergenDto[]
   onToggleAllergen?: (allergenId: string) => void
 }
 
@@ -38,11 +34,10 @@ export const MenuItemAllergens = ({
             {allAllergens.map(allergen => (
               <div
                 key={allergen.id}
-                className={`flex items-center gap-2 p-2 rounded-md transition-colors ${
-                  selectedAllergenIds.includes(allergen.id)
-                    ? 'bg-orange-50 border border-orange-200'
-                    : 'hover:bg-gray-50'
-                }`}
+                className={`flex items-center gap-2 p-2 rounded-md transition-colors ${selectedAllergenIds.includes(allergen.id)
+                  ? 'bg-orange-50 border border-orange-200'
+                  : 'hover:bg-gray-50'
+                  }`}
               >
                 <Checkbox
                   id={`allergen-${allergen.id}`}

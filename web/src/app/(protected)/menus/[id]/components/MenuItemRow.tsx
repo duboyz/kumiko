@@ -21,6 +21,7 @@ import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 
 import { cn } from '@/lib/utils'
+import { MenuItemAllergens } from './MenuItemAllergens'
 
 interface MenuItemRowProps {
   item: MenuCategoryItemDto
@@ -547,25 +548,31 @@ export const MenuItemRow = ({
                     <TableCell className="bg-gray-50"></TableCell>
                   </TableRow>
                 ))}
+                {/* Show allergens in view mode if there are any */}
+                {item.menuItem.allergens && item.menuItem.allergens.length > 0 && (
+                  <TableRow key={`${item.id}-allergens-view`}>
+                    <TableCell colSpan={8} className="bg-gray-50">
+                      <div className="p-4">
+                        <MenuItemAllergens
+                          allergens={item.menuItem.allergens}
+                          selectedAllergenIds={[]}
+                          isEditing={false}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
               </>
             )}
           </>
         )
       }
 
-      {/* {isExpanded && (
-        <TableRow key={`${item.id}-details`}>
-            <TableCell colSpan={8} className="bg-gray-100">
-            <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <MenuItemOptions
-                  options={isEditing ? editedData.options : item.menuItem.options || []}
-                  isEditing={isEditing}
-                  onAddOption={addOption}
-                  onRemoveOption={removeOption}
-                  onUpdateOption={updateOption}
-                />
-
+      {isExpanded && isEditing && (
+        <TableRow key={`${item.id}-allergens`}>
+          <TableCell colSpan={8} className="bg-gray-50">
+            <div className="p-4">
+              <div className="grid grid-cols-1 gap-4">
                 <MenuItemAllergens
                   allergens={item.menuItem.allergens || []}
                   selectedAllergenIds={editedData.allergenIds}
@@ -577,7 +584,7 @@ export const MenuItemRow = ({
             </div>
           </TableCell>
         </TableRow>
-      )} */}
+      )}
 
       {/* Remove Option Confirmation Dialog */}
       <AlertDialog open={showRemoveOptionDialog} onOpenChange={setShowRemoveOptionDialog}>

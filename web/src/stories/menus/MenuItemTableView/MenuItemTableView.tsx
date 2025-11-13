@@ -254,8 +254,10 @@ export default function MenuItemTableView({
           name: item.name,
           description: item.description,
           price: item.price,
+          hasOptions: item.hasOptions,
           isAvailable: item.isAvailable,
           restaurantMenuId: item.restaurantMenuId,
+          allergenIds: item.allergens?.map(a => a.id) || [],
         })
         toast.success('Menu item created successfully!')
         setIsAddingNew(false)
