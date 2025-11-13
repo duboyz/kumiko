@@ -164,7 +164,6 @@ export function MenuImportWizard({
         })),
       })
 
-      toast.success('Menu created successfully!')
       console.log('Menu created with ID:', result.menuId)
       onMenuCreated(result.menuId)
     } catch (error) {
@@ -233,20 +232,18 @@ export function MenuImportWizard({
               <div key={step} className="flex items-center gap-1 md:gap-2 flex-shrink-0">
                 <div className="flex items-center gap-1 md:gap-2">
                   <div
-                    className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium ${
-                      isCurrentStep
+                    className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium ${isCurrentStep
                         ? 'bg-primary text-primary-foreground'
                         : isCompleted
                           ? 'bg-green-500 text-white'
                           : 'bg-muted text-muted-foreground'
-                    }`}
+                      }`}
                   >
                     {isCompleted ? <CheckCircle className="w-3 h-3 md:w-4 md:h-4" /> : stepIndex}
                   </div>
                   <span
-                    className={`text-xs md:text-sm font-medium hidden sm:block ${
-                      isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
-                    }`}
+                    className={`text-xs md:text-sm font-medium hidden sm:block ${isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
+                      }`}
                   >
                     {label}
                   </span>
@@ -266,9 +263,8 @@ export function MenuImportWizard({
             return (
               <div
                 key={step.step}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  isCurrentStep ? 'w-8 bg-primary' : isCompleted ? 'w-6 bg-primary/60' : 'w-1.5 bg-muted'
-                }`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${isCurrentStep ? 'w-8 bg-primary' : isCompleted ? 'w-6 bg-primary/60' : 'w-1.5 bg-muted'
+                  }`}
               />
             )
           })}

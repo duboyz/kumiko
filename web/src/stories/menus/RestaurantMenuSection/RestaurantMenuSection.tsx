@@ -44,9 +44,7 @@ export function RestaurantMenuSection({
   // If ordering is enabled and we have all the data, use the full OrderForm
   if (canUseOrderForm) {
     return (
-      <section className={`relative py-20 px-10 bg-white ${className}`}>
-        <OrderForm menu={restaurantMenu as GetMenuByIdResult} restaurantId={restaurantId!} currency={currency} />
-      </section>
+      <OrderForm menu={restaurantMenu as GetMenuByIdResult} restaurantId={restaurantId!} currency={currency} />
     )
   }
 

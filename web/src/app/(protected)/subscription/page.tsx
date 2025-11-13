@@ -20,7 +20,6 @@ import { SubscriptionStatus } from '@/stories/subscriptions/SubscriptionStatus/S
 import { ContentContainer, LoadingSpinner } from '@/components'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
-import { Crown } from 'lucide-react'
 
 export default function SubscriptionPage() {
   const t = useTranslations('subscription')
@@ -101,6 +100,45 @@ export default function SubscriptionPage() {
           </div>
         </div>
 
+        {/* Available Plans */}
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold">
+            {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod
+              ? t('availablePlans')
+              : userSubscription
+                ? t('upgradeOrChangePlan')
+                : t('choosePlan')}
+          </h2>
+
+          <Tabs value={billingInterval} onValueChange={(v) => setBillingInterval(v as 'Monthly' | 'Yearly')}>
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="Monthly">{t('monthly')}</TabsTrigger>
+              <TabsTrigger value="Yearly">
+                {t('yearly')}
+                <span className="ml-2 text-xs text-green-600">({t('save17Percent')})</span>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value={billingInterval} className="mt-8">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                {plans?.plans.map((plan) => (
+                  <PricingCard
+                    key={plan.id}
+                    plan={plan}
+                    billingInterval={billingInterval}
+                    isCurrentPlan={currentPlanId === plan.id}
+                    isPopular={plan.tier === 'Premium'}
+                    onSelect={() => handleSelectPlan(plan.id)}
+                    loading={createCheckout.isPending}
+                  />
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+
+
         {/* Free Trial Banner */}
         {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod && (
           <>
@@ -172,42 +210,7 @@ export default function SubscriptionPage() {
           </div>
         )}
 
-        {/* Available Plans */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold">
-            {userSubscription && userSubscription.isTrialing && !userSubscription.hasPaymentMethod
-              ? t('availablePlans')
-              : userSubscription
-                ? t('upgradeOrChangePlan')
-                : t('choosePlan')}
-          </h2>
 
-          <Tabs value={billingInterval} onValueChange={(v) => setBillingInterval(v as 'Monthly' | 'Yearly')}>
-            <TabsList className="grid w-full max-w-md grid-cols-2">
-              <TabsTrigger value="Monthly">{t('monthly')}</TabsTrigger>
-              <TabsTrigger value="Yearly">
-                {t('yearly')}
-                <span className="ml-2 text-xs text-green-600">({t('save17Percent')})</span>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value={billingInterval} className="mt-8">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                {plans?.plans.map((plan) => (
-                  <PricingCard
-                    key={plan.id}
-                    plan={plan}
-                    billingInterval={billingInterval}
-                    isCurrentPlan={currentPlanId === plan.id}
-                    isPopular={plan.tier === 'Premium'}
-                    onSelect={() => handleSelectPlan(plan.id)}
-                    loading={createCheckout.isPending}
-                  />
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
 
         {/* Cancel Subscription Dialog */}
         <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>

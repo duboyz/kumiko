@@ -156,13 +156,13 @@ function ResetPasswordForm() {
                                                     type={showConfirmPassword ? 'text' : 'password'}
                                                     {...field}
                                                 />
-                                                <button
+                                                <Button
                                                     type="button"
                                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                                 >
                                                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                                </button>
+                                                </Button>
                                             </div>
                                         </FormControl>
                                         <FormMessage />
