@@ -200,7 +200,22 @@
     "categoryCreated": "Kategori skapad",
     "failedToCreateCategory": "Kunde inte skapa kategori",
     "orderUpdated": "Ordning uppdaterad",
-    "failedToReorder": "Kunde inte ändra ordning"
+    "failedToReorder": "Kunde inte ändra ordning",
+    "manageMenus": "Hantera dina restaurangmenyer och erbjudanden",
+    "noMenusYet": "Inga menyer ännu",
+    "createFirstMenu": "Skapa din första meny för att börja hantera dina restaurangerbjudanden.",
+    "createYourFirstMenu": "Skapa din första meny",
+    "noCategoriesYet": "Inga kategorier ännu",
+    "addFirstCategory": "Skapa din första kategori för att organisera dina menyobjekt.",
+    "addYourFirstCategory": "Lägg till din första kategori",
+    "menusAvailable": "{count} {plural} tillgängliga",
+    "menu": "meny",
+    "searchMenusPlaceholder": "Sök menyer efter namn eller beskrivning...",
+    "filters": "Filter",
+    "noMenusFound": "Inga menyer hittades",
+    "adjustSearchQuery": "Försök justera din sökning eller skapa en ny meny.",
+    "failedToLoadMenus": "Kunde inte ladda menyer",
+    "errorLoadingMenus": "Det uppstod ett fel när dina menyer laddades. Försök igen."
   },
   "dashboard": {
     "title": "Instrumentpanel",
