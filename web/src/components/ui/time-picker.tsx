@@ -16,7 +16,12 @@ export function TimePicker({ value, onChange, min, max, className, disabled }: T
   const [hours, setHours] = useState<string>('12')
   const [minutes, setMinutes] = useState<string>('00')
 
-  // Parse initial value
+  // Debug: log constraints
+  useEffect(() => {
+    console.log('[TimePicker] Received constraints:', { min, max, value })
+  }, [min, max, value])
+
+  // Parse initial value - update when value changes
   useEffect(() => {
     if (value) {
       const [h, m] = value.split(':')
@@ -99,7 +104,7 @@ export function TimePicker({ value, onChange, min, max, className, disabled }: T
   const handleHourChange = (newHour: string) => {
     setHours(newHour)
     const newTime = `${newHour}:${minutes}`
-    
+
     // Validate against constraints
     if (min && newTime < min) {
       // If new time is before min, set to min
@@ -121,7 +126,7 @@ export function TimePicker({ value, onChange, min, max, className, disabled }: T
   const handleMinuteChange = (newMinute: string) => {
     setMinutes(newMinute)
     const newTime = `${hours}:${newMinute}`
-    
+
     // Validate against constraints
     if (min && newTime < min) {
       // If new time is before min, set to min
@@ -143,31 +148,55 @@ export function TimePicker({ value, onChange, min, max, className, disabled }: T
   const availableHours = getAvailableHours()
   const availableMinutes = getAvailableMinutes()
 
-  // If current hour is not available, reset to first available
+  // Adjust time if it's outside constraints (but only if we have constraints)
   useEffect(() => {
-    if (availableHours.length > 0 && !availableHours.find(h => h.value === hours)) {
-      const firstHour = availableHours[0].value
-      const newTime = `${firstHour}:${minutes}`
-      setHours(firstHour)
-      onChange(newTime)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [min, max]) // Only when constraints change
+    if ((min || max) && value) {
+      const currentTime = `${hours}:${minutes}`
+      const isTimeValid = (!min || currentTime >= min) && (!max || currentTime <= max)
 
-  // If current minute is not available, reset to first available
-  useEffect(() => {
-    if (availableMinutes.length > 0 && !availableMinutes.find(m => m.value === minutes)) {
-      const firstMinute = availableMinutes[0].value
-      const newTime = `${hours}:${firstMinute}`
-      setMinutes(firstMinute)
-      onChange(newTime)
+      if (!isTimeValid) {
+        // Time is outside bounds, adjust it
+        if (min && currentTime < min) {
+          // Time is before min, set to min
+          const [minHour, minMinute] = min.split(':')
+          setHours(minHour)
+          setMinutes(minMinute)
+          onChange(min)
+        } else if (max && currentTime > max) {
+          // Time is after max, set to max
+          const [maxHour, maxMinute] = max.split(':')
+          setHours(maxHour)
+          setMinutes(maxMinute)
+          onChange(max)
+        }
+      } else {
+        // Time is valid, but check if hour/minute is in available lists
+        // If hour is not available, adjust to first available
+        if (availableHours.length > 0 && !availableHours.find(h => h.value === hours)) {
+          const firstHour = availableHours[0].value
+          const newTime = `${firstHour}:${minutes}`
+          setHours(firstHour)
+          onChange(newTime)
+        }
+        // If minute is not available, adjust to first available
+        else if (availableMinutes.length > 0 && !availableMinutes.find(m => m.value === minutes)) {
+          const firstMinute = availableMinutes[0].value
+          const newTime = `${hours}:${firstMinute}`
+          setMinutes(firstMinute)
+          onChange(newTime)
+        }
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hours, min, max]) // When hour or constraints change
+  }, [min, max, value]) // Only when constraints or value change
 
   return (
     <div className={`flex items-center gap-2 ${className || ''}`}>
-      <Select value={hours} onValueChange={handleHourChange} disabled={disabled || availableHours.length === 0}>
+      <Select
+        value={hours}
+        onValueChange={handleHourChange}
+        disabled={disabled || (min || max ? availableHours.length === 0 : false)}
+      >
         <SelectTrigger className="w-20">
           <SelectValue placeholder="HH" />
         </SelectTrigger>
@@ -180,7 +209,11 @@ export function TimePicker({ value, onChange, min, max, className, disabled }: T
         </SelectContent>
       </Select>
       <span className="text-muted-foreground">:</span>
-      <Select value={minutes} onValueChange={handleMinuteChange} disabled={disabled || availableMinutes.length === 0}>
+      <Select
+        value={minutes}
+        onValueChange={handleMinuteChange}
+        disabled={disabled || (min || max ? availableMinutes.length === 0 : false)}
+      >
         <SelectTrigger className="w-20">
           <SelectValue placeholder="mm" />
         </SelectTrigger>
@@ -195,4 +228,3 @@ export function TimePicker({ value, onChange, min, max, className, disabled }: T
     </div>
   )
 }
-
