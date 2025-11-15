@@ -18,12 +18,8 @@ import {
   ShoppingCart,
   LogOut,
   Menu,
-  X,
 } from 'lucide-react'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
-import { useCurrentUser } from '@shared'
-import { Button } from '@/components/ui/button'
-
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const t = useTranslations('navigation')
   const pathname = usePathname()
@@ -111,8 +107,9 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   const websitePattern = /\/websites\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   const isWebsitePage = websitePattern.test(pathname)
   const isOnboardingPage = pathname.startsWith('/onboarding')
+  const isNewMenuPage = pathname.startsWith('/new-menu')
 
-  if (isWebsitePage || isOnboardingPage) return children
+  if (isWebsitePage || isOnboardingPage || isNewMenuPage) return children
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
