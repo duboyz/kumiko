@@ -149,7 +149,7 @@ export const EditMenuItemCard = ({ item, setIsEditing }: EditMenuItemCardProps) 
 
                 <div>
                     <AllergensSelect
-                        menuItem={item}
+                        selectedAllergenIds={allergenIds}
                         onAddAllergens={handleAddAllergens}
                         onRemoveAllergen={handleRemoveAllergen}
                     />
