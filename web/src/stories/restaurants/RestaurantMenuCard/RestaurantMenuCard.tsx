@@ -41,7 +41,7 @@ export const RestaurantMenuCard = ({ menu, router }: { menu: RestaurantMenuDto; 
     <>
       <Card
         className="group relative hover:shadow-sm transition-shadow duration-200 cursor-pointer"
-        onClick={() => router.push(`/menus/${menu.id}`)}
+        onClick={() => router.push(`/new-menu/${menu.id}`)}
       >
         <CardHeader>
           <div className="flex items-start justify-between gap-3">
