@@ -9,6 +9,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/stories/dialogs/ConfirmDialog";
 
 interface MenuItemProps {
     item: MenuCategoryItemDto;
@@ -18,6 +19,7 @@ interface MenuItemProps {
 
 export const MenuItem = ({ item, onDirtyChange, onSaveHandlerReady }: MenuItemProps) => {
     const [isEditing, setIsEditing] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const { mutate: deleteItem, isPending: isDeleting } = useRemoveMenuItemFromCategory();
     const editRef = useRef<HTMLDivElement>(null);
     const saveHandlerRef = useRef<(() => boolean) | null>(null);
@@ -38,12 +40,13 @@ export const MenuItem = ({ item, onDirtyChange, onSaveHandlerReady }: MenuItemPr
     };
 
     const handleDelete = () => {
-        if (confirm(`Delete "${item.menuItem?.name}" from this category?`)) {
-            deleteItem(item.id, {
-                onSuccess: () => toast.success('Item removed from category'),
-                onError: () => toast.error('Failed to remove item'),
-            });
-        }
+        deleteItem(item.id, {
+            onSuccess: () => {
+                toast.success('Item removed from category');
+                setShowDeleteDialog(false);
+            },
+            onError: () => toast.error('Failed to remove item'),
+        });
     };
 
     // Scroll to edit form when editing mode is enabled
@@ -164,7 +167,7 @@ export const MenuItem = ({ item, onDirtyChange, onSaveHandlerReady }: MenuItemPr
                                     variant="ghost"
                                     size="icon"
                                     className="h-8 w-8 md:h-10 md:w-10 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                    onClick={handleDelete}
+                                    onClick={() => setShowDeleteDialog(true)}
                                     disabled={isDeleting}
                                 >
                                     <Trash className="w-3 h-3 md:w-4 md:h-4" />
@@ -174,6 +177,17 @@ export const MenuItem = ({ item, onDirtyChange, onSaveHandlerReady }: MenuItemPr
                     </div>
                 </div>
             </CardContent>
+
+            <ConfirmDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                title="Remove Item from Category"
+                description={`Are you sure you want to remove "${item.menuItem?.name}" from this category? The item will not be deleted, just removed from this category.`}
+                confirmText="Remove"
+                cancelText="Cancel"
+                onConfirm={handleDelete}
+                variant="destructive"
+            />
         </Card>
     );
 };

@@ -63,7 +63,7 @@ export const RestaurantMenuCard = ({ menu, router }: { menu: RestaurantMenuDto; 
                 <DropdownMenuItem
                   onClick={e => {
                     e.stopPropagation()
-                    router.push(`/menus/${menu.id}`)
+                    router.push(`/new-menu/${menu.id}`)
                   }}
                 >
                   <Edit />

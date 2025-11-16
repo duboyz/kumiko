@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/stories/dialogs/ConfirmDialog";
 
 export default function NewMenuPage() {
     const router = useRouter();
@@ -23,6 +24,7 @@ export default function NewMenuPage() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [showSavedIndicator, setShowSavedIndicator] = useState(false);
+    const [showBackDialog, setShowBackDialog] = useState(false);
     const saveAllHandlerRef = useRef<(() => void) | null>(null);
 
     // Keep the selected category in sync with the latest data
@@ -100,7 +102,13 @@ export default function NewMenuPage() {
             {/* Top Navigation Bar */}
             <div className="border-b bg-background p-4 flex items-center gap-4 sticky top-0 z-20">
                 <Button
-                    onClick={() => router.back()}
+                    onClick={() => {
+                        if (hasUnsavedChanges) {
+                            setShowBackDialog(true);
+                        } else {
+                            router.back();
+                        }
+                    }}
                     className="shrink-0"
                 >
                     <ArrowLeft className="h-5 w-5" />
@@ -134,7 +142,7 @@ export default function NewMenuPage() {
                                 saveAllHandlerRef.current();
                             }
                         }}
-                        className="bg-amber-500 hover:bg-amber-600 text-white hidden md:flex"
+                        className="hidden md:flex"
                     >
                         Save All Changes
                     </Button>
@@ -193,6 +201,18 @@ export default function NewMenuPage() {
                     />
                 </div>
             </div>
+
+            {/* Unsaved Changes Dialog */}
+            <ConfirmDialog
+                open={showBackDialog}
+                onOpenChange={setShowBackDialog}
+                title="Unsaved Changes"
+                description="You have unsaved changes. Are you sure you want to leave? All unsaved changes will be lost."
+                confirmText="Leave Without Saving"
+                cancelText="Stay"
+                onConfirm={() => router.back()}
+                variant="destructive"
+            />
         </div>
     );
 }

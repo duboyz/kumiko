@@ -107,7 +107,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   const websitePattern = /\/websites\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   const isWebsitePage = websitePattern.test(pathname)
   const isOnboardingPage = pathname.startsWith('/onboarding')
-  const isNewMenuPage = pathname.startsWith('/new-menu')
+  const isNewMenuPage = pathname.startsWith('/new-menu') && !pathname.startsWith('/new-menu/[id]')
 
   if (isWebsitePage || isOnboardingPage || isNewMenuPage) return children
 

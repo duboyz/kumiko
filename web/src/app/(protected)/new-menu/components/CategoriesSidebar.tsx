@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { GripVertical, Plus, Edit2, Trash, Check, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/stories/dialogs/ConfirmDialog";
 import {
     DndContext,
     closestCenter,
@@ -131,6 +132,7 @@ interface CategoryItemProps {
 
 const CategoryItem = ({ category, isSelected, onSelect }: CategoryItemProps) => {
     const [isEditing, setIsEditing] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [name, setName] = useState(category.name);
     const [description, setDescription] = useState(category.description);
     const { mutate: updateCategory, isPending: isUpdating } = useUpdateMenuCategory();
@@ -177,16 +179,15 @@ const CategoryItem = ({ category, isSelected, onSelect }: CategoryItemProps) => 
     };
 
     const handleDelete = () => {
-        if (confirm(`Delete category "${category.name}"? All items will be removed from this category.`)) {
-            deleteCategory(category.id, {
-                onSuccess: () => {
-                    toast.success('Category deleted');
-                },
-                onError: () => {
-                    toast.error('Failed to delete category');
-                },
-            });
-        }
+        deleteCategory(category.id, {
+            onSuccess: () => {
+                toast.success('Category deleted');
+                setShowDeleteDialog(false);
+            },
+            onError: () => {
+                toast.error('Failed to delete category');
+            },
+        });
     };
 
     if (isEditing) {
@@ -263,13 +264,24 @@ const CategoryItem = ({ category, isSelected, onSelect }: CategoryItemProps) => 
                     className="h-6 w-6"
                     onClick={(e) => {
                         e.stopPropagation();
-                        handleDelete();
+                        setShowDeleteDialog(true);
                     }}
                     disabled={isDeleting}
                 >
                     <Trash className="w-3 h-3" />
                 </Button>
             </div>
+
+            <ConfirmDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                title="Delete Category"
+                description={`Are you sure you want to delete "${category.name}"? All items will be removed from this category. This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                onConfirm={handleDelete}
+                variant="destructive"
+            />
         </div>
     );
 };

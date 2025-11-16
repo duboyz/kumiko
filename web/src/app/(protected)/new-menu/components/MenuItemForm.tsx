@@ -15,6 +15,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Trash, Plus, GripVertical } from "lucide-react";
 import { LabeledInput } from "@/stories/forms/LabeledInput";
 import { ItemTypeSwitch } from "@/stories/forms/ItemTypeSwitch";
+import { ConfirmDialog } from "@/stories/dialogs/ConfirmDialog";
 import {
     DndContext,
     closestCenter,
@@ -129,7 +130,13 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
 
     // Option handlers
     const handleAddOption = (newOption: Omit<UpdateMenuItemOptionDto, 'orderIndex' | 'id'>) => {
-        setOptions([...options, { ...newOption, orderIndex: options.length }]);
+        const newOpt = {
+            ...newOption,
+            orderIndex: options.length,
+            // Add stable temp ID for new options
+            id: `temp-${Date.now()}-${Math.random()}`
+        };
+        setOptions([...options, newOpt]);
         // Scroll to action buttons after adding option
         setTimeout(() => {
             actionButtonsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -171,8 +178,8 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
         // If toggling to options and there are no options, create 2 empty ones
         if (newHasOptions && options.length === 0) {
             setOptions([
-                { name: '', description: '', price: 0, orderIndex: 0 },
-                { name: '', description: '', price: 0, orderIndex: 1 },
+                { name: '', description: '', price: 0, orderIndex: 0, id: `temp-${Date.now()}-0` },
+                { name: '', description: '', price: 0, orderIndex: 1, id: `temp-${Date.now()}-1` },
             ]);
         }
 
@@ -227,6 +234,16 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
     const handleUpdate = () => {
         if (!validate() || !existingItem) return;
 
+        // Filter out temp IDs from options before sending to backend
+        const cleanedOptions = hasOptions ? options.map(opt => {
+            const cleanOpt = { ...opt };
+            // Remove temp IDs (they start with "temp-")
+            if (cleanOpt.id?.startsWith('temp-')) {
+                delete cleanOpt.id;
+            }
+            return cleanOpt;
+        }) : undefined;
+
         updateMenuItem(
             {
                 id: existingItem.menuItem?.id || '',
@@ -234,7 +251,7 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                 description: description.trim(),
                 price: hasOptions ? null : price,
                 hasOptions,
-                options: hasOptions ? options : undefined,
+                options: cleanedOptions,
                 isAvailable: existingItem.menuItem?.isAvailable ?? true,
                 allergenIds: allergenIds,
             },
@@ -255,13 +272,23 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
         if (!validate() || !selectedCategory) return;
 
         try {
+            // Filter out temp IDs from options before sending to backend
+            const cleanedOptions = hasOptions ? options.map(opt => {
+                const cleanOpt = { ...opt };
+                // Remove temp IDs (they start with "temp-")
+                if (cleanOpt.id?.startsWith('temp-')) {
+                    delete cleanOpt.id;
+                }
+                return cleanOpt;
+            }) : undefined;
+
             // Create the menu item
             const result = await createMenuItem({
                 name: name.trim(),
                 description: description.trim(),
                 price: hasOptions ? null : price,
                 hasOptions,
-                options: hasOptions ? options : undefined,
+                options: cleanedOptions,
                 isAvailable: true,
                 restaurantMenuId: selectedCategory.restaurantMenuId,
                 allergenIds,
@@ -349,37 +376,32 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                         placeholder="e.g., Classic tomato sauce and mozzarella"
                         className="md:flex-1"
                     />
-                    <LabeledInput
-                        id={`${isEditMode ? 'edit' : 'new'}-price`}
-                        label="Price"
-                        value={price.toString()}
-                        type="number"
-                        onChange={(value) => {
-                            setPrice(Number(value));
-                            if (validationErrors.price) {
-                                setValidationErrors(prev => ({ ...prev, price: undefined }));
-                            }
-                        }}
-                        placeholder="0.00"
-                        disabled={hasOptions}
-                        error={validationErrors.price}
-                    />
-                </div>
 
-                {/* Allergens */}
-                <div>
-                    <AllergensSelect
-                        selectedAllergenIds={allergenIds}
-                        onAddAllergens={handleAddAllergens}
-                        onRemoveAllergen={handleRemoveAllergen}
+                    <ItemTypeSwitch
+                        value={hasOptions ? 'options' : 'simple'}
+                        onChange={handleHasOptionsChange}
                     />
-                </div>
 
-                {/* Item Type Switch */}
-                <ItemTypeSwitch
-                    value={hasOptions ? 'options' : 'simple'}
-                    onChange={handleHasOptionsChange}
-                />
+                    {
+                        !hasOptions ? (
+                            <LabeledInput
+                                id={`${isEditMode ? 'edit' : 'new'}-price`}
+                                label="Price"
+                                value={price.toString()}
+                                type="number"
+                                onChange={(value) => {
+                                    setPrice(Number(value));
+                                    if (validationErrors.price) {
+                                        setValidationErrors(prev => ({ ...prev, price: undefined }));
+                                    }
+                                }}
+                                placeholder="0.00"
+                                error={validationErrors.price}
+                            />
+                        ) : null
+                    }
+
+                </div>
 
                 {/* Options Management */}
                 {hasOptions && (
@@ -407,12 +429,32 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                                     }));
                                 }
                             }}
-                            onRemoveOption={handleRemoveOption}
+                            onRemoveOption={(idx) => {
+                                handleRemoveOption(idx);
+                                // Clear errors for removed option
+                                if (validationErrors.optionErrors) {
+                                    const newOptionErrors = new Map(validationErrors.optionErrors);
+                                    newOptionErrors.delete(idx);
+                                    setValidationErrors(prev => ({
+                                        ...prev,
+                                        optionErrors: newOptionErrors.size > 0 ? newOptionErrors : undefined
+                                    }));
+                                }
+                            }}
                             onReorderOptions={handleReorderOptions}
                             optionErrors={validationErrors.optionErrors}
                         />
                     </div>
                 )}
+
+                {/* Allergens */}
+                <div>
+                    <AllergensSelect
+                        selectedAllergenIds={allergenIds}
+                        onAddAllergens={handleAddAllergens}
+                        onRemoveAllergen={handleRemoveAllergen}
+                    />
+                </div>
 
                 {/* Action Buttons */}
                 <div className="flex gap-2 items-center justify-end pt-2" ref={actionButtonsRef}>
@@ -444,7 +486,6 @@ interface OptionsListProps {
 }
 
 const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption, onReorderOptions, optionErrors }: OptionsListProps) => {
-    const [localOptions, setLocalOptions] = useState(options);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -463,11 +504,6 @@ const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption, onR
         })
     );
 
-    // Update local options when props change
-    useEffect(() => {
-        setLocalOptions(options);
-    }, [options]);
-
     const handleAddOption = () => {
         onAddOption({
             name: '',
@@ -477,7 +513,7 @@ const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption, onR
     };
 
     const handleOptionChange = (index: number, field: 'name' | 'description' | 'price', value: string) => {
-        const option = localOptions[index];
+        const option = options[index];
         onUpdateOption(index, {
             ...option,
             [field]: field === 'price' ? parseFloat(value) || 0 : value,
@@ -488,11 +524,10 @@ const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption, onR
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
-            const oldIndex = localOptions.findIndex((_, i) => i.toString() === active.id);
-            const newIndex = localOptions.findIndex((_, i) => i.toString() === over.id);
+            const oldIndex = options.findIndex((opt) => (opt.id || `idx-${opt.orderIndex}`) === active.id);
+            const newIndex = options.findIndex((opt) => (opt.id || `idx-${opt.orderIndex}`) === over.id);
 
-            const reordered = arrayMove(localOptions, oldIndex, newIndex);
-            setLocalOptions(reordered);
+            const reordered = arrayMove(options, oldIndex, newIndex);
 
             // Pass the reordered array to parent
             onReorderOptions(reordered);
@@ -502,16 +537,21 @@ const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption, onR
     return (
         <div className="flex flex-col gap-3">
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={localOptions.map((_, i) => i.toString())} strategy={verticalListSortingStrategy}>
+                <SortableContext
+                    items={options.map((opt) => opt.id || `idx-${opt.orderIndex}`)}
+                    strategy={verticalListSortingStrategy}
+                >
                     {/* Options List */}
-                    {localOptions.map((option, index) => (
+                    {options.map((option, index) => (
                         <OptionRow
-                            key={option.id || index}
+                            key={option.id || `idx-${option.orderIndex}`}
+                            sortableId={option.id || `idx-${option.orderIndex}`}
                             option={option}
                             index={index}
                             onOptionChange={handleOptionChange}
                             onRemove={() => onRemoveOption(index)}
                             optionError={optionErrors?.get(index)}
+                            canRemove={options.length > 2}
                         />
                     ))}
                 </SortableContext>
@@ -527,14 +567,18 @@ const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption, onR
 };
 
 interface OptionRowProps {
+    sortableId: string;
     option: UpdateMenuItemOptionDto;
     index: number;
     onOptionChange: (index: number, field: 'name' | 'description' | 'price', value: string) => void;
     onRemove: () => void;
     optionError?: { name?: string; price?: string };
+    canRemove: boolean;
 }
 
-const OptionRow = ({ option, index, onOptionChange, onRemove, optionError }: OptionRowProps) => {
+const OptionRow = ({ sortableId, option, index, onOptionChange, onRemove, optionError, canRemove }: OptionRowProps) => {
+    const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+
     const {
         attributes,
         listeners,
@@ -542,7 +586,7 @@ const OptionRow = ({ option, index, onOptionChange, onRemove, optionError }: Opt
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: index.toString() });
+    } = useSortable({ id: sortableId });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -597,12 +641,28 @@ const OptionRow = ({ option, index, onOptionChange, onRemove, optionError }: Opt
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={onRemove}
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10 mt-6"
+                    onClick={() => setShowRemoveDialog(true)}
+                    disabled={!canRemove}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title={!canRemove ? "Items with options must have at least 2 options" : "Remove option"}
                 >
                     <Trash className="w-4 h-4" />
                 </Button>
             </div>
+
+            <ConfirmDialog
+                open={showRemoveDialog}
+                onOpenChange={setShowRemoveDialog}
+                title="Remove Option"
+                description={`Are you sure you want to remove the option "${option.name || 'this option'}"?`}
+                confirmText="Remove"
+                cancelText="Cancel"
+                onConfirm={() => {
+                    onRemove();
+                    setShowRemoveDialog(false);
+                }}
+                variant="destructive"
+            />
         </div>
     );
 };

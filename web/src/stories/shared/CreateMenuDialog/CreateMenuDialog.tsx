@@ -60,7 +60,7 @@ export function CreateMenuDialog({
             setIsOpen(false)
             setMenuName('Main Menu')
             setMenuDescription('Our carefully crafted selection of dishes')
-            router.push(`/menus/${menu.id}`)
+            router.push(`/new-menu/${menu.id}`)
           }
         },
         onError: error => {
