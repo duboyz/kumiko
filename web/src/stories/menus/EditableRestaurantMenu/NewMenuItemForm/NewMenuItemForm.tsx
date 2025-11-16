@@ -48,7 +48,7 @@ export const NewMenuItemForm = ({ onCancel, category, isVisible, setIsVisible }:
 
     // Validation
     if (!name.trim()) return toast.error('Please enter a name for the menu item')
-    if (!hasOptions && (!parsedPrice || parsedPrice <= 0)) return toast.error('Please enter a valid price')
+    if (!hasOptions && (!parsedPrice || parsedPrice <= 0)) return toast.error('Please enter a valid price', {})
 
     if (hasOptions) {
       const validOptions = options.filter(o => o.name.trim() && o.price > 0)

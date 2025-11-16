@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 interface LabeledInputProps {
     id: string;
@@ -12,6 +13,7 @@ interface LabeledInputProps {
     className?: string;
     disabled?: boolean;
     variant?: 'input' | 'textarea';
+    error?: string;
 }
 
 export const LabeledInput = ({
@@ -23,7 +25,8 @@ export const LabeledInput = ({
     placeholder,
     className,
     disabled = false,
-    variant = 'input'
+    variant = 'input',
+    error
 }: LabeledInputProps) => {
     return (
         <div className={`flex flex-col gap-2 ${className || ''}`}>
@@ -41,6 +44,7 @@ export const LabeledInput = ({
                     step={type === 'number' ? '0.01' : undefined}
                     min={type === 'number' ? '0' : undefined}
                     disabled={disabled}
+                    className={cn(error && 'border-destructive focus-visible:ring-destructive')}
                 />
             ) : (
                 <Textarea
@@ -49,7 +53,12 @@ export const LabeledInput = ({
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     disabled={disabled}
+                    className={cn(error && 'border-destructive focus-visible:ring-destructive')}
                 />
+            )}
+
+            {error && (
+                <p className="text-sm text-destructive">{error}</p>
             )}
         </div>
     );

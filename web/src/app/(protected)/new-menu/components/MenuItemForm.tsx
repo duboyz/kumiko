@@ -21,14 +21,14 @@ interface MenuItemFormProps {
     onCancel: () => void;
     existingItem?: MenuCategoryItemDto; // If provided, we're editing
     onDirtyChange?: (isDirty: boolean) => void;
-    onSaveHandlerReady?: (saveHandler: () => void) => void;
+    onSaveHandlerReady?: (saveHandler: () => boolean) => void; // Returns true if saved, false if validation failed
 }
 
 export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirtyChange, onSaveHandlerReady }: MenuItemFormProps) => {
     const queryClient = useQueryClient();
     const isEditMode = !!existingItem;
     const actionButtonsRef = useRef<HTMLDivElement>(null);
-    const handleSaveRef = useRef<() => void>(() => { });
+    const handleSaveRef = useRef<() => boolean>(() => false);
 
     // Store initial values for dirty checking
     const initialValues = useRef({
@@ -68,6 +68,12 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
     const [allergenIds, setAllergenIds] = useState<string[]>(
         existingItem?.menuItem?.allergens?.map((a) => a.id) || []
     );
+    const [validationErrors, setValidationErrors] = useState<{
+        name?: string;
+        price?: string;
+        options?: string;
+        optionErrors?: Map<number, { name?: string; price?: string }>;
+    }>({});
 
     const isPending = isCreating || isAdding || isUpdating;
 
@@ -152,23 +158,46 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
 
     // Validation
     const validate = (): boolean => {
+        const errors: {
+            name?: string;
+            price?: string;
+            options?: string;
+            optionErrors?: Map<number, { name?: string; price?: string }>;
+        } = {};
+
         if (!name.trim()) {
-            toast.error('Please enter a menu item name');
-            return false;
+            errors.name = 'Name is required';
         }
         if (!hasOptions && price <= 0) {
-            toast.error('Please enter a valid price');
-            return false;
+            errors.price = 'Price must be greater than 0';
         }
         if (hasOptions && options.length < 2) {
-            toast.error('Items with options must have at least 2 options');
-            return false;
+            errors.options = 'Items with options must have at least 2 options';
         }
-        if (hasOptions && options.some((opt) => !opt.name.trim())) {
-            toast.error('Please fill in all option names');
-            return false;
+
+        // Validate individual options
+        if (hasOptions && options.length >= 2) {
+            const optionErrors = new Map<number, { name?: string; price?: string }>();
+            options.forEach((opt, index) => {
+                const optError: { name?: string; price?: string } = {};
+                if (!opt.name.trim()) {
+                    optError.name = 'Option name is required';
+                }
+                if (opt.price <= 0) {
+                    optError.price = 'Price must be greater than 0';
+                }
+                if (optError.name || optError.price) {
+                    optionErrors.set(index, optError);
+                }
+            });
+
+            if (optionErrors.size > 0) {
+                errors.optionErrors = optionErrors;
+            }
         }
-        return true;
+
+        setValidationErrors(errors);
+        return Object.keys(errors).length === 0 && !errors.optionErrors;
     };
 
     // Save handler for editing
@@ -238,12 +267,17 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
         }
     };
 
-    const handleSave = () => {
+    const handleSave = (): boolean => {
+        if (!validate()) {
+            return false; // Validation failed
+        }
+
         if (isEditMode) {
             handleUpdate();
         } else {
             handleCreate();
         }
+        return true; // Validation passed, save triggered
     };
 
     // Keep the save handler ref up to date
@@ -252,7 +286,7 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
     // Register save handler with parent (registers a function that calls the ref)
     useEffect(() => {
         const saveWrapper = () => {
-            handleSaveRef.current();
+            return handleSaveRef.current();
         };
         onSaveHandlerReady?.(saveWrapper);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -274,9 +308,15 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                         id={`${isEditMode ? 'edit' : 'new'}-name`}
                         label="Name"
                         value={name}
-                        onChange={setName}
+                        onChange={(value) => {
+                            setName(value);
+                            if (validationErrors.name) {
+                                setValidationErrors(prev => ({ ...prev, name: undefined }));
+                            }
+                        }}
                         placeholder="e.g., Margherita Pizza"
                         className="md:flex-1"
+                        error={validationErrors.name}
                     />
                     <LabeledInput
                         id={`${isEditMode ? 'edit' : 'new'}-description`}
@@ -291,9 +331,15 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                         label="Price"
                         value={price.toString()}
                         type="number"
-                        onChange={(value) => setPrice(Number(value))}
+                        onChange={(value) => {
+                            setPrice(Number(value));
+                            if (validationErrors.price) {
+                                setValidationErrors(prev => ({ ...prev, price: undefined }));
+                            }
+                        }}
                         placeholder="0.00"
                         disabled={hasOptions}
+                        error={validationErrors.price}
                     />
                 </div>
 
@@ -315,11 +361,31 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                 {/* Options Management */}
                 {hasOptions && (
                     <div className="flex flex-col gap-2">
+                        {validationErrors.options && (
+                            <p className="text-sm text-destructive">{validationErrors.options}</p>
+                        )}
                         <OptionsList
                             options={options}
-                            onAddOption={handleAddOption}
-                            onUpdateOption={handleUpdateOption}
+                            onAddOption={(opt) => {
+                                handleAddOption(opt);
+                                if (validationErrors.options || validationErrors.optionErrors) {
+                                    setValidationErrors(prev => ({ ...prev, options: undefined, optionErrors: undefined }));
+                                }
+                            }}
+                            onUpdateOption={(idx, opt) => {
+                                handleUpdateOption(idx, opt);
+                                // Clear errors for this specific option
+                                if (validationErrors.optionErrors) {
+                                    const newOptionErrors = new Map(validationErrors.optionErrors);
+                                    newOptionErrors.delete(idx);
+                                    setValidationErrors(prev => ({
+                                        ...prev,
+                                        optionErrors: newOptionErrors.size > 0 ? newOptionErrors : undefined
+                                    }));
+                                }
+                            }}
                             onRemoveOption={handleRemoveOption}
+                            optionErrors={validationErrors.optionErrors}
                         />
                     </div>
                 )}
@@ -349,9 +415,10 @@ interface OptionsListProps {
     onAddOption: (option: Omit<UpdateMenuItemOptionDto, 'orderIndex' | 'id'>) => void;
     onUpdateOption: (index: number, option: Omit<UpdateMenuItemOptionDto, 'orderIndex' | 'id'>) => void;
     onRemoveOption: (index: number) => void;
+    optionErrors?: Map<number, { name?: string; price?: string }>;
 }
 
-const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption }: OptionsListProps) => {
+const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption, optionErrors }: OptionsListProps) => {
     const handleAddOption = () => {
         onAddOption({
             name: '',
@@ -382,6 +449,7 @@ const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption }: O
                                     value={option.name}
                                     onChange={(value) => handleOptionChange(index, 'name', value)}
                                     placeholder="Add Bacon"
+                                    error={optionErrors?.get(index)?.name}
                                 />
                             </div>
                             <div className="flex-1">
@@ -401,6 +469,7 @@ const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption }: O
                                     type="number"
                                     onChange={(value) => handleOptionChange(index, 'price', value)}
                                     placeholder="0.00"
+                                    error={optionErrors?.get(index)?.price}
                                 />
                             </div>
                         </div>

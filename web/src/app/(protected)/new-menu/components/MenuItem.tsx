@@ -13,14 +13,14 @@ import { Badge } from "@/components/ui/badge";
 interface MenuItemProps {
     item: MenuCategoryItemDto;
     onDirtyChange?: (isDirty: boolean) => void;
-    onSaveHandlerReady?: (saveHandler: (() => void) | null) => void;
+    onSaveHandlerReady?: (saveHandler: (() => boolean) | null) => void;
 }
 
 export const MenuItem = ({ item, onDirtyChange, onSaveHandlerReady }: MenuItemProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const { mutate: deleteItem, isPending: isDeleting } = useRemoveMenuItemFromCategory();
     const editRef = useRef<HTMLDivElement>(null);
-    const saveHandlerRef = useRef<(() => void) | null>(null);
+    const saveHandlerRef = useRef<(() => boolean) | null>(null);
 
     const {
         attributes,
@@ -64,7 +64,7 @@ export const MenuItem = ({ item, onDirtyChange, onSaveHandlerReady }: MenuItemPr
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isEditing]);
 
-    const handleSaveHandlerReady = (saveHandler: () => void) => {
+    const handleSaveHandlerReady = (saveHandler: () => boolean) => {
         saveHandlerRef.current = saveHandler;
         onSaveHandlerReady?.(saveHandler);
     };

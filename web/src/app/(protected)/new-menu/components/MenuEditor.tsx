@@ -84,7 +84,7 @@ export const MenuItemsList = ({
     const [localItems, setLocalItems] = useState(items);
     const { mutate: reorderItems } = useReorderMenuItems();
     const addItemRef = useRef<HTMLDivElement>(null);
-    const saveHandlersRef = useRef<Map<string, () => void>>(new Map());
+    const saveHandlersRef = useRef<Map<string, () => boolean>>(new Map());
 
     // Close add item form when category changes
     useEffect(() => {
@@ -110,7 +110,7 @@ export const MenuItemsList = ({
         });
     };
 
-    const handleItemSaveHandlerReady = (itemId: string, saveHandler: (() => void) | null) => {
+    const handleItemSaveHandlerReady = (itemId: string, saveHandler: (() => boolean) | null) => {
         if (saveHandler) {
             saveHandlersRef.current.set(itemId, saveHandler);
         } else {
@@ -118,15 +118,27 @@ export const MenuItemsList = ({
         }
     };
 
-    const handleAddItemSaveHandlerReady = (saveHandler: () => void) => {
+    const handleAddItemSaveHandlerReady = (saveHandler: () => boolean) => {
         saveHandlersRef.current.set('__adding__', saveHandler);
     };
 
     // Register save all handler with parent
     useEffect(() => {
         const saveAll = () => {
-            // Trigger all registered save handlers
-            saveHandlersRef.current.forEach((handler) => handler());
+            // Try to save all forms and collect validation errors
+            let failedCount = 0;
+
+            saveHandlersRef.current.forEach((handler) => {
+                const success = handler(); // Returns true if validation passed, false otherwise
+                if (!success) {
+                    failedCount++;
+                }
+            });
+
+            // Show summary message if there were errors
+            if (failedCount > 0) {
+                toast.error(`${failedCount} form${failedCount > 1 ? 's have' : ' has'} validation errors. Please fix the errors shown.`);
+            }
         };
         onSaveAllHandlerReady?.(saveAll);
         // eslint-disable-next-line react-hooks/exhaustive-deps
