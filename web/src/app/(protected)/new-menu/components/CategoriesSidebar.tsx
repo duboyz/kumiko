@@ -233,7 +233,7 @@ const CategoryItem = ({ category, isSelected, onSelect }: CategoryItemProps) => 
             style={style}
             className={cn(
                 'flex items-center gap-2 p-2 rounded-md cursor-pointer group transition-colors',
-                isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'
+                isSelected ? 'bg-primary/20 text-primary' : 'hover:bg-accent'
             )}
         >
             <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">

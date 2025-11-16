@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     useCreateMenuItem,
     useAddMenuItemToCategory,
@@ -25,6 +25,7 @@ interface MenuItemFormProps {
 export const MenuItemForm = ({ selectedCategory, onCancel, existingItem }: MenuItemFormProps) => {
     const queryClient = useQueryClient();
     const isEditMode = !!existingItem;
+    const actionButtonsRef = useRef<HTMLDivElement>(null);
 
     // Create/Update hooks
     const { mutateAsync: createMenuItem, isPending: isCreating } = useCreateMenuItem();
@@ -51,9 +52,22 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem }: MenuI
 
     const isPending = isCreating || isAdding || isUpdating;
 
+    // Scroll to action buttons when hasOptions becomes true
+    useEffect(() => {
+        if (hasOptions && actionButtonsRef.current) {
+            setTimeout(() => {
+                actionButtonsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 100);
+        }
+    }, [hasOptions]);
+
     // Option handlers
     const handleAddOption = (newOption: Omit<UpdateMenuItemOptionDto, 'orderIndex' | 'id'>) => {
         setOptions([...options, { ...newOption, orderIndex: options.length }]);
+        // Scroll to action buttons after adding option
+        setTimeout(() => {
+            actionButtonsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 100);
     };
 
     const handleUpdateOption = (index: number, updatedOption: Omit<UpdateMenuItemOptionDto, 'orderIndex' | 'id'>) => {
@@ -79,6 +93,21 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem }: MenuI
         setAllergenIds((prev) => prev.filter((id) => id !== allergenId));
     };
 
+    // Handle has options toggle
+    const handleHasOptionsChange = (value: 'simple' | 'options') => {
+        const newHasOptions = value === 'options';
+
+        // If toggling to options and there are no options, create 2 empty ones
+        if (newHasOptions && options.length === 0) {
+            setOptions([
+                { name: '', description: '', price: 0, orderIndex: 0 },
+                { name: '', description: '', price: 0, orderIndex: 1 },
+            ]);
+        }
+
+        setHasOptions(newHasOptions);
+    };
+
     // Validation
     const validate = (): boolean => {
         if (!name.trim()) {
@@ -89,8 +118,8 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem }: MenuI
             toast.error('Please enter a valid price');
             return false;
         }
-        if (hasOptions && options.length === 0) {
-            toast.error('Please add at least one option or switch to simple item');
+        if (hasOptions && options.length < 2) {
+            toast.error('Items with options must have at least 2 options');
             return false;
         }
         if (hasOptions && options.some((opt) => !opt.name.trim())) {
@@ -226,7 +255,7 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem }: MenuI
                 {/* Item Type Switch */}
                 <ItemTypeSwitch
                     value={hasOptions ? 'options' : 'simple'}
-                    onChange={(value) => setHasOptions(value === 'options')}
+                    onChange={handleHasOptionsChange}
                 />
 
                 {/* Options Management */}
@@ -242,7 +271,7 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem }: MenuI
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex gap-2 items-center justify-end pt-2">
+                <div className="flex gap-2 items-center justify-end pt-2" ref={actionButtonsRef}>
                     <Button variant="outline" onClick={onCancel} disabled={isPending}>
                         Cancel
                     </Button>

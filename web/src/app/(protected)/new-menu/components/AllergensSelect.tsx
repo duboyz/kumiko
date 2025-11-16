@@ -1,4 +1,3 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +19,7 @@ export const AllergensSelect = ({ selectedAllergenIds, onAddAllergens, onRemoveA
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [pendingSelections, setPendingSelections] = useState<string[]>([]);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const doneButtonRef = useRef<HTMLButtonElement>(null);
 
     const selectedAllergens = allergensData?.filter((a) => selectedAllergenIds.includes(a.id)) || [];
 
@@ -44,6 +44,29 @@ export const AllergensSelect = ({ selectedAllergenIds, onAddAllergens, onRemoveA
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Scroll to ensure dropdown is visible when it opens or when selections change
+    useEffect(() => {
+        if (isDropdownOpen && dropdownRef.current) {
+            setTimeout(() => {
+                // Get the dropdown element position
+                const dropdown = dropdownRef.current;
+                if (!dropdown) return;
+
+                const rect = dropdown.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+
+                // Calculate if we need to scroll
+                // We want to ensure the dropdown + at least 200px below is visible
+                const spaceNeeded = 400; // Input + dropdown + done button
+                const bottomSpace = viewportHeight - rect.bottom;
+
+                if (bottomSpace < spaceNeeded) {
+                    dropdown.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 150);
+        }
+    }, [isDropdownOpen, pendingSelections.length]);
+
     const togglePendingSelection = (allergenId: string) => {
         setPendingSelections((prev) =>
             prev.includes(allergenId)
@@ -67,7 +90,7 @@ export const AllergensSelect = ({ selectedAllergenIds, onAddAllergens, onRemoveA
 
     return (
         <div className="flex flex-col gap-2">
-            <Label>Allergens</Label>
+            <span className="text-xs font-bold text-muted-foreground">Allergens</span>
 
             {/* Display current allergens as badges */}
             {selectedAllergens.length > 0 && (
@@ -126,6 +149,7 @@ export const AllergensSelect = ({ selectedAllergenIds, onAddAllergens, onRemoveA
                             {pendingSelections.length > 0 && (
                                 <div className="p-2 border-t bg-muted/50">
                                     <Button
+                                        ref={doneButtonRef}
                                         onClick={handleDone}
                                         className="w-full"
                                         size="sm"
