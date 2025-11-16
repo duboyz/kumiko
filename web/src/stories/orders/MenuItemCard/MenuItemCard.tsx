@@ -18,7 +18,6 @@ interface MenuItemCardProps {
 }
 
 export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: MenuItemCardProps) {
-  const [showOptions, setShowOptions] = useState(false)
   const { cart, updateQuantity, removeItem } = useCartStore()
 
   if (!item.isAvailable) return null
@@ -144,25 +143,11 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
       {/* Options section */}
       {hasOptions && (
         <div className="mt-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowOptions(!showOptions)}
-            className="w-full justify-between p-2.5 sm:p-3 h-auto hover:bg-muted/30 active:scale-100 focus:scale-100 hover:scale-100 transition-colors rounded-lg"
-          >
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground">
-              {item.options.length} option{item.options.length !== 1 ? 's' : ''} available
-            </span>
-            {showOptions ? (
-              <ChevronUp className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            )}
-          </Button>
+
+
 
           <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${showOptions ? 'max-h-[2000px] opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'
-              }`}
+            className=" mt-3"
           >
             <div className="space-y-2.5 sm:space-y-3 border-t border-border/50 pt-3 sm:pt-4">
               {item.options
@@ -172,7 +157,7 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
                   return (
                     <div
                       key={option.id}
-                      className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                      className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg transition-colors"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
