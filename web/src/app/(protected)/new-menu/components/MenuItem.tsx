@@ -10,7 +10,12 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Badge } from "@/components/ui/badge";
 
-export const MenuItem = ({ item }: { item: MenuCategoryItemDto }) => {
+interface MenuItemProps {
+    item: MenuCategoryItemDto;
+    onDirtyChange?: (isDirty: boolean) => void;
+}
+
+export const MenuItem = ({ item, onDirtyChange }: MenuItemProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const { mutate: deleteItem, isPending: isDeleting } = useRemoveMenuItemFromCategory();
     const editRef = useRef<HTMLDivElement>(null);
@@ -48,6 +53,14 @@ export const MenuItem = ({ item }: { item: MenuCategoryItemDto }) => {
         }
     }, [isEditing]);
 
+    // Reset dirty state when closing edit form
+    useEffect(() => {
+        if (!isEditing) {
+            onDirtyChange?.(false);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isEditing]);
+
     const getMinMaxPrice = () => {
         if (!item.menuItem?.hasOptions) return [item.menuItem?.price, item.menuItem?.price];
         return [
@@ -64,6 +77,7 @@ export const MenuItem = ({ item }: { item: MenuCategoryItemDto }) => {
                         selectedCategory={null}
                         onCancel={() => setIsEditing(false)}
                         existingItem={item}
+                        onDirtyChange={onDirtyChange}
                     />
                 </div>
             </div>

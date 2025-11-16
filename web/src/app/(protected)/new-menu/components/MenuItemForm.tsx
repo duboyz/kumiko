@@ -20,12 +20,29 @@ interface MenuItemFormProps {
     selectedCategory: MenuCategoryDto | null;
     onCancel: () => void;
     existingItem?: MenuCategoryItemDto; // If provided, we're editing
+    onDirtyChange?: (isDirty: boolean) => void;
 }
 
-export const MenuItemForm = ({ selectedCategory, onCancel, existingItem }: MenuItemFormProps) => {
+export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirtyChange }: MenuItemFormProps) => {
     const queryClient = useQueryClient();
     const isEditMode = !!existingItem;
     const actionButtonsRef = useRef<HTMLDivElement>(null);
+
+    // Store initial values for dirty checking
+    const initialValues = useRef({
+        name: existingItem?.menuItem?.name || '',
+        description: existingItem?.menuItem?.description || '',
+        price: existingItem?.menuItem?.price || 0,
+        hasOptions: existingItem?.menuItem?.hasOptions || false,
+        options: existingItem?.menuItem?.options?.map((opt, index) => ({
+            id: opt.id,
+            name: opt.name,
+            description: opt.description,
+            price: opt.price,
+            orderIndex: index,
+        })) || [],
+        allergenIds: existingItem?.menuItem?.allergens?.map((a) => a.id) || [],
+    });
 
     // Create/Update hooks
     const { mutateAsync: createMenuItem, isPending: isCreating } = useCreateMenuItem();
@@ -51,6 +68,29 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem }: MenuI
     );
 
     const isPending = isCreating || isAdding || isUpdating;
+
+    // Check if form is dirty (has changes)
+    useEffect(() => {
+        if (isEditMode) {
+            const sortedCurrentAllergens = [...allergenIds].sort();
+            const sortedInitialAllergens = [...initialValues.current.allergenIds].sort();
+
+            const isDirty =
+                name !== initialValues.current.name ||
+                description !== initialValues.current.description ||
+                price !== initialValues.current.price ||
+                hasOptions !== initialValues.current.hasOptions ||
+                JSON.stringify(options) !== JSON.stringify(initialValues.current.options) ||
+                JSON.stringify(sortedCurrentAllergens) !== JSON.stringify(sortedInitialAllergens);
+
+            onDirtyChange?.(isDirty);
+        } else {
+            // For new items, always consider dirty if form has content
+            const hasContent = !!(name.trim() || description.trim() || price > 0 || options.length > 0 || allergenIds.length > 0);
+            onDirtyChange?.(hasContent);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [name, description, price, hasOptions, options, allergenIds, isEditMode]);
 
     // Scroll to action buttons when hasOptions becomes true
     useEffect(() => {

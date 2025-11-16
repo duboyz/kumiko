@@ -22,7 +22,12 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
-export const MenuEditor = ({ selectedCategory }: { selectedCategory: MenuCategoryDto | null }) => {
+interface MenuEditorProps {
+    selectedCategory: MenuCategoryDto | null;
+    onUnsavedChangesChange?: (hasChanges: boolean) => void;
+}
+
+export const MenuEditor = ({ selectedCategory, onUnsavedChangesChange }: MenuEditorProps) => {
     const items = selectedCategory?.menuCategoryItems || [];
     const [isNewMenuItemFormVisible, setIsNewMenuItemFormVisible] = useState(false);
 
@@ -49,22 +54,56 @@ export const MenuEditor = ({ selectedCategory }: { selectedCategory: MenuCategor
                     {items.length} {items.length === 1 ? 'item' : 'items'}
                 </p>
             </div>
-            <MenuItemsList items={items} selectedCategory={selectedCategory} />
+            <MenuItemsList
+                items={items}
+                selectedCategory={selectedCategory}
+                onUnsavedChangesChange={onUnsavedChangesChange}
+            />
         </div>
     );
 };
 
+interface MenuItemsListProps {
+    items: MenuCategoryItemDto[];
+    selectedCategory: MenuCategoryDto | null;
+    onUnsavedChangesChange?: (hasChanges: boolean) => void;
+}
+
 export const MenuItemsList = ({
     items,
     selectedCategory,
-}: {
-    items: MenuCategoryItemDto[];
-    selectedCategory: MenuCategoryDto | null;
-}) => {
+    onUnsavedChangesChange,
+}: MenuItemsListProps) => {
     const [isAddingItem, setIsAddingItem] = useState(false);
+    const [isAddingItemDirty, setIsAddingItemDirty] = useState(false);
+    const [dirtyItemIds, setDirtyItemIds] = useState<Set<string>>(new Set());
     const [localItems, setLocalItems] = useState(items);
     const { mutate: reorderItems } = useReorderMenuItems();
     const addItemRef = useRef<HTMLDivElement>(null);
+
+    // Close add item form when category changes
+    useEffect(() => {
+        setIsAddingItem(false);
+        setIsAddingItemDirty(false);
+    }, [selectedCategory?.id]);
+
+    // Notify parent about unsaved changes
+    useEffect(() => {
+        const hasChanges = (isAddingItem && isAddingItemDirty) || dirtyItemIds.size > 0;
+        onUnsavedChangesChange?.(hasChanges);
+    }, [isAddingItem, isAddingItemDirty, dirtyItemIds.size, onUnsavedChangesChange]);
+
+    const handleItemDirtyChange = (itemId: string, isDirty: boolean) => {
+        setDirtyItemIds((prev) => {
+            const newSet = new Set(prev);
+            if (isDirty) {
+                newSet.add(itemId);
+            } else {
+                newSet.delete(itemId);
+            }
+            return newSet;
+        });
+    };
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -129,7 +168,11 @@ export const MenuItemsList = ({
                     <SortableContext items={localItems.map((item) => item.id)} strategy={verticalListSortingStrategy}>
                         <div className="flex flex-col gap-3">
                             {localItems.map((item) => (
-                                <MenuItem key={item.id} item={item} />
+                                <MenuItem
+                                    key={item.id}
+                                    item={item}
+                                    onDirtyChange={(isDirty) => handleItemDirtyChange(item.id, isDirty)}
+                                />
                             ))}
                         </div>
                     </SortableContext>
@@ -150,6 +193,7 @@ export const MenuItemsList = ({
                     <MenuItemForm
                         selectedCategory={selectedCategory}
                         onCancel={() => setIsAddingItem(false)}
+                        onDirtyChange={setIsAddingItemDirty}
                     />
                 ) : (
                     <Button variant="outline" onClick={() => setIsAddingItem(true)} className="w-full">

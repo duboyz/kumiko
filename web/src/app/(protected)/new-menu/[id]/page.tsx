@@ -4,9 +4,10 @@ import { MenuCategoryDto, useLocationSelection, useRestaurantMenus } from "@shar
 import { MenuEditor } from "../components/MenuEditor";
 import { CategoriesSidebar } from "../components/CategoriesSidebar";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2, Menu, ArrowLeft } from "lucide-react";
+import { Loader2, Menu, ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 
 export default function NewMenuPage() {
     const router = useRouter();
@@ -19,9 +20,29 @@ export default function NewMenuPage() {
 
     const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(categories[0]?.id ?? null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [showSavedIndicator, setShowSavedIndicator] = useState(false);
 
     // Keep the selected category in sync with the latest data
     const selectedCategory = categories.find((cat) => cat.id === selectedCategoryId) || null;
+
+    // Show "All changes saved" briefly when unsaved changes become false
+    useEffect(() => {
+        if (!hasUnsavedChanges && showSavedIndicator) {
+            const timer = setTimeout(() => {
+                setShowSavedIndicator(false);
+            }, 3000); // Show for 3 seconds
+            return () => clearTimeout(timer);
+        }
+    }, [hasUnsavedChanges, showSavedIndicator]);
+
+    const handleUnsavedChangesChange = (hasChanges: boolean) => {
+        if (hasUnsavedChanges && !hasChanges) {
+            // Transitioning from unsaved to saved - show saved indicator
+            setShowSavedIndicator(true);
+        }
+        setHasUnsavedChanges(hasChanges);
+    };
 
     useEffect(() => {
         if (categories.length > 0 && !selectedCategoryId) {
@@ -84,7 +105,20 @@ export default function NewMenuPage() {
                     Back
                 </Button>
                 <div className="flex-1 min-w-0">
-                    <h1 className="text-lg font-bold truncate">{menu.name}</h1>
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-lg font-bold truncate">{menu.name}</h1>
+                        {hasUnsavedChanges && (
+                            <Badge className="flex items-center gap-1 shrink-0 bg-amber-500 hover:bg-amber-600 text-white">
+                                <AlertCircle className="w-3 h-3" />
+                                Unsaved changes
+                            </Badge>
+                        )}
+                        {!hasUnsavedChanges && showSavedIndicator && (
+                            <Badge className="flex items-center gap-1 shrink-0 bg-green-600 hover:bg-green-700 text-white">
+                                ✓ No unsaved changes
+                            </Badge>
+                        )}
+                    </div>
                     {menu.description && (
                         <p className="text-sm text-muted-foreground truncate">{menu.description}</p>
                     )}
@@ -134,7 +168,10 @@ export default function NewMenuPage() {
 
                 {/* Main Content */}
                 <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-background">
-                    <MenuEditor selectedCategory={selectedCategory} />
+                    <MenuEditor
+                        selectedCategory={selectedCategory}
+                        onUnsavedChangesChange={handleUnsavedChangesChange}
+                    />
                 </div>
             </div>
         </div>
