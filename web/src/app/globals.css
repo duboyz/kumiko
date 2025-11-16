@@ -204,24 +204,31 @@
 
 :root {
   /* Enhanced color hierarchy with more distinct surface levels */
-  --background: oklch(0.9700 0 0);        /* Slightly darker base */
+  --background: oklch(0.9700 0 0);
+  /* Slightly darker base */
   --foreground: oklch(0 0 0);
-  --card: oklch(1.0000 0 0);               /* Pure white for cards - maximum contrast */
+  --card: oklch(1.0000 0 0);
+  /* Pure white for cards - maximum contrast */
   --card-foreground: oklch(0 0 0);
-  --popover: oklch(1.0000 0 0);            /* Elevated popover */
+  --popover: oklch(1.0000 0 0);
+  /* Elevated popover */
   --popover-foreground: oklch(0 0 0);
   --primary: oklch(0.1344 0 0);
   --primary-foreground: oklch(1.0000 0 0);
-  --secondary: oklch(0.9200 0 0);          /* More distinct from background */
+  --secondary: oklch(0.9200 0 0);
+  /* More distinct from background */
   --secondary-foreground: oklch(0 0 0);
-  --muted: oklch(0.9500 0 0);              /* Stronger muted level */
+  --muted: oklch(0.9500 0 0);
+  /* Stronger muted level */
   --muted-foreground: oklch(0.4386 0 0);
   --accent: oklch(0.9200 0 0);
   --accent-foreground: oklch(0 0 0);
   --destructive: oklch(0.6290 0.1902 23.0704);
   --destructive-foreground: oklch(1.0000 0 0);
-  --border: oklch(0.8800 0 0);             /* More visible borders */
-  --input: oklch(0.9900 0 0);              /* Lighter inputs */
+  --border: oklch(0.8800 0 0);
+  /* More visible borders */
+  --input: oklch(0.9900 0 0);
+  /* Lighter inputs */
   --ring: oklch(0 0 0);
   --chart-1: oklch(0.8089 0.1698 75.2054);
   --chart-2: oklch(0.5499 0.2197 264.4382);
@@ -239,7 +246,7 @@
   --font-sans: Montserrat, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Abhaya Libre, ui-serif, serif;
   --font-mono: Geist Mono, monospace;
-  --radius: 0.9rem;
+  --radius: 0.5rem;
 
   /* Enhanced shadow system with top-down lighting */
   --shadow-color: #000000;
@@ -283,24 +290,32 @@
 
 .dark {
   /* Enhanced dark mode with better surface hierarchy */
-  --background: oklch(0.05 0 0);            /* Deeper black base */
+  --background: oklch(0.05 0 0);
+  /* Deeper black base */
   --foreground: oklch(1.0000 0 0);
-  --card: oklch(0.12 0 0);                  /* Elevated card surface */
+  --card: oklch(0.12 0 0);
+  /* Elevated card surface */
   --card-foreground: oklch(1.0000 0 0);
-  --popover: oklch(0.15 0 0);               /* Even more elevated */
+  --popover: oklch(0.15 0 0);
+  /* Even more elevated */
   --popover-foreground: oklch(1.0000 0 0);
   --primary: oklch(1.0000 0 0);
   --primary-foreground: oklch(0 0 0);
-  --secondary: oklch(0.18 0 0);             /* Clearer secondary */
+  --secondary: oklch(0.18 0 0);
+  /* Clearer secondary */
   --secondary-foreground: oklch(1.0000 0 0);
-  --muted: oklch(0.15 0 0);                 /* More distinct muted */
+  --muted: oklch(0.15 0 0);
+  /* More distinct muted */
   --muted-foreground: oklch(0.7187 0 0);
-  --accent: oklch(0.22 0 0);                /* Stronger accent */
+  --accent: oklch(0.22 0 0);
+  /* Stronger accent */
   --accent-foreground: oklch(1.0000 0 0);
   --destructive: oklch(0.6897 0.1998 23.9818);
   --destructive-foreground: oklch(0 0 0);
-  --border: oklch(0.25 0 0);                /* More visible borders */
-  --input: oklch(0.18 0 0);                 /* Lighter inputs */
+  --border: oklch(0.25 0 0);
+  /* More visible borders */
+  --input: oklch(0.18 0 0);
+  /* Lighter inputs */
   --ring: oklch(0.7187 0 0);
   --chart-1: oklch(0.8089 0.1698 75.2054);
   --chart-2: oklch(0.5811 0.2100 260.8318);
@@ -318,7 +333,7 @@
   --font-sans: Montserrat, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Abhaya Libre, ui-serif, serif;
   --font-mono: Geist Mono, monospace;
-  --radius: 0.9rem;
+  --radius: 0.5rem;
 
   /* Enhanced dark mode shadows with top-down lighting */
   --shadow-color: #000000;

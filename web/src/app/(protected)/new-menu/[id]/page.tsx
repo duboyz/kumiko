@@ -3,10 +3,13 @@ import { useEffect, useState } from "react";
 import { MenuCategoryDto, useLocationSelection, useRestaurantMenus } from "@shared";
 import { MenuEditor } from "../components/MenuEditor";
 import { CategoriesSidebar } from "../components/CategoriesSidebar";
-import { useParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { Loader2, Menu, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export default function NewMenuPage() {
+    const router = useRouter();
     const menuId = useParams().id as string;
     const { selectedLocation } = useLocationSelection();
     const { data: menuData, isLoading, error } = useRestaurantMenus(selectedLocation?.id || '');
@@ -15,6 +18,7 @@ export default function NewMenuPage() {
     const categories = menu?.categories || [];
 
     const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(categories[0]?.id ?? null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Keep the selected category in sync with the latest data
     const selectedCategory = categories.find((cat) => cat.id === selectedCategoryId) || null;
@@ -24,6 +28,11 @@ export default function NewMenuPage() {
             setSelectedCategoryId(categories[0].id);
         }
     }, [categories, selectedCategoryId]);
+
+    const handleCategorySelect = (cat: MenuCategoryDto | null) => {
+        setSelectedCategoryId(cat?.id ?? null);
+        setIsMobileMenuOpen(false); // Close mobile menu when category is selected
+    };
 
     // Loading state
     if (isLoading) {
@@ -64,26 +73,69 @@ export default function NewMenuPage() {
     }
 
     return (
-        <div className="flex h-screen">
-            <div className="w-64 border-r bg-muted/30 flex flex-col">
-                <div className="p-4 border-b">
-                    <h1 className="text-xl font-bold truncate">{menu.name}</h1>
+        <div className="flex flex-col h-screen">
+            {/* Top Navigation Bar */}
+            <div className="border-b bg-background p-4 flex items-center gap-4 sticky top-0 z-20">
+                <Button
+                    onClick={() => router.back()}
+                    className="shrink-0"
+                >
+                    <ArrowLeft className="h-5 w-5" />
+                    Back
+                </Button>
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-lg font-bold truncate">{menu.name}</h1>
                     {menu.description && (
                         <p className="text-sm text-muted-foreground truncate">{menu.description}</p>
                     )}
                 </div>
-                <div className="flex-1 overflow-y-auto p-4">
-                    <CategoriesSidebar
-                        categories={categories}
-                        selectedCategory={selectedCategory}
-                        setSelectedCategory={(cat) => setSelectedCategoryId(cat?.id ?? null)}
-                        restaurantMenuId={menu.id}
-                    />
+                <div className="md:hidden">
+                    <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                        <SheetTrigger asChild>
+                            <Button variant="outline" size="icon">
+                                <Menu className="h-5 w-5" />
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="left" className="w-80 p-0">
+                            <div className="flex flex-col h-full">
+                                <div className="p-4 border-b">
+                                    <h2 className="text-lg font-semibold">Categories</h2>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-4">
+                                    <CategoriesSidebar
+                                        categories={categories}
+                                        selectedCategory={selectedCategory}
+                                        setSelectedCategory={handleCategorySelect}
+                                        restaurantMenuId={menu.id}
+                                    />
+                                </div>
+                            </div>
+                        </SheetContent>
+                    </Sheet>
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 bg-background">
-                <MenuEditor selectedCategory={selectedCategory} />
+            {/* Main Content Area */}
+            <div className="flex flex-1 overflow-hidden">
+                {/* Desktop Sidebar */}
+                <div className="hidden md:flex w-64 border-r bg-white flex-col">
+                    <div className="p-4 border-b">
+                        <h2 className="text-lg font-semibold">Categories</h2>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <CategoriesSidebar
+                            categories={categories}
+                            selectedCategory={selectedCategory}
+                            setSelectedCategory={handleCategorySelect}
+                            restaurantMenuId={menu.id}
+                        />
+                    </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-background">
+                    <MenuEditor selectedCategory={selectedCategory} />
+                </div>
             </div>
         </div>
     );

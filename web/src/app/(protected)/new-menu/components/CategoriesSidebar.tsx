@@ -10,6 +10,7 @@ import {
     closestCenter,
     KeyboardSensor,
     PointerSensor,
+    TouchSensor,
     useSensor,
     useSensors,
     DragEndEvent,
@@ -36,7 +37,17 @@ export const CategoriesSidebar = ({ categories, selectedCategory, setSelectedCat
     const { mutate: reorderCategories } = useReorderCategories();
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8, // Require 8px movement before activating
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 200, // 200ms delay before activating
+                tolerance: 8, // Allow 8px of movement during delay
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
@@ -69,8 +80,6 @@ export const CategoriesSidebar = ({ categories, selectedCategory, setSelectedCat
 
     return (
         <div className="flex flex-col gap-2 h-full">
-            <h2 className="text-lg font-semibold mb-2">Categories</h2>
-
             {localCategories.length > 0 ? (
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={localCategories.map((cat) => cat.id)} strategy={verticalListSortingStrategy}>

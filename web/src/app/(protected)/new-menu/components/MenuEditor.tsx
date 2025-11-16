@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { MenuItem } from "./MenuItem";
-import { NewMenuItemForm } from "./NewMenuItemCard";
+import { MenuItemForm } from "./MenuItemForm";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { MenuCategoryDto, MenuCategoryItemDto, useReorderMenuItems } from "@shared";
@@ -10,6 +10,7 @@ import {
     closestCenter,
     KeyboardSensor,
     PointerSensor,
+    TouchSensor,
     useSensor,
     useSensors,
     DragEndEvent,
@@ -38,13 +39,13 @@ export const MenuEditor = ({ selectedCategory }: { selectedCategory: MenuCategor
     }
 
     return (
-        <div className="space-y-6">
-            <div className="border-b pb-4">
-                <h2 className="text-3xl font-bold">{selectedCategory.name}</h2>
+        <div className="space-y-4 md:space-y-6">
+            <div className="pb-3 md:pb-4">
+                <h2 className="text-2xl md:text-3xl font-bold">{selectedCategory.name}</h2>
                 {selectedCategory.description && (
-                    <p className="text-muted-foreground mt-1">{selectedCategory.description}</p>
+                    <p className="text-sm md:text-base text-muted-foreground mt-1">{selectedCategory.description}</p>
                 )}
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="text-xs md:text-sm text-muted-foreground mt-2">
                     {items.length} {items.length === 1 ? 'item' : 'items'}
                 </p>
             </div>
@@ -63,9 +64,20 @@ export const MenuItemsList = ({
     const [isAddingItem, setIsAddingItem] = useState(false);
     const [localItems, setLocalItems] = useState(items);
     const { mutate: reorderItems } = useReorderMenuItems();
+    const addItemRef = useRef<HTMLDivElement>(null);
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8, // Require 8px movement before activating
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 200, // 200ms delay before activating
+                tolerance: 8, // Allow 8px of movement during delay
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
@@ -75,6 +87,15 @@ export const MenuItemsList = ({
     useEffect(() => {
         setLocalItems(items);
     }, [items]);
+
+    // Scroll to add item form when it opens
+    useEffect(() => {
+        if (isAddingItem && addItemRef.current) {
+            setTimeout(() => {
+                addItemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 100);
+        }
+    }, [isAddingItem]);
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
@@ -124,18 +145,19 @@ export const MenuItemsList = ({
                 )
             )}
 
-            {isAddingItem ? (
-                <NewMenuItemForm
-                    selectedCategory={selectedCategory}
-                    isVisible={isAddingItem}
-                    setIsVisible={setIsAddingItem}
-                />
-            ) : (
-                <Button variant="outline" onClick={() => setIsAddingItem(true)} className="w-full">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Item
-                </Button>
-            )}
+            <div ref={addItemRef}>
+                {isAddingItem ? (
+                    <MenuItemForm
+                        selectedCategory={selectedCategory}
+                        onCancel={() => setIsAddingItem(false)}
+                    />
+                ) : (
+                    <Button variant="outline" onClick={() => setIsAddingItem(true)} className="w-full">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Item
+                    </Button>
+                )}
+            </div>
         </div>
     );
 };

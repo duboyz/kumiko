@@ -21,20 +21,16 @@ export const AllergensSelect = ({ selectedAllergenIds, onAddAllergens, onRemoveA
     const [pendingSelections, setPendingSelections] = useState<string[]>([]);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Get selected allergens from all allergens data
     const selectedAllergens = allergensData?.filter((a) => selectedAllergenIds.includes(a.id)) || [];
 
-    // Check if all allergens are already added
     const allAllergensAdded = allergensData ? selectedAllergenIds.length >= allergensData.length : false;
 
-    // Filter allergens: search filter + not already added (excluding pending)
     const filteredAllergens = allergensData
         ?.filter((allergen) =>
             allergen.name.toLowerCase().includes(allergenSearch.toLowerCase())
         )
         .filter((allergen) => !selectedAllergenIds.includes(allergen.id));
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -100,7 +96,7 @@ export const AllergensSelect = ({ selectedAllergenIds, onAddAllergens, onRemoveA
                             setIsDropdownOpen(true);
                         }}
                         onFocus={() => setIsDropdownOpen(true)}
-                        placeholder="Search allergens to add..."
+                        placeholder="Search allergens to add more"
                     />
 
                     {/* Dropdown */}
