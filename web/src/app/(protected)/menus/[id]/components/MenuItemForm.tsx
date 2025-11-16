@@ -6,6 +6,7 @@ import {
     MenuCategoryDto,
     MenuCategoryItemDto,
     UpdateMenuItemOptionDto,
+    UpdateMenuItemAdditionalOptionDto,
 } from "@shared";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,14 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
             price: opt.price,
             orderIndex: index,
         })) || [],
+        additionalOptions: existingItem?.menuItem?.additionalOptions?.map((opt, index) => ({
+            id: opt.id,
+            name: opt.name,
+            description: opt.description,
+            price: opt.price,
+            orderIndex: index,
+            isAvailable: opt.isAvailable,
+        })) || [],
         allergenIds: existingItem?.menuItem?.allergens?.map((a) => a.id) || [],
     });
 
@@ -84,6 +93,16 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
             orderIndex: index,
         })) || []
     );
+    const [additionalOptions, setAdditionalOptions] = useState<UpdateMenuItemAdditionalOptionDto[]>(
+        existingItem?.menuItem?.additionalOptions?.map((opt, index) => ({
+            id: opt.id,
+            name: opt.name,
+            description: opt.description,
+            price: opt.price,
+            orderIndex: index,
+            isAvailable: opt.isAvailable,
+        })) || []
+    );
     const [allergenIds, setAllergenIds] = useState<string[]>(
         existingItem?.menuItem?.allergens?.map((a) => a.id) || []
     );
@@ -92,6 +111,7 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
         price?: string;
         options?: string;
         optionErrors?: Map<number, { name?: string; price?: string }>;
+        additionalOptionErrors?: Map<number, { name?: string; price?: string }>;
     }>({});
 
     const isPending = isCreating || isAdding || isUpdating;
@@ -108,16 +128,17 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                 price !== initialValues.current.price ||
                 hasOptions !== initialValues.current.hasOptions ||
                 JSON.stringify(options) !== JSON.stringify(initialValues.current.options) ||
+                JSON.stringify(additionalOptions) !== JSON.stringify(initialValues.current.additionalOptions) ||
                 JSON.stringify(sortedCurrentAllergens) !== JSON.stringify(sortedInitialAllergens);
 
             onDirtyChange?.(isDirty);
         } else {
             // For new items, always consider dirty if form has content
-            const hasContent = !!(name.trim() || description.trim() || price > 0 || options.length > 0 || allergenIds.length > 0);
+            const hasContent = !!(name.trim() || description.trim() || price > 0 || options.length > 0 || additionalOptions.length > 0 || allergenIds.length > 0);
             onDirtyChange?.(hasContent);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [name, description, price, hasOptions, options, allergenIds, isEditMode]);
+    }, [name, description, price, hasOptions, options, additionalOptions, allergenIds, isEditMode]);
 
     // Scroll to action buttons when hasOptions becomes true
     useEffect(() => {
@@ -160,6 +181,35 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
     const handleReorderOptions = (reorderedOptions: UpdateMenuItemOptionDto[]) => {
         const updatedOptions = reorderedOptions.map((opt, i) => ({ ...opt, orderIndex: i }));
         setOptions(updatedOptions);
+    };
+
+    // Additional Option handlers
+    const handleAddAdditionalOption = (newOption: Omit<UpdateMenuItemAdditionalOptionDto, 'orderIndex' | 'id'>) => {
+        const newOpt = {
+            ...newOption,
+            orderIndex: additionalOptions.length,
+            id: `temp-${Date.now()}-${Math.random()}`
+        };
+        setAdditionalOptions([...additionalOptions, newOpt]);
+    };
+
+    const handleUpdateAdditionalOption = (index: number, updatedOption: Omit<UpdateMenuItemAdditionalOptionDto, 'orderIndex' | 'id'>) => {
+        const updatedAdditionalOptions = additionalOptions.map((opt, i) =>
+            i === index ? { ...opt, ...updatedOption } : opt
+        );
+        setAdditionalOptions(updatedAdditionalOptions);
+    };
+
+    const handleRemoveAdditionalOption = (index: number) => {
+        const updatedAdditionalOptions = additionalOptions
+            .filter((_, i) => i !== index)
+            .map((opt, i) => ({ ...opt, orderIndex: i }));
+        setAdditionalOptions(updatedAdditionalOptions);
+    };
+
+    const handleReorderAdditionalOptions = (reorderedOptions: UpdateMenuItemAdditionalOptionDto[]) => {
+        const updatedAdditionalOptions = reorderedOptions.map((opt, i) => ({ ...opt, orderIndex: i }));
+        setAdditionalOptions(updatedAdditionalOptions);
     };
 
     // Allergen handlers
@@ -244,6 +294,15 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
             return cleanOpt;
         }) : undefined;
 
+        // Filter out temp IDs from additional options
+        const cleanedAdditionalOptions = additionalOptions.length > 0 ? additionalOptions.map(opt => {
+            const cleanOpt = { ...opt };
+            if (cleanOpt.id?.startsWith('temp-')) {
+                delete cleanOpt.id;
+            }
+            return cleanOpt;
+        }) : undefined;
+
         updateMenuItem(
             {
                 id: existingItem.menuItem?.id || '',
@@ -252,6 +311,7 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                 price: hasOptions ? null : price,
                 hasOptions,
                 options: cleanedOptions,
+                additionalOptions: cleanedAdditionalOptions,
                 isAvailable: existingItem.menuItem?.isAvailable ?? true,
                 allergenIds: allergenIds,
             },
@@ -282,6 +342,15 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                 return cleanOpt;
             }) : undefined;
 
+            // Filter out temp IDs from additional options
+            const cleanedAdditionalOptions = additionalOptions.length > 0 ? additionalOptions.map(opt => {
+                const cleanOpt = { ...opt };
+                if (cleanOpt.id?.startsWith('temp-')) {
+                    delete cleanOpt.id;
+                }
+                return cleanOpt;
+            }) : undefined;
+
             // Create the menu item
             const result = await createMenuItem({
                 name: name.trim(),
@@ -289,6 +358,7 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                 price: hasOptions ? null : price,
                 hasOptions,
                 options: cleanedOptions,
+                additionalOptions: cleanedAdditionalOptions,
                 isAvailable: true,
                 restaurantMenuId: selectedCategory.restaurantMenuId,
                 allergenIds,
@@ -453,6 +523,22 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                         selectedAllergenIds={allergenIds}
                         onAddAllergens={handleAddAllergens}
                         onRemoveAllergen={handleRemoveAllergen}
+                    />
+                </div>
+
+                {/* Additional Options */}
+                <div className="flex flex-col gap-2">
+                    <h4 className="text-sm font-medium">Additional Options (Optional)</h4>
+                    <p className="text-sm text-muted-foreground">
+                        Add extra items that customers can optionally add, like &quot;Extra Cheese&quot; or &quot;Extra Fries&quot;
+                    </p>
+                    <AdditionalOptionsList
+                        additionalOptions={additionalOptions}
+                        onAddAdditionalOption={handleAddAdditionalOption}
+                        onUpdateAdditionalOption={handleUpdateAdditionalOption}
+                        onRemoveAdditionalOption={handleRemoveAdditionalOption}
+                        onReorderAdditionalOptions={handleReorderAdditionalOptions}
+                        additionalOptionErrors={validationErrors.additionalOptionErrors}
                     />
                 </div>
 
@@ -655,6 +741,209 @@ const OptionRow = ({ sortableId, option, index, onOptionChange, onRemove, option
                 onOpenChange={setShowRemoveDialog}
                 title="Remove Option"
                 description={`Are you sure you want to remove the option "${option.name || 'this option'}"?`}
+                confirmText="Remove"
+                cancelText="Cancel"
+                onConfirm={() => {
+                    onRemove();
+                    setShowRemoveDialog(false);
+                }}
+                variant="destructive"
+            />
+        </div>
+    );
+};
+
+interface AdditionalOptionsListProps {
+    additionalOptions: UpdateMenuItemAdditionalOptionDto[];
+    onAddAdditionalOption: (option: Omit<UpdateMenuItemAdditionalOptionDto, 'orderIndex' | 'id'>) => void;
+    onUpdateAdditionalOption: (index: number, option: Omit<UpdateMenuItemAdditionalOptionDto, 'orderIndex' | 'id'>) => void;
+    onRemoveAdditionalOption: (index: number) => void;
+    onReorderAdditionalOptions: (reorderedOptions: UpdateMenuItemAdditionalOptionDto[]) => void;
+    additionalOptionErrors?: Map<number, { name?: string; price?: string }>;
+}
+
+const AdditionalOptionsList = ({
+    additionalOptions,
+    onAddAdditionalOption,
+    onUpdateAdditionalOption,
+    onRemoveAdditionalOption,
+    onReorderAdditionalOptions,
+    additionalOptionErrors
+}: AdditionalOptionsListProps) => {
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 200,
+                tolerance: 8,
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleAddAdditionalOption = () => {
+        onAddAdditionalOption({
+            name: '',
+            description: '',
+            price: 0,
+            isAvailable: true,
+        });
+    };
+
+    const handleAdditionalOptionChange = (index: number, field: 'name' | 'description' | 'price' | 'isAvailable', value: string | boolean) => {
+        const option = additionalOptions[index];
+        onUpdateAdditionalOption(index, {
+            ...option,
+            [field]: field === 'price' ? parseFloat(value as string) || 0 : value,
+        });
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            const oldIndex = additionalOptions.findIndex((opt) => (opt.id || `idx-${opt.orderIndex}`) === active.id);
+            const newIndex = additionalOptions.findIndex((opt) => (opt.id || `idx-${opt.orderIndex}`) === over.id);
+
+            const reordered = arrayMove(additionalOptions, oldIndex, newIndex);
+            onReorderAdditionalOptions(reordered);
+        }
+    };
+
+    return (
+        <div className="flex flex-col gap-3">
+            {additionalOptions.length > 0 && (
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext
+                        items={additionalOptions.map((opt) => opt.id || `idx-${opt.orderIndex}`)}
+                        strategy={verticalListSortingStrategy}
+                    >
+                        {additionalOptions.map((option, index) => (
+                            <AdditionalOptionRow
+                                key={option.id || `idx-${option.orderIndex}`}
+                                sortableId={option.id || `idx-${option.orderIndex}`}
+                                option={option}
+                                index={index}
+                                onOptionChange={handleAdditionalOptionChange}
+                                onRemove={() => onRemoveAdditionalOption(index)}
+                                optionError={additionalOptionErrors?.get(index)}
+                            />
+                        ))}
+                    </SortableContext>
+                </DndContext>
+            )}
+
+            <Button className="w-full" variant="outline" onClick={handleAddAdditionalOption}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Additional Option
+            </Button>
+        </div>
+    );
+};
+
+interface AdditionalOptionRowProps {
+    sortableId: string;
+    option: UpdateMenuItemAdditionalOptionDto;
+    index: number;
+    onOptionChange: (index: number, field: 'name' | 'description' | 'price' | 'isAvailable', value: string | boolean) => void;
+    onRemove: () => void;
+    optionError?: { name?: string; price?: string };
+}
+
+const AdditionalOptionRow = ({ sortableId, option, index, onOptionChange, onRemove, optionError }: AdditionalOptionRowProps) => {
+    const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: sortableId });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} className="p-4 border rounded-lg bg-gray-100">
+            <div className="flex flex-col md:flex-row gap-3 items-start">
+                <div
+                    {...attributes}
+                    {...listeners}
+                    className="cursor-grab active:cursor-grabbing touch-none pt-1"
+                >
+                    <GripVertical className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
+                </div>
+
+                <div className="flex-1 flex flex-col md:flex-row gap-3">
+                    <div className="flex-1">
+                        <LabeledInput
+                            id={`additional-option-name-${index}`}
+                            label="Option Name"
+                            value={option.name}
+                            onChange={(value) => onOptionChange(index, 'name', value)}
+                            placeholder="Extra Cheese"
+                            error={optionError?.name}
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <LabeledInput
+                            id={`additional-option-desc-${index}`}
+                            label="Description (optional)"
+                            value={option.description}
+                            onChange={(value) => onOptionChange(index, 'description', value)}
+                            placeholder="Add extra cheese"
+                        />
+                    </div>
+                    <div className="w-full md:w-32">
+                        <LabeledInput
+                            id={`additional-option-price-${index}`}
+                            label="Price"
+                            value={option.price.toString()}
+                            type="number"
+                            onChange={(value) => onOptionChange(index, 'price', value)}
+                            placeholder="0.00"
+                            error={optionError?.price}
+                        />
+                    </div>
+                    <div className="flex items-end pb-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={option.isAvailable}
+                                onChange={(e) => onOptionChange(index, 'isAvailable', e.target.checked)}
+                                className="h-4 w-4"
+                            />
+                            <span className="text-sm">Available</span>
+                        </label>
+                    </div>
+                </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowRemoveDialog(true)}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 mt-6"
+                    title="Remove additional option"
+                >
+                    <Trash className="w-4 h-4" />
+                </Button>
+            </div>
+
+            <ConfirmDialog
+                open={showRemoveDialog}
+                onOpenChange={setShowRemoveDialog}
+                title="Remove Additional Option"
+                description={`Are you sure you want to remove "${option.name || 'this option'}"?`}
                 confirmText="Remove"
                 cancelText="Cancel"
                 onConfirm={() => {

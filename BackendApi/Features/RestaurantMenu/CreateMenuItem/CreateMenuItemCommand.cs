@@ -8,6 +8,7 @@ public record CreateMenuItemCommand(
     decimal? Price,
     bool HasOptions,
     List<CreateMenuItemOptionDto>? Options,
+    List<CreateMenuItemAdditionalOptionDto>? AdditionalOptions,
     bool IsAvailable,
     Guid RestaurantMenuId,
     List<Guid>? AllergenIds
@@ -18,6 +19,14 @@ public record CreateMenuItemOptionDto(
     string Description,
     decimal Price,
     int OrderIndex
+);
+
+public record CreateMenuItemAdditionalOptionDto(
+    string Name,
+    string Description,
+    decimal Price,
+    int OrderIndex,
+    bool IsAvailable
 );
 
 public record CreateMenuItemResult(

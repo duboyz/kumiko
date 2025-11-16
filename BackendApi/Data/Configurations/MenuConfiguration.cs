@@ -79,6 +79,20 @@ public static class MenuConfiguration
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
+        // MenuItemAdditionalOption entity configuration
+        modelBuilder.Entity<MenuItemAdditionalOption>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Price).HasPrecision(10, 2);
+
+            entity.HasOne(e => e.MenuItem)
+                .WithMany(i => i.AdditionalOptions)
+                .HasForeignKey(e => e.MenuItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
         // Allergen entity configuration
         modelBuilder.Entity<Allergen>(entity =>
         {

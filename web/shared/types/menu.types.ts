@@ -32,6 +32,7 @@ export interface MenuItemDto {
   restaurantMenuId: string
   menuCategoryItems: MenuCategoryItemDto[]
   options: MenuItemOptionDto[]
+  additionalOptions: MenuItemAdditionalOptionDto[]
   allergens: AllergenDto[]
   createdAt: string
   updatedAt: string
@@ -54,6 +55,16 @@ export interface MenuItemOptionDto {
   description: string
   price: number
   orderIndex: number
+  menuItemId: string
+}
+
+export interface MenuItemAdditionalOptionDto {
+  id: string
+  name: string
+  description: string
+  price: number
+  orderIndex: number
+  isAvailable: boolean
   menuItemId: string
 }
 
@@ -84,6 +95,7 @@ export interface CreateMenuItemCommand {
   price: number | null
   hasOptions: boolean
   options?: CreateMenuItemOptionDto[]
+  additionalOptions?: CreateMenuItemAdditionalOptionDto[]
   isAvailable: boolean
   restaurantMenuId: string
   allergenIds?: string[]
@@ -94,6 +106,14 @@ export interface CreateMenuItemOptionDto {
   description: string
   price: number
   orderIndex: number
+}
+
+export interface CreateMenuItemAdditionalOptionDto {
+  name: string
+  description: string
+  price: number
+  orderIndex: number
+  isAvailable: boolean
 }
 
 export interface AddMenuItemToCategoryCommand {
@@ -139,6 +159,7 @@ export interface UpdateMenuItemCommand {
   price: number | null
   hasOptions: boolean
   options?: UpdateMenuItemOptionDto[]
+  additionalOptions?: UpdateMenuItemAdditionalOptionDto[]
   isAvailable: boolean
   allergenIds?: string[]
 }
@@ -149,6 +170,15 @@ export interface UpdateMenuItemOptionDto {
   description: string
   price: number
   orderIndex: number
+}
+
+export interface UpdateMenuItemAdditionalOptionDto {
+  id?: string
+  name: string
+  description: string
+  price: number
+  orderIndex: number
+  isAvailable: boolean
 }
 
 export interface UpdateMenuCategoryItemCommand {
@@ -196,6 +226,7 @@ export interface PublicMenuItemDto {
   price: number | null
   hasOptions: boolean
   options: PublicMenuItemOptionDto[]
+  additionalOptions: PublicMenuItemAdditionalOptionDto[]
   allergens: AllergenDto[]
   isAvailable: boolean
 }
@@ -206,6 +237,15 @@ export interface PublicMenuItemOptionDto {
   description?: string
   price: number
   orderIndex: number
+}
+
+export interface PublicMenuItemAdditionalOptionDto {
+  id: string
+  name: string
+  description?: string
+  price: number
+  orderIndex: number
+  isAvailable: boolean
 }
 
 export interface SimpleGenerateMenuFromImageResult {

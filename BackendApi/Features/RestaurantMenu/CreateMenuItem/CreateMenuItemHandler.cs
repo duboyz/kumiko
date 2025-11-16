@@ -71,6 +71,27 @@ public class CreateMenuItemHandler(ApplicationDbContext context) : ICommandHandl
             }
         }
 
+        // Add additional options if provided
+        if (request.AdditionalOptions != null)
+        {
+            foreach (var additionalOptionDto in request.AdditionalOptions)
+            {
+                var additionalOption = new MenuItemAdditionalOption
+                {
+                    Id = Guid.NewGuid(),
+                    Name = additionalOptionDto.Name,
+                    Description = additionalOptionDto.Description,
+                    Price = additionalOptionDto.Price,
+                    OrderIndex = additionalOptionDto.OrderIndex,
+                    IsAvailable = additionalOptionDto.IsAvailable,
+                    MenuItemId = menuItem.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                menuItem.AdditionalOptions.Add(additionalOption);
+            }
+        }
+
         context.MenuItems.Add(menuItem);
 
         // Add allergens if provided

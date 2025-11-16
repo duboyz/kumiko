@@ -25,6 +25,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<MenuItem> MenuItems { get; set; }
     public DbSet<MenuCategoryItem> MenuCategoryItems { get; set; }
     public DbSet<MenuItemOption> MenuItemOptions { get; set; }
+    public DbSet<MenuItemAdditionalOption> MenuItemAdditionalOptions { get; set; }
     public DbSet<Allergen> Allergens { get; set; }
     public DbSet<MenuItemAllergen> MenuItemAllergens { get; set; }
 

@@ -17,6 +17,10 @@ public class GetMenuByIdHandler(ApplicationDbContext context) : IQueryHandler<Ge
             .Include(m => m.Categories)
                 .ThenInclude(c => c.MenuCategoryItems)
                     .ThenInclude(mci => mci.MenuItem)
+                        .ThenInclude(mi => mi!.AdditionalOptions.OrderBy(ao => ao.OrderIndex))
+            .Include(m => m.Categories)
+                .ThenInclude(c => c.MenuCategoryItems)
+                    .ThenInclude(mci => mci.MenuItem)
                         .ThenInclude(mi => mi!.Allergens)
                             .ThenInclude(ma => ma.Allergen)
             .FirstOrDefaultAsync(m => m.Id == request.MenuId, cancellationToken);
@@ -50,6 +54,14 @@ public class GetMenuByIdHandler(ApplicationDbContext context) : IQueryHandler<Ge
                                 o.Description,
                                 o.Price,
                                 o.OrderIndex
+                            )),
+                            categoryItem.MenuItem.AdditionalOptions.Select(ao => new MenuByIdItemAdditionalOptionDto(
+                                ao.Id,
+                                ao.Name,
+                                ao.Description,
+                                ao.Price,
+                                ao.OrderIndex,
+                                ao.IsAvailable
                             )),
                             categoryItem.MenuItem.Allergens.Select(ma => new MenuByIdAllergenDto(
                                 ma.Allergen.Id,

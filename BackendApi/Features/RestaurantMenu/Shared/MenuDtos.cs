@@ -9,6 +9,7 @@ public record MenuItemDto(
     bool IsAvailable,
     Guid RestaurantMenuId,
     List<MenuItemOptionDto> Options,
+    List<MenuItemAdditionalOptionDto> AdditionalOptions,
     List<MenuItemAllergenDto> Allergens,
     DateTime CreatedAt,
     DateTime UpdatedAt
@@ -20,6 +21,16 @@ public record MenuItemOptionDto(
     string Description,
     decimal Price,
     int OrderIndex,
+    Guid MenuItemId
+);
+
+public record MenuItemAdditionalOptionDto(
+    Guid Id,
+    string Name,
+    string Description,
+    decimal Price,
+    int OrderIndex,
+    bool IsAvailable,
     Guid MenuItemId
 );
 

@@ -27,6 +27,10 @@ public class GetRestaurantMenusHandler(ApplicationDbContext context) : IQueryHan
             .Include(m => m.Categories)
             .ThenInclude(c => c.MenuCategoryItems)
             .ThenInclude(ci => ci.MenuItem)
+            .ThenInclude(mi => mi!.AdditionalOptions.OrderBy(ao => ao.OrderIndex))
+            .Include(m => m.Categories)
+            .ThenInclude(c => c.MenuCategoryItems)
+            .ThenInclude(ci => ci.MenuItem)
             .ThenInclude(mi => mi!.Allergens)
             .ThenInclude(ma => ma.Allergen)
             .ToListAsync(cancellationToken);
@@ -62,6 +66,15 @@ public class GetRestaurantMenusHandler(ApplicationDbContext context) : IQueryHan
                             o.Price,
                             o.OrderIndex,
                             o.MenuItemId
+                        )).ToList(),
+                        categoryItem.MenuItem.AdditionalOptions.Select(ao => new MenuItemAdditionalOptionDto(
+                            ao.Id,
+                            ao.Name,
+                            ao.Description,
+                            ao.Price,
+                            ao.OrderIndex,
+                            ao.IsAvailable,
+                            ao.MenuItemId
                         )).ToList(),
                         categoryItem.MenuItem.Allergens.Select(ma => new MenuItemAllergenDto(
                             ma.Allergen.Id,

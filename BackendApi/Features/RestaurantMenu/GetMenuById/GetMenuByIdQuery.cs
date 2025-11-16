@@ -37,6 +37,7 @@ public record MenuByIdItemDto(
     decimal? Price,
     bool HasOptions,
     IEnumerable<MenuByIdItemOptionDto> Options,
+    IEnumerable<MenuByIdItemAdditionalOptionDto> AdditionalOptions,
     IEnumerable<MenuByIdAllergenDto> Allergens,
     bool IsAvailable
 );
@@ -53,4 +54,13 @@ public record MenuByIdItemOptionDto(
     string? Description,
     decimal Price,
     int OrderIndex
+);
+
+public record MenuByIdItemAdditionalOptionDto(
+    Guid Id,
+    string Name,
+    string? Description,
+    decimal Price,
+    int OrderIndex,
+    bool IsAvailable
 );

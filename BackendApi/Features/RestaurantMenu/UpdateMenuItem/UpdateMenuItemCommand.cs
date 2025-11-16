@@ -9,6 +9,7 @@ public record UpdateMenuItemCommand(
     decimal? Price,
     bool HasOptions,
     List<UpdateMenuItemOptionDto>? Options,
+    List<UpdateMenuItemAdditionalOptionDto>? AdditionalOptions,
     bool IsAvailable,
     List<Guid>? AllergenIds
 ) : ICommand<UpdateMenuItemResult>;
@@ -19,6 +20,15 @@ public record UpdateMenuItemOptionDto(
     string Description,
     decimal Price,
     int OrderIndex
+);
+
+public record UpdateMenuItemAdditionalOptionDto(
+    Guid? Id,
+    string Name,
+    string Description,
+    decimal Price,
+    int OrderIndex,
+    bool IsAvailable
 );
 
 public record UpdateMenuItemResult(

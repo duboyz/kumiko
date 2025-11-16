@@ -13,6 +13,7 @@ public class MenuItem : BaseEntity
 
     public ICollection<MenuCategoryItem> MenuCategoryItems { get; set; } = [];
     public ICollection<MenuItemOption> Options { get; set; } = [];
+    public ICollection<MenuItemAdditionalOption> AdditionalOptions { get; set; } = [];
     public ICollection<MenuItemAllergen> Allergens { get; set; } = [];
 }
 

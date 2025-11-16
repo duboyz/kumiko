@@ -11,6 +11,7 @@ public class UpdateMenuItemHandler(ApplicationDbContext context) : ICommandHandl
     {
         var menuItem = await context.MenuItems
             .Include(i => i.Options)
+            .Include(i => i.AdditionalOptions)
             .Include(i => i.Allergens)
             .FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
 
@@ -78,6 +79,34 @@ public class UpdateMenuItemHandler(ApplicationDbContext context) : ICommandHandl
             if (menuItem.Options.Any())
             {
                 context.MenuItemOptions.RemoveRange(menuItem.Options.ToList());
+            }
+        }
+
+        // Handle additional options update - clear and rebuild
+        if (request.AdditionalOptions != null)
+        {
+            // Remove all existing additional options
+            if (menuItem.AdditionalOptions.Any())
+            {
+                context.MenuItemAdditionalOptions.RemoveRange(menuItem.AdditionalOptions.ToList());
+                await context.SaveChangesAsync(cancellationToken);
+            }
+
+            // Add all additional options from request
+            foreach (var additionalOptionDto in request.AdditionalOptions)
+            {
+                var newAdditionalOption = new MenuItemAdditionalOption
+                {
+                    Name = additionalOptionDto.Name,
+                    Description = additionalOptionDto.Description,
+                    Price = additionalOptionDto.Price,
+                    OrderIndex = additionalOptionDto.OrderIndex,
+                    IsAvailable = additionalOptionDto.IsAvailable,
+                    MenuItemId = menuItem.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                context.MenuItemAdditionalOptions.Add(newAdditionalOption);
             }
         }
 
