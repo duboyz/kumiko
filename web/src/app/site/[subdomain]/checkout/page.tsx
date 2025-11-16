@@ -13,7 +13,7 @@ import {
   getMinDate,
   getMinTime,
   getMaxTime,
-  isTimeAvailable,
+  isDateAvailable,
 } from '@shared'
 import { toast } from 'sonner'
 import { ArrowLeft } from 'lucide-react'
@@ -55,23 +55,99 @@ export default function CheckoutPage() {
   }, [businessHours])
 
   // Calculate min/max time for selected date
+  // Only set minTime for today to prevent past times, no maxTime constraint
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     return customerInfo.pickupDate || minDate || new Date().toISOString().split('T')[0]
   })
 
   const { minTime, maxTime } = useMemo(() => {
+    // Always use business hours constraints for the selected date
     if (!selectedDate || !businessHours) {
+      console.log('[Checkout] No selectedDate or businessHours', { selectedDate, businessHours })
       return { minTime: undefined, maxTime: undefined }
     }
 
-    const date = new Date(selectedDate)
+    // Parse date in local timezone to avoid timezone issues
+    const [year, month, day] = selectedDate.split('-').map(Number)
+    const date = new Date(year, month - 1, day)
+    const dayName = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][date.getDay()]
+
+    console.log('[Checkout] Calculating time constraints', {
+      selectedDate,
+      dayName,
+      businessHoursForDay: businessHours[dayName],
+      allBusinessHours: businessHours,
+    })
+
+    // Check if restaurant is open on this date
+    if (!isDateAvailable(date, businessHours)) {
+      console.log('[Checkout] Restaurant closed on selected date')
+      // If closed, no time constraints (date validation will catch this)
+      return { minTime: undefined, maxTime: undefined }
+    }
+
+    // Get min and max times based on business hours
     const min = getMinTime(date, businessHours)
     const max = getMaxTime(date, businessHours)
+
+    console.log('[Checkout] Calculated times', { min, max })
+
+    // If either is undefined, return undefined for both (shouldn't happen if isDateAvailable passed)
+    if (!min || !max) {
+      console.log('[Checkout] Min or max is undefined, returning undefined')
+      return { minTime: undefined, maxTime: undefined }
+    }
 
     return { minTime: min, maxTime: max }
   }, [selectedDate, businessHours])
 
   const handleDateChange = (date: string) => {
+    if (!date) return
+
+    // Parse date in local timezone
+    const [year, month, day] = date.split('-').map(Number)
+    const selectedDateObj = new Date(year, month - 1, day)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    selectedDateObj.setHours(0, 0, 0, 0)
+
+    // Validate that the date is not in the past
+    if (selectedDateObj < today) {
+      const errorMessage = t('dateInPast') || 'Cannot select a date in the past. Please select today or a future date.'
+      toast.error(errorMessage)
+      setValidationErrors(prev => ({
+        ...prev,
+        pickupDate: errorMessage,
+      }))
+      // Reset to today or next available date
+      const validDate = getMinDate(businessHours)
+      setSelectedDate(validDate)
+      setCustomerInfo('pickupDate', validDate)
+      return
+    }
+
+    // Validate that the selected date is available (restaurant is open)
+    if (businessHours && !isDateAvailable(selectedDateObj, businessHours)) {
+      const errorMessage = t('restaurantClosedOnDate')
+      toast.error(errorMessage)
+      // Set validation error
+      setValidationErrors(prev => ({
+        ...prev,
+        pickupDate: errorMessage,
+      }))
+      // Reset to a valid date
+      const validDate = getMinDate(businessHours)
+      setSelectedDate(validDate)
+      setCustomerInfo('pickupDate', validDate)
+      return
+    }
+
+    // Clear error if date is valid
+    setValidationErrors(prev => {
+      const newErrors = { ...prev }
+      delete newErrors.pickupDate
+      return newErrors
+    })
     setSelectedDate(date)
     setCustomerInfo('pickupDate', date)
   }
@@ -117,16 +193,33 @@ export default function CheckoutPage() {
     }
     if (!customerInfo.pickupDate) {
       errors.pickupDate = t('selectPickupDate')
+    } else if (businessHours) {
+      // Validate that the selected date is available (restaurant is open)
+      const pickupDateObj = new Date(customerInfo.pickupDate)
+      if (!isDateAvailable(pickupDateObj, businessHours)) {
+        errors.pickupDate = t('restaurantClosedOnDate')
+      }
     }
     if (!customerInfo.pickupTime) {
       errors.pickupTime = t('selectPickupTime') || 'Please select a pickup time'
     }
 
-    // Validate pickup time against business hours
-    if (businessHours && customerInfo.pickupDate && customerInfo.pickupTime) {
-      const pickupDate = new Date(customerInfo.pickupDate)
-      if (!isTimeAvailable(pickupDate, customerInfo.pickupTime, businessHours)) {
-        errors.pickupTime = t('pickupTimeOutsideHours') || 'Selected pickup time is outside business hours'
+    // Validate time is within business hours for the selected date
+    if (customerInfo.pickupDate && customerInfo.pickupTime && businessHours) {
+      const [year, month, day] = customerInfo.pickupDate.split('-').map(Number)
+      const pickupDate = new Date(year, month - 1, day)
+
+      // Check if restaurant is open on this date
+      if (isDateAvailable(pickupDate, businessHours)) {
+        const min = getMinTime(pickupDate, businessHours)
+        const max = getMaxTime(pickupDate, businessHours)
+
+        if (min && customerInfo.pickupTime < min) {
+          errors.pickupTime = t('pickupTimeInPast') || 'Pickup time cannot be in the past. Please select a later time.'
+        } else if (max && customerInfo.pickupTime > max) {
+          errors.pickupTime =
+            t('pickupTimeAfterClosing') || 'Pickup time is after closing time. Please select an earlier time.'
+        }
       }
     }
 

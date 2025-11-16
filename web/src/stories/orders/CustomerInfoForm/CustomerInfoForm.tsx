@@ -47,13 +47,16 @@ export function CustomerInfoForm({
     const minTimeChanged = prevMinTimeRef.current !== minTime
     const maxTimeChanged = prevMaxTimeRef.current !== maxTime
 
-    if ((dateChanged || minTimeChanged || maxTimeChanged) && customerInfo.pickupDate && customerInfo.pickupTime) {
+    // Only validate if we have constraints and a time value
+    // Don't validate if constraints are undefined (allows free time selection)
+    if ((dateChanged || minTimeChanged || maxTimeChanged) && customerInfo.pickupDate && customerInfo.pickupTime && minTime && maxTime) {
       // Only update if time is actually outside bounds AND different from what we'd set
-      if (minTime && customerInfo.pickupTime < minTime && customerInfo.pickupTime !== minTime) {
+      if (customerInfo.pickupTime < minTime) {
         onCustomerInfoChange('pickupTime', minTime)
-      } else if (maxTime && customerInfo.pickupTime > maxTime && customerInfo.pickupTime !== maxTime) {
+      } else if (customerInfo.pickupTime > maxTime) {
         onCustomerInfoChange('pickupTime', maxTime)
       }
+      // If time is within bounds, don't change it - let user keep their selection
     }
 
     // Update refs

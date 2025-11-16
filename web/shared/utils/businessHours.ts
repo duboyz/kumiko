@@ -70,19 +70,29 @@ export function getMinDate(businessHours: BusinessHours | null): string {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
+  // Format today in local timezone (YYYY-MM-DD)
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  const todayStr = `${year}-${month}-${day}`
+
   // Check if today is available
   if (isDateAvailable(today, businessHours)) {
-    return today.toISOString().split('T')[0]
+    return todayStr
   }
 
   // Find next available date
   const availableDates = getAvailableDates(businessHours, 30)
   if (availableDates.length > 0) {
-    return availableDates[0].toISOString().split('T')[0]
+    const nextDate = availableDates[0]
+    const nextYear = nextDate.getFullYear()
+    const nextMonth = String(nextDate.getMonth() + 1).padStart(2, '0')
+    const nextDay = String(nextDate.getDate()).padStart(2, '0')
+    return `${nextYear}-${nextMonth}-${nextDay}`
   }
 
   // Fallback to today
-  return today.toISOString().split('T')[0]
+  return todayStr
 }
 
 /**
@@ -115,13 +125,13 @@ export function isTimeAvailable(
 /**
  * Get minimum time for a given date (restaurant opening time, or current time if later)
  */
-export function getMinTime(date: Date, businessHours: BusinessHours | null): string {
-  if (!businessHours) return '00:00'
+export function getMinTime(date: Date, businessHours: BusinessHours | null): string | undefined {
+  if (!businessHours) return undefined
 
   const dayName = getDayName(date)
   const dayHours = businessHours[dayName]
 
-  if (!dayHours) return '00:00' // Closed, but return default
+  if (!dayHours) return undefined // Closed
 
   const today = new Date()
   const isToday = date.toDateString() === today.toDateString()
@@ -150,13 +160,13 @@ export function getMinTime(date: Date, businessHours: BusinessHours | null): str
 /**
  * Get maximum time for a given date (restaurant closing time)
  */
-export function getMaxTime(date: Date, businessHours: BusinessHours | null): string {
-  if (!businessHours) return '23:59'
+export function getMaxTime(date: Date, businessHours: BusinessHours | null): string | undefined {
+  if (!businessHours) return undefined
 
   const dayName = getDayName(date)
   const dayHours = businessHours[dayName]
 
-  if (!dayHours) return '23:59' // Closed, but return default
+  if (!dayHours) return undefined // Closed
 
   return dayHours.close
 }
