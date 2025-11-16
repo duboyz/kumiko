@@ -12,9 +12,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AllergensSelect } from "./AllergensSelect";
 import { useQueryClient } from "@tanstack/react-query";
-import { Trash, Plus } from "lucide-react";
+import { Trash, Plus, GripVertical } from "lucide-react";
 import { LabeledInput } from "@/stories/forms/LabeledInput";
 import { ItemTypeSwitch } from "@/stories/forms/ItemTypeSwitch";
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    TouchSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface MenuItemFormProps {
     selectedCategory: MenuCategoryDto | null;
@@ -129,6 +147,11 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
         const updatedOptions = options
             .filter((_, i) => i !== index)
             .map((opt, i) => ({ ...opt, orderIndex: i }));
+        setOptions(updatedOptions);
+    };
+
+    const handleReorderOptions = (reorderedOptions: UpdateMenuItemOptionDto[]) => {
+        const updatedOptions = reorderedOptions.map((opt, i) => ({ ...opt, orderIndex: i }));
         setOptions(updatedOptions);
     };
 
@@ -385,6 +408,7 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
                                 }
                             }}
                             onRemoveOption={handleRemoveOption}
+                            onReorderOptions={handleReorderOptions}
                             optionErrors={validationErrors.optionErrors}
                         />
                     </div>
@@ -415,10 +439,35 @@ interface OptionsListProps {
     onAddOption: (option: Omit<UpdateMenuItemOptionDto, 'orderIndex' | 'id'>) => void;
     onUpdateOption: (index: number, option: Omit<UpdateMenuItemOptionDto, 'orderIndex' | 'id'>) => void;
     onRemoveOption: (index: number) => void;
+    onReorderOptions: (reorderedOptions: UpdateMenuItemOptionDto[]) => void;
     optionErrors?: Map<number, { name?: string; price?: string }>;
 }
 
-const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption, optionErrors }: OptionsListProps) => {
+const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption, onReorderOptions, optionErrors }: OptionsListProps) => {
+    const [localOptions, setLocalOptions] = useState(options);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 200,
+                tolerance: 8,
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    // Update local options when props change
+    useEffect(() => {
+        setLocalOptions(options);
+    }, [options]);
+
     const handleAddOption = () => {
         onAddOption({
             name: '',
@@ -428,68 +477,132 @@ const OptionsList = ({ options, onAddOption, onUpdateOption, onRemoveOption, opt
     };
 
     const handleOptionChange = (index: number, field: 'name' | 'description' | 'price', value: string) => {
-        const option = options[index];
+        const option = localOptions[index];
         onUpdateOption(index, {
             ...option,
             [field]: field === 'price' ? parseFloat(value) || 0 : value,
         });
     };
 
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            const oldIndex = localOptions.findIndex((_, i) => i.toString() === active.id);
+            const newIndex = localOptions.findIndex((_, i) => i.toString() === over.id);
+
+            const reordered = arrayMove(localOptions, oldIndex, newIndex);
+            setLocalOptions(reordered);
+
+            // Pass the reordered array to parent
+            onReorderOptions(reordered);
+        }
+    };
+
     return (
         <div className="flex flex-col gap-3">
-            {/* Options List */}
-            {options.map((option, index) => (
-                <div key={option.id || index} className="p-4 border rounded-lg bg-gray-100">
-                    <div className="flex flex-col md:flex-row gap-3 items-start">
-                        <div className="flex-1 flex flex-col md:flex-row gap-3">
-                            <div className="flex-1">
-                                <LabeledInput
-                                    id={`option-name-${index}`}
-                                    label="Option Name"
-                                    value={option.name}
-                                    onChange={(value) => handleOptionChange(index, 'name', value)}
-                                    placeholder="Add Bacon"
-                                    error={optionErrors?.get(index)?.name}
-                                />
-                            </div>
-                            <div className="flex-1">
-                                <LabeledInput
-                                    id={`option-desc-${index}`}
-                                    label="Description (optional)"
-                                    value={option.description}
-                                    onChange={(value) => handleOptionChange(index, 'description', value)}
-                                    placeholder="Two strips of crispy bacon"
-                                />
-                            </div>
-                            <div className="w-full md:w-32">
-                                <LabeledInput
-                                    id={`option-price-${index}`}
-                                    label="Price"
-                                    value={option.price.toString()}
-                                    type="number"
-                                    onChange={(value) => handleOptionChange(index, 'price', value)}
-                                    placeholder="0.00"
-                                    error={optionErrors?.get(index)?.price}
-                                />
-                            </div>
-                        </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => onRemoveOption(index)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10 mt-6"
-                        >
-                            <Trash className="w-4 h-4" />
-                        </Button>
-                    </div>
-                </div>
-            ))}
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={localOptions.map((_, i) => i.toString())} strategy={verticalListSortingStrategy}>
+                    {/* Options List */}
+                    {localOptions.map((option, index) => (
+                        <OptionRow
+                            key={option.id || index}
+                            option={option}
+                            index={index}
+                            onOptionChange={handleOptionChange}
+                            onRemove={() => onRemoveOption(index)}
+                            optionError={optionErrors?.get(index)}
+                        />
+                    ))}
+                </SortableContext>
+            </DndContext>
 
             {/* Add Option Button */}
             <Button className="w-full" variant="outline" onClick={handleAddOption}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Option
             </Button>
+        </div>
+    );
+};
+
+interface OptionRowProps {
+    option: UpdateMenuItemOptionDto;
+    index: number;
+    onOptionChange: (index: number, field: 'name' | 'description' | 'price', value: string) => void;
+    onRemove: () => void;
+    optionError?: { name?: string; price?: string };
+}
+
+const OptionRow = ({ option, index, onOptionChange, onRemove, optionError }: OptionRowProps) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: index.toString() });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} className="p-4 border rounded-lg bg-gray-100">
+            <div className="flex flex-col md:flex-row gap-3 items-start">
+                {/* Drag handle */}
+                <div
+                    {...attributes}
+                    {...listeners}
+                    className="cursor-grab active:cursor-grabbing touch-none pt-1"
+                >
+                    <GripVertical className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
+                </div>
+
+                <div className="flex-1 flex flex-col md:flex-row gap-3">
+                    <div className="flex-1">
+                        <LabeledInput
+                            id={`option-name-${index}`}
+                            label="Option Name"
+                            value={option.name}
+                            onChange={(value) => onOptionChange(index, 'name', value)}
+                            placeholder="Add Bacon"
+                            error={optionError?.name}
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <LabeledInput
+                            id={`option-desc-${index}`}
+                            label="Description (optional)"
+                            value={option.description}
+                            onChange={(value) => onOptionChange(index, 'description', value)}
+                            placeholder="Two strips of crispy bacon"
+                        />
+                    </div>
+                    <div className="w-full md:w-32">
+                        <LabeledInput
+                            id={`option-price-${index}`}
+                            label="Price"
+                            value={option.price.toString()}
+                            type="number"
+                            onChange={(value) => onOptionChange(index, 'price', value)}
+                            placeholder="0.00"
+                            error={optionError?.price}
+                        />
+                    </div>
+                </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onRemove}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 mt-6"
+                >
+                    <Trash className="w-4 h-4" />
+                </Button>
+            </div>
         </div>
     );
 };
