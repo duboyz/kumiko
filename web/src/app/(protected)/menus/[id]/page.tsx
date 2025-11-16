@@ -1,185 +1,206 @@
-'use client'
+'use client';
+import { useEffect, useState, useRef } from "react";
+import { MenuCategoryDto, useLocationSelection, useRestaurantMenus } from "@shared";
+import { MenuEditor } from "./components/MenuEditor";
+import { CategoriesSidebar } from "./components/CategoriesSidebar";
+import { useParams, useRouter } from "next/navigation";
+import { Loader2, Menu, ArrowLeft, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/stories/dialogs/ConfirmDialog";
 
-import { useParams } from 'next/navigation'
-import { useRestaurantMenus, useLocationSelection, useCreateMenuCategory, useReorderCategories } from '@shared'
-import { LoadingSpinner, EmptyState } from '@/components'
-import { ContentLoadingError } from '@/stories/shared/ContentLoadingError/ContentLoadingError'
-import { ContentNotFound } from '@/stories/shared/ContentNotFound/ContentNotFound'
-import { ContentContainer } from '@/components'
-import { Button } from '@/components/ui/button'
-import { Plus, LayoutList } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { toast } from 'sonner'
-import { useTranslations } from 'next-intl'
-import { AddCategoryForm, SortableCategory } from './components'
+export default function NewMenuPage() {
+    const router = useRouter();
+    const menuId = useParams().id as string;
+    const { selectedLocation } = useLocationSelection();
+    const { data: menuData, isLoading, error } = useRestaurantMenus(selectedLocation?.id || '');
 
-export default function MenuEditPage() {
-  const t = useTranslations('menus')
-  const params = useParams()
-  const { selectedLocation } = useLocationSelection()
+    const menu = menuData?.menus.find((menu) => menu.id === menuId);
+    const categories = menu?.categories || [];
 
-  const menuId = params.id as string
-  const restaurantId = selectedLocation?.type === 'Restaurant' ? selectedLocation.id : null
+    const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(categories[0]?.id ?? null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [showSavedIndicator, setShowSavedIndicator] = useState(false);
+    const [showBackDialog, setShowBackDialog] = useState(false);
+    const saveAllHandlerRef = useRef<(() => void) | null>(null);
 
-  const { data: menusData, isLoading, error } = useRestaurantMenus(restaurantId || '')
+    // Keep the selected category in sync with the latest data
+    const selectedCategory = categories.find((cat) => cat.id === selectedCategoryId) || null;
 
-  const menu = menusData?.menus?.find(m => m.id === menuId)
+    // Show "All changes saved" briefly when unsaved changes become false
+    useEffect(() => {
+        if (!hasUnsavedChanges && showSavedIndicator) {
+            const timer = setTimeout(() => {
+                setShowSavedIndicator(false);
+            }, 3000); // Show for 3 seconds
+            return () => clearTimeout(timer);
+        }
+    }, [hasUnsavedChanges, showSavedIndicator]);
 
-  const [showAddCategoryForm, setShowAddCategoryForm] = useState(false)
-  const createCategoryMutation = useCreateMenuCategory()
-  const reorderCategoriesMutation = useReorderCategories()
+    const handleUnsavedChangesChange = (hasChanges: boolean) => {
+        if (hasUnsavedChanges && !hasChanges) {
+            // Transitioning from unsaved to saved - show saved indicator
+            setShowSavedIndicator(true);
+        }
+        setHasUnsavedChanges(hasChanges);
+    };
 
-  const [categories, setCategories] = useState(menu?.categories || [])
+    useEffect(() => {
+        if (categories.length > 0 && !selectedCategoryId) {
+            setSelectedCategoryId(categories[0].id);
+        }
+    }, [categories, selectedCategoryId]);
 
-  useEffect(() => {
-    if (menu?.categories) {
-      setCategories(menu.categories)
-    }
-  }, [menu?.categories])
+    const handleCategorySelect = (cat: MenuCategoryDto | null) => {
+        setSelectedCategoryId(cat?.id ?? null);
+        setIsMobileMenuOpen(false); // Close mobile menu when category is selected
+    };
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
-  const handleAddCategory = () => {
-    setShowAddCategoryForm(true)
-  }
-
-  const handleCancelAddCategory = () => {
-    setShowAddCategoryForm(false)
-  }
-
-  const handleCreateCategory = (data: { name: string; description: string }) => {
-    if (!data.name.trim()) {
-      toast.error(t('nameRequired'))
-      return
-    }
-
-    createCategoryMutation.mutate(
-      {
-        name: data.name,
-        description: data.description,
-        orderIndex: 0,
-        restaurantMenuId: menu?.id || '',
-      },
-      {
-        onSuccess: () => {
-          setShowAddCategoryForm(false)
-        },
-        onError: (error) => {
-          console.error('Create category error:', error)
-          toast.error(t('failedToCreateCategory'))
-        },
-      }
-    )
-  }
-
-  const handleCategoryDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-
-    if (!over || active.id === over.id) {
-      return
+    // Loading state
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+                    <p className="text-muted-foreground">Loading menu...</p>
+                </div>
+            </div>
+        );
     }
 
-    const oldIndex = categories.findIndex(cat => cat.id === active.id)
-    const newIndex = categories.findIndex(cat => cat.id === over.id)
-
-    if (oldIndex === -1 || newIndex === -1) {
-      return
+    // Error state
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <p className="text-destructive mb-2">Failed to load menu</p>
+                    <p className="text-sm text-muted-foreground">Please try refreshing the page</p>
+                </div>
+            </div>
+        );
     }
 
-    const newCategories = arrayMove(categories, oldIndex, newIndex)
-    setCategories(newCategories)
+    // Menu not found
+    if (!menu) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <p className="text-lg font-semibold mb-2">Menu not found</p>
+                    <p className="text-sm text-muted-foreground">
+                        The requested menu could not be found
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
-    const categoryIds = newCategories.map(cat => cat.id)
-    reorderCategoriesMutation.mutate(categoryIds, {
-      onError: () => {
-        setCategories(categories)
-        toast.error('Failed to reorder categories')
-      },
-    })
-  }
-
-  if (isLoading) return <LoadingSpinner />
-  if (error)
     return (
-      <ContentLoadingError
-        message={error.message}
-        title="Error Loading Menu"
-        backToText="Back to Menus"
-        backToLink="/menus"
-      />
-    )
-  if (!menu)
-    return (
-      <ContentNotFound
-        message="The menu you're looking for doesn't exist or you don't have access to it."
-        title="Menu Not Found"
-        backToText="Back to Menus"
-        backToLink="/menus"
-      />
-    )
+        <div className="flex flex-col h-screen">
+            {/* Top Navigation Bar */}
+            <div className="border-b bg-background p-4 flex items-center gap-4 sticky top-0 z-20">
 
-  return (
-    <ContentContainer>
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold">{menu.name}</h1>
-            {menu.description && (
-              <p className="text-gray-600 mt-2">{menu.description}</p>
-            )}
-          </div>
-          <Button
-            onClick={handleAddCategory}
-            disabled={showAddCategoryForm}
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Add Category
-          </Button>
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-lg font-bold truncate">{menu.name}</h1>
+                        {hasUnsavedChanges && (
+                            <Badge className="flex items-center gap-1 shrink-0 bg-amber-500 hover:bg-amber-600 text-white">
+                                <AlertCircle className="w-3 h-3" />
+                                <span className="hidden md:inline">Unsaved changes</span>
+                                <span className="md:hidden">Unsaved</span>
+                            </Badge>
+                        )}
+                        {!hasUnsavedChanges && showSavedIndicator && (
+                            <Badge className="flex items-center gap-1 shrink-0 bg-green-600 hover:bg-green-700 text-white">
+                                ✓ <span className="hidden md:inline">No unsaved changes</span>
+                                <span className="md:hidden">Saved</span>
+                            </Badge>
+                        )}
+                    </div>
+                    {menu.description && (
+                        <p className="text-sm text-muted-foreground truncate hidden md:block">{menu.description}</p>
+                    )}
+                </div>
+                {hasUnsavedChanges && (
+                    <Button
+                        onClick={() => {
+                            if (saveAllHandlerRef.current) {
+                                saveAllHandlerRef.current();
+                            }
+                        }}
+                        className="hidden md:flex"
+                    >
+                        Save All Changes
+                    </Button>
+                )}
+                <div className="md:hidden">
+                    <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                        <SheetTrigger asChild>
+                            <Button variant="outline" size="icon">
+                                <Menu className="h-5 w-5" />
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="left" className="w-80 p-0">
+                            <div className="flex flex-col h-full">
+                                <div className="p-4 border-b">
+                                    <h2 className="text-lg font-semibold">Categories</h2>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-4">
+                                    <CategoriesSidebar
+                                        categories={categories}
+                                        selectedCategory={selectedCategory}
+                                        setSelectedCategory={handleCategorySelect}
+                                        restaurantMenuId={menu.id}
+                                    />
+                                </div>
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex flex-1 overflow-hidden">
+                {/* Desktop Sidebar */}
+                <div className="hidden md:flex w-64 border-r bg-white flex-col">
+                    <div className="p-4 border-b">
+                        <h2 className="text-lg font-semibold">Categories</h2>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <CategoriesSidebar
+                            categories={categories}
+                            selectedCategory={selectedCategory}
+                            setSelectedCategory={handleCategorySelect}
+                            restaurantMenuId={menu.id}
+                        />
+                    </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-background">
+                    <MenuEditor
+                        selectedCategory={selectedCategory}
+                        onUnsavedChangesChange={handleUnsavedChangesChange}
+                        onSaveAllHandlerReady={(handler) => {
+                            saveAllHandlerRef.current = handler;
+                        }}
+                    />
+                </div>
+            </div>
+
+            {/* Unsaved Changes Dialog */}
+            <ConfirmDialog
+                open={showBackDialog}
+                onOpenChange={setShowBackDialog}
+                title="Unsaved Changes"
+                description="You have unsaved changes. Are you sure you want to leave? All unsaved changes will be lost."
+                confirmText="Leave Without Saving"
+                cancelText="Stay"
+                onConfirm={() => router.back()}
+                variant="destructive"
+            />
         </div>
-
-        {showAddCategoryForm && (
-          <AddCategoryForm
-            onSubmit={handleCreateCategory}
-            onCancel={handleCancelAddCategory}
-            isSubmitting={createCategoryMutation.isPending}
-          />
-        )}
-      </div>
-
-      {categories.length === 0 && !showAddCategoryForm ? (
-        <EmptyState
-          icon={LayoutList}
-          title={t('noCategoriesYet')}
-          description={t('addFirstCategory')}
-          action={{
-            label: t('addYourFirstCategory'),
-            onClick: handleAddCategory,
-            variant: 'default',
-          }}
-        />
-      ) : (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
-          <div className="space-y-6 min-h-[200px]">
-            <SortableContext items={categories.map(cat => cat.id)} strategy={verticalListSortingStrategy}>
-              {categories.map(category => (
-                <SortableCategory key={category.id} menuCategory={category} />
-              ))}
-            </SortableContext>
-          </div>
-        </DndContext>
-      )}
-    </ContentContainer>
-  )
+    );
 }

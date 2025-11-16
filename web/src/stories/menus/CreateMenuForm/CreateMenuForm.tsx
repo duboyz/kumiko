@@ -42,7 +42,7 @@ export function CreateMenuForm({ restaurantName, isLoading, router }: CreateMenu
       },
       {
         onSuccess: menu => {
-          if (menu) router.push(`/new-menu/${menu.id}`)
+          if (menu) router.push(`/menus/${menu.id}`)
         },
       }
     )
