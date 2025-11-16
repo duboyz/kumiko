@@ -25,9 +25,10 @@ import {
 interface MenuEditorProps {
     selectedCategory: MenuCategoryDto | null;
     onUnsavedChangesChange?: (hasChanges: boolean) => void;
+    onSaveAllHandlerReady?: (saveAllHandler: () => void) => void;
 }
 
-export const MenuEditor = ({ selectedCategory, onUnsavedChangesChange }: MenuEditorProps) => {
+export const MenuEditor = ({ selectedCategory, onUnsavedChangesChange, onSaveAllHandlerReady }: MenuEditorProps) => {
     const items = selectedCategory?.menuCategoryItems || [];
     const [isNewMenuItemFormVisible, setIsNewMenuItemFormVisible] = useState(false);
 
@@ -58,6 +59,7 @@ export const MenuEditor = ({ selectedCategory, onUnsavedChangesChange }: MenuEdi
                 items={items}
                 selectedCategory={selectedCategory}
                 onUnsavedChangesChange={onUnsavedChangesChange}
+                onSaveAllHandlerReady={onSaveAllHandlerReady}
             />
         </div>
     );
@@ -67,12 +69,14 @@ interface MenuItemsListProps {
     items: MenuCategoryItemDto[];
     selectedCategory: MenuCategoryDto | null;
     onUnsavedChangesChange?: (hasChanges: boolean) => void;
+    onSaveAllHandlerReady?: (saveAllHandler: () => void) => void;
 }
 
 export const MenuItemsList = ({
     items,
     selectedCategory,
     onUnsavedChangesChange,
+    onSaveAllHandlerReady,
 }: MenuItemsListProps) => {
     const [isAddingItem, setIsAddingItem] = useState(false);
     const [isAddingItemDirty, setIsAddingItemDirty] = useState(false);
@@ -80,6 +84,7 @@ export const MenuItemsList = ({
     const [localItems, setLocalItems] = useState(items);
     const { mutate: reorderItems } = useReorderMenuItems();
     const addItemRef = useRef<HTMLDivElement>(null);
+    const saveHandlersRef = useRef<Map<string, () => void>>(new Map());
 
     // Close add item form when category changes
     useEffect(() => {
@@ -104,6 +109,28 @@ export const MenuItemsList = ({
             return newSet;
         });
     };
+
+    const handleItemSaveHandlerReady = (itemId: string, saveHandler: (() => void) | null) => {
+        if (saveHandler) {
+            saveHandlersRef.current.set(itemId, saveHandler);
+        } else {
+            saveHandlersRef.current.delete(itemId);
+        }
+    };
+
+    const handleAddItemSaveHandlerReady = (saveHandler: () => void) => {
+        saveHandlersRef.current.set('__adding__', saveHandler);
+    };
+
+    // Register save all handler with parent
+    useEffect(() => {
+        const saveAll = () => {
+            // Trigger all registered save handlers
+            saveHandlersRef.current.forEach((handler) => handler());
+        };
+        onSaveAllHandlerReady?.(saveAll);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -172,6 +199,7 @@ export const MenuItemsList = ({
                                     key={item.id}
                                     item={item}
                                     onDirtyChange={(isDirty) => handleItemDirtyChange(item.id, isDirty)}
+                                    onSaveHandlerReady={(handler) => handleItemSaveHandlerReady(item.id, handler)}
                                 />
                             ))}
                         </div>
@@ -192,8 +220,12 @@ export const MenuItemsList = ({
                 {isAddingItem ? (
                     <MenuItemForm
                         selectedCategory={selectedCategory}
-                        onCancel={() => setIsAddingItem(false)}
+                        onCancel={() => {
+                            setIsAddingItem(false);
+                            saveHandlersRef.current.delete('__adding__');
+                        }}
                         onDirtyChange={setIsAddingItemDirty}
+                        onSaveHandlerReady={handleAddItemSaveHandlerReady}
                     />
                 ) : (
                     <Button variant="outline" onClick={() => setIsAddingItem(true)} className="w-full">

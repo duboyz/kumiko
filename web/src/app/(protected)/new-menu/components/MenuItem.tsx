@@ -13,12 +13,14 @@ import { Badge } from "@/components/ui/badge";
 interface MenuItemProps {
     item: MenuCategoryItemDto;
     onDirtyChange?: (isDirty: boolean) => void;
+    onSaveHandlerReady?: (saveHandler: (() => void) | null) => void;
 }
 
-export const MenuItem = ({ item, onDirtyChange }: MenuItemProps) => {
+export const MenuItem = ({ item, onDirtyChange, onSaveHandlerReady }: MenuItemProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const { mutate: deleteItem, isPending: isDeleting } = useRemoveMenuItemFromCategory();
     const editRef = useRef<HTMLDivElement>(null);
+    const saveHandlerRef = useRef<(() => void) | null>(null);
 
     const {
         attributes,
@@ -53,13 +55,19 @@ export const MenuItem = ({ item, onDirtyChange }: MenuItemProps) => {
         }
     }, [isEditing]);
 
-    // Reset dirty state when closing edit form
+    // Reset dirty state and save handler when closing edit form
     useEffect(() => {
         if (!isEditing) {
             onDirtyChange?.(false);
+            onSaveHandlerReady?.(null);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isEditing]);
+
+    const handleSaveHandlerReady = (saveHandler: () => void) => {
+        saveHandlerRef.current = saveHandler;
+        onSaveHandlerReady?.(saveHandler);
+    };
 
     const getMinMaxPrice = () => {
         if (!item.menuItem?.hasOptions) return [item.menuItem?.price, item.menuItem?.price];
@@ -78,6 +86,7 @@ export const MenuItem = ({ item, onDirtyChange }: MenuItemProps) => {
                         onCancel={() => setIsEditing(false)}
                         existingItem={item}
                         onDirtyChange={onDirtyChange}
+                        onSaveHandlerReady={handleSaveHandlerReady}
                     />
                 </div>
             </div>

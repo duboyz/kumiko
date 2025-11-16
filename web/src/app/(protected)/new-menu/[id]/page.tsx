@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { MenuCategoryDto, useLocationSelection, useRestaurantMenus } from "@shared";
 import { MenuEditor } from "../components/MenuEditor";
 import { CategoriesSidebar } from "../components/CategoriesSidebar";
@@ -8,6 +8,7 @@ import { Loader2, Menu, ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 export default function NewMenuPage() {
     const router = useRouter();
@@ -22,6 +23,7 @@ export default function NewMenuPage() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [showSavedIndicator, setShowSavedIndicator] = useState(false);
+    const saveAllHandlerRef = useRef<(() => void) | null>(null);
 
     // Keep the selected category in sync with the latest data
     const selectedCategory = categories.find((cat) => cat.id === selectedCategoryId) || null;
@@ -110,19 +112,33 @@ export default function NewMenuPage() {
                         {hasUnsavedChanges && (
                             <Badge className="flex items-center gap-1 shrink-0 bg-amber-500 hover:bg-amber-600 text-white">
                                 <AlertCircle className="w-3 h-3" />
-                                Unsaved changes
+                                <span className="hidden md:inline">Unsaved changes</span>
+                                <span className="md:hidden">Unsaved</span>
                             </Badge>
                         )}
                         {!hasUnsavedChanges && showSavedIndicator && (
                             <Badge className="flex items-center gap-1 shrink-0 bg-green-600 hover:bg-green-700 text-white">
-                                ✓ No unsaved changes
+                                ✓ <span className="hidden md:inline">No unsaved changes</span>
+                                <span className="md:hidden">Saved</span>
                             </Badge>
                         )}
                     </div>
                     {menu.description && (
-                        <p className="text-sm text-muted-foreground truncate">{menu.description}</p>
+                        <p className="text-sm text-muted-foreground truncate hidden md:block">{menu.description}</p>
                     )}
                 </div>
+                {hasUnsavedChanges && (
+                    <Button
+                        onClick={() => {
+                            if (saveAllHandlerRef.current) {
+                                saveAllHandlerRef.current();
+                            }
+                        }}
+                        className="bg-amber-500 hover:bg-amber-600 text-white hidden md:flex"
+                    >
+                        Save All Changes
+                    </Button>
+                )}
                 <div className="md:hidden">
                     <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                         <SheetTrigger asChild>
@@ -171,6 +187,9 @@ export default function NewMenuPage() {
                     <MenuEditor
                         selectedCategory={selectedCategory}
                         onUnsavedChangesChange={handleUnsavedChangesChange}
+                        onSaveAllHandlerReady={(handler) => {
+                            saveAllHandlerRef.current = handler;
+                        }}
                     />
                 </div>
             </div>

@@ -21,12 +21,14 @@ interface MenuItemFormProps {
     onCancel: () => void;
     existingItem?: MenuCategoryItemDto; // If provided, we're editing
     onDirtyChange?: (isDirty: boolean) => void;
+    onSaveHandlerReady?: (saveHandler: () => void) => void;
 }
 
-export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirtyChange }: MenuItemFormProps) => {
+export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirtyChange, onSaveHandlerReady }: MenuItemFormProps) => {
     const queryClient = useQueryClient();
     const isEditMode = !!existingItem;
     const actionButtonsRef = useRef<HTMLDivElement>(null);
+    const handleSaveRef = useRef<() => void>(() => { });
 
     // Store initial values for dirty checking
     const initialValues = useRef({
@@ -243,6 +245,18 @@ export const MenuItemForm = ({ selectedCategory, onCancel, existingItem, onDirty
             handleCreate();
         }
     };
+
+    // Keep the save handler ref up to date
+    handleSaveRef.current = handleSave;
+
+    // Register save handler with parent (registers a function that calls the ref)
+    useEffect(() => {
+        const saveWrapper = () => {
+            handleSaveRef.current();
+        };
+        onSaveHandlerReady?.(saveWrapper);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Only require selectedCategory for create mode
     if (!isEditMode && !selectedCategory) return null;
