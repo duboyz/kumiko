@@ -32,8 +32,9 @@ interface BusinessDetailsEditorProps {
 }
 
 export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetailsEditorProps) {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const formFieldsRef = useRef<HTMLDivElement>(null)
+  const basicInfoCardRef = useRef<HTMLDivElement>(null)
+  const locationCardRef = useRef<HTMLDivElement>(null)
+  const contactCardRef = useRef<HTMLDivElement>(null)
 
   const [details, setDetails] = useState<BusinessDetails>(() => {
     if (businessData) {
@@ -74,31 +75,21 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
 
   // GSAP animations on mount
   useEffect(() => {
-    if (!cardRef.current || !formFieldsRef.current) return
+    const cards = [basicInfoCardRef.current, locationCardRef.current, contactCardRef.current].filter(Boolean)
 
-    const formGroups = formFieldsRef.current.querySelectorAll('.form-group')
+    if (cards.length === 0) return
 
-    gsap.set(cardRef.current, { opacity: 0, y: 20 })
-    gsap.set(formGroups, { opacity: 0, x: -20 })
+    gsap.set(cards, { opacity: 0, y: 20 })
 
     const tl = gsap.timeline()
 
-    tl.to(cardRef.current, {
+    tl.to(cards, {
       opacity: 1,
       y: 0,
       duration: 0.4,
+      stagger: 0.1,
       ease: 'power2.out',
-    }).to(
-      formGroups,
-      {
-        opacity: 1,
-        x: 0,
-        duration: 0.3,
-        stagger: 0.05,
-        ease: 'power2.out',
-      },
-      '-=0.2'
-    )
+    })
   }, [])
 
   const handleChange = (field: keyof BusinessDetails, value: string) => {
@@ -132,194 +123,200 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
   }
 
   return (
-    <Card ref={cardRef}>
-      <CardHeader>
-        <div className="flex items-center gap-4">
-          {/* Kumiko business icon - spans both lines */}
-          <div className="flex-shrink-0">
-            <Image
-              src={KumikoBusiness}
-              alt="Kumiko helping with business details"
-              width={80}
-              height={80}
-              className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
-            />
-          </div>
-
-          {/* Title and description next to Kumiko */}
-          <div className="flex-1">
-            <CardTitle className="flex items-center gap-2">Review what we found</CardTitle>
-            <CardDescription>
-              {businessData
-                ? 'We found your business! Please review and update any details below.'
-                : "Let's set up your restaurant details so we can create your website."}
-            </CardDescription>
-          </div>
+    <div className="space-y-6">
+      {/* Header with Kumiko icon */}
+      <div className="flex items-center gap-4 mb-6">
+        <div className="flex-shrink-0">
+          <Image
+            src={KumikoBusiness}
+            alt="Kumiko helping with business details"
+            width={80}
+            height={80}
+            className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+          />
         </div>
-      </CardHeader>
-      <CardContent>
-        <div ref={formFieldsRef} className="space-y-6">
-          {/* Basic Information */}
-          <div className="form-group space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Basic Information</h3>
+        <div className="flex-1">
+          <h2 className="text-2xl font-semibold">Review what we found</h2>
+          <p className="text-muted-foreground">
+            {businessData
+              ? 'We found your business! Please review and update any details below.'
+              : "Let's set up your restaurant details so we can create your website."}
+          </p>
+        </div>
+      </div>
 
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">What's your restaurant called? *</Label>
-                <Input
-                  id="name"
-                  value={details.name}
-                  onChange={e => handleChange('name', e.target.value)}
-                  onFocus={handleInputFocus}
-                  onBlur={handleInputBlur}
-                  placeholder="e.g., Mario's Pizza"
-                  required
-                  className="transition-transform duration-200"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Tell us about your place</Label>
-                <Textarea
-                  id="description"
-                  value={details.description}
-                  onChange={e => handleChange('description', e.target.value)}
-                  onFocus={handleInputFocus}
-                  onBlur={handleInputBlur}
-                  placeholder="What makes your restaurant special? (optional)"
-                  rows={3}
-                  className="transition-transform duration-200"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Location */}
-          <div className="form-group space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Location</h3>
-
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="address">Where are you located? *</Label>
-                <Input
-                  id="address"
-                  value={details.address}
-                  onChange={e => handleChange('address', e.target.value)}
-                  onFocus={handleInputFocus}
-                  onBlur={handleInputBlur}
-                  placeholder="e.g., 123 Main Street"
-                  required
-                  className="transition-transform duration-200"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="city">City *</Label>
-                  <Input
-                    id="city"
-                    value={details.city}
-                    onChange={e => handleChange('city', e.target.value)}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
-                    placeholder="City"
-                    required
-                    className="transition-transform duration-200"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="state">State/Province</Label>
-                  <Input
-                    id="state"
-                    value={details.state}
-                    onChange={e => handleChange('state', e.target.value)}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
-                    placeholder="State"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="zip">Postal Code</Label>
-                  <Input
-                    id="zip"
-                    value={details.zip}
-                    onChange={e => handleChange('zip', e.target.value)}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
-                    placeholder="12345"
-                    className="transition-transform duration-200"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="country">Country *</Label>
-                  <Input
-                    id="country"
-                    value={details.country}
-                    onChange={e => handleChange('country', e.target.value)}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
-                    placeholder="NO"
-                    required
-                    className="transition-transform duration-200"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Contact Information */}
+      {/* Basic Information Card */}
+      <Card ref={basicInfoCardRef}>
+        <CardHeader>
+          <CardTitle>Basic Information</CardTitle>
+          <CardDescription>Tell us about your restaurant</CardDescription>
+        </CardHeader>
+        <CardContent>
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Contact Information</h3>
+            <div className="space-y-2">
+              <Label htmlFor="name">What's your restaurant called? *</Label>
+              <Input
+                id="name"
+                value={details.name}
+                onChange={e => handleChange('name', e.target.value)}
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+                placeholder="e.g., Mario's Pizza"
+                required
+                className="transition-transform duration-200"
+              />
+            </div>
 
-            <div className="grid gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="description">Tell us about your place</Label>
+              <Textarea
+                id="description"
+                value={details.description}
+                onChange={e => handleChange('description', e.target.value)}
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+                placeholder="What makes your restaurant special? (optional)"
+                rows={3}
+                className="transition-transform duration-200"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Location Card */}
+      <Card ref={locationCardRef}>
+        <CardHeader>
+          <CardTitle>Location</CardTitle>
+          <CardDescription>Where is your restaurant located?</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="address">Where are you located? *</Label>
+              <Input
+                id="address"
+                value={details.address}
+                onChange={e => handleChange('address', e.target.value)}
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+                placeholder="e.g., 123 Main Street"
+                required
+                className="transition-transform duration-200"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone number (optional)</Label>
+                <Label htmlFor="city">City *</Label>
                 <Input
-                  id="phone"
-                  type="tel"
-                  value={details.phone}
-                  onChange={e => handleChange('phone', e.target.value)}
+                  id="city"
+                  value={details.city}
+                  onChange={e => handleChange('city', e.target.value)}
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
-                  placeholder="+47 123 45 678"
+                  placeholder="City"
+                  required
                   className="transition-transform duration-200"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="website">Do you have a website? (optional)</Label>
+                <Label htmlFor="state">State/Province</Label>
                 <Input
-                  id="website"
+                  id="state"
+                  value={details.state}
+                  onChange={e => handleChange('state', e.target.value)}
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
-                  type="url"
-                  value={details.website}
-                  onChange={e => handleChange('website', e.target.value)}
-                  placeholder="https://yourrestaurant.com"
+                  placeholder="State"
+                  className="transition-transform duration-200"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="zip">Postal Code</Label>
+                <Input
+                  id="zip"
+                  value={details.zip}
+                  onChange={e => handleChange('zip', e.target.value)}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  placeholder="12345"
+                  className="transition-transform duration-200"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="country">Country *</Label>
+                <Input
+                  id="country"
+                  value={details.country}
+                  onChange={e => handleChange('country', e.target.value)}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  placeholder="NO"
+                  required
                   className="transition-transform duration-200"
                 />
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Hidden fields from Google Places */}
-          {details.latitude && details.longitude && (
-            <div className="pt-4 border-t">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Google Place ID: {details.googlePlaceId}</span>
-                <span>
-                  Coordinates: {parseFloat(details.latitude).toFixed(6)}, {parseFloat(details.longitude).toFixed(6)}
-                </span>
-              </div>
+      {/* Contact Information Card */}
+      <Card ref={contactCardRef}>
+        <CardHeader>
+          <CardTitle>Contact Information</CardTitle>
+          <CardDescription>How can customers reach you?</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone number (optional)</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={details.phone}
+                onChange={e => handleChange('phone', e.target.value)}
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+                placeholder="+47 123 45 678"
+                className="transition-transform duration-200"
+              />
             </div>
-          )}
+
+            <div className="space-y-2">
+              <Label htmlFor="website">Do you have a website? (optional)</Label>
+              <Input
+                id="website"
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+                type="url"
+                value={details.website}
+                onChange={e => handleChange('website', e.target.value)}
+                placeholder="https://yourrestaurant.com"
+                className="transition-transform duration-200"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Hidden fields from Google Places */}
+      {details.latitude && details.longitude && (
+        <div className="pt-4 border-t text-xs text-muted-foreground">
+          <div className="flex items-center justify-between">
+            <span>Google Place ID: {details.googlePlaceId}</span>
+            <span>
+              Coordinates: {parseFloat(details.latitude).toFixed(6)}, {parseFloat(details.longitude).toFixed(6)}
+            </span>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   )
 }
