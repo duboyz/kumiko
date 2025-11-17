@@ -249,7 +249,10 @@ export default function CheckoutPage() {
     return { isValid: Object.keys(errors).length === 0, errors }
   }
 
-  const handleSubmitOrder = async () => {
+  const handleSubmitOrder = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+
     // Validate form
     const { isValid, errors } = validateForm()
 
@@ -257,9 +260,18 @@ export default function CheckoutPage() {
       // Scroll to first error
       const firstErrorField = Object.keys(errors)[0]
       if (firstErrorField) {
+        // Map error field names to actual input IDs
+        const fieldIdMap: Record<string, string> = {
+          name: 'customerName',
+          phone: 'customerPhone',
+          email: 'customerEmail',
+          pickupDate: 'pickupDate',
+          pickupTime: 'pickupTime',
+        }
+        const elementId = fieldIdMap[firstErrorField] || firstErrorField
         // Use setTimeout to ensure DOM is updated with error messages
         setTimeout(() => {
-          const element = document.getElementById(firstErrorField)
+          const element = document.getElementById(elementId)
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' })
             element.focus()
@@ -394,6 +406,7 @@ export default function CheckoutPage() {
                 <span className="text-xl font-bold text-gray-900">{formatPrice(totalAmount, currency)}</span>
               </div>
               <Button
+                type="button"
                 onClick={handleSubmitOrder}
                 className="w-full text-base font-semibold"
                 size="lg"
@@ -416,6 +429,7 @@ export default function CheckoutPage() {
         </div>
         <div className="px-4 pb-4">
           <Button
+            type="button"
             onClick={handleSubmitOrder}
             className="w-full text-base font-semibold"
             size="lg"
