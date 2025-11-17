@@ -10,11 +10,16 @@ import {
   Alert,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '@/contexts/auth.context'
 import { orderService } from '@/services/order.service'
 import { OrderDto } from '@/types/order.types'
 import OrderDetailModal from '@/components/OrderDetailModal'
+import OrderFiltersModal from '@/components/OrderFiltersModal'
 import { notificationService } from '@/services/notification.service'
+
+type SortOption = 'createdDate' | 'pickupDate'
+type OrderStatus = 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
 
 export default function HomeScreen() {
   const { selectedLocationId, selectedLocation } = useAuth()
@@ -23,6 +28,9 @@ export default function HomeScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<OrderDto | null>(null)
   const [modalVisible, setModalVisible] = useState(false)
+  const [filtersModalVisible, setFiltersModalVisible] = useState(false)
+  const [sortBy, setSortBy] = useState<SortOption>('createdDate')
+  const [selectedStatuses, setSelectedStatuses] = useState<OrderStatus[]>([])
 
   const notificationListener = useRef<any>(null)
   const responseListener = useRef<any>(null)
@@ -112,6 +120,38 @@ export default function HomeScreen() {
     setSelectedOrder(null)
   }
 
+  const handleApplyFilters = (statuses: OrderStatus[], sort: SortOption) => {
+    setSelectedStatuses(statuses)
+    setSortBy(sort)
+  }
+
+  const getFilteredAndSortedOrders = () => {
+    let filtered = orders
+
+    // Apply status filter
+    if (selectedStatuses.length > 0) {
+      filtered = filtered.filter((order) =>
+        selectedStatuses.includes(order.status.toLowerCase() as OrderStatus)
+      )
+    }
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortBy === 'createdDate') {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      } else {
+        // pickupDate sorting
+        const dateA = new Date(a.pickupDate).getTime()
+        const dateB = new Date(b.pickupDate).getTime()
+        return dateA - dateB
+      }
+    })
+
+    return sorted
+  }
+
+  const filteredOrders = getFilteredAndSortedOrders()
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.centerContainer}>
@@ -121,26 +161,43 @@ export default function HomeScreen() {
     )
   }
 
+  const hasActiveFilters = selectedStatuses.length > 0 || sortBy !== 'createdDate'
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>Orders</Text>
-          {selectedLocation && (
-            <Text style={styles.subtitle}>{selectedLocation.restaurant.name}</Text>
-          )}
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={styles.title}>Orders</Text>
+            {selectedLocation && (
+              <Text style={styles.subtitle}>{selectedLocation.restaurant.name}</Text>
+            )}
+          </View>
+          <TouchableOpacity
+            style={[styles.filterButton, hasActiveFilters && styles.filterButtonActive]}
+            onPress={() => setFiltersModalVisible(true)}
+          >
+            <Ionicons name="filter" size={20} color="#fff" />
+            {hasActiveFilters && <View style={styles.filterBadge} />}
+          </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.listContainer}>
-        {orders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No orders yet</Text>
-            <Text style={styles.emptySubtext}>Orders will appear here when customers place them</Text>
+            <Text style={styles.emptyText}>
+              {orders.length === 0 ? 'No orders yet' : 'No orders found'}
+            </Text>
+            <Text style={styles.emptySubtext}>
+              {orders.length === 0
+                ? 'Orders will appear here when customers place them'
+                : 'Try adjusting your filters to see more results'}
+            </Text>
           </View>
         ) : (
           <FlatList
-            data={orders}
+            data={filteredOrders}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
             refreshControl={
@@ -209,6 +266,14 @@ export default function HomeScreen() {
         onClose={handleCloseModal}
         onStatusUpdate={() => loadOrders()}
       />
+
+      <OrderFiltersModal
+        visible={filtersModalVisible}
+        onClose={() => setFiltersModalVisible(false)}
+        selectedStatuses={selectedStatuses}
+        sortBy={sortBy}
+        onApply={handleApplyFilters}
+      />
     </SafeAreaView>
   )
 }
@@ -235,6 +300,34 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 20,
     backgroundColor: '#000000',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  filterButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  filterButtonActive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#34C759',
+    borderWidth: 2,
+    borderColor: '#000000',
   },
   title: {
     fontSize: 32,
