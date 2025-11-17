@@ -74,15 +74,15 @@ export function MenuDisplay({ menu, currency = Currency.USD, onAddToCart, classN
   return (
     <div
       ref={containerRef}
-      className={`py-4 sm:py-6 lg:py-8 px-4${className}`}
+      className={`${className}`}
     >
       <div className="space-y-8 sm:space-y-12 lg:space-y-16">
         {menu.categories.map((category, categoryIndex) => (
           <div key={category.id} className="category-section">
             <div className="mb-6 sm:mb-8">
-              <h3 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-foreground px-1">{category.name}</h3>
+              <h3 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-foreground">{category.name}</h3>
               {category.description && (
-                <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-3xl px-1">
+                <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-3xl">
                   {category.description}
                 </p>
               )}
