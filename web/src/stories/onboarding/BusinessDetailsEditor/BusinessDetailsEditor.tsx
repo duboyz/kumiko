@@ -29,12 +29,20 @@ export interface BusinessDetails {
 interface BusinessDetailsEditorProps {
   businessData?: ResponseBusinessDetails
   onChange: (details: BusinessDetails) => void
+  onValidationChange?: (isValid: boolean) => void
 }
 
-export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetailsEditorProps) {
+export function BusinessDetailsEditor({ businessData, onChange, onValidationChange }: BusinessDetailsEditorProps) {
   const basicInfoCardRef = useRef<HTMLDivElement>(null)
   const locationCardRef = useRef<HTMLDivElement>(null)
   const contactCardRef = useRef<HTMLDivElement>(null)
+
+  const [errors, setErrors] = useState<{
+    name?: string
+    address?: string
+    city?: string
+    country?: string
+  }>({})
 
   const [details, setDetails] = useState<BusinessDetails>(() => {
     if (businessData) {
@@ -69,9 +77,20 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
     }
   })
 
+  // Check if form is valid (all required fields filled)
+  const isValid =
+    details.name.trim() !== '' &&
+    details.address.trim() !== '' &&
+    details.city.trim() !== '' &&
+    details.country.trim() !== ''
+
   useEffect(() => {
     onChange(details)
   }, [details, onChange])
+
+  useEffect(() => {
+    onValidationChange?.(isValid)
+  }, [isValid, onValidationChange])
 
   // GSAP animations on mount
   useEffect(() => {
@@ -92,8 +111,68 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
     })
   }, [])
 
+  const validateField = (field: keyof BusinessDetails, value: string) => {
+    setErrors(prev => {
+      const newErrors = { ...prev }
+
+      switch (field) {
+        case 'name':
+          if (!value.trim()) {
+            newErrors.name = 'Restaurant name is required'
+          } else {
+            delete newErrors.name
+          }
+          break
+        case 'address':
+          if (!value.trim()) {
+            newErrors.address = 'Address is required'
+          } else {
+            delete newErrors.address
+          }
+          break
+        case 'city':
+          if (!value.trim()) {
+            newErrors.city = 'City is required'
+          } else {
+            delete newErrors.city
+          }
+          break
+        case 'country':
+          if (!value.trim()) {
+            newErrors.country = 'Country is required'
+          } else {
+            delete newErrors.country
+          }
+          break
+      }
+
+      return newErrors
+    })
+  }
+
   const handleChange = (field: keyof BusinessDetails, value: string) => {
     setDetails(prev => ({ ...prev, [field]: value }))
+    // Validate immediately if there was an error (real-time validation feedback)
+    setErrors(prev => {
+      if (prev[field as keyof typeof prev]) {
+        // If field has value, clear error; otherwise keep it
+        if (value.trim()) {
+          const newErrors = { ...prev }
+          delete newErrors[field as keyof typeof newErrors]
+          return newErrors
+        }
+      }
+      return prev
+    })
+  }
+
+  const handleBlur = (
+    field: keyof BusinessDetails,
+    value: string,
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    handleInputBlur(e)
+    validateField(field, value)
   }
 
   // Focus animation
@@ -160,11 +239,18 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
                 value={details.name}
                 onChange={e => handleChange('name', e.target.value)}
                 onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
+                onBlur={e => handleBlur('name', details.name, e)}
                 placeholder="e.g., Mario's Pizza"
                 required
-                className="transition-transform duration-200"
+                className={`transition-transform duration-200 ${errors.name ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                aria-invalid={!!errors.name}
+                aria-describedby={errors.name ? 'name-error' : undefined}
               />
+              {errors.name && (
+                <p id="name-error" className="text-sm text-destructive mt-1">
+                  {errors.name}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -199,11 +285,18 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
                 value={details.address}
                 onChange={e => handleChange('address', e.target.value)}
                 onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
+                onBlur={e => handleBlur('address', details.address, e)}
                 placeholder="e.g., 123 Main Street"
                 required
-                className="transition-transform duration-200"
+                className={`transition-transform duration-200 ${errors.address ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                aria-invalid={!!errors.address}
+                aria-describedby={errors.address ? 'address-error' : undefined}
               />
+              {errors.address && (
+                <p id="address-error" className="text-sm text-destructive mt-1">
+                  {errors.address}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -214,11 +307,18 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
                   value={details.city}
                   onChange={e => handleChange('city', e.target.value)}
                   onFocus={handleInputFocus}
-                  onBlur={handleInputBlur}
+                  onBlur={e => handleBlur('city', details.city, e)}
                   placeholder="City"
                   required
-                  className="transition-transform duration-200"
+                  className={`transition-transform duration-200 ${errors.city ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                  aria-invalid={!!errors.city}
+                  aria-describedby={errors.city ? 'city-error' : undefined}
                 />
+                {errors.city && (
+                  <p id="city-error" className="text-sm text-destructive mt-1">
+                    {errors.city}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -256,11 +356,18 @@ export function BusinessDetailsEditor({ businessData, onChange }: BusinessDetail
                   value={details.country}
                   onChange={e => handleChange('country', e.target.value)}
                   onFocus={handleInputFocus}
-                  onBlur={handleInputBlur}
+                  onBlur={e => handleBlur('country', details.country, e)}
                   placeholder="NO"
                   required
-                  className="transition-transform duration-200"
+                  className={`transition-transform duration-200 ${errors.country ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                  aria-invalid={!!errors.country}
+                  aria-describedby={errors.country ? 'country-error' : undefined}
                 />
+                {errors.country && (
+                  <p id="country-error" className="text-sm text-destructive mt-1">
+                    {errors.country}
+                  </p>
+                )}
               </div>
             </div>
           </div>

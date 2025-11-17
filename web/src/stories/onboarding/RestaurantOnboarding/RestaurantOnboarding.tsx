@@ -56,6 +56,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
   const [selectedBusiness, setSelectedBusiness] = useState<ResponseBusinessDetails | null>(null)
   const [businessDetails, setBusinessDetails] = useState<BusinessDetails | null>(null)
   const [businessHours, setBusinessHours] = useState<BusinessHours | null>(null)
+  const [isBusinessDetailsValid, setIsBusinessDetailsValid] = useState(false)
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
   const [menuId, setMenuId] = useState<string | null>(null)
   const [selectedTemplates, setSelectedTemplates] = useState<PageTemplate[]>([])
@@ -69,6 +70,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
 
   const handleBusinessSelect = (business: ResponseBusinessDetails) => {
     setSelectedBusiness(business)
+    setIsBusinessDetailsValid(false) // Reset validation when new business is selected
     // Auto-advance to details step immediately
     setCurrentStep('details')
   }
@@ -83,12 +85,13 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
 
   const handleAddDetailsManually = () => {
     // Allow manual entry without requiring a selected business
+    setIsBusinessDetailsValid(false) // Reset validation when starting manual entry
     setCurrentStep('details')
   }
 
   const handleContinueToHours = () => {
-    if (!businessDetails) {
-      toast.error('Please fill in business details')
+    if (!businessDetails || !isBusinessDetailsValid) {
+      toast.error('Please fill in all required fields')
       return
     }
     setCurrentStep('hours')
@@ -390,18 +393,20 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
                 <div key={step} className="flex items-center gap-1 md:gap-2 flex-shrink-0">
                   <div className="flex items-center gap-1 md:gap-2">
                     <div
-                      className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium transition-all duration-300 ${isCurrentStep
-                        ? 'bg-primary text-primary-foreground active-step-indicator shadow-lg'
-                        : isCompleted
-                          ? 'bg-green-500 text-white'
-                          : 'bg-muted text-muted-foreground'
-                        }`}
+                      className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium transition-all duration-300 ${
+                        isCurrentStep
+                          ? 'bg-primary text-primary-foreground active-step-indicator shadow-lg'
+                          : isCompleted
+                            ? 'bg-green-500 text-white'
+                            : 'bg-muted text-muted-foreground'
+                      }`}
                     >
                       {isCompleted ? <CheckCircle className="w-3 h-3 md:w-4 md:h-4 checkmark-icon" /> : stepIndex}
                     </div>
                     <span
-                      className={`text-xs md:text-sm font-medium hidden sm:block transition-colors duration-200 ${isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
-                        }`}
+                      className={`text-xs md:text-sm font-medium hidden sm:block transition-colors duration-200 ${
+                        isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
+                      }`}
                     >
                       {label}
                     </span>
@@ -469,12 +474,18 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
         )}
 
         {currentStep === 'details' && (
-          <BusinessDetailsEditor businessData={selectedBusiness || undefined} onChange={setBusinessDetails} />
+          <BusinessDetailsEditor
+            businessData={selectedBusiness || undefined}
+            onChange={setBusinessDetails}
+            onValidationChange={setIsBusinessDetailsValid}
+          />
         )}
 
         {currentStep === 'hours' && (
           <BusinessHoursEditor
-            initialHours={selectedBusiness?.parsedBusinessHours ? JSON.parse(selectedBusiness.parsedBusinessHours) : undefined}
+            initialHours={
+              selectedBusiness?.parsedBusinessHours ? JSON.parse(selectedBusiness.parsedBusinessHours) : undefined
+            }
             weekdayText={selectedBusiness?.openingHours?.weekdayText}
             onChange={setBusinessHours}
           />
@@ -521,7 +532,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
             </Button>
 
             {currentStep === 'details' && (
-              <Button onClick={handleContinueToHours} disabled={!businessDetails}>
+              <Button onClick={handleContinueToHours} disabled={!businessDetails || !isBusinessDetailsValid}>
                 Next: Opening Hours
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
