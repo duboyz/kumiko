@@ -85,7 +85,8 @@ export function ComicStripSection({}: ComicStripSectionProps) {
     let closestDistance = Infinity
 
     // Filter out images with zero height and calculate distances
-    const imagesWithDimensions = imageRefs.current
+    // Use desktopImageRefs directly since this only runs on desktop
+    const imagesWithDimensions = desktopImageRefs.current
       .map((ref, index) => {
         if (!ref) return null
         const rect = ref.getBoundingClientRect()
