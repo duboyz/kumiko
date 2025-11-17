@@ -146,7 +146,7 @@ export function HeroSection({}: HeroSectionProps) {
     <div
       ref={heroRef}
       className={`min-h-screen flex items-center justify-center relative overflow-hidden pt-16 ${bebasNeue.className}`}
-      style={{ backgroundColor: '#fdfdfd' }}
+      style={{ backgroundColor: '#fdfdfd', marginTop: '-16px' }}
     >
       {/* Title Section */}
       <h1
@@ -183,11 +183,11 @@ export function HeroSection({}: HeroSectionProps) {
               transform: 'translateY(30px)',
             }}
           >
-            DIGITIZE YOUR
+            GROW YOUR
             <br />
-            RESTAURANT
+            RESTAURANT,
             <br />
-            IN MINUTES
+            NOT YOUR TO-DO LIST
           </h2>
           <p
             ref={descriptionRef}
@@ -197,8 +197,8 @@ export function HeroSection({}: HeroSectionProps) {
               transform: 'translateY(20px)',
             }}
           >
-            Transform your paper menu into a stunning digital experience. Get a beautiful, fresh website that's
-            optimized for food ordering and ready to take orders immediately—all without any technical skills required.
+            One photo. One click. One beautiful website that takes orders immediately. Focus on cooking, we'll handle
+            the rest.
           </p>
           <button
             ref={buttonRef}
