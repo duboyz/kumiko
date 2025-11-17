@@ -9,10 +9,9 @@ import { PinBasedAnnotationStep, PinAnnotation } from '@/stories/menus/MenuImpor
 import { ProcessStep } from '@/app/(protected)/menus/import/components/ProcessStep'
 import { StructureReviewStep } from '@/app/(protected)/menus/import/components/StructureReviewStep'
 import { useImportFlow } from '@/app/(protected)/menus/import/hooks/useImportFlow'
-import { useCreateMenuStructure, useCreateRestaurantMenu, useRestaurantMenus } from '@shared'
+import { useCreateMenuStructure, useCreateRestaurantMenu, useRestaurantMenus, RestaurantMenuDto } from '@shared'
 import { toast } from 'sonner'
-import { RestaurantMenu } from '@/stories/menus/EditableRestaurantMenu/RestaurantMenu/RestaurantMenu'
-import { PenTool } from 'lucide-react'
+import { MenuBuilder } from '@/stories/menus/MenuBuilder'
 
 interface MenuImportWizardProps {
   restaurantId: string
@@ -56,6 +55,38 @@ const getStepNumber = (step: ImportStep): number => {
 
 const getStepProgress = (step: ImportStep): number => {
   return (getStepNumber(step) / 4) * 100
+}
+
+interface MenuBuilderContentProps {
+  menu: RestaurantMenuDto
+  onBack: () => void
+  onContinue: () => void
+}
+
+function MenuBuilderContent({ menu, onBack, onContinue }: MenuBuilderContentProps) {
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold mb-2">Build Your Menu</h2>
+        <p className="text-muted-foreground">Add categories and items to build your menu manually</p>
+      </div>
+
+      <div className="border rounded-lg overflow-hidden bg-background min-h-[700px] h-[800px] max-h-[calc(100vh-250px)]">
+        <MenuBuilder menu={menu} className="h-full" />
+      </div>
+
+      <div className="flex items-center justify-between pt-6">
+        <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </Button>
+        <Button onClick={onContinue} size="lg" className="flex items-center gap-2">
+          Continue
+          <ArrowRight className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  )
 }
 
 export function MenuImportWizard({
@@ -232,18 +263,20 @@ export function MenuImportWizard({
               <div key={step} className="flex items-center gap-1 md:gap-2 flex-shrink-0">
                 <div className="flex items-center gap-1 md:gap-2">
                   <div
-                    className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium ${isCurrentStep
+                    className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-medium ${
+                      isCurrentStep
                         ? 'bg-primary text-primary-foreground'
                         : isCompleted
                           ? 'bg-green-500 text-white'
                           : 'bg-muted text-muted-foreground'
-                      }`}
+                    }`}
                   >
                     {isCompleted ? <CheckCircle className="w-3 h-3 md:w-4 md:h-4" /> : stepIndex}
                   </div>
                   <span
-                    className={`text-xs md:text-sm font-medium hidden sm:block ${isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
-                      }`}
+                    className={`text-xs md:text-sm font-medium hidden sm:block ${
+                      isCurrentStep ? 'text-foreground' : 'text-muted-foreground'
+                    }`}
                   >
                     {label}
                   </span>
@@ -263,8 +296,9 @@ export function MenuImportWizard({
             return (
               <div
                 key={step.step}
-                className={`h-1.5 rounded-full transition-all duration-300 ${isCurrentStep ? 'w-8 bg-primary' : isCompleted ? 'w-6 bg-primary/60' : 'w-1.5 bg-muted'
-                  }`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  isCurrentStep ? 'w-8 bg-primary' : isCompleted ? 'w-6 bg-primary/60' : 'w-1.5 bg-muted'
+                }`}
               />
             )
           })}
@@ -286,27 +320,7 @@ export function MenuImportWizard({
         (() => {
           const menu = menusData.menus.find(m => m.id === createdMenuId)
           return menu ? (
-            <div className="space-y-6">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2">Build Your Menu</h2>
-                <p className="text-muted-foreground">Add categories and items to build your menu manually</p>
-              </div>
-
-              <div className="border rounded-lg p-6">
-                <RestaurantMenu menu={menu} />
-              </div>
-
-              <div className="flex items-center justify-between pt-6">
-                <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
-                  <ArrowLeft className="w-4 h-4" />
-                  Back
-                </Button>
-                <Button onClick={handleManualMenuContinue} size="lg" className="flex items-center gap-2">
-                  Continue
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
+            <MenuBuilderContent menu={menu} onBack={handleBack} onContinue={handleManualMenuContinue} />
           ) : null
         })()}
 
