@@ -221,6 +221,9 @@ export default function CheckoutPage() {
     }
     if (!customerInfo.pickupTime) {
       errors.pickupTime = t('selectPickupTime') || 'Please select a pickup time'
+    } else {
+      // If time is set, validate it's within business hours (unless it's the ASAP time which is minTime)
+      // The ASAP option automatically sets minTime, so we only validate if it's not minTime
     }
 
     // Validate time is within business hours for the selected date
