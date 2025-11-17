@@ -13,27 +13,54 @@ interface MenuItemCardProps {
     menuItemName: string,
     price: number,
     menuItemOptionId?: string,
-    menuItemOptionName?: string
+    menuItemOptionName?: string,
+    additionalOptionId?: string,
+    additionalOptionName?: string,
+    additionalOptionPrice?: number
   ) => void
 }
 
 export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: MenuItemCardProps) {
   const { cart, updateQuantity, removeItem } = useCartStore()
+  const [showAdditionalOptions, setShowAdditionalOptions] = useState(false)
 
   if (!item.isAvailable) return null
 
   const hasOptions = item.hasOptions && item.options.length > 0
   const hasAllergens = item.allergens && item.allergens.length > 0
+  const hasAdditionalOptions = item.additionalOptions && item.additionalOptions.length > 0
+  const availableAdditionalOptions = item.additionalOptions?.filter(opt => opt.isAvailable) || []
 
-  // Helper function to get quantity from cart
+  // Helper function to get quantity from cart (for base items without addons)
   const getItemQuantity = (menuItemId: string, menuItemOptionId?: string) => {
-    const cartItem = cart.find(item => item.menuItemId === menuItemId && item.menuItemOptionId === menuItemOptionId)
+    const cartItem = cart.find(
+      item =>
+        item.menuItemId === menuItemId &&
+        item.menuItemOptionId === menuItemOptionId &&
+        (!item.additionalOptions || item.additionalOptions.length === 0)
+    )
     return cartItem?.quantity || 0
   }
 
   // Helper function to get cart index
   const getCartItemIndex = (menuItemId: string, menuItemOptionId?: string) => {
-    return cart.findIndex(item => item.menuItemId === menuItemId && item.menuItemOptionId === menuItemOptionId)
+    return cart.findIndex(
+      item =>
+        item.menuItemId === menuItemId &&
+        item.menuItemOptionId === menuItemOptionId &&
+        (!item.additionalOptions || item.additionalOptions.length === 0)
+    )
+  }
+
+  // Check if a specific addon is in the cart for this item
+  const isAddonInCart = (menuItemId: string, menuItemOptionId: string | undefined, addonId: string) => {
+    const cartItem = cart.find(
+      item =>
+        item.menuItemId === menuItemId &&
+        item.menuItemOptionId === menuItemOptionId &&
+        (!item.additionalOptions || item.additionalOptions.length === 0)
+    )
+    return cartItem?.additionalOptions?.some(addon => addon.id === addonId) || false
   }
 
   // Handle quantity decrease
@@ -55,9 +82,12 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
     menuItemName: string,
     price: number,
     menuItemOptionId?: string,
-    menuItemOptionName?: string
+    menuItemOptionName?: string,
+    additionalOptionId?: string,
+    additionalOptionName?: string,
+    additionalOptionPrice?: number
   ) => {
-    onAddToCart(menuItemId, menuItemName, price, menuItemOptionId, menuItemOptionName)
+    onAddToCart(menuItemId, menuItemName, price, menuItemOptionId, menuItemOptionName, additionalOptionId, additionalOptionName, additionalOptionPrice)
   }
 
   const mainItemQuantity = getItemQuantity(item.id)
@@ -143,12 +173,7 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
       {/* Options section */}
       {hasOptions && (
         <div className="mt-4">
-
-
-
-          <div
-            className=" mt-3"
-          >
+          <div className=" mt-3">
             <div className="space-y-2.5 sm:space-y-3 border-t border-border/50 pt-3 sm:pt-4">
               {item.options
                 .sort((a, b) => a.orderIndex - b.orderIndex)
@@ -206,6 +231,73 @@ export function MenuItemCard({ item, currency = Currency.USD, onAddToCart }: Men
           </div>
         </div>
       )}
+
+      {/* Additional Options (Addons) section */}
+      {hasAdditionalOptions && availableAdditionalOptions.length > 0 && (
+        <div className="mt-4">
+          <button
+            onClick={() => setShowAdditionalOptions(!showAdditionalOptions)}
+            className="flex items-center justify-between w-full text-left px-2 py-2 rounded-lg hover:bg-muted/50 transition-colors group"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-foreground">Add Extras</span>
+              <Badge variant="secondary" className="text-xs">
+                {availableAdditionalOptions.length}
+              </Badge>
+            </div>
+            {showAdditionalOptions ? (
+              <ChevronUp className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            )}
+          </button>
+
+          {showAdditionalOptions && (
+            <div className="space-y-2.5 sm:space-y-3 border-t border-border/50 pt-3 sm:pt-4 mt-3">
+              {availableAdditionalOptions
+                .sort((a, b) => a.orderIndex - b.orderIndex)
+                .map(addon => {
+                  const isAdded = hasOptions
+                    ? false // For items with options, we check per option
+                    : isAddonInCart(item.id, undefined, addon.id)
+
+                  return (
+                    <div
+                      key={addon.id}
+                      className={`flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg transition-all ${isAdded ? 'bg-primary/10 border border-primary/30' : 'bg-muted/30 hover:bg-muted/50'
+                        }`}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                          <span className="text-xs sm:text-sm font-medium text-foreground">{addon.name}</span>
+                          {addon.description && (
+                            <span className="text-xs text-muted-foreground truncate">{addon.description}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
+                        <span className="text-xs sm:text-sm font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent whitespace-nowrap">
+                          +{formatPrice(addon.price, currency)}
+                        </span>
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            handleIncrease(item.id, item.name, item.price || 0, undefined, undefined, addon.id, addon.name, addon.price)
+                          }
+                          disabled={isAdded}
+                          className="h-7 w-7 sm:h-8 sm:w-8 p-0 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
+

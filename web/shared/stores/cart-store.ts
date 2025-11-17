@@ -16,7 +16,10 @@ interface CartStore {
     menuItemName: string,
     price: number,
     menuItemOptionId?: string,
-    menuItemOptionName?: string
+    menuItemOptionName?: string,
+    additionalOptionId?: string,
+    additionalOptionName?: string,
+    additionalOptionPrice?: number
   ) => void
   updateQuantity: (index: number, delta: number) => void
   removeItem: (index: number) => void
@@ -57,30 +60,79 @@ export const useCartStore = create<CartStore>()(
       menuId: null,
       currency: Currency.USD,
 
-      addToCart: (menuItemId, menuItemName, price, menuItemOptionId, menuItemOptionName) => {
+      addToCart: (menuItemId, menuItemName, price, menuItemOptionId, menuItemOptionName, additionalOptionId, additionalOptionName, additionalOptionPrice) => {
         const { cart } = get()
-        const existingIndex = cart.findIndex(
-          item => item.menuItemId === menuItemId && item.menuItemOptionId === menuItemOptionId
-        )
 
-        if (existingIndex >= 0) {
-          const newCart = [...cart]
-          newCart[existingIndex].quantity += 1
-          set({ cart: newCart })
+        // If adding an additional option
+        if (additionalOptionId && additionalOptionName && additionalOptionPrice !== undefined) {
+          // Find existing item with same base (menuItemId + menuItemOptionId) but NO addons yet
+          const baseItemIndex = cart.findIndex(
+            item =>
+              item.menuItemId === menuItemId &&
+              item.menuItemOptionId === menuItemOptionId &&
+              (!item.additionalOptions || item.additionalOptions.length === 0)
+          )
+
+          if (baseItemIndex >= 0) {
+            // Add addon to existing base item
+            const newCart = [...cart]
+            const existingItem = newCart[baseItemIndex]
+            newCart[baseItemIndex] = {
+              ...existingItem,
+              additionalOptions: [
+                ...(existingItem.additionalOptions || []),
+                { id: additionalOptionId, name: additionalOptionName, price: additionalOptionPrice }
+              ],
+              price: existingItem.price + additionalOptionPrice
+            }
+            set({ cart: newCart })
+          } else {
+            // Create new item with addon
+            set({
+              cart: [
+                ...cart,
+                {
+                  menuItemId,
+                  menuItemName,
+                  menuItemOptionId,
+                  menuItemOptionName,
+                  additionalOptions: [
+                    { id: additionalOptionId, name: additionalOptionName, price: additionalOptionPrice }
+                  ],
+                  price: price + additionalOptionPrice,
+                  quantity: 1,
+                },
+              ],
+            })
+          }
         } else {
-          set({
-            cart: [
-              ...cart,
-              {
-                menuItemId,
-                menuItemName,
-                menuItemOptionId,
-                menuItemOptionName,
-                price,
-                quantity: 1,
-              },
-            ],
-          })
+          // Adding base item (no addon)
+          const existingIndex = cart.findIndex(
+            item =>
+              item.menuItemId === menuItemId &&
+              item.menuItemOptionId === menuItemOptionId &&
+              (!item.additionalOptions || item.additionalOptions.length === 0)
+          )
+
+          if (existingIndex >= 0) {
+            const newCart = [...cart]
+            newCart[existingIndex].quantity += 1
+            set({ cart: newCart })
+          } else {
+            set({
+              cart: [
+                ...cart,
+                {
+                  menuItemId,
+                  menuItemName,
+                  menuItemOptionId,
+                  menuItemOptionName,
+                  price,
+                  quantity: 1,
+                },
+              ],
+            })
+          }
         }
       },
 

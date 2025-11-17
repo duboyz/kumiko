@@ -40,7 +40,16 @@ export function CartItemCard({ item, index, currency = Currency.USD, onUpdateQua
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm sm:text-base text-foreground mb-1 pr-2">{item.menuItemName}</h3>
             {item.menuItemOptionName && (
-              <p className="text-xs sm:text-sm text-muted-foreground mb-2">{item.menuItemOptionName}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">{item.menuItemOptionName}</p>
+            )}
+            {item.additionalOptions && item.additionalOptions.length > 0 && (
+              <div className="mt-1 space-y-0.5">
+                {item.additionalOptions.map((addon, idx) => (
+                  <p key={idx} className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
+                    <span className="text-primary">+</span> {addon.name}
+                  </p>
+                ))}
+              </div>
             )}
             {item.specialInstructions && (
               <div className="mt-2 pt-2 border-t border-border/50">

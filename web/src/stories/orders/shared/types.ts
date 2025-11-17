@@ -3,6 +3,11 @@ export interface CartItem {
   menuItemName: string
   menuItemOptionId?: string
   menuItemOptionName?: string
+  additionalOptions?: Array<{
+    id: string
+    name: string
+    price: number
+  }>
   price: number
   quantity: number
   specialInstructions?: string

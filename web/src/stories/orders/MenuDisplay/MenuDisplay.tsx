@@ -17,7 +17,10 @@ interface MenuDisplayProps {
     menuItemName: string,
     price: number,
     menuItemOptionId?: string,
-    menuItemOptionName?: string
+    menuItemOptionName?: string,
+    additionalOptionId?: string,
+    additionalOptionName?: string,
+    additionalOptionPrice?: number
   ) => void
   className?: string
 }

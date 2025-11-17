@@ -40,9 +40,12 @@ export function OrderForm({ menu, restaurantId, currency = Currency.USD, classNa
     menuItemName: string,
     price: number,
     menuItemOptionId?: string,
-    menuItemOptionName?: string
+    menuItemOptionName?: string,
+    additionalOptionId?: string,
+    additionalOptionName?: string,
+    additionalOptionPrice?: number
   ) => {
-    addToCartStore(menuItemId, menuItemName, price, menuItemOptionId, menuItemOptionName)
+    addToCartStore(menuItemId, menuItemName, price, menuItemOptionId, menuItemOptionName, additionalOptionId, additionalOptionName, additionalOptionPrice)
     // toast.success(`Added ${menuItemName} to cart`)
   }
 
