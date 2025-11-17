@@ -1,5 +1,5 @@
 import { LoginRdto, RegisterRdto, AuthSdto, UserSdto, ResponseData, ApiResponse, RefreshTokenResult } from '@shared'
-import type { ForgotPasswordCommand, ForgotPasswordResult, ResetPasswordCommand, ResetPasswordResult } from '../types/auth.types'
+import type { ForgotPasswordCommand, ForgotPasswordResult, ResetPasswordCommand, ResetPasswordResult, RegisterCustomerCommand, RegisterCustomerResult } from '../types/auth.types'
 import apiClient from './client'
 
 export const authApi = {
@@ -18,6 +18,15 @@ export const authApi = {
       clientType: 'Web',
     })
     if (!data.success) throw new Error(data.message || 'Registration failed')
+    return data.data
+  },
+
+  registerCustomer: async (credentials: Omit<RegisterCustomerCommand, 'clientType'>): Promise<ResponseData<RegisterCustomerResult>> => {
+    const { data } = await apiClient.post<ApiResponse<RegisterCustomerResult>>('/api/auth/register-customer', {
+      ...credentials,
+      clientType: 'Web',
+    })
+    if (!data.success) throw new Error(data.message || 'Customer registration failed')
     return data.data
   },
 

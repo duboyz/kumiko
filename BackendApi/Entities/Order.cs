@@ -11,6 +11,11 @@ public enum OrderStatus
 
 public class Order : BaseEntity
 {
+    // Optional link to registered customer
+    public Guid? CustomerId { get; set; }
+    public User? Customer { get; set; }
+
+    // Customer information (either from linked user or provided directly)
     public string CustomerName { get; set; } = string.Empty;
     public string CustomerPhone { get; set; } = string.Empty;
     public string CustomerEmail { get; set; } = string.Empty;
@@ -18,13 +23,13 @@ public class Order : BaseEntity
     public TimeSpan PickupTime { get; set; }
     public string AdditionalNote { get; set; } = string.Empty;
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
-    
+
     public Guid RestaurantId { get; set; }
     public Restaurant Restaurant { get; set; } = null!;
-    
+
     public Guid RestaurantMenuId { get; set; }
     public RestaurantMenu RestaurantMenu { get; set; } = null!;
-    
+
     public ICollection<OrderItem> OrderItems { get; set; } = [];
 }
 

@@ -1,4 +1,5 @@
 export * from './auth.hooks'
+export * from './customer-auth.hooks'
 export * from './restaurant.hooks'
 export * from './restaurantSelection.hooks'
 export * from './locationSelection.hooks'

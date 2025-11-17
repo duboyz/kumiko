@@ -3,6 +3,7 @@ using BackendApi.Shared.Contracts;
 namespace BackendApi.Features.Order.CreateOrder;
 
 public record CreateOrderCommand(
+    Guid? CustomerId,
     string CustomerName,
     string CustomerPhone,
     string CustomerEmail,

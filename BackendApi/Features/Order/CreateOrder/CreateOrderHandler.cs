@@ -52,13 +52,42 @@ public class CreateOrderHandler(
             throw new ArgumentException("Order must have at least one item");
         }
 
+        // If customer is authenticated, optionally get their saved info
+        string customerName = request.CustomerName;
+        string customerPhone = request.CustomerPhone;
+        string customerEmail = request.CustomerEmail;
+
+        if (request.CustomerId.HasValue)
+        {
+            var customer = await context.Users
+                .FirstOrDefaultAsync(u => u.Id == request.CustomerId.Value, cancellationToken);
+
+            if (customer != null)
+            {
+                // Use saved customer info if not provided in request
+                if (string.IsNullOrWhiteSpace(customerName) && !string.IsNullOrWhiteSpace(customer.FirstName))
+                {
+                    customerName = $"{customer.FirstName} {customer.LastName}".Trim();
+                }
+                if (string.IsNullOrWhiteSpace(customerPhone))
+                {
+                    customerPhone = customer.PhoneNumber ?? string.Empty;
+                }
+                if (string.IsNullOrWhiteSpace(customerEmail))
+                {
+                    customerEmail = customer.Email;
+                }
+            }
+        }
+
         // Create order
         var order = new Entities.Order
         {
             Id = Guid.NewGuid(),
-            CustomerName = request.CustomerName.Trim(),
-            CustomerPhone = request.CustomerPhone.Trim(),
-            CustomerEmail = request.CustomerEmail.Trim(),
+            CustomerId = request.CustomerId,
+            CustomerName = customerName.Trim(),
+            CustomerPhone = customerPhone.Trim(),
+            CustomerEmail = customerEmail.Trim(),
             PickupDate = request.PickupDate,
             PickupTime = request.PickupTime,
             AdditionalNote = request.AdditionalNote?.Trim() ?? string.Empty,

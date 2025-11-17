@@ -3,6 +3,7 @@
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { CustomerInfoForm } from '@/stories/orders/CustomerInfoForm'
+import { CustomerAuthSection } from '@/stories/orders/CustomerAuthSection'
 import {
   useCartStore,
   useCreateOrder,
@@ -14,6 +15,7 @@ import {
   getMinTime,
   getMaxTime,
   isDateAvailable,
+  useCustomerAuthStore,
 } from '@shared'
 import { toast } from 'sonner'
 import { ArrowLeft } from 'lucide-react'
@@ -41,8 +43,25 @@ export default function CheckoutPage() {
     getTotalAmount,
   } = useCartStore()
 
+  const { customer, isAuthenticated } = useCustomerAuthStore()
   const { data: websiteData } = useWebsiteBySubdomain(subdomain)
   const createOrderMutation = useCreateOrder()
+
+  // Pre-fill customer info when logged in
+  useEffect(() => {
+    if (isAuthenticated && customer) {
+      // Only pre-fill if fields are empty
+      if (!customerInfo.name) {
+        setCustomerInfo('name', `${customer.firstName} ${customer.lastName}`.trim())
+      }
+      if (!customerInfo.email) {
+        setCustomerInfo('email', customer.email)
+      }
+      if (!customerInfo.phone && customer.phoneNumber) {
+        setCustomerInfo('phone', customer.phoneNumber)
+      }
+    }
+  }, [isAuthenticated, customer, customerInfo, setCustomerInfo])
 
   // Parse business hours
   const businessHours = useMemo(() => {
@@ -349,6 +368,9 @@ export default function CheckoutPage() {
         </div>
 
         <div className="max-w-2xl mx-auto">
+          {/* Customer Authentication Section */}
+          <CustomerAuthSection />
+
           {/* Customer Info Form */}
           <div className="bg-white rounded-lg shadow-sm p-4 sm:p-5 md:p-6 lg:p-6 flex flex-col">
             <h2 className="text-lg sm:text-xl md:text-xl font-semibold mb-4 sm:mb-5">Customer Information</h2>

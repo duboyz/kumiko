@@ -7,6 +7,7 @@ import {
   UpdateOrderStatusResult,
   OrderDto,
   GetOrderByIdResult,
+  CustomerOrderDto,
 } from '../types/order.types'
 import { ApiResponse, ResponseData } from '../types/apiResponse.types'
 
@@ -37,6 +38,12 @@ export const orderApi = {
   getOrderById: async (orderId: string): Promise<ResponseData<GetOrderByIdResult>> => {
     const { data: response } = await client.get<ApiResponse<GetOrderByIdResult>>(`/api/orders/${orderId}/status`)
     if (!response.success || !response.data) throw new Error(response.message || 'Failed to get order')
+    return response.data
+  },
+
+  getCustomerOrders: async (): Promise<ResponseData<CustomerOrderDto[]>> => {
+    const { data: response } = await client.get<ApiResponse<CustomerOrderDto[]>>('/api/orders/my-orders')
+    if (!response.success || !response.data) throw new Error(response.message || 'Failed to get customer orders')
     return response.data
   },
 }

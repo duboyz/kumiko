@@ -49,3 +49,11 @@ export const useOrderById = (orderId: string) => {
   })
 }
 
+// Get customer orders (authenticated)
+export const useCustomerOrders = () => {
+  return useQuery({
+    queryKey: ['customer-orders'],
+    queryFn: () => orderApi.getCustomerOrders(),
+  })
+}
+

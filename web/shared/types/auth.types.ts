@@ -41,6 +41,22 @@ export interface RegisterRdto {
   clientType?: string
 }
 
+// Register Customer
+export interface RegisterCustomerCommand {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  phoneNumber?: string
+  clientType: string
+}
+
+export interface RegisterCustomerResult {
+  accessToken: string | null
+  refreshToken: string | null
+  expiresAt: string
+}
+
 // Refresh Token
 export interface RefreshTokenResult {
   accessToken: string

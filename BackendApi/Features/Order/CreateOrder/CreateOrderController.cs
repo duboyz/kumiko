@@ -1,15 +1,24 @@
+using BackendApi.Controllers;
 using BackendApi.Models;
-using BackendApi.Shared.Controllers;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendApi.Features.Order.CreateOrder;
 
 [Route("api/orders")]
 [Tags("Order")]
-public class CreateOrderController(IMediator mediator) : BaseController(mediator)
+public class CreateOrderController : BaseAuthenticatedController
 {
+    private readonly IMediator _mediator;
+
+    public CreateOrderController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
     [HttpPost]
+    [AllowAnonymous]
     public async Task<ActionResult<ApiResponse<CreateOrderResult>>> CreateOrder([FromBody] CreateOrderRequest request)
     {
         // Parse pickup time from string to TimeSpan
@@ -23,7 +32,11 @@ public class CreateOrderController(IMediator mediator) : BaseController(mediator
             });
         }
 
+        // Check if customer is authenticated (optional)
+        var customerId = TryGetUserId();
+
         var command = new CreateOrderCommand(
+            customerId,
             request.CustomerName,
             request.CustomerPhone,
             request.CustomerEmail,
@@ -35,8 +48,15 @@ public class CreateOrderController(IMediator mediator) : BaseController(mediator
             request.OrderItems
         );
 
-        var result = await Mediator.Send(command);
-        return CreateResponse(result, ApiResponseStatusCode.Success, "Order created successfully");
+        var result = await _mediator.Send(command);
+
+        return Ok(new ApiResponse<CreateOrderResult>
+        {
+            Success = true,
+            StatusCode = ApiResponseStatusCode.Success,
+            Message = "Order created successfully",
+            Data = result
+        });
     }
 }
 

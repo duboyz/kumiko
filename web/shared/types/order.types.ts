@@ -124,3 +124,22 @@ export interface RestaurantInfoDto {
   currency: string
 }
 
+// Customer order history
+export interface CustomerOrderDto {
+  id: string
+  customerName: string
+  customerPhone: string
+  customerEmail: string
+  pickupDate: string
+  pickupTime: string
+  status: string
+  totalAmount: number
+  createdAt: string
+  restaurant: CustomerOrderRestaurantDto
+}
+
+export interface CustomerOrderRestaurantDto {
+  id: string
+  name: string
+}
+

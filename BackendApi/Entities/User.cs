@@ -22,5 +22,6 @@ public class User : BaseEntity
     public DateTime? PasswordResetTokenExpiresAt { get; set; }
 
     public ICollection<UserRestaurant> Restaurants { get; set; } = [];
+    public ICollection<Order> Orders { get; set; } = [];
     public UserSubscription? Subscription { get; set; }
 }

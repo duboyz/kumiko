@@ -5,6 +5,7 @@ export interface UserSdto {
   email: string
   firstName: string
   lastName: string
+  phoneNumber?: string
   isActive: boolean
   userType: UserType
   preferredLanguage: Language
