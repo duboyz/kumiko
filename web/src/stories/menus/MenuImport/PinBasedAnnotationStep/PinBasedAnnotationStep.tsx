@@ -244,7 +244,7 @@ export function PinBasedAnnotationStep({
           />
         </div>
         <p className="text-sm text-muted-foreground mt-2 text-center max-w-sm">
-          Kumiko is ready to help you annotate your menu and extract the details!
+          Click <strong>one example</strong> of each type on your menu image
         </p>
       </div>
 
@@ -273,6 +273,9 @@ export function PinBasedAnnotationStep({
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold text-primary text-sm sm:text-base">{nextStep.label}</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{nextStep.description}</p>
+                <p className="text-xs sm:text-sm text-primary font-medium mt-2">
+                  Click <strong>one</strong> example on the image
+                </p>
               </div>
             </div>
           </CardContent>
@@ -388,7 +391,15 @@ export function PinBasedAnnotationStep({
 
         {/* Instructions */}
         <div className="mt-2 text-center text-xs sm:text-sm text-muted-foreground px-2">
-          Tap on the image to place {selectedAnnotationType?.label.toLowerCase()} pins
+          {nextStep ? (
+            <>
+              Click <strong>one</strong> {nextStep.label.toLowerCase()} on the image
+            </>
+          ) : (
+            <>
+              Click <strong>one</strong> {selectedAnnotationType?.label.toLowerCase()} on the image
+            </>
+          )}
         </div>
       </div>
 
