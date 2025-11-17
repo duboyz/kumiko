@@ -54,7 +54,7 @@ export function OrderForm({ menu, restaurantId, currency = Currency.USD, classNa
   }
 
   return (
-    <div className={className}>
+    <section className={`relative py-20 px-10 bg-white ${className}`}>
       {/* Floating Cart Button */}
       <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
         <DialogTrigger asChild>
@@ -71,9 +71,20 @@ export function OrderForm({ menu, restaurantId, currency = Currency.USD, classNa
         />
       </Dialog>
 
-      {/* Menu Display */}
-      <MenuDisplay menu={menu} currency={currency} onAddToCart={addToCart} />
-    </div>
+      {/* Content with max-width constraint for desktop */}
+      <div className="max-w-[1000px] mx-auto">
+        {/* Menu Header */}
+        <div className="text-center mb-[60px]">
+          <h2 className="text-4xl font-light mb-4">{menu.name}</h2>
+          {menu.description && (
+            <p className="text-base text-muted-foreground">{menu.description}</p>
+          )}
+        </div>
+
+        {/* Menu Display */}
+        <MenuDisplay menu={menu} currency={currency} onAddToCart={addToCart} />
+      </div>
+    </section>
   )
 }
 
