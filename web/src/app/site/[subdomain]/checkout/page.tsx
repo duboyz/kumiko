@@ -356,7 +356,7 @@ export default function CheckoutPage() {
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold text-gray-900">{t('cartEmpty')}</h1>
           <p className="text-gray-600">{t('addItemsFirst')}</p>
-          <Button onClick={() => router.push(`/site/${subdomain}`)}>{t('backToMenu')}</Button>
+          <Button onClick={() => router.push(`/menu`)}>{t('backToMenu')}</Button>
         </div>
       </div>
     )
