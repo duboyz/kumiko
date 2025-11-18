@@ -22,7 +22,8 @@ import { ArrowLeft } from 'lucide-react'
 import { PoweredByKumiko } from '@/stories/websites'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
+import { gsap } from 'gsap'
 
 export default function CheckoutPage() {
   const t = useTranslations('checkout')
@@ -49,6 +50,31 @@ export default function CheckoutPage() {
 
   // Checkout step state: 'auth' or 'info'
   const [checkoutStep, setCheckoutStep] = useState<'auth' | 'info'>('auth')
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
+
+  // Mark as mounted after hydration
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Animation when checkout page appears
+  useEffect(() => {
+    if (!contentRef.current || !mounted) return
+
+    const tl = gsap.timeline()
+    tl.fromTo(
+      contentRef.current,
+      { opacity: 0, x: 30, filter: 'blur(10px)' },
+      {
+        opacity: 1,
+        x: 0,
+        filter: 'blur(0px)',
+        duration: 0.5,
+        ease: 'power2.out',
+      }
+    )
+  }, [mounted])
 
   // Skip auth step if already authenticated
   useEffect(() => {
@@ -419,7 +445,7 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <div className="max-w-2xl mx-auto">
+        <div ref={contentRef} className="max-w-2xl mx-auto">
           {checkoutStep === 'auth' ? (
             /* Customer Authentication Section - First Step */
             <CustomerAuthSection
