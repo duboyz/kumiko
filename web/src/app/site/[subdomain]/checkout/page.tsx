@@ -305,6 +305,17 @@ export default function CheckoutPage() {
     }
 
     try {
+      // Validate required fields before proceeding
+      if (!customerInfo.pickupDate) {
+        toast.error(t('selectPickupDate') || 'Please select a pickup date')
+        return
+      }
+
+      if (!customerInfo.pickupTime) {
+        toast.error(t('selectPickupTime') || 'Please select a pickup time')
+        return
+      }
+
       const orderItems: CreateOrderItemDto[] = cart.map(item => ({
         menuItemId: item.menuItemId,
         menuItemOptionId: item.menuItemOptionId,
@@ -313,14 +324,40 @@ export default function CheckoutPage() {
       }))
 
       // Format pickup date as ISO string
-      const pickupDateISO = new Date(customerInfo.pickupDate).toISOString()
+      // Parse date in local timezone to avoid timezone issues
+      const [year, month, day] = customerInfo.pickupDate.split('-').map(Number)
+      const pickupDateObj = new Date(year, month - 1, day)
+
+      if (isNaN(pickupDateObj.getTime())) {
+        toast.error('Invalid pickup date. Please select a valid date.')
+        return
+      }
+
+      const pickupDateISO = pickupDateObj.toISOString()
 
       // Format pickup time as HH:mm:ss
-      const pickupTimeFormatted = customerInfo.pickupTime.includes(':')
-        ? customerInfo.pickupTime.split(':').length === 2
-          ? `${customerInfo.pickupTime}:00`
-          : customerInfo.pickupTime
-        : '12:00:00'
+      let pickupTimeFormatted: string
+      if (!customerInfo.pickupTime || customerInfo.pickupTime.trim() === '') {
+        toast.error('Pickup time is required')
+        return
+      }
+
+      if (customerInfo.pickupTime.includes(':')) {
+        const timeParts = customerInfo.pickupTime.split(':')
+        if (timeParts.length === 2) {
+          // Format as HH:mm:ss
+          pickupTimeFormatted = `${customerInfo.pickupTime}:00`
+        } else if (timeParts.length === 3) {
+          // Already in HH:mm:ss format
+          pickupTimeFormatted = customerInfo.pickupTime
+        } else {
+          toast.error('Invalid time format')
+          return
+        }
+      } else {
+        toast.error('Invalid time format. Please select a valid time.')
+        return
+      }
 
       const result = await createOrderMutation.mutateAsync({
         customerName: customerInfo.name.trim(),
@@ -328,7 +365,7 @@ export default function CheckoutPage() {
         customerEmail: customerInfo.email.trim(),
         pickupDate: pickupDateISO,
         pickupTime: pickupTimeFormatted,
-        additionalNote: customerInfo.additionalNote.trim(),
+        additionalNote: customerInfo.additionalNote?.trim() || '',
         restaurantId,
         restaurantMenuId: menuId,
         orderItems,
@@ -343,9 +380,14 @@ export default function CheckoutPage() {
       // Redirect to order status page
       if (result?.id) {
         router.push(`/order/${result.id}/status`)
+      } else {
+        console.error('Order created but no ID returned:', result)
+        toast.error('Order created but could not redirect. Please check your orders.')
       }
     } catch (error) {
-      toast.error(t('failedToPlaceOrder'))
+      console.error('Error placing order:', error)
+      const errorMessage = error instanceof Error ? error.message : t('failedToPlaceOrder')
+      toast.error(errorMessage)
     }
   }
 
