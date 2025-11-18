@@ -47,6 +47,16 @@ export default function CheckoutPage() {
   const { data: websiteData } = useWebsiteBySubdomain(subdomain)
   const createOrderMutation = useCreateOrder()
 
+  // Checkout step state: 'auth' or 'info'
+  const [checkoutStep, setCheckoutStep] = useState<'auth' | 'info'>('auth')
+
+  // Skip auth step if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && customer) {
+      setCheckoutStep('info')
+    }
+  }, [isAuthenticated, customer])
+
   // Pre-fill customer info when logged in
   useEffect(() => {
     if (isAuthenticated && customer) {
@@ -286,7 +296,7 @@ export default function CheckoutPage() {
 
     if (cart.length === 0) {
       toast.error(t('cartEmpty'))
-      router.push(`/site/${subdomain}`)
+      router.push('/menu')
       return
     }
     if (!restaurantId || !menuId) {
@@ -383,62 +393,81 @@ export default function CheckoutPage() {
         </div>
 
         <div className="max-w-2xl mx-auto">
-          {/* Customer Authentication Section */}
-          <CustomerAuthSection />
-
-          {/* Customer Info Form */}
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-5 md:p-6 lg:p-6 flex flex-col">
-            <h2 className="text-lg sm:text-xl md:text-xl font-semibold mb-4 sm:mb-5">Customer Information</h2>
-            <CustomerInfoForm
-              customerInfo={customerInfo}
-              onCustomerInfoChange={handleCustomerInfoChange}
-              minDate={minDate}
-              minTime={minTime}
-              maxTime={maxTime}
-              onDateChange={handleDateChange}
-              errors={validationErrors}
+          {checkoutStep === 'auth' ? (
+            /* Customer Authentication Section - First Step */
+            <CustomerAuthSection
+              onContinueAsGuest={() => setCheckoutStep('info')}
+              onAuthenticated={() => setCheckoutStep('info')}
             />
-
-            {/* Total and Place Order Button - Desktop */}
-            <div className="hidden lg:block mt-6 pt-6 border-t border-gray-200">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-lg font-semibold text-gray-700">Total:</span>
-                <span className="text-xl font-bold text-gray-900">{formatPrice(totalAmount, currency)}</span>
+          ) : (
+            /* Customer Info Form - Second Step */
+            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-5 md:p-6 lg:p-6 flex flex-col">
+              <div className="mb-4 sm:mb-5">
+                <h2 className="text-lg sm:text-xl md:text-xl font-semibold">Customer Information</h2>
+                {!isAuthenticated && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCheckoutStep('auth')}
+                    className="mt-2 text-sm text-gray-600 hover:text-gray-900"
+                  >
+                    ← Back to sign in
+                  </Button>
+                )}
               </div>
-              <Button
-                type="button"
-                onClick={handleSubmitOrder}
-                className="w-full text-base font-semibold"
-                size="lg"
-                disabled={createOrderMutation.isPending}
-              >
-                {createOrderMutation.isPending ? 'Placing Order...' : 'Place Order'}
-              </Button>
+              <CustomerInfoForm
+                customerInfo={customerInfo}
+                onCustomerInfoChange={handleCustomerInfoChange}
+                minDate={minDate}
+                minTime={minTime}
+                maxTime={maxTime}
+                onDateChange={handleDateChange}
+                errors={validationErrors}
+              />
+
+              {/* Total and Place Order Button - Desktop/Tablet */}
+              <div className="hidden md:block mt-4 pt-4 border-t border-gray-200">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-lg font-semibold text-gray-700">Total:</span>
+                  <span className="text-xl font-bold text-gray-900">{formatPrice(totalAmount, currency)}</span>
+                </div>
+                <Button
+                  type="button"
+                  onClick={handleSubmitOrder}
+                  className="w-full text-base font-semibold"
+                  size="lg"
+                  disabled={createOrderMutation.isPending}
+                >
+                  {createOrderMutation.isPending ? 'Placing Order...' : 'Place Order'}
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       {/* Sticky Total and Place Order Button - Mobile only */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-        <div className="px-4 pt-3 pb-2">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-base font-semibold text-gray-700">Total:</span>
-            <span className="text-lg font-bold text-gray-900">{formatPrice(totalAmount, currency)}</span>
+      {checkoutStep === 'info' && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+          <div className="px-4 pt-3 pb-2">
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-base font-semibold text-gray-700">Total:</span>
+              <span className="text-lg font-bold text-gray-900">{formatPrice(totalAmount, currency)}</span>
+            </div>
+          </div>
+          <div className="px-4 pb-4">
+            <Button
+              type="button"
+              onClick={handleSubmitOrder}
+              className="w-full text-base font-semibold"
+              size="lg"
+              disabled={createOrderMutation.isPending}
+            >
+              {createOrderMutation.isPending ? 'Placing Order...' : 'Place Order'}
+            </Button>
           </div>
         </div>
-        <div className="px-4 pb-4">
-          <Button
-            type="button"
-            onClick={handleSubmitOrder}
-            className="w-full text-base font-semibold"
-            size="lg"
-            disabled={createOrderMutation.isPending}
-          >
-            {createOrderMutation.isPending ? 'Placing Order...' : 'Place Order'}
-          </Button>
-        </div>
-      </div>
+      )}
 
       <PoweredByKumiko />
     </div>
