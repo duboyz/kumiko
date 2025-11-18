@@ -90,9 +90,7 @@ export default function CheckoutPage() {
   })
 
   const { minTime, maxTime } = useMemo(() => {
-    // Always use business hours constraints for the selected date
     if (!selectedDate || !businessHours) {
-      console.log('[Checkout] No selectedDate or businessHours', { selectedDate, businessHours })
       return { minTime: undefined, maxTime: undefined }
     }
 
@@ -101,17 +99,8 @@ export default function CheckoutPage() {
     const date = new Date(year, month - 1, day)
     const dayName = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][date.getDay()]
 
-    console.log('[Checkout] Calculating time constraints', {
-      selectedDate,
-      dayName,
-      businessHoursForDay: businessHours[dayName],
-      allBusinessHours: businessHours,
-    })
-
     // Check if restaurant is open on this date
     if (!isDateAvailable(date, businessHours)) {
-      console.log('[Checkout] Restaurant closed on selected date')
-      // If closed, no time constraints (date validation will catch this)
       return { minTime: undefined, maxTime: undefined }
     }
 
@@ -119,11 +108,7 @@ export default function CheckoutPage() {
     const min = getMinTime(date, businessHours)
     const max = getMaxTime(date, businessHours)
 
-    console.log('[Checkout] Calculated times', { min, max })
-
-    // If either is undefined, return undefined for both (shouldn't happen if isDateAvailable passed)
     if (!min || !max) {
-      console.log('[Checkout] Min or max is undefined, returning undefined')
       return { minTime: undefined, maxTime: undefined }
     }
 

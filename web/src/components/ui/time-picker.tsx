@@ -16,11 +16,6 @@ export function TimePicker({ value, onChange, min, max, className, disabled }: T
   const [hours, setHours] = useState<string>('12')
   const [minutes, setMinutes] = useState<string>('00')
 
-  // Debug: log constraints
-  useEffect(() => {
-    console.log('[TimePicker] Received constraints:', { min, max, value })
-  }, [min, max, value])
-
   // Parse initial value - update when value changes
   useEffect(() => {
     if (value) {

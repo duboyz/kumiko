@@ -35,7 +35,7 @@ export function CustomerInfoForm({
   const formRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
 
-  // Initialize with ASAP as default (stable across server/client)
+  // Initialize with ASAP as default
   const [isAsap, setIsAsap] = useState(true)
 
   // Mark as mounted after hydration
@@ -43,12 +43,11 @@ export function CustomerInfoForm({
     setMounted(true)
   }, [])
 
-  // Subtle animation when form appears (similar to onboarding stepper)
+  // Subtle animation when form appears
   useEffect(() => {
     if (!formRef.current || !mounted) return
 
     const tl = gsap.timeline()
-
     tl.fromTo(
       formRef.current,
       { opacity: 0, x: 30, filter: 'blur(10px)' },
@@ -62,6 +61,17 @@ export function CustomerInfoForm({
     )
   }, [mounted])
 
+  // Initialize ASAP when minDate/minTime become available
+  useEffect(() => {
+    if (minDate && minTime && isAsap) {
+      onCustomerInfoChange('pickupDate', minDate)
+      if (onDateChange) {
+        onDateChange(minDate)
+      }
+      onCustomerInfoChange('pickupTime', minTime)
+    }
+  }, [minDate, minTime, isAsap]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleDateChange = (date: string) => {
     onCustomerInfoChange('pickupDate', date)
     if (onDateChange) {
@@ -73,7 +83,7 @@ export function CustomerInfoForm({
   const handleAsapToggle = (asap: boolean) => {
     setIsAsap(asap)
     if (asap) {
-      // When ASAP is selected, set date to today (or earliest available) and time to minTime
+      // When ASAP is selected, set date and time to earliest available
       if (minDate) {
         onCustomerInfoChange('pickupDate', minDate)
         if (onDateChange) {
@@ -83,91 +93,8 @@ export function CustomerInfoForm({
       if (minTime) {
         onCustomerInfoChange('pickupTime', minTime)
       }
-    } else if (!asap && !customerInfo.pickupTime) {
-      // If switching from ASAP to specific time and no time is set, use minTime
-      if (minTime) {
-        onCustomerInfoChange('pickupTime', minTime)
-      }
     }
   }
-
-  // Update time to valid range when date or constraints change
-  const prevDateRef = useRef<string | undefined>(customerInfo.pickupDate)
-  const prevMinTimeRef = useRef<string | undefined>(minTime)
-  const prevMaxTimeRef = useRef<string | undefined>(maxTime)
-
-  useEffect(() => {
-    // Only validate when date changes or constraints change, not when time changes
-    const dateChanged = prevDateRef.current !== customerInfo.pickupDate
-    const minTimeChanged = prevMinTimeRef.current !== minTime
-    const maxTimeChanged = prevMaxTimeRef.current !== maxTime
-
-    // If ASAP is selected, keep date and time in sync with earliest available
-    if (isAsap) {
-      // Update date to minDate if it doesn't match (but only if minDate is available and date didn't just change from user action)
-      // Since date picker is hidden when ASAP is selected, dateChanged means it was updated programmatically
-      if (minDate && customerInfo.pickupDate !== minDate) {
-        onCustomerInfoChange('pickupDate', minDate)
-        if (onDateChange) {
-          onDateChange(minDate)
-        }
-      }
-      // Update time to minTime if it changed or doesn't match
-      if (minTime && (minTimeChanged || customerInfo.pickupTime !== minTime)) {
-        onCustomerInfoChange('pickupTime', minTime)
-      }
-    }
-
-    // Only validate if we have constraints and a time value
-    // Don't validate if constraints are undefined (allows free time selection)
-    if (
-      (dateChanged || minTimeChanged || maxTimeChanged) &&
-      customerInfo.pickupDate &&
-      customerInfo.pickupTime &&
-      minTime &&
-      maxTime &&
-      !isAsap
-    ) {
-      // Only update if time is actually outside bounds AND different from what we'd set
-      if (customerInfo.pickupTime < minTime) {
-        onCustomerInfoChange('pickupTime', minTime)
-      } else if (customerInfo.pickupTime > maxTime) {
-        onCustomerInfoChange('pickupTime', maxTime)
-      }
-      // If time is within bounds, don't change it - let user keep their selection
-    }
-
-    // Update refs
-    prevDateRef.current = customerInfo.pickupDate
-    prevMinTimeRef.current = minTime
-    prevMaxTimeRef.current = maxTime
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customerInfo.pickupDate, minTime, maxTime, isAsap]) // Don't include pickupTime to avoid loops
-
-  // Initialize ASAP date and time when minDate/minTime becomes available
-  useEffect(() => {
-    if (isAsap) {
-      if (minDate && (!customerInfo.pickupDate || customerInfo.pickupDate !== minDate)) {
-        onCustomerInfoChange('pickupDate', minDate)
-        if (onDateChange) {
-          onDateChange(minDate)
-        }
-      }
-      if (minTime && (!customerInfo.pickupTime || customerInfo.pickupTime === '')) {
-        onCustomerInfoChange('pickupTime', minTime)
-      }
-    }
-  }, [minDate, minTime, isAsap]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Update isAsap when pickupTime changes externally (user manually changes time)
-  useEffect(() => {
-    if (customerInfo.pickupTime && minTime && customerInfo.pickupTime !== minTime) {
-      setIsAsap(false)
-    } else if (customerInfo.pickupTime && minTime && customerInfo.pickupTime === minTime && !isAsap) {
-      // If time is set to minTime but ASAP is not selected, don't auto-select ASAP
-      // (user might have explicitly chosen that time)
-    }
-  }, [customerInfo.pickupTime, minTime, isAsap])
 
   return (
     <div ref={formRef} className="space-y-3 sm:space-y-4">
