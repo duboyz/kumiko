@@ -132,14 +132,79 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
     }
   }
 
-  const handleMenuCreated = (createdMenuId: string) => {
+  const handleMenuCreated = async (createdMenuId: string) => {
     console.log('RestaurantOnboarding: Menu created with ID:', createdMenuId)
     setMenuId(createdMenuId)
-    setCurrentStep('website')
+
+    // Automatically create website with menu page only (skip website step)
+    if (!restaurantId || !businessDetails) {
+      toast.error('Missing required information')
+      return
+    }
+
+    try {
+      setIsCreatingWebsite(true)
+      setCreationProgress(0)
+
+      // Simulate progress steps
+      const progressSteps = ['Creating website...', 'Generating pages...', 'Finalizing...']
+      let stepIndex = 0
+
+      const progressInterval = setInterval(() => {
+        stepIndex++
+        setCreationProgress((stepIndex / progressSteps.length) * 100)
+        if (stepIndex >= progressSteps.length) {
+          clearInterval(progressInterval)
+        }
+      }, 500)
+
+      // Generate clean subdomain from restaurant name
+      const subdomain =
+        businessDetails.name
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '') || 'restaurant'
+
+      // Use menu page only template (simple website with just the menu)
+      const result = await createWebsiteFromTemplates.mutateAsync({
+        restaurantId,
+        websiteName: `${businessDetails.name} Website`,
+        subdomain,
+        description: `Website for ${businessDetails.name}`,
+        pageTemplates: [
+          {
+            templateType: PageTemplate.MenuPage,
+          },
+        ],
+        menuId: createdMenuId,
+      })
+
+      clearInterval(progressInterval)
+      setCreationProgress(100)
+
+      // Store website data for celebration step
+      if (result?.createdPages) {
+        setWebsiteData({
+          subdomain,
+          pagesCount: result.createdPages.length,
+        })
+      }
+
+      // Small delay to show 100% before transitioning
+      setTimeout(() => {
+        setIsCreatingWebsite(false)
+        setCurrentStep('celebration')
+      }, 300)
+    } catch (error) {
+      console.error('Failed to create website:', error)
+      toast.error('Failed to create website')
+      setIsCreatingWebsite(false)
+    }
   }
 
   const handleSkipMenu = () => {
-    setCurrentStep('website')
+    // Skip menu and go directly to celebration (no website step)
+    setCurrentStep('celebration')
   }
 
   const handleTemplatesSelected = async (templates: PageTemplate[]) => {
@@ -232,9 +297,11 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
       setCurrentStep('details')
     } else if (currentStep === 'menu') {
       setCurrentStep('hours')
-    } else if (currentStep === 'website') {
-      setCurrentStep('menu')
     }
+    // Website step commented out - no longer in flow
+    // else if (currentStep === 'website') {
+    //   setCurrentStep('menu')
+    // }
     // Don't call onBack for first step since we're directly on restaurant onboarding
   }
 
@@ -303,8 +370,8 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
     }
   }, [isCreatingWebsite])
 
-  // Calculate progress percentage
-  const stepOrder: Step[] = ['search', 'details', 'hours', 'menu', 'website', 'celebration']
+  // Calculate progress percentage (website step removed from flow)
+  const stepOrder: Step[] = ['search', 'details', 'hours', 'menu', 'celebration']
   const progressPercentage = (stepOrder.indexOf(currentStep) / (stepOrder.length - 1)) * 100
 
   // Get contextual header based on current step
@@ -336,12 +403,13 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
           description: 'Import your menu to get started',
           icon: null,
         }
-      case 'website':
-        return {
-          title: 'Create Your Website',
-          description: 'Choose what template you want!',
-          icon: Globe,
-        }
+      // Website step commented out - automatically creating menu page only website
+      // case 'website':
+      //   return {
+      //     title: 'Create Your Website',
+      //     description: 'Choose what template you want!',
+      //     icon: Globe,
+      //   }
       case 'celebration':
         return {
           title: 'All Set!',
@@ -380,13 +448,12 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
               { step: 'details', label: 'Details', icon: CheckCircle },
               { step: 'hours', label: 'Hours', icon: CheckCircle },
               { step: 'menu', label: 'Menu', icon: Upload },
-              { step: 'website', label: 'Website', icon: Globe },
+              // { step: 'website', label: 'Website', icon: Globe }, // Commented out - website step removed
               { step: 'celebration', label: 'Live!', icon: PartyPopper },
             ].map(({ step, label, icon: Icon }, index) => {
               const stepIndex = index + 1
               const isCurrentStep = currentStep === step
-              const isCompleted =
-                ['search', 'details', 'hours', 'menu', 'website', 'celebration'].indexOf(currentStep) > index
+              const isCompleted = ['search', 'details', 'hours', 'menu', 'celebration'].indexOf(currentStep) > index
               const isActive = isCurrentStep || isCompleted
 
               return (
@@ -411,7 +478,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
                       {label}
                     </span>
                   </div>
-                  {index < 5 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
+                  {index < 4 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
                 </div>
               )
             })}
@@ -501,13 +568,14 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
           />
         )}
 
-        {currentStep === 'website' && (
+        {/* Website step commented out - automatically creating menu page only website */}
+        {/* {currentStep === 'website' && (
           <WebsiteTemplateStep
             onTemplatesSelected={handleTemplatesSelected}
             onSkip={handleSkipWebsite}
             selectedMenuId={menuId || undefined}
           />
-        )}
+        )} */}
 
         {currentStep === 'celebration' && websiteData && businessDetails && (
           <CelebrationStep
@@ -521,31 +589,29 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
       </div>
 
       {/* Navigation Buttons */}
-      {currentStep !== 'search' &&
-        currentStep !== 'menu' &&
-        currentStep !== 'celebration' &&
-        currentStep !== 'website' && (
-          <div className="flex items-center justify-between pt-6">
-            <Button onClick={handleBack} variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+      {/* Website step commented out - no longer in flow */}
+      {currentStep !== 'search' && currentStep !== 'menu' && currentStep !== 'celebration' && (
+        <div className="flex items-center justify-between pt-6">
+          <Button onClick={handleBack} variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+
+          {currentStep === 'details' && (
+            <Button onClick={handleContinueToHours} disabled={!businessDetails || !isBusinessDetailsValid}>
+              Next: Opening Hours
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
+          )}
 
-            {currentStep === 'details' && (
-              <Button onClick={handleContinueToHours} disabled={!businessDetails || !isBusinessDetailsValid}>
-                Next: Opening Hours
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            )}
-
-            {currentStep === 'hours' && (
-              <Button onClick={handleContinueToMenu} disabled={!businessHours || createRestaurant.isPending}>
-                {createRestaurant.isPending ? 'Setting up your place...' : 'Next: Add Your Menu'}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            )}
-          </div>
-        )}
+          {currentStep === 'hours' && (
+            <Button onClick={handleContinueToMenu} disabled={!businessHours || createRestaurant.isPending}>
+              {createRestaurant.isPending ? 'Setting up your place...' : 'Next: Add Your Menu'}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          )}
+        </div>
+      )}
 
       {createRestaurant.error && (
         <p className="text-red-600 text-sm text-center">Error: {createRestaurant.error.message}</p>
