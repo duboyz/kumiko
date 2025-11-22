@@ -59,6 +59,12 @@ export default function SettingsPage() {
         {/* Tabbed Settings */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className={`grid w-full mb-6 ${hasRestaurant ? 'grid-cols-3' : 'grid-cols-2'}`}>
+            {hasRestaurant && (
+              <TabsTrigger value="restaurant" className="flex items-center gap-2">
+                <Store className="w-4 h-4" />
+                <span>{t('settings.restaurantTab')}</span>
+              </TabsTrigger>
+            )}
             <TabsTrigger value="account" className="flex items-center gap-2">
               <User className="w-4 h-4" />
               <span>{t('settings.accountTab')}</span>
@@ -67,12 +73,6 @@ export default function SettingsPage() {
               <CreditCard className="w-4 h-4" />
               <span>{t('settings.subscriptionTab')}</span>
             </TabsTrigger>
-            {hasRestaurant && (
-              <TabsTrigger value="restaurant" className="flex items-center gap-2">
-                <Store className="w-4 h-4" />
-                <span>{t('settings.restaurantTab')}</span>
-              </TabsTrigger>
-            )}
 
           </TabsList>
 

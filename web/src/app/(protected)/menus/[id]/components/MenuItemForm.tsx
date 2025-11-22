@@ -613,7 +613,7 @@ const OptionRow = ({ sortableId, option, index, onOptionChange, onRemove, option
                             label="Option Name"
                             value={option.name}
                             onChange={(value) => onOptionChange(index, 'name', value)}
-                            placeholder="Add Bacon"
+                            placeholder="e.g Small, Large"
                             error={optionError?.name}
                         />
                     </div>
@@ -623,7 +623,7 @@ const OptionRow = ({ sortableId, option, index, onOptionChange, onRemove, option
                             label="Description (optional)"
                             value={option.description}
                             onChange={(value) => onOptionChange(index, 'description', value)}
-                            placeholder="Two strips of crispy bacon"
+                            placeholder="e.g. 340g"
                         />
                     </div>
                     <div className="w-full md:w-32">
@@ -633,7 +633,7 @@ const OptionRow = ({ sortableId, option, index, onOptionChange, onRemove, option
                             value={option.price.toString()}
                             type="number"
                             onChange={(value) => onOptionChange(index, 'price', value)}
-                            placeholder="0.00"
+                            placeholder="Price"
                             error={optionError?.price}
                         />
                     </div>
