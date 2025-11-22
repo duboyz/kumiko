@@ -35,7 +35,7 @@ export default function SettingsPage() {
   const hasRestaurant = selectedLocation && selectedLocation.type === 'Restaurant' && selectedLocation.restaurant
 
   // Get active tab from URL or default to 'account'
-  const activeTab = searchParams.get('tab') || 'account'
+  const activeTab = searchParams.get('tab') || (hasRestaurant ? 'restaurant' : 'account')
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {
