@@ -210,11 +210,11 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
           />
 
           {/* Divider */}
-          <div className="flex items-center gap-4 max-w-md mx-auto">
+          {/* <div className="flex items-center gap-4 max-w-md mx-auto">
             <div className="flex-1 h-px bg-border" />
             <span className="text-sm text-muted-foreground">or</span>
             <div className="flex-1 h-px bg-border" />
-          </div>
+          </div> */}
 
           {/* Build Manually Option */}
           {onBuildManually && (

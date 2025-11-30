@@ -12,6 +12,7 @@ import { useImportFlow } from '@/app/(protected)/menus/import/hooks/useImportFlo
 import { useCreateMenuStructure, useCreateRestaurantMenu, useRestaurantMenus, RestaurantMenuDto } from '@shared'
 import { toast } from 'sonner'
 import { MenuBuilder } from '@/stories/menus/MenuBuilder'
+import { MenuImportMethodSelection } from './MenuImportMethodSelection'
 
 interface MenuImportWizardProps {
   restaurantId: string
@@ -22,6 +23,7 @@ interface MenuImportWizardProps {
 }
 
 export enum ImportStep {
+  SELECT_METHOD = 'select_method',
   UPLOAD = 'upload',
   PREVIEW = 'preview',
   PROCESS = 'process',
@@ -30,6 +32,7 @@ export enum ImportStep {
 }
 
 export type ImportStepType =
+  | ImportStep.SELECT_METHOD
   | ImportStep.UPLOAD
   | ImportStep.PREVIEW
   | ImportStep.PROCESS
@@ -38,6 +41,8 @@ export type ImportStepType =
 
 const getStepNumber = (step: ImportStep): number => {
   switch (step) {
+    case ImportStep.SELECT_METHOD:
+      return 0
     case ImportStep.UPLOAD:
       return 1
     case ImportStep.PREVIEW:
@@ -49,7 +54,7 @@ const getStepNumber = (step: ImportStep): number => {
     case ImportStep.BUILD_MANUAL:
       return 1 // Manual build is an alternative to upload
     default:
-      return 1
+      return 0
   }
 }
 
@@ -96,7 +101,7 @@ export function MenuImportWizard({
   onBack,
   hideInternalStepper = false,
 }: MenuImportWizardProps) {
-  const [currentStep, setCurrentStep] = useState<ImportStep>(ImportStep.UPLOAD)
+  const [currentStep, setCurrentStep] = useState<ImportStep>(ImportStep.SELECT_METHOD)
 
   console.log('MenuImportWizard received restaurantId:', restaurantId)
   const [menuImages, setMenuImages] = useState<MenuImage[]>([])
@@ -229,8 +234,10 @@ export function MenuImportWizard({
   }
 
   const handleBack = () => {
-    if (currentStep === ImportStep.UPLOAD) {
+    if (currentStep === ImportStep.SELECT_METHOD) {
       onBack()
+    } else if (currentStep === ImportStep.UPLOAD) {
+      setCurrentStep(ImportStep.SELECT_METHOD)
     } else if (currentStep === ImportStep.PREVIEW) {
       setCurrentStep(ImportStep.UPLOAD)
     } else if (currentStep === ImportStep.PROCESS) {
@@ -238,8 +245,16 @@ export function MenuImportWizard({
     } else if (currentStep === ImportStep.REVIEW) {
       setCurrentStep(ImportStep.PROCESS)
     } else if (currentStep === ImportStep.BUILD_MANUAL) {
-      setCurrentStep(ImportStep.UPLOAD)
+      setCurrentStep(ImportStep.SELECT_METHOD)
     }
+  }
+
+  const handleSelectAI = () => {
+    setCurrentStep(ImportStep.UPLOAD)
+  }
+
+  const handleSelectManual = () => {
+    handleBuildManually()
   }
 
   const steps = [
@@ -249,10 +264,18 @@ export function MenuImportWizard({
     { step: ImportStep.REVIEW, label: 'Review', icon: FileText },
   ]
 
+  // Only show progress indicator for AI import flow steps (not for SELECT_METHOD or BUILD_MANUAL)
+  const showProgressIndicator =
+    !hideInternalStepper &&
+    (currentStep === ImportStep.UPLOAD ||
+      currentStep === ImportStep.PREVIEW ||
+      currentStep === ImportStep.PROCESS ||
+      currentStep === ImportStep.REVIEW)
+
   return (
     <div className="space-y-6">
-      {/* Progress Indicator - Conditionally shown */}
-      {!hideInternalStepper ? (
+      {/* Progress Indicator - Conditionally shown for AI import flow only */}
+      {showProgressIndicator && (
         <div className="flex items-center justify-center gap-1 md:gap-2 overflow-x-auto pb-2">
           {steps.map(({ step, label, icon: Icon }, index) => {
             const stepIndex = index + 1
@@ -286,8 +309,10 @@ export function MenuImportWizard({
             )
           })}
         </div>
-      ) : (
-        /* Subtle progress dots when stepper is hidden */
+      )}
+
+      {/* Subtle progress dots when stepper is hidden but in AI flow */}
+      {hideInternalStepper && showProgressIndicator && (
         <div className="flex items-center justify-center gap-2 pb-2">
           {steps.map((step, index) => {
             const isCurrentStep = currentStep === step.step
@@ -306,11 +331,18 @@ export function MenuImportWizard({
       )}
 
       {/* Step Content */}
+      {currentStep === ImportStep.SELECT_METHOD && (
+        <MenuImportMethodSelection
+          onSelectAI={handleSelectAI}
+          onSelectManual={handleSelectManual}
+          onBack={handleBack}
+        />
+      )}
+
       {currentStep === ImportStep.UPLOAD && (
         <MultiImageUploadStep
           onImagesSelect={handleImagesSelect}
           onBack={handleBack}
-          onBuildManually={handleBuildManually}
         />
       )}
 
@@ -374,6 +406,14 @@ export function MenuImportWizard({
       )}
 
       {/* Navigation */}
+      {currentStep === ImportStep.SELECT_METHOD && (
+        <div className="flex items-center justify-between pt-6">
+          <Button onClick={onSkip} variant="outline">
+            Skip for now
+          </Button>
+        </div>
+      )}
+
       {currentStep === ImportStep.UPLOAD && (
         <div className="flex items-center justify-between pt-6">
           <Button onClick={onSkip} variant="outline">
