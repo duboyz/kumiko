@@ -478,7 +478,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
                       {label}
                     </span>
                   </div>
-                  {index < 4 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
+                  {index < 4 && <div key={`connector-${step}`} className="w-6 md:w-12 h-0.5 bg-muted" />}
                 </div>
               )
             })}

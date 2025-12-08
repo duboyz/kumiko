@@ -46,11 +46,11 @@ const getStepNumber = (step: ImportStep): number => {
     case ImportStep.UPLOAD:
       return 1
     case ImportStep.PREVIEW:
-      return 2
+      return 2 // Keep for backward compatibility, but step is skipped
     case ImportStep.PROCESS:
-      return 3
+      return 2 // Changed from 3 to 2 since we're skipping PREVIEW
     case ImportStep.REVIEW:
-      return 4
+      return 3 // Changed from 4 to 3 since we're skipping PREVIEW
     case ImportStep.BUILD_MANUAL:
       return 1 // Manual build is an alternative to upload
     default:
@@ -59,7 +59,8 @@ const getStepNumber = (step: ImportStep): number => {
 }
 
 const getStepProgress = (step: ImportStep): number => {
-  return (getStepNumber(step) / 4) * 100
+  // Updated to 3 steps instead of 4 (skipping PREVIEW/annotation step)
+  return (getStepNumber(step) / 3) * 100
 }
 
 interface MenuBuilderContentProps {
@@ -140,7 +141,9 @@ export function MenuImportWizard({
       setImageFile(images[0].file)
       setImagePreview(images[0].preview)
     }
-    setCurrentStep(ImportStep.PREVIEW)
+    // Skip annotation step - go directly to processing
+    setAnnotations([]) // Ensure annotations are empty
+    setCurrentStep(ImportStep.PROCESS)
   }
 
   const handleAnnotate = (annotations: PinAnnotation[]) => {
@@ -241,7 +244,8 @@ export function MenuImportWizard({
     } else if (currentStep === ImportStep.PREVIEW) {
       setCurrentStep(ImportStep.UPLOAD)
     } else if (currentStep === ImportStep.PROCESS) {
-      setCurrentStep(ImportStep.PREVIEW)
+      // Skip PREVIEW step - go directly back to UPLOAD
+      setCurrentStep(ImportStep.UPLOAD)
     } else if (currentStep === ImportStep.REVIEW) {
       setCurrentStep(ImportStep.PROCESS)
     } else if (currentStep === ImportStep.BUILD_MANUAL) {
@@ -259,7 +263,7 @@ export function MenuImportWizard({
 
   const steps = [
     { step: ImportStep.UPLOAD, label: 'Upload', icon: Upload },
-    { step: ImportStep.PREVIEW, label: 'Annotate', icon: Eye },
+    // { step: ImportStep.PREVIEW, label: 'Annotate', icon: Eye }, // Commented out - annotation step skipped
     { step: ImportStep.PROCESS, label: 'Process', icon: Cog },
     { step: ImportStep.REVIEW, label: 'Review', icon: FileText },
   ]
@@ -268,7 +272,7 @@ export function MenuImportWizard({
   const showProgressIndicator =
     !hideInternalStepper &&
     (currentStep === ImportStep.UPLOAD ||
-      currentStep === ImportStep.PREVIEW ||
+      // currentStep === ImportStep.PREVIEW || // Commented out - annotation step skipped
       currentStep === ImportStep.PROCESS ||
       currentStep === ImportStep.REVIEW)
 
@@ -340,10 +344,7 @@ export function MenuImportWizard({
       )}
 
       {currentStep === ImportStep.UPLOAD && (
-        <MultiImageUploadStep
-          onImagesSelect={handleImagesSelect}
-          onBack={handleBack}
-        />
+        <MultiImageUploadStep onImagesSelect={handleImagesSelect} onBack={handleBack} />
       )}
 
       {currentStep === ImportStep.BUILD_MANUAL &&
@@ -356,7 +357,8 @@ export function MenuImportWizard({
           ) : null
         })()}
 
-      {currentStep === ImportStep.PREVIEW && imageFile && imagePreview && (
+      {/* Annotation step commented out - skipping directly to processing */}
+      {/* {currentStep === ImportStep.PREVIEW && imageFile && imagePreview && (
         <div className="space-y-4">
           {menuImages.length > 1 && (
             <div className="text-center">
@@ -375,7 +377,7 @@ export function MenuImportWizard({
             initialAnnotations={getCurrentImageAnnotations()}
           />
         </div>
-      )}
+      )} */}
 
       {currentStep === ImportStep.PROCESS && imageFile && imagePreview && (
         <ProcessStep
