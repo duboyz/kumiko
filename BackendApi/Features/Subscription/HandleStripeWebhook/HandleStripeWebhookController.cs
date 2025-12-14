@@ -19,13 +19,13 @@ public class HandleStripeWebhookController(IMediator mediator, ILogger<HandleStr
         logger.LogWarning($"WEBHOOK RECEIVED at {timestamp}"); // Use Warning level to bypass log filtering
 
         var payload = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-        var signature = HttpContext.Request.Headers["Stripe-Signature"].ToString();
+        var signature = HttpContext.Request.Headers["Stripe-Signature"].FirstOrDefault() ?? string.Empty;
 
-        Console.WriteLine($"[WEBHOOK] Signature: {signature?.Substring(0, Math.Min(20, signature?.Length ?? 0))}...");
+        Console.WriteLine($"[WEBHOOK] Signature: {signature.Substring(0, Math.Min(20, signature.Length))}...");
         Console.WriteLine($"[WEBHOOK] Payload length: {payload?.Length} bytes");
-        logger.LogWarning($"Webhook signature: {signature?.Substring(0, Math.Min(20, signature?.Length ?? 0))}..., Payload: {payload?.Length} bytes");
+        logger.LogWarning($"Webhook signature: {signature.Substring(0, Math.Min(20, signature.Length))}..., Payload: {payload?.Length} bytes");
 
-        var command = new HandleStripeWebhookCommand(payload, signature);
+        var command = new HandleStripeWebhookCommand(payload ?? string.Empty, signature);
         var result = await Mediator.Send(command);
 
         if (!result.Success)

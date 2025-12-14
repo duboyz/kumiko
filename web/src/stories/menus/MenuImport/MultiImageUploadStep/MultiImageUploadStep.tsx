@@ -2,13 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ArrowRight, ArrowLeft, X, Plus, Trash2, Upload, PenTool } from 'lucide-react'
-import { Dropzone } from '../Dropzone/Dropzone'
+import { ArrowRight, ArrowLeft, X, Plus, Trash2, Upload, Camera } from 'lucide-react'
 import { gsap } from 'gsap'
-import Image from 'next/image'
-import KumikoImport from '../../../onboarding/assets/kumiko-import.png'
+import { cn } from '@/lib/utils'
 
 export interface MenuImage {
   id: string
@@ -66,6 +64,9 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
     }
   }, [images.length])
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+
   const handleFilesSelect = (files: File[]) => {
     const validFiles = files.filter(file => file?.type.startsWith('image/'))
 
@@ -99,6 +100,28 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
 
       setImages(prev => [...prev, ...newImages])
     }
+  }
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleCameraClick = () => {
+    // cameraInputRef.current?.click()
+  }
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length > 0) handleFilesSelect(files)
+    // Reset input so same file can be selected again
+    if (e.target) e.target.value = ''
+  }
+
+  const handleCameraInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length > 0) handleFilesSelect(files)
+    // Reset input so same file can be selected again
+    if (e.target) e.target.value = ''
   }
 
   const handleRemoveImage = (imageId: string) => {
@@ -179,52 +202,114 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
   return (
     <div ref={containerRef} className="space-y-6">
       <div className="text-center">
-        {/* <h2 className="text-2xl font-bold mb-2">Upload Menu Images</h2>
+        <h2 className="text-2xl font-bold mb-2">Add Your Menu</h2>
         <p className="text-muted-foreground">
-          Upload multiple clear photos of your menu pages to automatically extract menu items
-        </p> */}
+          Upload menu images to automatically extract menu items, prices, and categories
+        </p>
       </div>
 
       {/* Upload Area */}
       {images.length === 0 && (
         <div ref={uploadAreaRef} className="space-y-6">
-          {/* Kumiko import image */}
-          <div className="flex flex-col items-center">
-            <div className="relative">
-              <Image
-                src={KumikoImport}
-                alt="Kumiko ready to import your menu"
-                width={120}
-                height={120}
-                className="w-24 h-24 sm:w-30 sm:h-30 object-contain"
-              />
-            </div>
-            <p className="text-sm text-muted-foreground mt-2 text-center max-w-sm">
-              Kumiko is ready to help you import your menu and get it online!
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* Upload Image Card */}
+            <Card
+              className={cn(
+                'cursor-pointer transition-all hover:shadow-lg hover:border-primary/50',
+                'group relative overflow-hidden'
+              )}
+              onClick={handleUploadClick}
+            >
+              <div className="absolute top-4 right-4">
+                <Badge variant="secondary" className="bg-orange-500/10 text-orange-600 border-orange-500/20">
+                  Beta
+                </Badge>
+              </div>
+              <CardHeader className="pb-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <Upload className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Upload Image</CardTitle>
+                <CardDescription className="text-base mt-2">
+                  Select menu images from your device to automatically extract items, prices, and categories
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span>Choose from your photo library</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span>Supports multiple images</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span>AI extracts menu items automatically</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Take a Picture Card */}
+            <Card
+              className={cn(
+                'cursor-pointer transition-all hover:shadow-lg hover:border-primary/50',
+                'group relative overflow-hidden'
+              )}
+              onClick={handleCameraClick}
+            >
+              <div className="absolute top-4 right-4">
+                <Badge variant="secondary" className="bg-orange-500/10 text-orange-600 border-orange-500/20">
+                  Beta
+                </Badge>
+              </div>
+              <CardHeader className="pb-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <Camera className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle className="text-xl">Take a Picture</CardTitle>
+                <CardDescription className="text-base mt-2">
+                  Use your device camera to capture menu photos and let AI automatically extract menu items
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span>Capture menu with your camera</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span>Works on mobile and desktop</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span>AI extracts menu items automatically</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
           </div>
 
-          <Dropzone
-            onFileSelect={handleFilesSelect}
-            className="border-2 border-dashed rounded-lg p-6 text-center max-w-md mx-auto"
+          {/* Hidden file inputs */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,image/heic"
+            multiple
+            onChange={handleFileInputChange}
+            className="hidden"
           />
-
-          {/* Divider */}
-          <div className="flex items-center gap-4 max-w-md mx-auto">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-sm text-muted-foreground">or</span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-
-          {/* Build Manually Option */}
-          {onBuildManually && (
-            <div className="flex justify-center">
-              <Button variant="outline" onClick={onBuildManually} className="flex items-center gap-2">
-                <PenTool className="w-4 h-4" />
-                Build Menu Manually
-              </Button>
-            </div>
-          )}
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleCameraInputChange}
+            className="hidden"
+          />
         </div>
       )}
 

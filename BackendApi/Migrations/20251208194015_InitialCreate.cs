@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace BackendApi.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -69,6 +71,8 @@ namespace BackendApi.Migrations
                     Country = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Latitude = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Longitude = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    BusinessHours = table.Column<string>(type: "text", nullable: true),
+                    IsOpenNow = table.Column<bool>(type: "boolean", nullable: true),
                     Currency = table.Column<string>(type: "text", nullable: false, defaultValue: "USD"),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -78,6 +82,30 @@ namespace BackendApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Restaurants", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubscriptionPlans",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Tier = table.Column<string>(type: "text", nullable: false),
+                    MonthlyPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    YearlyPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    MaxLocations = table.Column<int>(type: "integer", nullable: false),
+                    MaxMenusPerLocation = table.Column<int>(type: "integer", nullable: false),
+                    StripePriceIdMonthly = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    StripePriceIdYearly = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubscriptionPlans", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -93,6 +121,8 @@ namespace BackendApi.Migrations
                     PreferredLanguage = table.Column<string>(type: "text", nullable: false, defaultValue: "English"),
                     RefreshToken = table.Column<string>(type: "text", nullable: true),
                     RefreshTokenExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    PasswordResetToken = table.Column<string>(type: "text", nullable: true),
+                    PasswordResetTokenExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
@@ -124,6 +154,31 @@ namespace BackendApi.Migrations
                         name: "FK_HospitalityRooms_Hospitalities_HospitalityId",
                         column: x => x.HospitalityId,
                         principalTable: "Hospitalities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DeviceTokens",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RestaurantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExpoPushToken = table.Column<string>(type: "text", nullable: false),
+                    DeviceType = table.Column<string>(type: "text", nullable: false),
+                    LastRegisteredAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeviceTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DeviceTokens_Restaurants_RestaurantId",
+                        column: x => x.RestaurantId,
+                        principalTable: "Restaurants",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -247,6 +302,46 @@ namespace BackendApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserSubscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubscriptionPlanId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    BillingInterval = table.Column<string>(type: "text", nullable: false),
+                    TrialStartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    TrialEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    SubscriptionStartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    SubscriptionEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CanceledAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    StripeCustomerId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    StripeSubscriptionId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    CurrentPeriodStart = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CurrentPeriodEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSubscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserSubscriptions_SubscriptionPlans_SubscriptionPlanId",
+                        column: x => x.SubscriptionPlanId,
+                        principalTable: "SubscriptionPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserSubscriptions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MenuCategories",
                 columns: table => new
                 {
@@ -296,6 +391,48 @@ namespace BackendApi.Migrations
                         principalTable: "RestaurantMenus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CustomerName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    CustomerPhone = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    CustomerEmail = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    PickupDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PickupTime = table.Column<TimeSpan>(type: "interval", nullable: false),
+                    AdditionalNote = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    RestaurantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RestaurantMenuId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_RestaurantMenus_RestaurantMenuId",
+                        column: x => x.RestaurantMenuId,
+                        principalTable: "RestaurantMenus",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Orders_Restaurants_RestaurantId",
+                        column: x => x.RestaurantId,
+                        principalTable: "Restaurants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Orders_Users_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -484,6 +621,45 @@ namespace BackendApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrderItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    MenuItemId = table.Column<Guid>(type: "uuid", nullable: false),
+                    MenuItemOptionId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    PriceAtOrder = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: false),
+                    SpecialInstructions = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_MenuItemOptions_MenuItemOptionId",
+                        column: x => x.MenuItemOptionId,
+                        principalTable: "MenuItemOptions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_MenuItems_MenuItemId",
+                        column: x => x.MenuItemId,
+                        principalTable: "MenuItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "HeroSections",
                 columns: table => new
                 {
@@ -607,11 +783,26 @@ namespace BackendApi.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "SubscriptionPlans",
+                columns: new[] { "Id", "CreatedAt", "DeletedAt", "IsActive", "IsDeleted", "MaxLocations", "MaxMenusPerLocation", "MonthlyPrice", "Name", "StripePriceIdMonthly", "StripePriceIdYearly", "Tier", "UpdatedAt", "YearlyPrice" },
+                values: new object[,]
+                {
+                    { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2025, 12, 8, 19, 40, 14, 986, DateTimeKind.Utc).AddTicks(9650), null, true, false, 1, 3, 29.99m, "Basic", null, null, "Basic", null, 299.99m },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), new DateTime(2025, 12, 8, 19, 40, 14, 986, DateTimeKind.Utc).AddTicks(9660), null, true, false, 3, 3, 79.99m, "Premium", null, null, "Premium", null, 799.99m },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), new DateTime(2025, 12, 8, 19, 40, 14, 986, DateTimeKind.Utc).AddTicks(9660), null, true, false, -1, -1, 199.99m, "Enterprise", null, null, "Enterprise", null, 1999.99m }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Allergens_Name",
                 table: "Allergens",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeviceTokens_RestaurantId",
+                table: "DeviceTokens",
+                column: "RestaurantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HeroSections_WebsiteSectionId",
@@ -672,6 +863,46 @@ namespace BackendApi.Migrations
                 column: "RestaurantMenuId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderItems_MenuItemId",
+                table: "OrderItems",
+                column: "MenuItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderItems_MenuItemOptionId",
+                table: "OrderItems",
+                column: "MenuItemOptionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderItems_OrderId",
+                table: "OrderItems",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_CustomerId",
+                table: "Orders",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_PickupDate",
+                table: "Orders",
+                column: "PickupDate");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_RestaurantId",
+                table: "Orders",
+                column: "RestaurantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_RestaurantMenuId",
+                table: "Orders",
+                column: "RestaurantMenuId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_Status",
+                table: "Orders",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RestaurantMenus_RestaurantId",
                 table: "RestaurantMenus",
                 column: "RestaurantId");
@@ -685,6 +916,12 @@ namespace BackendApi.Migrations
                 name: "IX_RestaurantMenuSections_WebsiteSectionId",
                 table: "RestaurantMenuSections",
                 column: "WebsiteSectionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubscriptionPlans_Tier",
+                table: "SubscriptionPlans",
+                column: "Tier",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -728,6 +965,27 @@ namespace BackendApi.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserSubscriptions_StripeCustomerId",
+                table: "UserSubscriptions",
+                column: "StripeCustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSubscriptions_StripeSubscriptionId",
+                table: "UserSubscriptions",
+                column: "StripeSubscriptionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSubscriptions_SubscriptionPlanId",
+                table: "UserSubscriptions",
+                column: "SubscriptionPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSubscriptions_UserId",
+                table: "UserSubscriptions",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WebsitePages_WebsiteId",
                 table: "WebsitePages",
                 column: "WebsiteId");
@@ -758,6 +1016,9 @@ namespace BackendApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "DeviceTokens");
+
+            migrationBuilder.DropTable(
                 name: "HeroSections");
 
             migrationBuilder.DropTable(
@@ -776,6 +1037,9 @@ namespace BackendApi.Migrations
                 name: "MenuItemOptionRemovedAllergens");
 
             migrationBuilder.DropTable(
+                name: "OrderItems");
+
+            migrationBuilder.DropTable(
                 name: "RestaurantMenuSections");
 
             migrationBuilder.DropTable(
@@ -791,6 +1055,9 @@ namespace BackendApi.Migrations
                 name: "UserRestaurants");
 
             migrationBuilder.DropTable(
+                name: "UserSubscriptions");
+
+            migrationBuilder.DropTable(
                 name: "MenuCategories");
 
             migrationBuilder.DropTable(
@@ -800,13 +1067,19 @@ namespace BackendApi.Migrations
                 name: "MenuItemOptions");
 
             migrationBuilder.DropTable(
+                name: "Orders");
+
+            migrationBuilder.DropTable(
                 name: "WebsiteSections");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "SubscriptionPlans");
 
             migrationBuilder.DropTable(
                 name: "MenuItems");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "WebsitePages");

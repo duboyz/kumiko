@@ -25,6 +25,9 @@ public static class RestaurantConfiguration
                 .HasConversion<string>()
                 .HasDefaultValue(Currency.USD)
                 .HasSentinel(Currency.Unspecified);
+            entity.Property(e => e.StripeConnectAccountId).HasMaxLength(255);
+            entity.Property(e => e.StripeConnectOnboardingComplete).HasDefaultValue(false);
+            entity.Property(e => e.StripeConnectChargesEnabled).HasDefaultValue(false);
         });
 
         // UserRestaurant (junction table) configuration

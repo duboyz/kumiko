@@ -575,11 +575,20 @@ namespace BackendApi.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("PaymentStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<DateTime>("PickupDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<TimeSpan>("PickupTime")
                         .HasColumnType("interval");
+
+                    b.Property<decimal?>("PlatformFeeAmount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<Guid>("RestaurantId")
                         .HasColumnType("uuid");
@@ -589,6 +598,14 @@ namespace BackendApi.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
+
+                    b.Property<string>("StripePaymentIntentId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -727,6 +744,20 @@ namespace BackendApi.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("StripeConnectAccountId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("StripeConnectChargesEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("StripeConnectOnboardingComplete")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -883,7 +914,7 @@ namespace BackendApi.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2025, 11, 17, 14, 25, 7, 213, DateTimeKind.Utc).AddTicks(1780),
+                            CreatedAt = new DateTime(2025, 12, 8, 21, 35, 50, 785, DateTimeKind.Utc).AddTicks(7380),
                             IsActive = true,
                             IsDeleted = false,
                             MaxLocations = 1,
@@ -896,7 +927,7 @@ namespace BackendApi.Migrations
                         new
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            CreatedAt = new DateTime(2025, 11, 17, 14, 25, 7, 213, DateTimeKind.Utc).AddTicks(1780),
+                            CreatedAt = new DateTime(2025, 12, 8, 21, 35, 50, 785, DateTimeKind.Utc).AddTicks(7390),
                             IsActive = true,
                             IsDeleted = false,
                             MaxLocations = 3,
@@ -909,7 +940,7 @@ namespace BackendApi.Migrations
                         new
                         {
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            CreatedAt = new DateTime(2025, 11, 17, 14, 25, 7, 213, DateTimeKind.Utc).AddTicks(1790),
+                            CreatedAt = new DateTime(2025, 12, 8, 21, 35, 50, 785, DateTimeKind.Utc).AddTicks(7390),
                             IsActive = true,
                             IsDeleted = false,
                             MaxLocations = -1,

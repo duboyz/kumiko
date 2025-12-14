@@ -12,7 +12,8 @@ public record CreateOrderCommand(
     string AdditionalNote,
     Guid RestaurantId,
     Guid RestaurantMenuId,
-    List<CreateOrderItemDto> OrderItems
+    List<CreateOrderItemDto> OrderItems,
+    string? PaymentMethodId = null
 ) : ICommand<CreateOrderResult>;
 
 public record CreateOrderItemDto(
@@ -33,6 +34,7 @@ public record CreateOrderResult(
     string Status,
     decimal TotalAmount,
     Guid RestaurantId,
-    Guid RestaurantMenuId
+    Guid RestaurantMenuId,
+    string? PaymentIntentClientSecret = null // For Standard accounts, we need to confirm PaymentIntent on frontend
 );
 

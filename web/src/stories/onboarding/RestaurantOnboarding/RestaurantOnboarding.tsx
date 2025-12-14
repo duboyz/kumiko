@@ -47,7 +47,7 @@ interface RestaurantOnboardingProps {
   onComplete?: () => void
 }
 
-type Step = 'search' | 'details' | 'hours' | 'menu' | 'website' | 'celebration'
+type Step = 'search' | 'details' | 'hours' | 'menu' | 'payment' | 'website' | 'celebration'
 
 export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardingProps) {
   const router = useRouter()
@@ -193,7 +193,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
       // Small delay to show 100% before transitioning
       setTimeout(() => {
         setIsCreatingWebsite(false)
-        setCurrentStep('celebration')
+        setCurrentStep('payment')
       }, 300)
     } catch (error) {
       console.error('Failed to create website:', error)
@@ -202,9 +202,43 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
     }
   }
 
+  // Handle return from Stripe onboarding
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('stripe_return') === 'true' && restaurantId) {
+      // User returned from Stripe onboarding
+      toast.success('Stripe account connected! You can now accept payments.')
+      setCurrentStep('celebration')
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [restaurantId])
+
   const handleSkipMenu = () => {
-    // Skip menu and go directly to celebration (no website step)
+    // Skip menu and go directly to payment step
+    setCurrentStep('payment')
+  }
+
+  const handleSkipPayment = () => {
+    // Skip payment setup and go to celebration
     setCurrentStep('celebration')
+  }
+
+  const handleConnectStripe = async () => {
+    if (!restaurantId) {
+      toast.error('Restaurant ID not found')
+      return
+    }
+
+    try {
+      const { stripeConnectApi } = await import('@shared/api/stripe-connect.api')
+      const result = await stripeConnectApi.createOnboardingLink(restaurantId)
+      // Redirect to Stripe onboarding
+      window.location.href = result.onboardingUrl
+    } catch (error) {
+      console.error('Failed to create onboarding link:', error)
+      toast.error('Failed to connect Stripe. You can set this up later in settings.')
+    }
   }
 
   const handleTemplatesSelected = async (templates: PageTemplate[]) => {
@@ -297,6 +331,8 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
       setCurrentStep('details')
     } else if (currentStep === 'menu') {
       setCurrentStep('hours')
+    } else if (currentStep === 'payment') {
+      setCurrentStep('menu')
     }
     // Website step commented out - no longer in flow
     // else if (currentStep === 'website') {
@@ -370,8 +406,8 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
     }
   }, [isCreatingWebsite])
 
-  // Calculate progress percentage (website step removed from flow)
-  const stepOrder: Step[] = ['search', 'details', 'hours', 'menu', 'celebration']
+  // Calculate progress percentage
+  const stepOrder: Step[] = ['search', 'details', 'hours', 'menu', 'payment', 'celebration']
   const progressPercentage = (stepOrder.indexOf(currentStep) / (stepOrder.length - 1)) * 100
 
   // Get contextual header based on current step
@@ -401,6 +437,12 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
         return {
           title: 'Add Your Menu',
           description: 'Import your menu to get started',
+          icon: null,
+        }
+      case 'payment':
+        return {
+          title: 'Payment Setup (Optional)',
+          description: 'Connect Stripe to accept online payments',
           icon: null,
         }
       // Website step commented out - automatically creating menu page only website
@@ -448,12 +490,13 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
               { step: 'details', label: 'Details', icon: CheckCircle },
               { step: 'hours', label: 'Hours', icon: CheckCircle },
               { step: 'menu', label: 'Menu', icon: Upload },
+              { step: 'payment', label: 'Payment', icon: CheckCircle },
               // { step: 'website', label: 'Website', icon: Globe }, // Commented out - website step removed
               { step: 'celebration', label: 'Live!', icon: PartyPopper },
             ].map(({ step, label, icon: Icon }, index) => {
               const stepIndex = index + 1
               const isCurrentStep = currentStep === step
-              const isCompleted = ['search', 'details', 'hours', 'menu', 'celebration'].indexOf(currentStep) > index
+              const isCompleted = ['search', 'details', 'hours', 'menu', 'payment', 'celebration'].indexOf(currentStep) > index
               const isActive = isCurrentStep || isCompleted
 
               return (
@@ -478,7 +521,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
                       {label}
                     </span>
                   </div>
-                  {index < 4 && <div className="w-6 md:w-12 h-0.5 bg-muted" />}
+                  {index < 5 && <div key={`connector-${step}`} className="w-6 md:w-12 h-0.5 bg-muted" />}
                 </div>
               )
             })}
@@ -568,6 +611,27 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
           />
         )}
 
+        {currentStep === 'payment' && restaurantId && (
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Payment Setup</CardTitle>
+              <CardDescription>
+                Connect your Stripe account to accept online payments from customers. You can skip this and set it up later in settings.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col gap-4">
+                <Button onClick={handleConnectStripe} className="w-full">
+                  Connect Stripe Account
+                </Button>
+                <Button onClick={handleSkipPayment} variant="outline" className="w-full">
+                  Skip for Now
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Website step commented out - automatically creating menu page only website */}
         {/* {currentStep === 'website' && (
           <WebsiteTemplateStep
@@ -590,7 +654,7 @@ export function RestaurantOnboarding({ onBack, onComplete }: RestaurantOnboardin
 
       {/* Navigation Buttons */}
       {/* Website step commented out - no longer in flow */}
-      {currentStep !== 'search' && currentStep !== 'menu' && currentStep !== 'celebration' && (
+      {currentStep !== 'search' && currentStep !== 'menu' && currentStep !== 'payment' && currentStep !== 'celebration' && (
         <div className="flex items-center justify-between pt-6">
           <Button onClick={handleBack} variant="outline">
             <ArrowLeft className="w-4 h-4 mr-2" />

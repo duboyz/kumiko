@@ -2,6 +2,7 @@ import client from './client'
 import {
   CreateOrderCommand,
   CreateOrderResult,
+  CreateCheckoutSessionResult,
   GetRestaurantOrdersResult,
   UpdateOrderStatusCommand,
   UpdateOrderStatusResult,
@@ -46,5 +47,12 @@ export const orderApi = {
     if (!response.success || !response.data) throw new Error(response.message || 'Failed to get customer orders')
     return response.data
   },
-}
 
+  createCheckoutSession: async (orderId: string): Promise<CreateCheckoutSessionResult> => {
+    const { data: response } = await client.post<ApiResponse<CreateCheckoutSessionResult>>(
+      `/api/orders/${orderId}/checkout-session`
+    )
+    if (!response.success || !response.data) throw new Error(response.message || 'Failed to create checkout session')
+    return response.data
+  },
+}
