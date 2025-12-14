@@ -47,7 +47,7 @@ public class CreateCheckoutSessionHandler(
         var currency = "usd"; // TODO: use restaurant currency
 
         // Set API key
-        var stripeKey = configuration["Stripe:SecretKey"];
+        var stripeKey = configuration["Stripe:Connect:SecretKey"] ?? configuration["Stripe:SecretKey"];
         StripeConfiguration.ApiKey = stripeKey;
 
         // Build URLs

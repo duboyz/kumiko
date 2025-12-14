@@ -12,7 +12,7 @@ public class GetPublishableKeyController(IConfiguration configuration) : Control
     [Microsoft.AspNetCore.Cors.EnableCors("AllowPublic")]
     public ActionResult<ApiResponse<string>> GetPublishableKey()
     {
-        var publishableKey = configuration["Stripe:PublishableKey"];
+        var publishableKey = configuration["Stripe:Connect:PublishableKey"] ?? configuration["Stripe:PublishableKey"];
 
         if (string.IsNullOrEmpty(publishableKey))
         {

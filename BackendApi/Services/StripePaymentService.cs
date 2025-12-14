@@ -18,7 +18,7 @@ public class StripePaymentService(
         try
         {
             // Set Stripe API key
-            var stripeKey = configuration["Stripe:SecretKey"];
+            var stripeKey = configuration["Stripe:Connect:SecretKey"] ?? configuration["Stripe:SecretKey"];
             StripeConfiguration.ApiKey = stripeKey;
 
             // Get platform fee percentage
@@ -123,7 +123,7 @@ public class StripePaymentService(
         try
         {
             // Set Stripe API key
-            var stripeKey = configuration["Stripe:SecretKey"];
+            var stripeKey = configuration["Stripe:Connect:SecretKey"] ?? configuration["Stripe:SecretKey"];
             StripeConfiguration.ApiKey = stripeKey;
 
             logger.LogInformation("Processing refund for payment intent {PaymentIntentId}", paymentIntentId);

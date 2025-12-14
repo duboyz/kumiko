@@ -47,7 +47,7 @@ public class RefreshConnectStatusHandler(
         try
         {
             // Set Stripe API key
-            var stripeKey = configuration["Stripe:SecretKey"];
+            var stripeKey = configuration["Stripe:Connect:SecretKey"] ?? configuration["Stripe:SecretKey"];
             if (string.IsNullOrEmpty(stripeKey))
             {
                 throw new InvalidOperationException("Stripe SecretKey is not configured");

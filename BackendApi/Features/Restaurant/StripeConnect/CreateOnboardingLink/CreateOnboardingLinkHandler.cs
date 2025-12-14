@@ -35,7 +35,7 @@ public class CreateOnboardingLinkHandler(
         }
 
         // Set Stripe API key
-        var stripeKey = configuration["Stripe:SecretKey"];
+        var stripeKey = configuration["Stripe:Connect:SecretKey"] ?? configuration["Stripe:SecretKey"];
         if (string.IsNullOrEmpty(stripeKey))
         {
             logger.LogError("Stripe SecretKey is not configured");
