@@ -17,6 +17,7 @@ import {
   isDateAvailable,
   useCustomerAuthStore,
 } from '@shared'
+import { orderApi } from '@shared/api/order.api'
 import { toast } from 'sonner'
 import { ArrowLeft } from 'lucide-react'
 import { PoweredByKumiko } from '@/stories/websites'
@@ -24,6 +25,7 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState, useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
+import { PaymentMethodSelector, PaymentMethod } from '@/components/PaymentMethodSelector/PaymentMethodSelector'
 
 export default function CheckoutPage() {
   const t = useTranslations('checkout')
@@ -52,6 +54,7 @@ export default function CheckoutPage() {
   const [checkoutStep, setCheckoutStep] = useState<'auth' | 'info'>('auth')
   const contentRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('pay_on_pickup')
 
   // Mark as mounted after hydration
   useEffect(() => {
@@ -370,6 +373,11 @@ export default function CheckoutPage() {
         return
       }
 
+      // For "Pay Now", we need to create the order first to get the PaymentIntent client_secret
+      // Then confirm the PaymentIntent with card details
+      // For "Pay on Pickup", just create the order without payment
+      const shouldProcessPayment = paymentMethod === 'pay_now'
+
       const result = await createOrderMutation.mutateAsync({
         customerName: customerInfo.name.trim(),
         customerPhone: customerInfo.phone.trim(),
@@ -380,8 +388,33 @@ export default function CheckoutPage() {
         restaurantId,
         restaurantMenuId: menuId,
         orderItems,
+        paymentMethodId: shouldProcessPayment ? 'pay_now' : undefined, // Signal that payment is requested
       })
 
+      // If PaymentIntent was created, we need to confirm it with card details
+      if (shouldProcessPayment) {
+        if (result?.id) {
+          // Create checkout session for Stripe Checkout
+          try {
+            const session = await orderApi.createCheckoutSession(result.id)
+            if (session.checkoutUrl) {
+              window.location.href = session.checkoutUrl
+              return
+            }
+          } catch (error) {
+            console.error('Failed to create checkout session', error)
+            toast.error('Online payment is not available right now. Please try Pay on Pickup.')
+            setPaymentMethod('pay_on_pickup')
+            return
+          }
+        }
+        // If we reach here, fail back to Pay on Pickup
+        toast.error('Online payment is not available right now. Please try Pay on Pickup.')
+        setPaymentMethod('pay_on_pickup')
+        return
+      }
+
+      // Order created without payment (Pay on Pickup)
       toast.success(t('orderPlacedSuccessfully'))
 
       // Reset form
@@ -477,6 +510,17 @@ export default function CheckoutPage() {
                 onDateChange={handleDateChange}
                 errors={validationErrors}
               />
+
+              {/* Payment Method Selection */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <PaymentMethodSelector
+                  value={paymentMethod}
+                  onChange={value => {
+                    setPaymentMethod(value)
+                  }}
+                  disabled={createOrderMutation.isPending}
+                />
+              </div>
 
               {/* Total and Place Order Button - Desktop/Tablet */}
               <div className="hidden md:block mt-4 pt-4 border-t border-gray-200">

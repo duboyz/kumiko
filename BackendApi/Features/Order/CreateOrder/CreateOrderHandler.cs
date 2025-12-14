@@ -1,7 +1,7 @@
 using BackendApi.Data;
 using BackendApi.Entities;
-using BackendApi.Services;
 using BackendApi.Shared.Contracts;
+using BackendApi.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendApi.Features.Order.CreateOrder;
@@ -80,27 +80,7 @@ public class CreateOrderHandler(
             }
         }
 
-        // Create order
-        var order = new Entities.Order
-        {
-            Id = Guid.NewGuid(),
-            CustomerId = request.CustomerId,
-            CustomerName = customerName.Trim(),
-            CustomerPhone = customerPhone.Trim(),
-            CustomerEmail = customerEmail.Trim(),
-            PickupDate = request.PickupDate,
-            PickupTime = request.PickupTime,
-            AdditionalNote = request.AdditionalNote?.Trim() ?? string.Empty,
-            Status = OrderStatus.Pending,
-            RestaurantId = request.RestaurantId,
-            RestaurantMenuId = request.RestaurantMenuId,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        context.Orders.Add(order);
-
-        // Add order items
+        // Calculate total amount first (before creating order)
         decimal totalAmount = 0;
         foreach (var itemDto in request.OrderItems)
         {
@@ -134,6 +114,63 @@ public class CreateOrderHandler(
                 price = menuItem.Price.Value;
             }
 
+            totalAmount += price * itemDto.Quantity;
+        }
+
+        // Create order
+        var order = new Entities.Order
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = request.CustomerId,
+            CustomerName = customerName.Trim(),
+            CustomerPhone = customerPhone.Trim(),
+            CustomerEmail = customerEmail.Trim(),
+            PickupDate = request.PickupDate,
+            PickupTime = request.PickupTime,
+            AdditionalNote = request.AdditionalNote?.Trim() ?? string.Empty,
+            Status = OrderStatus.Pending,
+            RestaurantId = request.RestaurantId,
+            RestaurantMenuId = request.RestaurantMenuId,
+            TotalAmount = totalAmount,
+            PaymentStatus = PaymentStatus.NotRequired, // Default, will be updated if payment is processed
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        context.Orders.Add(order);
+
+        // Add order items (reuse the calculated prices from above)
+        foreach (var itemDto in request.OrderItems)
+        {
+            var menuItem = await context.MenuItems
+                .Include(mi => mi.Options)
+                .FirstOrDefaultAsync(mi => mi.Id == itemDto.MenuItemId, cancellationToken);
+
+            if (menuItem == null)
+            {
+                throw new ArgumentException($"Menu item {itemDto.MenuItemId} not found");
+            }
+
+            // Determine price (same logic as above)
+            decimal price;
+            if (itemDto.MenuItemOptionId.HasValue)
+            {
+                var option = menuItem.Options.FirstOrDefault(o => o.Id == itemDto.MenuItemOptionId.Value);
+                if (option == null)
+                {
+                    throw new ArgumentException($"Menu item option {itemDto.MenuItemOptionId} not found");
+                }
+                price = option.Price;
+            }
+            else
+            {
+                if (!menuItem.Price.HasValue)
+                {
+                    throw new ArgumentException($"Menu item {itemDto.MenuItemId} requires an option to be selected");
+                }
+                price = menuItem.Price.Value;
+            }
+
             var orderItem = new OrderItem
             {
                 Id = Guid.NewGuid(),
@@ -148,10 +185,18 @@ public class CreateOrderHandler(
             };
 
             context.OrderItems.Add(orderItem);
-            totalAmount += price * itemDto.Quantity;
         }
 
+        // Save order first to get the ID
         await context.SaveChangesAsync(cancellationToken);
+
+        // If Pay Now was selected, mark payment as pending (Stripe Checkout will handle payment)
+        if (request.PaymentMethodId == "pay_now")
+        {
+            order.PaymentStatus = PaymentStatus.Pending;
+            order.UpdatedAt = DateTime.UtcNow;
+            await context.SaveChangesAsync(cancellationToken);
+        }
 
         // Send push notifications to all devices registered for this restaurant
         try
@@ -197,7 +242,8 @@ public class CreateOrderHandler(
             order.Status.ToString(),
             totalAmount,
             order.RestaurantId,
-            order.RestaurantMenuId
+            order.RestaurantMenuId,
+            null
         );
     }
 }

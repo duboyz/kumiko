@@ -18,6 +18,10 @@ public static class OrderConfiguration
             entity.Property(e => e.PickupTime).IsRequired();
             entity.Property(e => e.AdditionalNote).HasMaxLength(1000);
             entity.Property(e => e.Status).IsRequired();
+            entity.Property(e => e.PaymentStatus).IsRequired().HasDefaultValue(PaymentStatus.NotRequired);
+            entity.Property(e => e.StripePaymentIntentId).HasMaxLength(255);
+            entity.Property(e => e.PlatformFeeAmount).HasPrecision(10, 2);
+            entity.Property(e => e.TotalAmount).IsRequired().HasPrecision(10, 2);
 
             entity.HasOne(e => e.Restaurant)
                 .WithMany()

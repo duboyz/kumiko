@@ -10,6 +10,7 @@ export interface CreateOrderCommand {
   restaurantId: string
   restaurantMenuId: string
   orderItems: CreateOrderItemDto[]
+  paymentMethodId?: string
 }
 
 export interface CreateOrderItemDto {
@@ -31,6 +32,11 @@ export interface CreateOrderResult {
   totalAmount: number
   restaurantId: string
   restaurantMenuId: string
+  paymentIntentClientSecret?: string | null
+}
+
+export interface CreateCheckoutSessionResult {
+  checkoutUrl: string
 }
 
 export interface GetRestaurantOrdersResult {
@@ -142,4 +148,3 @@ export interface CustomerOrderRestaurantDto {
   id: string
   name: string
 }
-

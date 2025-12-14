@@ -31,6 +31,7 @@ public static class DependencyInjectionConfiguration
         services.AddScoped<ISubscriptionService, SubscriptionService>();
         services.AddScoped<ITwilioSmsService, TwilioSmsService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IStripePaymentService, StripePaymentService>();
         services.AddSingleton<IExpoNotificationService, ExpoNotificationService>();
 
         // Hosted Services

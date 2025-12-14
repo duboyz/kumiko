@@ -21,6 +21,11 @@ public class Restaurant : BaseEntity
     // Localization settings
     public Currency Currency { get; set; } = Currency.USD;
 
+    // Stripe Connect integration
+    public string? StripeConnectAccountId { get; set; }
+    public bool StripeConnectOnboardingComplete { get; set; }
+    public bool StripeConnectChargesEnabled { get; set; }
+
     public ICollection<UserRestaurant> Staff { get; set; } = [];
     public ICollection<RestaurantMenu> Menus { get; set; } = [];
 }

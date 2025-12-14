@@ -45,7 +45,8 @@ public class CreateOrderController : BaseAuthenticatedController
             request.AdditionalNote,
             request.RestaurantId,
             request.RestaurantMenuId,
-            request.OrderItems
+            request.OrderItems,
+            request.PaymentMethodId
         );
 
         var result = await _mediator.Send(command);
@@ -69,6 +70,7 @@ public record CreateOrderRequest(
     string AdditionalNote,
     Guid RestaurantId,
     Guid RestaurantMenuId,
-    List<CreateOrderItemDto> OrderItems
+    List<CreateOrderItemDto> OrderItems,
+    string? PaymentMethodId = null
 );
 

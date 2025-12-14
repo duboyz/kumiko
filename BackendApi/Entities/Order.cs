@@ -9,6 +9,15 @@ public enum OrderStatus
     Cancelled
 }
 
+public enum PaymentStatus
+{
+    NotRequired,
+    Pending,
+    Paid,
+    Failed,
+    Refunded
+}
+
 public class Order : BaseEntity
 {
     // Optional link to registered customer
@@ -31,5 +40,11 @@ public class Order : BaseEntity
     public RestaurantMenu RestaurantMenu { get; set; } = null!;
 
     public ICollection<OrderItem> OrderItems { get; set; } = [];
+
+    // Payment information
+    public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.NotRequired;
+    public string? StripePaymentIntentId { get; set; }
+    public decimal? PlatformFeeAmount { get; set; }
+    public decimal TotalAmount { get; set; }
 }
 

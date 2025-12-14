@@ -8,6 +8,7 @@ import {
   BusinessHoursSettings,
   SubscriptionSettings,
 } from '@/components'
+import { PaymentSettings } from '@/components/PaymentSettings/PaymentSettings'
 import { DeleteMeCard } from './DeleteMeCard'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -97,6 +98,7 @@ export default function SettingsPage() {
             <TabsContent value="restaurant" className="space-y-6">
               <ContactInformationSettings restaurant={selectedLocation.restaurant} />
               <BusinessHoursSettings restaurant={selectedLocation.restaurant} />
+              <PaymentSettings restaurantId={selectedLocation.restaurant.id} />
             </TabsContent>
           )}
         </Tabs>
