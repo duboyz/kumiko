@@ -10,20 +10,34 @@ interface PaymentMethodSelectorProps {
   value: PaymentMethod
   onChange: (value: PaymentMethod) => void
   disabled?: boolean
+  payNowDisabled?: boolean
+  payNowDisabledReason?: string
 }
 
-export function PaymentMethodSelector({ value, onChange, disabled }: PaymentMethodSelectorProps) {
+export function PaymentMethodSelector({
+  value,
+  onChange,
+  disabled,
+  payNowDisabled,
+  payNowDisabledReason,
+}: PaymentMethodSelectorProps) {
   return (
     <div className="space-y-3">
       <Label className="text-base font-semibold">Payment Method</Label>
       <RadioGroup value={value} onValueChange={onChange} disabled={disabled}>
-        <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
-          <RadioGroupItem value="pay_now" id="pay_now" />
+        <div
+          className={`flex items-center space-x-2 p-4 border rounded-lg ${
+            payNowDisabled ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'
+          }`}
+        >
+          <RadioGroupItem value="pay_now" id="pay_now" disabled={payNowDisabled} />
           <Label htmlFor="pay_now" className="flex-1 cursor-pointer flex items-center gap-2">
             <CreditCard className="h-5 w-5 text-gray-600" />
             <div>
               <div className="font-medium">Pay Now</div>
-              <div className="text-sm text-gray-500">Pay securely online with your card</div>
+              <div className="text-sm text-gray-500">
+                {payNowDisabled ? payNowDisabledReason || 'Online payment is not available' : 'Pay securely online with your card'}
+              </div>
             </div>
           </Label>
         </div>

@@ -26,6 +26,7 @@ import { useTranslations } from 'next-intl'
 import { useMemo, useState, useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { PaymentMethodSelector, PaymentMethod } from '@/components/PaymentMethodSelector/PaymentMethodSelector'
+import { stripeConnectApi } from '@shared/api/stripe-connect.api'
 
 export default function CheckoutPage() {
   const t = useTranslations('checkout')
@@ -55,6 +56,7 @@ export default function CheckoutPage() {
   const contentRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('pay_on_pickup')
+  const [payNowAvailable, setPayNowAvailable] = useState(false)
 
   // Mark as mounted after hydration
   useEffect(() => {
@@ -101,6 +103,38 @@ export default function CheckoutPage() {
       }
     }
   }, [isAuthenticated, customer, customerInfo, setCustomerInfo])
+
+  // Determine if Pay Now is allowed based on restaurant Stripe Connect status
+  useEffect(() => {
+    let isMounted = true
+
+    const loadConnectStatus = async () => {
+      if (!restaurantId) {
+        setPayNowAvailable(false)
+        return
+      }
+
+      try {
+        const status = await stripeConnectApi.getPublicConnectStatus(restaurantId)
+        const enabled = status?.isConnected && status?.chargesEnabled
+        if (!isMounted) return
+        setPayNowAvailable(!!enabled)
+        if (!enabled) {
+          setPaymentMethod('pay_on_pickup')
+        }
+      } catch {
+        if (!isMounted) return
+        setPayNowAvailable(false)
+        setPaymentMethod('pay_on_pickup')
+      }
+    }
+
+    loadConnectStatus()
+
+    return () => {
+      isMounted = false
+    }
+  }, [restaurantId])
 
   // Parse business hours
   const businessHours = useMemo(() => {
@@ -376,7 +410,7 @@ export default function CheckoutPage() {
       // For "Pay Now", we need to create the order first to get the PaymentIntent client_secret
       // Then confirm the PaymentIntent with card details
       // For "Pay on Pickup", just create the order without payment
-      const shouldProcessPayment = paymentMethod === 'pay_now'
+      const shouldProcessPayment = paymentMethod === 'pay_now' && payNowAvailable
 
       const result = await createOrderMutation.mutateAsync({
         customerName: customerInfo.name.trim(),
@@ -511,16 +545,20 @@ export default function CheckoutPage() {
                 errors={validationErrors}
               />
 
-              {/* Payment Method Selection */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <PaymentMethodSelector
-                  value={paymentMethod}
-                  onChange={value => {
-                    setPaymentMethod(value)
-                  }}
-                  disabled={createOrderMutation.isPending}
-                />
-              </div>
+              {/* Payment Method Selection (only show if Pay Now is available) */}
+              {payNowAvailable && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <PaymentMethodSelector
+                    value={paymentMethod}
+                    onChange={value => {
+                      setPaymentMethod(value)
+                    }}
+                    disabled={createOrderMutation.isPending}
+                    payNowDisabled={!payNowAvailable}
+                    payNowDisabledReason="Online payment is not available for this restaurant"
+                  />
+                </div>
+              )}
 
               {/* Total and Place Order Button - Desktop/Tablet */}
               <div className="hidden md:block mt-4 pt-4 border-t border-gray-200">

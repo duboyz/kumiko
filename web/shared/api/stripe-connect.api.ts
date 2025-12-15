@@ -13,6 +13,16 @@ export interface CreateOnboardingLinkResult {
 }
 
 export const stripeConnectApi = {
+  getPublicConnectStatus: async (restaurantId: string): Promise<GetConnectStatusResult> => {
+    const { data } = await publicApiClient.get<ApiResponse<GetConnectStatusResult>>(
+      `/api/public/restaurant/${restaurantId}/stripe-connect/status`
+    )
+    if (!data.success) {
+      throw new Error(data.message || 'Failed to get connect status')
+    }
+    return data.data!
+  },
+
   getConnectStatus: async (restaurantId: string): Promise<GetConnectStatusResult> => {
     const { data } = await apiClient.get<ApiResponse<GetConnectStatusResult>>(
       `/api/restaurant/${restaurantId}/stripe-connect/status`
