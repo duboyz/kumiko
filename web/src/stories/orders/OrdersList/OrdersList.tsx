@@ -4,15 +4,21 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Phone, Mail, Clock, Calendar, FileText, ChevronDown, ChevronUp } from 'lucide-react'
-import { OrderDto, ORDER_STATUS_COLORS, ORDER_STATUS_LABELS, useUpdateOrderStatus, Currency, formatPrice, useLocationSelection } from '@shared'
+import {
+  OrderDto,
+  OrderStatus,
+  ORDER_STATUS_COLORS,
+  ORDER_STATUS_LABELS,
+  PAYMENT_STATUS_COLORS,
+  PAYMENT_STATUS_LABELS,
+  PaymentStatus,
+  useUpdateOrderStatus,
+  Currency,
+  formatPrice,
+  useLocationSelection,
+} from '@shared'
 import { toast } from 'sonner'
 
 interface OrdersListProps {
@@ -36,7 +42,7 @@ export function OrdersList({ orders, isLoading }: OrdersListProps) {
     setExpandedOrders(newExpanded)
   }
 
-  const handleStatusChange = async (orderId: string, newStatus: string) => {
+  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
     try {
       await updateOrderStatus.mutateAsync({ orderId, status: newStatus })
       toast.success('Order status updated successfully')
@@ -80,6 +86,9 @@ export function OrdersList({ orders, isLoading }: OrdersListProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Badge className={ORDER_STATUS_COLORS[order.status]}>{ORDER_STATUS_LABELS[order.status]}</Badge>
+                <Badge variant="outline" className={PAYMENT_STATUS_COLORS[order.paymentStatus]}>
+                  {PAYMENT_STATUS_LABELS[order.paymentStatus]}
+                </Badge>
                 <span className="text-lg font-semibold">{formatPrice(order.totalAmount, currency)}</span>
               </div>
             </div>
@@ -105,12 +114,7 @@ export function OrdersList({ orders, isLoading }: OrdersListProps) {
             )}
 
             <div className="flex items-center justify-between pt-2 border-t">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => toggleOrderExpanded(order.id)}
-                className="text-sm"
-              >
+              <Button variant="ghost" size="sm" onClick={() => toggleOrderExpanded(order.id)} className="text-sm">
                 {expandedOrders.has(order.id) ? (
                   <>
                     <ChevronUp className="h-4 w-4 mr-1" />
@@ -126,16 +130,16 @@ export function OrdersList({ orders, isLoading }: OrdersListProps) {
 
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Status:</span>
-                <Select value={order.status} onValueChange={status => handleStatusChange(order.id, status)}>
+                <Select value={order.status} onValueChange={(status) => handleStatusChange(order.id, status as OrderStatus)}>
                   <SelectTrigger className="w-[160px] h-8">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pending">Pending</SelectItem>
-                    <SelectItem value="Confirmed">Confirmed</SelectItem>
-                    <SelectItem value="Ready">Ready for Pickup</SelectItem>
-                    <SelectItem value="Completed">Completed</SelectItem>
-                    <SelectItem value="Cancelled">Cancelled</SelectItem>
+                    <SelectItem value={OrderStatus.Pending}>Pending</SelectItem>
+                    <SelectItem value={OrderStatus.Confirmed}>Confirmed</SelectItem>
+                    <SelectItem value={OrderStatus.Ready}>Ready for Pickup</SelectItem>
+                    <SelectItem value={OrderStatus.Completed}>Completed</SelectItem>
+                    <SelectItem value={OrderStatus.Cancelled}>Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -173,4 +177,3 @@ export function OrdersList({ orders, isLoading }: OrdersListProps) {
     </div>
   )
 }
-

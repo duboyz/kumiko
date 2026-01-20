@@ -43,8 +43,8 @@ public class CreateOnboardingLinkHandler(
         }
         StripeConfiguration.ApiKey = stripeKey;
 
-        var returnUrl = configuration["Stripe:Connect:ReturnUrl"] ?? "http://localhost:3004/settings?tab=restaurant";
-        var refreshUrl = configuration["Stripe:Connect:RefreshUrl"] ?? "http://localhost:3004/settings?tab=restaurant";
+        var returnUrl = configuration["Stripe:Connect:ReturnUrl"] ?? "http://localhost:3000/settings?tab=restaurant";
+        var refreshUrl = configuration["Stripe:Connect:RefreshUrl"] ?? "http://localhost:3000/settings?tab=restaurant";
         
         logger.LogInformation("Creating onboarding link for restaurant {RestaurantId}, ReturnUrl: {ReturnUrl}", restaurant.Id, returnUrl);
 

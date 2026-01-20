@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { OrdersList } from './OrdersList'
-import { OrderDto } from '@shared'
+import { OrderDto, OrderStatus, PaymentStatus } from '@shared'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,7 +38,8 @@ const mockOrders: OrderDto[] = [
     pickupDate: '2025-10-15',
     pickupTime: '12:30',
     additionalNote: 'Please add extra napkins',
-    status: 'Pending',
+    status: OrderStatus.Pending,
+    paymentStatus: PaymentStatus.Pending,
     totalAmount: 45.99,
     restaurantId: 'restaurant-1',
     restaurantMenuId: 'menu-1',
@@ -72,7 +73,8 @@ const mockOrders: OrderDto[] = [
     pickupDate: '2025-10-15',
     pickupTime: '13:00',
     additionalNote: '',
-    status: 'Confirmed',
+    status: OrderStatus.Confirmed,
+    paymentStatus: PaymentStatus.Paid,
     totalAmount: 32.5,
     restaurantId: 'restaurant-1',
     restaurantMenuId: 'menu-1',
@@ -103,7 +105,8 @@ const mockOrders: OrderDto[] = [
     pickupDate: '2025-10-15',
     pickupTime: '14:00',
     additionalNote: 'Allergic to nuts',
-    status: 'Ready',
+    status: OrderStatus.Ready,
+    paymentStatus: PaymentStatus.NotRequired,
     totalAmount: 28.99,
     restaurantId: 'restaurant-1',
     restaurantMenuId: 'menu-1',
@@ -161,21 +164,21 @@ export const SingleOrder: Story = {
 
 export const PendingOrders: Story = {
   args: {
-    orders: mockOrders.filter(o => o.status === 'Pending'),
+    orders: mockOrders.filter(o => o.status === OrderStatus.Pending),
     isLoading: false,
   },
 }
 
 export const ConfirmedOrders: Story = {
   args: {
-    orders: mockOrders.filter(o => o.status === 'Confirmed'),
+    orders: mockOrders.filter(o => o.status === OrderStatus.Confirmed),
     isLoading: false,
   },
 }
 
 export const ReadyOrders: Story = {
   args: {
-    orders: mockOrders.filter(o => o.status === 'Ready'),
+    orders: mockOrders.filter(o => o.status === OrderStatus.Ready),
     isLoading: false,
   },
 }
@@ -185,7 +188,7 @@ export const CompletedOrder: Story = {
     orders: [
       {
         ...mockOrders[0],
-        status: 'Completed',
+        status: OrderStatus.Completed,
       },
     ],
     isLoading: false,
@@ -197,7 +200,7 @@ export const CancelledOrder: Story = {
     orders: [
       {
         ...mockOrders[0],
-        status: 'Cancelled',
+        status: OrderStatus.Cancelled,
       },
     ],
     isLoading: false,
@@ -212,18 +215,17 @@ export const ManyOrders: Story = {
         ...mockOrders[0],
         id: '4',
         customerName: 'Alice Williams',
-        status: 'Pending',
+        status: OrderStatus.Pending,
         pickupTime: '15:00',
       },
       {
         ...mockOrders[1],
         id: '5',
         customerName: 'Charlie Brown',
-        status: 'Completed',
+        status: OrderStatus.Completed,
         pickupTime: '15:30',
       },
     ],
     isLoading: false,
   },
 }
-

@@ -15,6 +15,7 @@ public record OrderDto(
     string PickupTime,
     string AdditionalNote,
     string Status,
+    string PaymentStatus,
     decimal TotalAmount,
     Guid RestaurantId,
     Guid RestaurantMenuId,

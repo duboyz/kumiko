@@ -16,9 +16,18 @@ public class HandleConnectWebhookHandler(
         try
         {
             var webhookSecret = configuration["Stripe:WebhookSecret"];
+            // var webhookSecret = "whsec_3a973a85951e3f13b3fdbb5b1d9a6d091a7717059191d9d930ca607d0c452183";
 
-            logger.LogInformation("Received Connect webhook with signature: {SignaturePrefix}...",
-                request.Signature?.Length > 20 ? request.Signature.Substring(0, 20) : request.Signature);
+            if (string.IsNullOrWhiteSpace(webhookSecret))
+            {
+                logger.LogError("Stripe:WebhookSecret is missing; cannot verify webhook");
+                return new HandleConnectWebhookResult(false, "Webhook secret not configured");
+            }
+
+            logger.LogInformation(
+                "Received Connect webhook. Signature prefix: {SignaturePrefix}, PayloadLength: {PayloadLength}",
+                request.Signature?.Length > 20 ? request.Signature.Substring(0, 20) : request.Signature,
+                request.Payload?.Length);
 
             // Verify webhook signature
             var stripeEvent = EventUtility.ConstructEvent(
@@ -28,8 +37,8 @@ public class HandleConnectWebhookHandler(
                 throwOnApiVersionMismatch: false
             );
 
-            logger.LogInformation("Processing Stripe Connect webhook event: {EventType}, EventId: {EventId}",
-                stripeEvent.Type, stripeEvent.Id);
+            logger.LogInformation("Processing Stripe Connect webhook event: {EventType}, EventId: {EventId}, Account: {Account}",
+                stripeEvent.Type, stripeEvent.Id, stripeEvent.Account);
 
             // Handle different event types
             switch (stripeEvent.Type)
@@ -107,8 +116,14 @@ public class HandleConnectWebhookHandler(
             return;
         }
 
-        logger.LogInformation("Processing payment_intent.succeeded for PaymentIntent: {PaymentIntentId}, Account: {AccountId}, Amount: {Amount}",
-            paymentIntent.Id, connectedAccountId, paymentIntent.Amount);
+        logger.LogInformation(
+            "Processing payment_intent.succeeded. PI: {PaymentIntentId}, Account: {AccountId}, Amount: {Amount}, Currency: {Currency}, Status: {Status}, MetadataKeys: {MetadataKeys}",
+            paymentIntent.Id,
+            connectedAccountId,
+            paymentIntent.Amount,
+            paymentIntent.Currency,
+            paymentIntent.Status,
+            paymentIntent.Metadata?.Keys != null ? string.Join(",", paymentIntent.Metadata.Keys) : "none");
 
         // Find restaurant by Stripe Connect account ID
         var restaurant = await context.Restaurants
@@ -120,6 +135,8 @@ public class HandleConnectWebhookHandler(
             return;
         }
 
+        logger.LogInformation("Matched restaurant {RestaurantId} for connected account {AccountId}", restaurant.Id, connectedAccountId);
+
         // Find order by PaymentIntent ID
         var order = await context.Orders
             .FirstOrDefaultAsync(o => o.StripePaymentIntentId == paymentIntent.Id, cancellationToken);
@@ -130,6 +147,8 @@ public class HandleConnectWebhookHandler(
             return;
         }
 
+        logger.LogInformation("Matched order {OrderId} for PaymentIntent {PaymentIntentId}", order.Id, paymentIntent.Id);
+
         // Get platform fee amount from metadata or calculate it
         decimal platformFeeAmount = 0;
         if (paymentIntent.Metadata != null && paymentIntent.Metadata.TryGetValue("platform_fee_amount", out var feeStr))
@@ -137,6 +156,11 @@ public class HandleConnectWebhookHandler(
             if (decimal.TryParse(feeStr, out var fee))
             {
                 platformFeeAmount = fee;
+                logger.LogInformation("Platform fee from metadata: {PlatformFeeAmount}", platformFeeAmount);
+            }
+            else
+            {
+                logger.LogWarning("platform_fee_amount metadata present but not parseable: {FeeStr}", feeStr);
             }
         }
 
@@ -147,6 +171,8 @@ public class HandleConnectWebhookHandler(
             var feePercentage = decimal.Parse(feePercentageStr);
             var totalAmount = paymentIntent.Amount / 100m; // Convert from cents
             platformFeeAmount = totalAmount * feePercentage;
+            logger.LogInformation("Calculated platform fee: Total={TotalAmount}, Percentage={Percentage}, Fee={Fee}",
+                totalAmount, feePercentage, platformFeeAmount);
         }
 
         logger.LogInformation(

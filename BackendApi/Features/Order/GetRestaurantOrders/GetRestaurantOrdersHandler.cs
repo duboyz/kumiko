@@ -35,6 +35,7 @@ public class GetRestaurantOrdersHandler(ApplicationDbContext context) : IQueryHa
             order.PickupTime.ToString(@"hh\:mm\:ss"),
             order.AdditionalNote,
             order.Status.ToString(),
+            order.PaymentStatus.ToString(),
             order.OrderItems.Sum(oi => oi.PriceAtOrder * oi.Quantity),
             order.RestaurantId,
             order.RestaurantMenuId,

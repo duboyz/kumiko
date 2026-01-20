@@ -52,6 +52,7 @@ export interface OrderDto {
   pickupTime: string
   additionalNote: string
   status: OrderStatus
+  paymentStatus: PaymentStatus
   totalAmount: number
   restaurantId: string
   restaurantMenuId: string
@@ -90,6 +91,14 @@ export enum OrderStatus {
   Cancelled = 'Cancelled',
 }
 
+export enum PaymentStatus {
+  NotRequired = 'NotRequired',
+  Pending = 'Pending',
+  Paid = 'Paid',
+  Failed = 'Failed',
+  Refunded = 'Refunded',
+}
+
 export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
   [OrderStatus.Pending]: 'bg-yellow-100 text-yellow-800',
   [OrderStatus.Confirmed]: 'bg-blue-100 text-blue-800',
@@ -104,6 +113,22 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   [OrderStatus.Ready]: 'Ready for Pickup',
   [OrderStatus.Completed]: 'Completed',
   [OrderStatus.Cancelled]: 'Cancelled',
+}
+
+export const PAYMENT_STATUS_COLORS: Record<PaymentStatus, string> = {
+  [PaymentStatus.NotRequired]: 'bg-slate-100 text-slate-800',
+  [PaymentStatus.Pending]: 'bg-amber-100 text-amber-800',
+  [PaymentStatus.Paid]: 'bg-emerald-100 text-emerald-800',
+  [PaymentStatus.Failed]: 'bg-rose-100 text-rose-800',
+  [PaymentStatus.Refunded]: 'bg-indigo-100 text-indigo-800',
+}
+
+export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+  [PaymentStatus.NotRequired]: 'Pay on Pickup',
+  [PaymentStatus.Pending]: 'Payment Pending',
+  [PaymentStatus.Paid]: 'Paid',
+  [PaymentStatus.Failed]: 'Payment Failed',
+  [PaymentStatus.Refunded]: 'Refunded',
 }
 
 export interface GetOrderByIdResult {
