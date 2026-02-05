@@ -47,6 +47,10 @@ public class HandleConnectWebhookHandler(
                     await HandleAccountUpdated(stripeEvent, cancellationToken);
                     break;
 
+                case "checkout.session.completed":
+                    await HandleCheckoutSessionCompleted(stripeEvent, cancellationToken);
+                    break;
+
                 case "payment_intent.succeeded":
                     await HandlePaymentIntentSucceeded(stripeEvent, cancellationToken);
                     break;
@@ -98,6 +102,62 @@ public class HandleConnectWebhookHandler(
             restaurant.Id, restaurant.StripeConnectOnboardingComplete, restaurant.StripeConnectChargesEnabled);
     }
 
+    private async Task HandleCheckoutSessionCompleted(Event stripeEvent, CancellationToken cancellationToken)
+    {
+        var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
+        if (session == null)
+        {
+            logger.LogWarning("Checkout session is null in checkout.session.completed event");
+            return;
+        }
+
+        logger.LogInformation("Processing checkout.session.completed: SessionId={SessionId}, PaymentIntentId={PaymentIntentId}, Mode={Mode}",
+            session.Id, session.PaymentIntentId, session.Mode);
+
+        // Only process payment mode sessions (not subscription mode)
+        if (session.Mode != "payment")
+        {
+            logger.LogInformation("Skipping checkout session - not in payment mode (Mode: {Mode})", session.Mode);
+            return;
+        }
+
+        // Get order_id from session metadata
+        if (session.Metadata == null || !session.Metadata.TryGetValue("order_id", out var orderIdStr))
+        {
+            logger.LogWarning("No order_id in checkout session metadata for session {SessionId}", session.Id);
+            return;
+        }
+
+        if (!Guid.TryParse(orderIdStr, out var orderId))
+        {
+            logger.LogWarning("Invalid order_id format in checkout session metadata: {OrderIdStr}", orderIdStr);
+            return;
+        }
+
+        // Find the order
+        var order = await context.Orders
+            .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
+
+        if (order == null)
+        {
+            logger.LogWarning("Order not found for checkout session: OrderId={OrderId}, SessionId={SessionId}", orderId, session.Id);
+            return;
+        }
+
+        // Store PaymentIntent ID if available
+        if (!string.IsNullOrEmpty(session.PaymentIntentId))
+        {
+            order.StripePaymentIntentId = session.PaymentIntentId;
+            order.UpdatedAt = DateTime.UtcNow;
+            await context.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Stored PaymentIntent ID {PaymentIntentId} on order {OrderId}", session.PaymentIntentId, order.Id);
+        }
+        else
+        {
+            logger.LogWarning("Checkout session completed but no PaymentIntent ID available: SessionId={SessionId}", session.Id);
+        }
+    }
+
     private async Task HandlePaymentIntentSucceeded(Event stripeEvent, CancellationToken cancellationToken)
     {
         var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
@@ -107,12 +167,21 @@ public class HandleConnectWebhookHandler(
             return;
         }
 
-        // Get the connected account ID from the event's account property
-        // For events from connected accounts, stripeEvent.Account contains the connected account ID
+        // Get the connected account ID: from event (connected account events) or from transfer_data (platform events)
         var connectedAccountId = stripeEvent.Account;
+        if (string.IsNullOrEmpty(connectedAccountId) && paymentIntent.TransferData?.Destination != null)
+        {
+            var destinationAccount = paymentIntent.TransferData.Destination;
+            connectedAccountId = destinationAccount?.Id;
+            logger.LogInformation(
+                "Platform event: using connected account from transfer_data.destination: {AccountId}",
+                connectedAccountId);
+        }
         if (string.IsNullOrEmpty(connectedAccountId))
         {
-            logger.LogWarning("No connected account ID found in event for PaymentIntent {PaymentIntentId}", paymentIntent.Id);
+            logger.LogWarning(
+                "No connected account ID found in event or transfer_data for PaymentIntent {PaymentIntentId}.",
+                paymentIntent.Id);
             return;
         }
 
@@ -137,9 +206,31 @@ public class HandleConnectWebhookHandler(
 
         logger.LogInformation("Matched restaurant {RestaurantId} for connected account {AccountId}", restaurant.Id, connectedAccountId);
 
-        // Find order by PaymentIntent ID
+        // Find order by PaymentIntent ID (primary lookup)
         var order = await context.Orders
             .FirstOrDefaultAsync(o => o.StripePaymentIntentId == paymentIntent.Id, cancellationToken);
+
+        // Fallback: If not found, try looking up by order_id from metadata
+        if (order == null && paymentIntent.Metadata != null)
+        {
+            if (paymentIntent.Metadata.TryGetValue("order_id", out var orderIdStr))
+            {
+                if (Guid.TryParse(orderIdStr, out var orderId))
+                {
+                    logger.LogInformation("Order not found by PaymentIntent ID, trying metadata order_id: {OrderId}", orderId);
+                    order = await context.Orders
+                        .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
+
+                    if (order != null)
+                    {
+                        // Store the PaymentIntent ID for future lookups
+                        order.StripePaymentIntentId = paymentIntent.Id;
+                        await context.SaveChangesAsync(cancellationToken);
+                        logger.LogInformation("Found order by metadata order_id and stored PaymentIntent ID");
+                    }
+                }
+            }
+        }
 
         if (order == null)
         {
