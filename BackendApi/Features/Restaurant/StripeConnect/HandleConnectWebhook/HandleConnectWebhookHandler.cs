@@ -1,3 +1,4 @@
+using System.Text.Json;
 using BackendApi.Data;
 using BackendApi.Shared.Contracts;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +53,7 @@ public class HandleConnectWebhookHandler(
                     break;
 
                 case "payment_intent.succeeded":
-                    await HandlePaymentIntentSucceeded(stripeEvent, cancellationToken);
+                    await HandlePaymentIntentSucceeded(stripeEvent, request.Payload, cancellationToken);
                     break;
 
                 default:
@@ -158,7 +159,7 @@ public class HandleConnectWebhookHandler(
         }
     }
 
-    private async Task HandlePaymentIntentSucceeded(Event stripeEvent, CancellationToken cancellationToken)
+    private async Task HandlePaymentIntentSucceeded(Event stripeEvent, string rawPayload, CancellationToken cancellationToken)
     {
         var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
         if (paymentIntent == null)
@@ -167,15 +168,33 @@ public class HandleConnectWebhookHandler(
             return;
         }
 
-        // Get the connected account ID: from event (connected account events) or from transfer_data (platform events)
+        Console.WriteLine("stripEvent");
+        Console.WriteLine(stripeEvent);
+
+
+        // Connected account ID: from event root (connected-account events) or from data.object.transfer_data.destination (platform events)
         var connectedAccountId = stripeEvent.Account;
-        if (string.IsNullOrEmpty(connectedAccountId) && paymentIntent.TransferData?.Destination != null)
+        // var connectedAccountId =  paymentIntent.TransferData?.Destination
+        if (string.IsNullOrEmpty(connectedAccountId) && !string.IsNullOrEmpty(rawPayload))
         {
-            var destinationAccount = paymentIntent.TransferData.Destination;
-            connectedAccountId = destinationAccount?.Id;
-            logger.LogInformation(
-                "Platform event: using connected account from transfer_data.destination: {AccountId}",
-                connectedAccountId);
+            try
+            {
+                using var doc = JsonDocument.Parse(rawPayload);
+                var destination = doc.RootElement
+                    .GetProperty("data").GetProperty("object")
+                    .GetProperty("transfer_data").GetProperty("destination");
+                if (destination.ValueKind == JsonValueKind.String)
+                {
+                    connectedAccountId = destination.GetString();
+                    logger.LogInformation(
+                        "Platform event: connected account from transfer_data.destination: {AccountId}",
+                        connectedAccountId);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogDebug(ex, "Could not parse transfer_data.destination from payload");
+            }
         }
         if (string.IsNullOrEmpty(connectedAccountId))
         {
