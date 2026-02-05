@@ -7,6 +7,7 @@ public interface IStripePaymentService
         Guid restaurantId,
         string restaurantStripeAccountId,
         decimal totalAmount,
+        string currency,
         string customerEmail,
         string? paymentMethodId = null,
         CancellationToken cancellationToken = default);

@@ -44,7 +44,12 @@ public class CreateCheckoutSessionHandler(
         var totalAmountCents = (long)(order.TotalAmount * 100);
         var platformFeeCents = (long)(platformFeeAmount * 100);
 
-        var currency = "usd"; // TODO: use restaurant currency
+        // Stripe expects lowercase ISO 4217 currency codes (e.g. "nok", "usd")
+        var currency = restaurant.Currency.ToString().ToLowerInvariant();
+        if (currency == "unspecified")
+        {
+            currency = "nok";
+        }
 
         // Set API key
         var stripeKey = configuration["Stripe:Connect:SecretKey"] ?? configuration["Stripe:SecretKey"];

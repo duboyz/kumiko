@@ -11,6 +11,7 @@ public class StripePaymentService(
         Guid restaurantId,
         string restaurantStripeAccountId,
         decimal totalAmount,
+        string currency,
         string customerEmail,
         string? paymentMethodId = null,
         CancellationToken cancellationToken = default)
@@ -36,11 +37,13 @@ public class StripePaymentService(
             var restaurantAmountCents = totalAmountCents - platformFeeCents; // Amount restaurant receives
 
             // For Standard accounts, we use direct charges with application fee
+            // Stripe expects lowercase ISO 4217 (e.g. "nok", "usd")
+            var currencyLower = string.IsNullOrWhiteSpace(currency) ? "usd" : currency.ToLowerInvariant();
             var paymentIntentService = new PaymentIntentService();
             var paymentIntentOptions = new PaymentIntentCreateOptions
             {
                 Amount = totalAmountCents,
-                Currency = "usd", // TODO: Get from restaurant currency setting
+                Currency = currencyLower,
                 ApplicationFeeAmount = platformFeeCents, // Stripe routes fee to platform balance automatically
                 AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
                 {
