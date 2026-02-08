@@ -3,6 +3,7 @@ using BackendApi.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackendApi.Features.Order.CreateOrder;
 
@@ -19,6 +20,7 @@ public class CreateOrderController : BaseAuthenticatedController
 
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("CreateOrder")]
     public async Task<ActionResult<ApiResponse<CreateOrderResult>>> CreateOrder([FromBody] CreateOrderRequest request)
     {
         // Parse pickup time from string to TimeSpan

@@ -1,3 +1,4 @@
+import axios from 'axios'
 import client from './client'
 import {
   CreateOrderCommand,
@@ -14,9 +15,16 @@ import { ApiResponse, ResponseData } from '../types/apiResponse.types'
 
 export const orderApi = {
   createOrder: async (data: CreateOrderCommand): Promise<ResponseData<CreateOrderResult>> => {
-    const { data: response } = await client.post<ApiResponse<CreateOrderResult>>('/api/orders', data)
-    if (!response.success || !response.data) throw new Error(response.message || 'Failed to create order')
-    return response.data
+    try {
+      const { data: response } = await client.post<ApiResponse<CreateOrderResult>>('/api/orders', data)
+      if (!response.success || !response.data) throw new Error(response.message || 'Failed to create order')
+      return response.data
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 429) {
+        throw new Error('Too many orders. Please wait a minute and try again.')
+      }
+      throw err
+    }
   },
 
   getRestaurantOrders: async (restaurantId: string): Promise<ResponseData<OrderDto[]>> => {

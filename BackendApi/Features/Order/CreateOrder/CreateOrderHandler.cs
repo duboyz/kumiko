@@ -80,6 +80,23 @@ public class CreateOrderHandler(
             }
         }
 
+        // Prevent duplicate/rapid orders: same restaurant + email + pickup within last 2 minutes
+        var emailNormalized = customerEmail.Trim().ToLowerInvariant();
+        var cooldownSince = DateTime.UtcNow.AddMinutes(-2);
+        var pickupDateStart = request.PickupDate.Date;
+        var pickupDateEnd = pickupDateStart.AddDays(1);
+        var recentDuplicate = await context.Orders
+            .AnyAsync(o =>
+                o.RestaurantId == request.RestaurantId
+                && o.CustomerEmail.Trim().ToLower() == emailNormalized
+                && o.PickupDate >= pickupDateStart && o.PickupDate < pickupDateEnd
+                && o.PickupTime == request.PickupTime
+                && o.CreatedAt >= cooldownSince, cancellationToken);
+        if (recentDuplicate)
+        {
+            throw new ArgumentException("A very similar order was just placed. Please wait a moment before placing another.");
+        }
+
         // Calculate total amount first (before creating order)
         decimal totalAmount = 0;
         foreach (var itemDto in request.OrderItems)
