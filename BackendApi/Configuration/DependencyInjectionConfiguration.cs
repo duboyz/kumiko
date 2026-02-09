@@ -33,6 +33,7 @@ public static class DependencyInjectionConfiguration
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IStripePaymentService, StripePaymentService>();
         services.AddSingleton<IExpoNotificationService, ExpoNotificationService>();
+        services.AddSingleton<ICameraSessionService, CameraSessionService>();
 
         // Hosted Services
         services.AddHostedService<StripePriceSyncService>();

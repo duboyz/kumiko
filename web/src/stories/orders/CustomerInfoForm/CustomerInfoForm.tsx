@@ -160,7 +160,7 @@ export function CustomerInfoForm({
         )}
       </div>
 
-      <div>
+      <div id="pickupTimeSection">
         <Label className="text-sm sm:text-base mb-3 sm:mb-4 block">
           {t('pickupTime')} {t('requiredField')}
         </Label>

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
@@ -17,15 +18,18 @@ public static class SwaggerConfiguration
                 Description = "API for the Kumiko restaurant management system"
             });
 
-            // Add file upload operation filter
-            c.OperationFilter<FileUploadOperationFilter>();
-
-            // Disable body consumption inference for multipart forms
+            // Map IFormFile to binary schema BEFORE operation filter (so Swagger doesn't try to generate it)
             c.MapType<IFormFile>(() => new OpenApiSchema
             {
                 Type = "string",
                 Format = "binary"
             });
+
+            // Add parameter filter to handle IFormFile parameters before operation filter
+            c.ParameterFilter<FormFileParameterFilter>();
+
+            // Add file upload operation filter (handles multipart/form-data request body)
+            c.OperationFilter<FileUploadOperationFilter>();
 
             // Include XML comments if available
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

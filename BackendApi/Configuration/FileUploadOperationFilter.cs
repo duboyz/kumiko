@@ -16,13 +16,13 @@ public class FileUploadOperationFilter : IOperationFilter
 
         if (!hasFormFileParameter) return;
 
-        // Clear existing parameters for form data
-        var parametersToRemove = operation.Parameters
+        // Clear existing parameters for form data (but keep route/query parameters)
+        var formParametersToRemove = operation.Parameters
             .Where(p => context.ApiDescription.ParameterDescriptions
                 .Any(pd => pd.Name == p.Name && pd.Source?.Id == "Form"))
             .ToList();
 
-        foreach (var param in parametersToRemove)
+        foreach (var param in formParametersToRemove)
         {
             operation.Parameters.Remove(param);
         }
