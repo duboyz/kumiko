@@ -4,9 +4,13 @@ import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ArrowRight, ArrowLeft, X, Plus, Trash2, Upload, Camera } from 'lucide-react'
 import { gsap } from 'gsap'
 import { cn } from '@/lib/utils'
+import { isMobileDevice } from '@/lib/device-detection'
+import QRCode from 'qrcode'
+import axios from 'axios'
 
 export interface MenuImage {
   id: string
@@ -24,9 +28,17 @@ interface MultiImageUploadStepProps {
 export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }: MultiImageUploadStepProps) {
   const [images, setImages] = useState<MenuImage[]>([])
   const [isAnimating, setIsAnimating] = useState(false)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null)
+  const [showQrDialog, setShowQrDialog] = useState(false)
+  const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null)
+  const [sessionExpired, setSessionExpired] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const imagesGridRef = useRef<HTMLDivElement>(null)
   const uploadAreaRef = useRef<HTMLDivElement>(null)
+  const fetchedImageIdsRef = useRef<Set<string>>(new Set())
+
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5158'
 
   // Animate container entrance
   useEffect(() => {
@@ -63,6 +75,75 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
       }
     }
   }, [images.length])
+
+  // Poll for new images from session
+  useEffect(() => {
+    if (sessionId && showQrDialog) {
+      const interval = setInterval(async () => {
+        try {
+          const response = await axios.get(`${API_BASE_URL}/api/camera-session/${sessionId}/images`)
+          const sessionImages = response.data.data.images as Array<{
+            id: string
+            mimeType: string
+            fileName: string
+            uploadedAt: string
+          }>
+
+          for (const sessionImage of sessionImages) {
+            if (!fetchedImageIdsRef.current.has(sessionImage.id)) {
+              fetchedImageIdsRef.current.add(sessionImage.id)
+
+              // Fetch the image blob
+              const imageResponse = await fetch(`${API_BASE_URL}/api/camera-session/${sessionId}/images/${sessionImage.id}`)
+              const blob = await imageResponse.blob()
+
+              // Convert blob to File
+              const file = new File([blob], sessionImage.fileName, { type: sessionImage.mimeType })
+              const preview = URL.createObjectURL(blob)
+
+              const newImage: MenuImage = {
+                id: sessionImage.id,
+                file,
+                preview,
+                name: sessionImage.fileName,
+              }
+
+              setImages(prev => [...prev, newImage])
+            }
+          }
+        } catch (error) {
+          // 404 = session not found (e.g. backend restarted, in-memory session lost) – stop polling
+          if (axios.isAxiosError(error) && error.response?.status === 404) {
+            clearInterval(interval)
+            setPollingInterval(null)
+            setShowQrDialog(false)
+            setSessionId(null)
+            setSessionExpired(true)
+          } else {
+            console.error('Error polling for images:', error)
+          }
+        }
+      }, 2000) // Poll every 2 seconds
+
+      setPollingInterval(interval)
+
+      return () => {
+        clearInterval(interval)
+      }
+    } else if (pollingInterval) {
+      clearInterval(pollingInterval)
+      setPollingInterval(null)
+    }
+  }, [sessionId, showQrDialog, API_BASE_URL])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval)
+      }
+    }
+  }, [pollingInterval])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -106,8 +187,55 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
     fileInputRef.current?.click()
   }
 
-  const handleCameraClick = () => {
-    // cameraInputRef.current?.click()
+  const handleCameraClick = async () => {
+    const isMobile = isMobileDevice()
+
+    if (isMobile) {
+      // On mobile, use the camera input directly
+      cameraInputRef.current?.click()
+    } else {
+      // On desktop, create a session and show QR code
+      try {
+        setSessionExpired(false)
+        const response = await axios.post(`${API_BASE_URL}/api/camera-session/create`)
+        const newSessionId = response.data.data.sessionId
+
+        setSessionId(newSessionId)
+
+        // QR points to phone-accessible URL; ?api= tells the camera page which backend to upload to.
+        const isDev = process.env.NODE_ENV !== 'production'
+        let frontendOrigin: string
+        let apiUrlForPhone: string
+
+        if (isDev) {
+          // Dev: use LAN IP so phone on same Wi‑Fi can reach the app (frontend + backend).
+          const phoneHost = '192.168.186.232'
+          const phonePort = '3000'
+          const isOnPhoneHost = typeof window !== 'undefined' && window.location.hostname === phoneHost
+          frontendOrigin = isOnPhoneHost ? window.location.origin : `http://${phoneHost}:${phonePort}`
+          apiUrlForPhone = `http://${phoneHost}:5158`
+        } else {
+          // Prod: use env URLs so QR points to production frontend and backend.
+          frontendOrigin =
+            process.env.NEXT_PUBLIC_APP_URL ||
+            (typeof window !== 'undefined' ? window.location.origin : '')
+          apiUrlForPhone = process.env.NEXT_PUBLIC_API_URL || API_BASE_URL
+        }
+
+        const cameraUrl = `${frontendOrigin}/camera/${newSessionId}?api=${encodeURIComponent(apiUrlForPhone)}`
+
+        const qrDataUrl = await QRCode.toDataURL(cameraUrl, {
+          width: 400,
+          margin: 2,
+        });
+
+        setQrCodeUrl(qrDataUrl)
+        setShowQrDialog(true)
+      } catch (error) {
+        console.error('Failed to create session:', error)
+        alert('Failed to create camera session. Please try again.')
+      }
+    }
   }
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,6 +286,15 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
 
   const handleContinue = () => {
     if (images.length > 0) {
+      // Stop polling if active
+      if (pollingInterval) {
+        clearInterval(pollingInterval)
+        setPollingInterval(null)
+      }
+      if (showQrDialog) {
+        setShowQrDialog(false)
+      }
+
       // Animate the continue button
       const continueBtn = document.querySelector('[data-continue-btn]')
       if (continueBtn) {
@@ -271,18 +408,20 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
                 </div>
                 <CardTitle className="text-xl">Take a Picture</CardTitle>
                 <CardDescription className="text-base mt-2">
-                  Use your device camera to capture menu photos and let AI automatically extract menu items
+                  {isMobileDevice()
+                    ? 'Use your device camera to capture menu photos and let AI automatically extract menu items'
+                    : 'Scan QR code with your phone to take photos that sync to your desktop'}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-0.5">•</span>
-                    <span>Capture menu with your camera</span>
+                    <span>{isMobileDevice() ? 'Capture menu with your camera' : 'Scan QR code with your phone'}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-0.5">•</span>
-                    <span>Works on mobile and desktop</span>
+                    <span>{isMobileDevice() ? 'Works on mobile and desktop' : 'Photos sync automatically'}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-0.5">•</span>
@@ -313,14 +452,46 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
         </div>
       )}
 
+      {/* QR Code Dialog */}
+      <Dialog open={showQrDialog} onOpenChange={setShowQrDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Scan QR Code with Your Phone</DialogTitle>
+            <DialogDescription>
+              Scan with your phone, take menu photos—they’ll appear here. You can close this and open it again to add
+              more.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            {qrCodeUrl && (
+              <div className="p-4 bg-white rounded-lg">
+                <img src={qrCodeUrl} alt="QR Code" className="w-64 h-64" />
+              </div>
+            )}
+            <p className="text-sm text-muted-foreground text-center">
+              Photos you take will appear here automatically. You can take multiple photos.
+            </p>
+            <Button variant="outline" onClick={() => setShowQrDialog(false)}>
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Images Grid */}
       {images.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="secondary" className="text-sm">
                 {images.length} image{images.length !== 1 ? 's' : ''} uploaded
               </Badge>
+              {sessionExpired && (
+                <span className="text-xs text-muted-foreground">Session expired. Start a new camera session to add more from phone.</span>
+              )}
+              {sessionId && !showQrDialog && !sessionExpired && (
+                <span className="text-xs text-muted-foreground">You can add more from your phone.</span>
+              )}
               {images.length > 1 && (
                 <Button
                   variant="ghost"
@@ -333,25 +504,42 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
                 </Button>
               )}
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const input = document.createElement('input')
-                input.type = 'file'
-                input.accept = 'image/*,image/heic'
-                input.multiple = true
-                input.onchange = e => {
-                  const files = Array.from((e.target as HTMLInputElement).files || [])
-                  if (files.length > 0) handleFilesSelect(files)
-                }
-                input.click()
-              }}
-              className="flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Add more
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (sessionExpired || !sessionId) {
+                    handleCameraClick()
+                  } else {
+                    setShowQrDialog(true)
+                  }
+                }}
+                className="flex items-center gap-2"
+              >
+                <Camera className="w-4 h-4" />
+                {sessionExpired ? 'Start camera session' : 'Add from phone'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const input = document.createElement('input')
+                  input.type = 'file'
+                  input.accept = 'image/*,image/heic'
+                  input.multiple = true
+                  input.onchange = e => {
+                    const files = Array.from((e.target as HTMLInputElement).files || [])
+                    if (files.length > 0) handleFilesSelect(files)
+                  }
+                  input.click()
+                }}
+                className="flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add files
+              </Button>
+            </div>
           </div>
 
           <div ref={imagesGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -386,25 +574,43 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
               </div>
               <div>
                 <h4 className="text-sm font-medium mb-1">Add More Images</h4>
-                <p className="text-xs text-muted-foreground mb-3">Drag and drop more images here, or click to browse</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const input = document.createElement('input')
-                    input.type = 'file'
-                    input.accept = 'image/*,image/heic'
-                    input.multiple = true
-                    input.onchange = e => {
-                      const files = Array.from((e.target as HTMLInputElement).files || [])
-                      if (files.length > 0) handleFilesSelect(files)
-                    }
-                    input.click()
-                  }}
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Choose Files
-                </Button>
+                <p className="text-xs text-muted-foreground mb-3">Add from your phone or choose files from your device</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (sessionExpired || !sessionId) {
+                        handleCameraClick()
+                      } else {
+                        setShowQrDialog(true)
+                      }
+                    }}
+                    className="flex items-center gap-1"
+                  >
+                    <Camera className="w-4 h-4" />
+                    {sessionExpired ? 'Start camera session' : 'Add from phone'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const input = document.createElement('input')
+                      input.type = 'file'
+                      input.accept = 'image/*,image/heic'
+                      input.multiple = true
+                      input.onchange = e => {
+                        const files = Array.from((e.target as HTMLInputElement).files || [])
+                        if (files.length > 0) handleFilesSelect(files)
+                      }
+                      input.click()
+                    }}
+                    className="flex items-center gap-1"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Choose Files
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

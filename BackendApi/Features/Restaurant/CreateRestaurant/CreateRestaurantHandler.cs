@@ -22,10 +22,10 @@ public class CreateRestaurantHandler(
 
         // Check subscription limits
         var canCreate = await subscriptionService.CanCreateRestaurantAsync(userId, cancellationToken);
-        if (!canCreate)
-        {
-            throw new Exception("You have reached the maximum number of locations for your subscription plan. Please upgrade to create more locations.");
-        }
+        // if (!canCreate)
+        // {
+        //     throw new Exception("You have reached the maximum number of locations for your subscription plan. Please upgrade to create more locations.");
+        // }
 
         // BusinessHours should already be parsed from SearchBusinessHandler
         // Just use it as-is

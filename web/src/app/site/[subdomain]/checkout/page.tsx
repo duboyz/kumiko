@@ -240,6 +240,21 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [minDate]) // Only depend on minDate to avoid loops
 
+  // When "Want it now!" is selected but form didn't get minDate/minTime yet (e.g. data loaded late),
+  // or when persisted cart has a stale time (e.g. 12:00) that's before today's earliest slot,
+  // set pickup date/time so validation and submit work.
+  useEffect(() => {
+    if (checkoutStep !== 'info' || !minDate || !minTime) return
+    const needsAsapSync =
+      !customerInfo.pickupTime ||
+      (customerInfo.pickupDate === minDate && customerInfo.pickupTime < minTime)
+    if (needsAsapSync) {
+      setCustomerInfo('pickupDate', minDate)
+      setCustomerInfo('pickupTime', minTime)
+      setSelectedDate(minDate)
+    }
+  }, [checkoutStep, minDate, minTime, customerInfo.pickupTime, customerInfo.pickupDate, setCustomerInfo])
+
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
 
   const handleCustomerInfoChange = (field: keyof typeof customerInfo, value: string) => {
@@ -324,7 +339,7 @@ export default function CheckoutPage() {
           phone: 'customerPhone',
           email: 'customerEmail',
           pickupDate: 'pickupDate',
-          pickupTime: 'pickupTime',
+          pickupTime: 'pickupTimeSection', // section containing "Want it now!" when time picker is hidden
         }
         const elementId = fieldIdMap[firstErrorField] || firstErrorField
         // Use setTimeout to ensure DOM is updated with error messages

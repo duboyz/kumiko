@@ -44,6 +44,7 @@ const publicRoutes = [
   '/privacy',
   '/terms',
   '/faq',
+  '/camera', // QR-scanned camera page for menu import (no auth required)
 ]
 
 // Define the JWT secret (should match backend)
