@@ -32,6 +32,7 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null)
   const [showQrDialog, setShowQrDialog] = useState(false)
   const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null)
+  const [sessionExpired, setSessionExpired] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const imagesGridRef = useRef<HTMLDivElement>(null)
   const uploadAreaRef = useRef<HTMLDivElement>(null)
@@ -116,6 +117,8 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
             clearInterval(interval)
             setPollingInterval(null)
             setShowQrDialog(false)
+            setSessionId(null)
+            setSessionExpired(true)
           } else {
             console.error('Error polling for images:', error)
           }
@@ -193,19 +196,21 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
     } else {
       // On desktop, create a session and show QR code
       try {
+        setSessionExpired(false)
         const response = await axios.post(`${API_BASE_URL}/api/camera-session/create`)
         const newSessionId = response.data.data.sessionId
 
         setSessionId(newSessionId)
 
         // QR points to phone-accessible URL; ?api= tells the camera page which backend to upload to.
+        // Use current origin when already on the LAN host so the port matches (e.g. 3000 or 3003).
+        // const phoneHost = '192.168.186.232'
         const phoneHost = '192.168.186.232'
-        const phonePort = '3003'
-        const apiUrlForPhone = `http://${phoneHost}:5158` // Backend on same IP, port 5158
-        const cameraUrl = `http://${phoneHost}:${phonePort}/camera/${newSessionId}?api=${encodeURIComponent(apiUrlForPhone)}`
-        
-        console.log('QR Code URL:', cameraUrl)
-        console.log('Backend API URL for phone:', apiUrlForPhone)
+        const phonePort = '3000'
+        const isOnPhoneHost = typeof window !== 'undefined' && window.location.hostname === phoneHost
+        const frontendOrigin = isOnPhoneHost ? window.location.origin : `http://${phoneHost}:${phonePort}`
+        const apiUrlForPhone = `http://${phoneHost}:5158`
+        const cameraUrl = `${frontendOrigin}/camera/${newSessionId}?api=${encodeURIComponent(apiUrlForPhone)}`
 
         const qrDataUrl = await QRCode.toDataURL(cameraUrl, {
           width: 400,
@@ -441,7 +446,8 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
           <DialogHeader>
             <DialogTitle>Scan QR Code with Your Phone</DialogTitle>
             <DialogDescription>
-              Open your phone's camera app and scan this QR code to take photos that will appear on your desktop.
+              Scan with your phone, take menu photos—they’ll appear here. You can close this and open it again to add
+              more.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
@@ -463,11 +469,17 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
       {/* Images Grid */}
       {images.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="secondary" className="text-sm">
                 {images.length} image{images.length !== 1 ? 's' : ''} uploaded
               </Badge>
+              {sessionExpired && (
+                <span className="text-xs text-muted-foreground">Session expired. Start a new camera session to add more from phone.</span>
+              )}
+              {sessionId && !showQrDialog && !sessionExpired && (
+                <span className="text-xs text-muted-foreground">You can add more from your phone.</span>
+              )}
               {images.length > 1 && (
                 <Button
                   variant="ghost"
@@ -480,25 +492,42 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
                 </Button>
               )}
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const input = document.createElement('input')
-                input.type = 'file'
-                input.accept = 'image/*,image/heic'
-                input.multiple = true
-                input.onchange = e => {
-                  const files = Array.from((e.target as HTMLInputElement).files || [])
-                  if (files.length > 0) handleFilesSelect(files)
-                }
-                input.click()
-              }}
-              className="flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Add more
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (sessionExpired || !sessionId) {
+                    handleCameraClick()
+                  } else {
+                    setShowQrDialog(true)
+                  }
+                }}
+                className="flex items-center gap-2"
+              >
+                <Camera className="w-4 h-4" />
+                {sessionExpired ? 'Start camera session' : 'Add from phone'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const input = document.createElement('input')
+                  input.type = 'file'
+                  input.accept = 'image/*,image/heic'
+                  input.multiple = true
+                  input.onchange = e => {
+                    const files = Array.from((e.target as HTMLInputElement).files || [])
+                    if (files.length > 0) handleFilesSelect(files)
+                  }
+                  input.click()
+                }}
+                className="flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add files
+              </Button>
+            </div>
           </div>
 
           <div ref={imagesGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -533,25 +562,43 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
               </div>
               <div>
                 <h4 className="text-sm font-medium mb-1">Add More Images</h4>
-                <p className="text-xs text-muted-foreground mb-3">Drag and drop more images here, or click to browse</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const input = document.createElement('input')
-                    input.type = 'file'
-                    input.accept = 'image/*,image/heic'
-                    input.multiple = true
-                    input.onchange = e => {
-                      const files = Array.from((e.target as HTMLInputElement).files || [])
-                      if (files.length > 0) handleFilesSelect(files)
-                    }
-                    input.click()
-                  }}
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Choose Files
-                </Button>
+                <p className="text-xs text-muted-foreground mb-3">Add from your phone or choose files from your device</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (sessionExpired || !sessionId) {
+                        handleCameraClick()
+                      } else {
+                        setShowQrDialog(true)
+                      }
+                    }}
+                    className="flex items-center gap-1"
+                  >
+                    <Camera className="w-4 h-4" />
+                    {sessionExpired ? 'Start camera session' : 'Add from phone'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const input = document.createElement('input')
+                      input.type = 'file'
+                      input.accept = 'image/*,image/heic'
+                      input.multiple = true
+                      input.onchange = e => {
+                        const files = Array.from((e.target as HTMLInputElement).files || [])
+                        if (files.length > 0) handleFilesSelect(files)
+                      }
+                      input.click()
+                    }}
+                    className="flex items-center gap-1"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Choose Files
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

@@ -1,7 +1,14 @@
+using System.Text.RegularExpressions;
+
 namespace BackendApi.Configuration;
 
 public static class CorsConfiguration
 {
+    // *.localhost with any port (e.g. hoggorm.localhost:3001, foo.localhost:3002)
+    private static readonly Regex LocalhostSubdomainOrigin = new(@"^https?://[^/]+\.localhost:\d+$");
+    // LAN IPs for phone/device testing (e.g. http://192.168.1.5:3000)
+    private static readonly Regex LanOrigin = new(@"^https?://(\d{1,3}\.){3}\d{1,3}(:\d+)?$");
+
     public static IServiceCollection AddCorsConfiguration(this IServiceCollection services)
     {
         services.AddCors(options =>
@@ -15,8 +22,12 @@ public static class CorsConfiguration
                     if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:"))
                         return true;
 
-                    // Allow localhost subdomains with port 3000
-                    if (origin.StartsWith("http://") && (origin.EndsWith(".localhost:3000") || origin.EndsWith(".localhost:3003")))
+                    // Allow *.localhost with any port (3000, 3001, 3002, ...)
+                    if (LocalhostSubdomainOrigin.IsMatch(origin))
+                        return true;
+
+                    // Allow LAN IPs (e.g. phone at 192.168.1.x:3000 for camera session upload)
+                    if (!string.IsNullOrEmpty(origin) && LanOrigin.IsMatch(origin))
                         return true;
 
                     // Allow specific production domains
@@ -53,8 +64,12 @@ public static class CorsConfiguration
                     if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:"))
                         return true;
 
-                    // Allow localhost subdomains
-                    if (origin.StartsWith("http://") && (origin.EndsWith(".localhost:3000") || origin.EndsWith(".localhost:3003") || origin.EndsWith(".localhost:3004")))
+                    // Allow *.localhost with any port (3000, 3001, 3002, ...)
+                    if (LocalhostSubdomainOrigin.IsMatch(origin))
+                        return true;
+
+                    // Allow LAN IPs (e.g. phone testing)
+                    if (!string.IsNullOrEmpty(origin) && LanOrigin.IsMatch(origin))
                         return true;
 
                     // Allow specific production domains

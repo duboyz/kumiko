@@ -1,31 +1,33 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useState, useRef, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Camera, Upload, Check, X } from 'lucide-react'
+import { Camera, Upload, Check } from 'lucide-react'
+
+const DEFAULT_API_URL = 'http://localhost:5158'
 
 export default function CameraPage() {
   const params = useParams()
-  const searchParams = useSearchParams()
   const sessionId = params.sessionId as string
+  const [apiBaseUrl, setApiBaseUrl] = useState(DEFAULT_API_URL)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [uploadCount, setUploadCount] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
 
-  // When opened via QR from desktop, ?api= points to backend the phone can reach (same host as frontend).
-  // This way you don't need NEXT_PUBLIC_API_URL=LAN_IP for the whole app (which breaks auth/onboarding).
-  const API_BASE_URL =
-    searchParams.get('api') ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5158'
+  // Read ?api= from URL on the client only (avoids useSearchParams which can hang on mobile)
+  useEffect(() => {
+    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+    const api = params.get('api')
+    if (api) setApiBaseUrl(api)
+    else if (process.env.NEXT_PUBLIC_API_URL) setApiBaseUrl(process.env.NEXT_PUBLIC_API_URL)
+  }, [])
 
-  // Debug: log the API URL being used (helpful for troubleshooting)
-  if (typeof window !== 'undefined') {
-    console.log('Camera page API_BASE_URL:', API_BASE_URL)
-    console.log('API param from URL:', searchParams.get('api'))
-  }
+  const API_BASE_URL = apiBaseUrl
 
   const handleFileSelect = (file: File) => {
     const reader = new FileReader()
@@ -66,7 +68,6 @@ export default function CameraPage() {
     setUploadSuccess(false)
 
     try {
-      // Convert data URL to blob
       const response = await fetch(capturedImage)
       const blob = await response.blob()
 
@@ -74,11 +75,9 @@ export default function CameraPage() {
       formData.append('image', blob, 'camera-image.jpg')
 
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 20_000) // 20s timeout so request doesn't hang
+      const timeoutId = setTimeout(() => controller.abort(), 20_000)
 
       const uploadUrl = `${API_BASE_URL}/api/camera-session/${sessionId}/upload`
-      console.log('Uploading to:', uploadUrl)
-
       const uploadRes = await fetch(uploadUrl, {
         method: 'POST',
         body: formData,
@@ -93,13 +92,9 @@ export default function CameraPage() {
       }
 
       setUploadSuccess(true)
-      setTimeout(() => {
-        setCapturedImage(null)
-        setUploadSuccess(false)
-      }, 2000)
+      setUploadCount(c => c + 1)
     } catch (error: unknown) {
       console.error('Upload failed:', error)
-      console.error('Attempted URL:', `${API_BASE_URL}/api/camera-session/${sessionId}/upload`)
       const msg = error instanceof Error ? error.message : String(error)
       const isAborted = error instanceof Error && error.name === 'AbortError'
       const isNetwork =
@@ -121,6 +116,11 @@ export default function CameraPage() {
     } finally {
       setIsUploading(false)
     }
+  }
+
+  const resetCapture = () => {
+    setCapturedImage(null)
+    setUploadSuccess(false)
   }
 
   return (
@@ -158,23 +158,33 @@ export default function CameraPage() {
                 <img src={capturedImage} alt="Captured" className="w-full h-full object-contain" />
               </div>
               {uploadSuccess ? (
-                <div className="flex items-center justify-center gap-2 text-green-600">
-                  <Check className="w-5 h-5" />
-                  <span>Uploaded successfully!</span>
+                <div className="space-y-4">
+                  <div className="flex flex-col items-center gap-2 text-green-600">
+                    <Check className="w-8 h-8" />
+                    <span className="font-medium">Uploaded!</span>
+                    {uploadCount > 0 && (
+                      <span className="text-sm text-muted-foreground">
+                        {uploadCount} photo{uploadCount !== 1 ? 's' : ''} sent to your computer
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Button onClick={resetCapture} className="w-full">
+                      <Camera className="w-4 h-4 mr-2" />
+                      Take another photo
+                    </Button>
+                    <Button variant="outline" onClick={resetCapture} className="w-full">
+                      Done
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex gap-2">
                   <Button onClick={handleUpload} disabled={isUploading} className="flex-1">
                     {isUploading ? 'Uploading...' : 'Upload'}
                   </Button>
-                  <Button
-                    onClick={() => {
-                      setCapturedImage(null)
-                      setUploadSuccess(false)
-                    }}
-                    variant="outline"
-                  >
-                    <X className="w-4 h-4" />
+                  <Button onClick={resetCapture} variant="outline">
+                    Cancel
                   </Button>
                 </div>
               )}
