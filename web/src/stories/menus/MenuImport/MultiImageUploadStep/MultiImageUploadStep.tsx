@@ -203,13 +203,25 @@ export function MultiImageUploadStep({ onImagesSelect, onBack, onBuildManually }
         setSessionId(newSessionId)
 
         // QR points to phone-accessible URL; ?api= tells the camera page which backend to upload to.
-        // Use current origin when already on the LAN host so the port matches (e.g. 3000 or 3003).
-        // const phoneHost = '192.168.186.232'
-        const phoneHost = '192.168.186.232'
-        const phonePort = '3000'
-        const isOnPhoneHost = typeof window !== 'undefined' && window.location.hostname === phoneHost
-        const frontendOrigin = isOnPhoneHost ? window.location.origin : `http://${phoneHost}:${phonePort}`
-        const apiUrlForPhone = `http://${phoneHost}:5158`
+        const isDev = process.env.NODE_ENV !== 'production'
+        let frontendOrigin: string
+        let apiUrlForPhone: string
+
+        if (isDev) {
+          // Dev: use LAN IP so phone on same Wi‑Fi can reach the app (frontend + backend).
+          const phoneHost = '192.168.186.232'
+          const phonePort = '3000'
+          const isOnPhoneHost = typeof window !== 'undefined' && window.location.hostname === phoneHost
+          frontendOrigin = isOnPhoneHost ? window.location.origin : `http://${phoneHost}:${phonePort}`
+          apiUrlForPhone = `http://${phoneHost}:5158`
+        } else {
+          // Prod: use env URLs so QR points to production frontend and backend.
+          frontendOrigin =
+            process.env.NEXT_PUBLIC_APP_URL ||
+            (typeof window !== 'undefined' ? window.location.origin : '')
+          apiUrlForPhone = process.env.NEXT_PUBLIC_API_URL || API_BASE_URL
+        }
+
         const cameraUrl = `${frontendOrigin}/camera/${newSessionId}?api=${encodeURIComponent(apiUrlForPhone)}`
 
         const qrDataUrl = await QRCode.toDataURL(cameraUrl, {
